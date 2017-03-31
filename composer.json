@@ -34,8 +34,8 @@
         "phpgangsta/googleauthenticator": "dev-master",
         "pear/net_ldap2": "^2.2",
         "pear/log": "^1.13",
-        "pear/config": "dev-master",
-        "pear/db": "dev-master"
+        "pear/config": "dev-trunk",
+        "pear/db": "dev-trunk"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.0",

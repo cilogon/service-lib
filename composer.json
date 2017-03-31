@@ -1,0 +1,49 @@
+{
+    "name": "cilogon/service-lib",
+    "description": "Library used by the CILogon Service",
+    "license": "NCSA",
+    "authors": [
+        {
+            "name": "Terry Fleury",
+            "email": "tfleury@cilogon.org",
+            "homepage": "http://www.cilogon.org"
+        }
+    ],
+    "keywords": [
+        "authentication",
+        "authorization",
+        "cilogon"
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pear/Config"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/pear/DB"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "league/oauth2-google": "^2.0",
+        "league/oauth2-github": "^2.0",
+        "duosecurity/duo_php": "dev-master",
+        "endroid/qrcode": "^1.9",
+        "phpgangsta/googleauthenticator": "dev-master",
+        "pear/net_ldap2": "^2.2",
+        "pear/log": "^1.13",
+        "pear/config": "dev-master",
+        "pear/db": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.0",
+        "mockery/mockery": "~0.9",
+        "squizlabs/php_codesniffer": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CILogon\\": "src/"
+        }
+    }
+}

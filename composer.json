@@ -24,6 +24,7 @@
             "url": "https://github.com/pear/DB"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.6.0",
         "league/oauth2-google": "^2.0",

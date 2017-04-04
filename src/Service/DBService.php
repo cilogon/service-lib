@@ -410,8 +410,8 @@ class DBService
                 $arg = func_get_arg($i);
                 if (strlen($arg) > 0) {
                     $cmd .= '&' . $params[$i] . '=';
-                    // Convert first_name and last_name to UTF-7
-                    if (($i == 3) || ($i == 4)) {
+                    // Convert idp_display_name, first_name, last_name to UTF-7
+                    if (($i == 2) || ($i == 3) || ($i == 4)) {
                         $cmd .= urlencode(iconv('UTF-8', 'UTF-7', $arg));
                     } else {
                         $cmd .= urlencode($arg);

@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/cilogon/service-lib/badge.svg?branch=master)](https://coveralls.io/github/cilogon/service-lib?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cilogon/service-lib/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cilogon/service-lib/?branch=master)
 
-This package contains the library for the [CILogon Service](https://github.com/cilogon/service).
+This package contains the library used by the [CILogon Service](https://github.com/cilogon/service).
 
 This package is compliant with [PSR-1][], [PSR-2][] and [PSR-4][]. If you notice compliance oversights, please send
 a patch via pull request.

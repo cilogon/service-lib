@@ -423,7 +423,8 @@ class DBService
             $idp = func_get_arg(1);
             $idp_display_name = func_get_arg(2);
             if ((Util::getIdpList()->isRegisteredByInCommon($idp)) ||
-                ($idp_display_name == 'Google')) {
+                ($idp_display_name == 'Google') ||
+                ($idp_display_name == 'GitHub')) {
                 $us_idp = 1;
             }
             $cmd .= "&us_idp=$us_idp";

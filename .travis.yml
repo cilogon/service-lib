@@ -17,6 +17,7 @@ before_script:
 script:
   - mkdir -p build/logs
   - ./vendor/bin/phpcs --standard=psr2 src/
+  - ./vendor/bin/atoum --test-all
   - ./vendor/bin/phpunit --coverage-clover build/logs/coverage.clover
 
 after_success:

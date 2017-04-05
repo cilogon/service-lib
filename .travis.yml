@@ -6,6 +6,9 @@ php:
   - 7.1
   - hhvm
 
+before_install:
+  - echo "extension=ldap.so" >>php --ini | grep "Loaded Configuration" | sed -e "s|.:\s||"``
+
 before_script:
   - travis_retry composer self-update
   - travis_retry composer install --no-interaction --prefer-source --dev

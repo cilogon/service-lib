@@ -12,13 +12,11 @@ before_script:
   - travis_retry composer self-update
   - travis_retry composer install --no-interaction --prefer-source --dev
   - travis_retry composer require satooshi/php-coveralls --dev
-  - travis_retry composer require atoum/atoum
   - travis_retry phpenv rehash
 
 script:
   - mkdir -p build/logs
   - ./vendor/bin/phpcs --standard=psr2 src/
-  - ./vendor/bin/atoum --test-all
   - ./vendor/bin/phpunit --coverage-clover build/logs/coverage.clover
 
 after_success:

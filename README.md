@@ -1,6 +1,6 @@
 # Library for the CILogon Service
 
-[![License](https://img.shields.io/badge/license-NCSA-brightgreen.svg)](https://github.com/cilogon/oauth2-cilogon/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-NCSA-brightgreen.svg)](https://github.com/cilogon/service-lib/master/LICENSE)
 [![Travis](https://img.shields.io/travis/cilogon/service-lib/master.svg)](https://travis-ci.org/cilogon/service-lib)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/cilogon/service-lib/master.svg)](https://scrutinizer-ci.com/g/cilogon/service-lib/)
 [![Coveralls](https://img.shields.io/coveralls/cilogon/service-lib/master.svg)](https://coveralls.io/github/cilogon/service-lib?branch=master)
@@ -32,4 +32,4 @@ composer require cilogon/service-lib
 
 ## License
 
-The University of Illinois/NCSA Open Source License (NCSA). Please see [License File](https://github.com/cilogon/oauth2-cilogon/blob/master/LICENSE) for more information.
+The University of Illinois/NCSA Open Source License (NCSA). Please see [License File](https://github.com/cilogon/service-lib/blob/master/LICENSE) for more information.

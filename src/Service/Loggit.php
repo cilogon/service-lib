@@ -42,7 +42,6 @@ class Loggit
      *        'mail'. Defaults to 'syslog'.
      * @param string $email (Optional) The destination email address if
      *        $logtype is 'mail'. Defaults to 'help@cilogon.org'.
-     * @return Loggit A new Loggit object
      */
     public function __construct($logtype = 'syslog', $email = 'help@cilogon.org')
     {

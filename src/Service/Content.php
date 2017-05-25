@@ -242,7 +242,6 @@ class Content
      */
     public static function printWAYF($showremember = true, $incommonidps = false)
     {
-        $whiteidpsfile = '/var/www/html/include/whiteidps.txt';
         $helptext = 'Check this box to bypass the welcome page on ' .
             'subsequent visits and proceed directly to the selected ' .
             'identity provider. You will need to clear your browser\'s ' .
@@ -1097,7 +1096,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
      * appear inline with other information.  This is accomplished via the
      * use of wrapping the image in a <span> tag.
      *
-     * @param string $icon: The prefix of the '...Icon.png' image to be
+     * @param string $icon The prefix of the '...Icon.png' image to be
      *        shown. E.g., to show 'errorIcon.png', pass in 'error'.
      * @param string $popuptext (Optionals) The popup 'title' text to be
      *        displayed when the  mouse cursor hovers over the icon.
@@ -1348,6 +1347,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             Util::setSessionVar('responsesubmit', $responsesubmit);
             $csrf = Util::getCsrf();
             $csrf->setCookieAndSession();
+            $extraparams = arary();
             $extraparams['state'] = $csrf->getTokenValue();
 
             // To bypass SSO at IdP, check for session var 'forceauthn' == 1
@@ -2343,7 +2343,7 @@ IdPs for the skin.'
      * IdPs based on the skin's whitelist/blacklist and the global
      * blacklist file. For the TestIdP page, the list is all InCommon IdPs.
      *
-     * @param bool $incommon idps (Optional) Show all InCommon IdPs in
+     * @param bool $incommonidps (Optional) Show all InCommon IdPs in
      *        selection list? Defaults to false, which means show only
      *        whitelisted IdPs.
      */
@@ -2411,7 +2411,7 @@ IdPs for the skin.'
      * @param string $ePPN
      * @param string $ePTID
      * @param string $firstname
-     * @param string $lastname,
+     * @param string $lastname
      * @param string $displayname
      * @param string $emailaddr
      * @param string $idp

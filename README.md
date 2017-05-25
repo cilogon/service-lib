@@ -1,8 +1,9 @@
 # Library for the CILogon Service
 
-[![Build Status](https://travis-ci.org/cilogon/service-lib.svg?branch=master)](https://travis-ci.org/cilogon/service-lib)
-[![Coverage Status](https://coveralls.io/repos/github/cilogon/service-lib/badge.svg?branch=master)](https://coveralls.io/github/cilogon/service-lib?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cilogon/service-lib/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cilogon/service-lib/?branch=master)
+[![License](https://img.shields.io/badge/license-NCSA-brightgreen.svg)](https://github.com/cilogon/oauth2-cilogon/blob/master/LICENSE)
+[![Travis](https://img.shields.io/travis/cilogon/service-lib/master.svg)](https://travis-ci.org/cilogon/service-lib)
+[![Scrutinizer](https://img.shields.io/scrutinizer/g/cilogon/service-lib/master.svg)](https://scrutinizer-ci.com/g/cilogon/service-lib/)
+[![Coveralls](https://img.shields.io/coveralls/cilogon/service-lib/master.svg)](https://coveralls.io/github/cilogon/service-lib?branch=master)
 
 This package contains the library used by the [CILogon Service](https://github.com/cilogon/service).
 

@@ -224,7 +224,7 @@ class DBService
     public $two_factor;
 
     /**
-     * @var string $idp_uids IdPs stored in the 'values' of the array
+     * @var array $idp_uids IdPs stored in the 'values' of the array
      */
     public $idp_uids;
 
@@ -244,7 +244,7 @@ class DBService
     public $client_home_uri;
 
     /**
-     * @var string $client_callback_uris An array of OAuth 2.0 callback URLs
+     * @var array $client_callback_uris An array of OAuth 2.0 callback URLs
      */
     public $client_callback_uris;
 
@@ -261,7 +261,6 @@ class DBService
      *
      * @param string $serviceurl (Optional) The URL of the database service
      *        servlet
-     * @return DBService A new DBService object
      */
     public function __construct($serviceurl = self::DEFAULTDBSERVICEURL)
     {
@@ -383,7 +382,7 @@ class DBService
      * appropriately.  If the servlet returns correctly (i.e. an HTTP
      * status code of 200), this method returns true.
      *
-     * @param string $params,... Variable number of parameters: 1, or more.
+     * @param mixed $args Variable number of parameters: 1, or more.
      *        For 1 parameter : $uid (database user identifier)
      *        For more than 1 parameter, parameters can include:
      *            $remote_user, $idp, $idp_display_name,
@@ -392,22 +391,22 @@ class DBService
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
-    public function getUser()
+    public function getUser(...$args)
     {
         $retval = false;
         $this->clearUser();
         $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
-        $numargs = func_num_args();
+        $numargs = count($args);
         if ($numargs == 1) {
             $retval = $this->call('action=getUser&user_uid=' .
-                urlencode(func_get_arg(0)));
+                urlencode($args[0]));
         } elseif ($numargs > 1) {
             $params = array('remote_user','idp','idp_display_name',
                             'first_name','last_name','display_name','email',
                             'eppn','eptid','open_id','oidc','affiliation','ou');
             $cmd = 'action=getUser';
             for ($i = 0; $i < $numargs; $i++) {
-                $arg = func_get_arg($i);
+                $arg = $args[$i];
                 if (strlen($arg) > 0) {
                     $cmd .= '&' . $params[$i] . '=';
                     // Convert idp_display_name, first_name, last_name to UTF-7
@@ -420,8 +419,8 @@ class DBService
             }
             // Add 'us_idp' parameter for InCommon/Google (1) or eduGAIN (0)
             $us_idp = 0;
-            $idp = func_get_arg(1);
-            $idp_display_name = func_get_arg(2);
+            $idp = $args[1];
+            $idp_display_name = $args[2];
             if ((Util::getIdpList()->isRegisteredByInCommon($idp)) ||
                 ($idp_display_name == 'Google') ||
                 ($idp_display_name == 'GitHub')) {
@@ -737,7 +736,7 @@ class DBService
                 if ($httpcode == 200) {
                     $success = true;
                     if (preg_match('/status=([^\r\n]+)/', $output, $match)) {
-                        $this->status = urldecode($match[1]);
+                        $this->status = (int)(urldecode($match[1]));
                     }
                     if (preg_match('/user_uid=([^\r\n]+)/', $output, $match)) {
                         $this->user_uid = urldecode($match[1]);

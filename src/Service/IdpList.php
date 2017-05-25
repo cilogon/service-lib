@@ -99,7 +99,7 @@ class IdpList
     protected $idpdom = null;
 
     /**
-     * @var array $idparray An array version of $idpdom. It is used
+     * @var mixed $idparray An array version of $idpdom. It is used
      * primarily since searching an array is faster than xpath query.
      */
     protected $idparray = null;
@@ -133,7 +133,6 @@ class IdpList
      *         exist? Defaults to true.
      * @param string $filetype (Optional) The type of file to read/write,
      *        one of 'xml' or 'json'. Defaults to 'json'.
-     * @return IdpList A new IdpList object.
      */
     public function __construct(
         $idpfilename = self::DEFAULTIDPFILENAME,
@@ -324,8 +323,8 @@ class IdpList
      * It also adds elements to the internal $idparray, thus creating
      * the internal idparray at the same time as the idpdom.
      *
-     * @param DOMDocument $dom A DOMDocument object
-     * @param DOMElement $idpnode A pointer to a parent <idp> DOMElement
+     * @param \DOMDocument $dom A DOMDocument object
+     * @param \DOMElement $idpnode A pointer to a parent <idp> DOMElement
      * @param string $nodename The name of the new child node DOMElement
      * @param string $nodevalue The value of the new child node DOMElement
      */
@@ -594,7 +593,6 @@ EOT;
                     }
 
                     // Check for assurance-certification = silver, bronze, or SIRTFI
-                    $sirtfiadded = false;
                     $xp = $sxe->xpath(
                         "Extensions/mdattr:EntityAttributes/" .
                         "saml:Attribute[@Name='" .
@@ -609,7 +607,6 @@ EOT;
                                 $this->addNode($dom, $idp, 'Bronze', '1');
                             } elseif ($value == 'https://refeds.org/sirtfi') {
                                 $this->addNode($dom, $idp, 'SIRTFI', '1');
-                                $sirtfiadded = true;
                             }
                         }
                     }

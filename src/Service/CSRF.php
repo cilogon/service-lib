@@ -75,7 +75,6 @@ class CSRF
      *
      * @param string $tokenname (Optional) The 'name' of the csrf
      *        token. Defaults to 'CSRF'.
-     * @return CSRF A new csrf object
      */
     public function __construct($tokenname = self::DEFAULTTOKENNAME)
     {

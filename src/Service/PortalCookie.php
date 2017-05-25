@@ -52,8 +52,6 @@ class PortalCookie
      *
      * Default constructor.  This reads the current portal cookie into
      * the class $portalarray arary.
-     *
-     * @return PortalCookie  A new PortalCookie object.
      */
     public function __construct()
     {

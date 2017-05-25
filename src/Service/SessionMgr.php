@@ -56,7 +56,7 @@ class SessionMgr
     protected $db = null;
 
     /**
-     * @var int $crc Session data cache id
+     * @var string $crc Session data cache id
      */
     protected $crc = null;
 
@@ -66,8 +66,6 @@ class SessionMgr
      * Default constructor.  This method calls
      * session_set_save_handler() with the methods in this class as
      * parameters.
-     *
-     * @return SessionMgr A new SessionMgr object.
      */
     public function __construct()
     {

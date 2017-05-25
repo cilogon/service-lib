@@ -11,15 +11,14 @@ before_install:
 before_script:
   - travis_retry composer self-update
   - travis_retry composer install --no-interaction --prefer-source --dev
-  - travis_retry composer require satooshi/php-coveralls --dev
   - travis_retry phpenv rehash
 
 script:
   - mkdir -p build/logs
-  - ./vendor/bin/phpcs --standard=psr2 src/
-  - ./vendor/bin/phpunit --coverage-clover build/logs/coverage.clover
+  - ./vendor/bin/parallel-lint src test
+  - ./vendor/bin/phpunit --coverage-text
+  - ./vendor/bin/phpcs --standard=psr2 -sp src
 
 after_success:
-  - travis_retry php vendor/bin/coveralls -v
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover build/logs/coverage.clover
+  - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+  - php coveralls.phar

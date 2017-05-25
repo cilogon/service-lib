@@ -32,7 +32,6 @@ class OAuth2Provider
      * with getAuthorizationUrl()).
      *
      * @param string $idp The Identity Provider to use for OAuth2 connection.
-     * @return OAuth2Provider A new OAuth2Provider for the given IdP.
      */
     public function __construct($idp)
     {

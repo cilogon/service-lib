@@ -125,7 +125,6 @@ class DBProps
     {
         $retval = null;
 
-        $db = new DB();
         $dsn = array(
             'phptype'  => $this->dbtype,
             'username' => $this->getUsername(),

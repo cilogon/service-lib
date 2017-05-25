@@ -29,9 +29,8 @@ class DuoConfig
     /**
      * __construct
      *
-     * Default constructor. This method
-     *
-     * @return DuoConfig A new DuoConfig object
+     * Default constructor. This method reads in the configuration values
+     * needed for the Duo connection.
      */
     public function __construct()
     {
@@ -57,7 +56,7 @@ class DuoConfig
      * @param string $method An HTTP method, either 'get' or 'post'
      * @param string $endpoint The endpoint of the REST API method, e.g.,
      *        '/rest/v1/ping'
-     * @param array $params An array of parameters to be passed to the
+     * @param mixed $params An array of parameters to be passed to the
      *        REST API method. Pass 'false' if no parameters
      *        are needed by the given REST API method.
      * @return string A SHA1 HMAC signature of the parameters as needed
@@ -88,7 +87,7 @@ class DuoConfig
      * @param string $method An HTTP method, either 'get' or 'post'
      * @param string $endpoint The endpoint of the REST API method, e.g.,
      *        '/rest/v1/ping'
-     * @param array $params (Optional) An array of parameters to be passed
+     * @param mixed $params (Optional) An array of parameters to be passed
      *        to the REST API method. Defaults to 'false', which
      *        means no parameters are needed by the given
      *        REST API method.

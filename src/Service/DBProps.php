@@ -125,6 +125,7 @@ class DBProps
     {
         $retval = null;
 
+        $db = new DB(); // So defined constants get read in
         $dsn = array(
             'phptype'  => $this->dbtype,
             'username' => $this->getUsername(),

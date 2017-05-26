@@ -422,7 +422,7 @@ class DBService
             $idp = $args[1];
             $idp_display_name = $args[2];
             if ((Util::getIdpList()->isRegisteredByInCommon($idp)) ||
-                (in_array($idp_display_name, ['Google', 'GitHub', 'ORCID']))) {
+                (in_array($idp_display_name, Util::$oauth2idps))) {
                 $us_idp = 1;
             }
             $cmd .= "&us_idp=$us_idp";

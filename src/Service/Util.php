@@ -55,6 +55,11 @@ class Util
      */
     public static $skin = null;
 
+    /**
+     * @var array $oauth2idps An array of OAuth2 Identity Providers.
+     */
+    public static $oauth2idps = ['Google', 'GitHub', 'ORCID'];
+
 
     /**
      * getIdPList

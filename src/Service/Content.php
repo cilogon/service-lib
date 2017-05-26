@@ -943,8 +943,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 Util::setCookieVar('providerId', $providerId);
             }
             $providerName = Util::getAuthzIdP($providerId);
-            if (in_array($providerName, ['Google' , 'GitHub', 'ORCID'])) {
-                // Log in with Google, GitHub, or ORCID
+            if (in_array($providerName, Util::$oauth2idps)) {
+                // Log in with an OAuth2 IdP
                 static::redirectToGetOAuth2User($providerId);
             } else { // Use InCommon authn
                 static::redirectToGetShibUser($providerId);
@@ -1072,8 +1072,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
                 $providerName = Util::getAuthzIdP($providerId);
-                if (in_array($providerName, ['Google', 'GitHub', 'ORCID'])) {
-                    // Log in with Google, GitHub, or ORCID
+                if (in_array($providerName, Util::$oauth2idps)) {
+                    // Log in with an OAuth2 IdP
                     static::redirectToGetOAuth2User($providerId);
                 } elseif (Util::getIdpList()->exists($providerId)) {
                     // Log in with InCommon
@@ -1487,7 +1487,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             ';
 
             if ($status == DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) {
-                // Check if the problem IdP was Google: probably no first/last name
+                // Check if the problem IdP was an OAuth2 IdP; 
+                // probably no first/last name
                 if ($idpname == 'Google') {
                     static::printErrorBox('
                     <p>
@@ -2401,13 +2402,13 @@ IdPs for the skin.'
         $idplist = Util::getIdpList();
         if ($incommonidps) { // Get all InCommon IdPs only
             $retarray = $idplist->getInCommonIdPs();
-        } else { // Get the whitelisted InCommon IdPs, plus maybe Google/GitHub/ORCID
+        } else { // Get the whitelisted InCommon IdPs, plus maybe OAuth2 IdPs
             $retarray = $idplist->getWhitelistedIdPs();
 
-            // Add Google, GitHub, and ORCID to the list
-            $retarray[Util::getAuthzUrl('Google')] = 'Google';
-            $retarray[Util::getAuthzUrl('GitHub')] = 'GitHub';
-            $retarray[Util::getAuthzUrl('ORCID')]  = 'ORCID';
+            // Add all OAuth2 IdPs to the list
+            foreach (Util::$oauth2idps as $key => $value) {
+                $retarray[Util::getAuthzUrl($key)] = $key;
+            }
 
             // Check to see if the skin's config.xml has a whitelist of IDPs.
             // If so, go thru master IdP list and keep only those IdPs in the
@@ -2673,11 +2674,11 @@ IdPs for the skin.'
             }
         }
 
-        // First, make sure $idp was set and is not Google/GitHub/ORCID.
+        // First, make sure $idp was set and is not an OAuth2 IdP.
         $idplist = Util::getIdpList();
         if (((strlen($idp) > 0) &&
             (strlen($idpname) > 0) &&
-            (!in_array($idpname, ['Google', 'GitHub', 'ORCID']))) &&
+            (!in_array($idpname, Util::$oauth2idps))) &&
                 (
                 // Next, check for eduGAIN without REFEDS R&S and SIRTFI
                 ((!$idplist->isRegisteredByInCommon($idp)) &&

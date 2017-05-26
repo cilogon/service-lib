@@ -1359,7 +1359,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             Util::setSessionVar('responsesubmit', $responsesubmit);
             $csrf = Util::getCsrf();
             $csrf->setCookieAndSession();
-            $extraparams = arary();
+            $extraparams = array();
             $extraparams['state'] = $csrf->getTokenValue();
 
             // To bypass SSO at IdP, check for session var 'forceauthn' == 1

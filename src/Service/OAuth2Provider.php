@@ -61,7 +61,7 @@ class OAuth2Provider
         } elseif ($idp == 'orcid') {
             $client_id     = Util::getConfigVar('orcidoauth2.clientid');
             $client_secret = Util::getConfigVar('orcidoauth2.clientsecret');
-            $classname     = 'League\OAuth2\Client\Provider\ORCID';
+            $classname     = 'CILogon\OAuth2\Client\Provider\ORCID';
         }
 
         if ((strlen($client_id) > 0) && (strlen($client_secret) > 0)) {

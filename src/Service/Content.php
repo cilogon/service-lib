@@ -1487,7 +1487,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             ';
 
             if ($status == DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) {
-                // Check if the problem IdP was an OAuth2 IdP; 
+                // Check if the problem IdP was an OAuth2 IdP;
                 // probably no first/last name
                 if ($idpname == 'Google') {
                     static::printErrorBox('

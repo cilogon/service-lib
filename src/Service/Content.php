@@ -2407,7 +2407,7 @@ IdPs for the skin.'
 
             // Add all OAuth2 IdPs to the list
             foreach (Util::$oauth2idps as $key => $value) {
-                $retarray[Util::getAuthzUrl($key)] = $key;
+                $retarray[Util::getAuthzUrl($value)] = $value;
             }
 
             // Check to see if the skin's config.xml has a whitelist of IDPs.

@@ -5,6 +5,7 @@ namespace CILogon\Service;
 use CILogon\Service\Util;
 use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Google;
+use CILogon\OAuth2\Client\Provider\ORCID;
 
 /**
  * OAuth2Provider
@@ -57,6 +58,10 @@ class OAuth2Provider
             $client_secret = Util::getConfigVar('githuboauth2.clientsecret');
             $classname     = 'League\OAuth2\Client\Provider\Github';
             $this->authzUrlOpts = [ 'scope' => ['user:email'] ];
+        } elseif ($idp == 'orcid') {
+            $client_id     = Util::getConfigVar('orcidoauth2.clientid');
+            $client_secret = Util::getConfigVar('orcidoauth2.clientsecret');
+            $classname     = 'League\OAuth2\Client\Provider\ORCID';
         }
 
         if ((strlen($client_id) > 0) && (strlen($client_secret) > 0)) {

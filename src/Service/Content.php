@@ -475,6 +475,18 @@ class Content
                   </p>
                   ';
                 }
+                $orcidauthz = Util::getAuthzUrl('ORCID');
+                if ((isset($idps[$orcidauthz])) &&
+                    ($skin->idpAvailable($orcidauthz))) {
+                    echo '
+                  <p>
+                  If you have a <a target="_blank"
+                  href="https://orcid.org/my-orcid">ORCID</a>
+                  account, you can select it for
+                  authenticating to the CILogon Service.
+                  </p>
+                  ';
+                }
             }
 
             echo '
@@ -931,8 +943,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 Util::setCookieVar('providerId', $providerId);
             }
             $providerName = Util::getAuthzIdP($providerId);
-            if (in_array($providerName, [ 'Google' , 'GitHub' ])) {
-                // Log in with Google or GitHub
+            if (in_array($providerName, ['Google' , 'GitHub', 'ORCID'])) {
+                // Log in with Google, GitHub, or ORCID
                 static::redirectToGetOAuth2User($providerId);
             } else { // Use InCommon authn
                 static::redirectToGetShibUser($providerId);
@@ -1060,8 +1072,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
                 $providerName = Util::getAuthzIdP($providerId);
-                if (in_array($providerName, [ 'Google', 'GitHub' ])) {
-                    // Log in with Google or GitHub
+                if (in_array($providerName, ['Google', 'GitHub', 'ORCID'])) {
+                    // Log in with Google, GitHub, or ORCID
                     static::redirectToGetOAuth2User($providerId);
                 } elseif (Util::getIdpList()->exists($providerId)) {
                     // Log in with InCommon
@@ -1484,8 +1496,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                     name or email address was missing. To rectify this problem,
                     go to the <a target="_blank"
                     href="https://myaccount.google.com/privacy#personalinfo">Google
-                    Account Personal Information page</a>, and enter your First
-                    Name, Last Name, and email address. (All other Google
+                    Account Personal Information page</a>, and enter your first
+                    name, last name, and email address. (All other Google
                     account information is not required by the CILogon Service.)
                     </p>
                     <p>
@@ -1518,7 +1530,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                     name or email address was missing. To rectify this problem,
                     go to the <a target="_blank"
                     href="https://github.com/settings/profile">GitHub
-                    Public Profile page</a>, and enter your Name and email address.
+                    Public Profile page</a>, and enter your name and email address.
                     (All other GitHub account information is not required by
                     the CILogon Service.)
                     </p>
@@ -1538,6 +1550,41 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                     <p class="centered">
                     <input type="hidden" name="providerId" value="' ,
                     Util::getAuthzUrl('GitHub') , '" /> ' , $redirectform , '
+                    <input type="submit" name="submit" class="submit"
+                    value="Proceed" />
+                    </p>
+                    </form>
+                    </div>
+                    ';
+                } elseif ($idpname == 'ORCID') {
+                    static::printErrorBox('
+                    <p>
+                    There was a problem logging on. It appears that you have
+                    attempted to use ORCID as your identity provider, but your
+                    name or email address was missing. To rectify this problem,
+                    go to your <a target="_blank"
+                    href="https://orcid.org/my-orcid">ORCID
+                    Profile page</a>, enter your name and email address, and
+                    make sure they can be viewed by Everyone.
+                    (All other ORCID account information is not required by
+                    the CILogon Service.)
+                    </p>
+                    <p>
+                    After you have updated your ORCID account profile, click
+                    the "Proceed" button below and attempt to log on
+                    with your ORCID account again. If you have any questions,
+                    please contact us at the email address at the bottom of the
+                    page.</p>
+                    ');
+
+                    echo '
+                    <div>
+                    ';
+                    static::printFormHead($redirect, 'get');
+                    echo '
+                    <p class="centered">
+                    <input type="hidden" name="providerId" value="' ,
+                    Util::getAuthzUrl('ORCID') , '" /> ' , $redirectform , '
                     <input type="submit" name="submit" class="submit"
                     value="Proceed" />
                     </p>
@@ -2354,12 +2401,13 @@ IdPs for the skin.'
         $idplist = Util::getIdpList();
         if ($incommonidps) { // Get all InCommon IdPs only
             $retarray = $idplist->getInCommonIdPs();
-        } else { // Get the whitelisted InCommon IdPs, plus maybe Google/GitHub
+        } else { // Get the whitelisted InCommon IdPs, plus maybe Google/GitHub/ORCID
             $retarray = $idplist->getWhitelistedIdPs();
 
-            // Add Google and GitHub to the list
+            // Add Google, GitHub, and ORCID to the list
             $retarray[Util::getAuthzUrl('Google')] = 'Google';
             $retarray[Util::getAuthzUrl('GitHub')] = 'GitHub';
+            $retarray[Util::getAuthzUrl('ORCID')]  = 'ORCID';
 
             // Check to see if the skin's config.xml has a whitelist of IDPs.
             // If so, go thru master IdP list and keep only those IdPs in the
@@ -2625,11 +2673,11 @@ IdPs for the skin.'
             }
         }
 
-        // First, make sure $idp was set and is not Google/GitHub.
+        // First, make sure $idp was set and is not Google/GitHub/ORCID.
         $idplist = Util::getIdpList();
         if (((strlen($idp) > 0) &&
             (strlen($idpname) > 0) &&
-            (!in_array($idpname, ['Google', 'GitHub']))) &&
+            (!in_array($idpname, ['Google', 'GitHub', 'ORCID']))) &&
                 (
                 // Next, check for eduGAIN without REFEDS R&S and SIRTFI
                 ((!$idplist->isRegisteredByInCommon($idp)) &&

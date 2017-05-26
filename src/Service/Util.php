@@ -801,6 +801,7 @@ Remote Address= ' . $remoteaddr . '
         $idptourl = array(
             'Google' => 'https://accounts.google.com/o/oauth2/auth',
             'GitHub' => 'https://github.com/login/oauth/authorize',
+            'ORCID'  => 'https://orcid.org/oauth/authorize',
         );
         if (array_key_exists($idp, $idptourl)) {
             $url = $idptourl[$idp];
@@ -823,6 +824,7 @@ Remote Address= ' . $remoteaddr . '
         $urltoidp = array(
             'https://accounts.google.com/o/oauth2/auth' => 'Google',
             'https://github.com/login/oauth/authorize'  => 'GitHub',
+            'https://orcid.org/oauth/authorize'         => 'ORCID',
         );
         if (array_key_exists($url, $urltoidp)) {
             $idp = $urltoidp[$url];

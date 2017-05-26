@@ -29,6 +29,7 @@
         "php": ">=5.6.0",
         "league/oauth2-google": "^2.0",
         "league/oauth2-github": "^2.0",
+        "cilogon/oauth2-orcid": "^1.0",
         "duosecurity/duo_php": "dev-master",
         "endroid/qrcode": "^1.9",
         "phpgangsta/googleauthenticator": "dev-master",

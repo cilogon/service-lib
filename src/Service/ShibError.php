@@ -167,7 +167,8 @@ class ShibError
         </p>
         ';
 
-        $forceauthn = Content::$skin->getConfigOption('forceauthn');
+        $skin = Util::getSkin();
+        $forceauthn = $skin->getConfigOption('forceauthn');
         if ((!is_null($forceauthn)) && ((int)$forceauthn == 1)) {
             $erroroutput .= '
             <p>

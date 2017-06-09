@@ -144,8 +144,8 @@ class Skin
         $skinvar = '';
 
         // Check for matching IdP or callbackURI in the forceskin.txt file
-        $uristocheck = array(Util::getSessionVar('idp'),
-                             Util::getSessionVar('callbackuri'));
+        $uristocheck = array(Util::getSessionVar('callbackuri'),
+                             Util::getSessionVar('idp'));
         foreach ($uristocheck as $value) {
             if (strlen($value) > 0) {
                 $skin = $this->getForceSkin($value);

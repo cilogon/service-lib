@@ -472,7 +472,7 @@ EOT;
 
                     // CIL-367 Prefer <OrganizationDisplayName>
                     $xp = $idx[0]->xpath(
-                        "Organization/OrganizationDisplayName[@xml:lang='en']"
+                        "Organization/OrganizationDisplayName[starts-with(@xml:lang,'en')]"
                     );
                     if (($xp !== false) && (count($xp) > 0)) {
                         $this->addNode(
@@ -485,7 +485,7 @@ EOT;
                         // If we didn't find the OrganizationDisplayName,
                         // look for mdui:DisplayName instead
                         $xp = $sxe->xpath(
-                            "IDPSSODescriptor/Extensions/mdui:UIInfo/mdui:DisplayName[@xml:lang='en']"
+                            "IDPSSODescriptor/Extensions/mdui:UIInfo/mdui:DisplayName[starts-with(@xml:lang,'en')]"
                         );
                         if (($xp !== false) && (count($xp) > 0)) {
                             $this->addNode(

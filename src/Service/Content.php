@@ -2429,13 +2429,6 @@ IdPs for the skin.'
                     unset($retarray[(string)$blackidp]);
                 }
             }
-
-            // Check the global blacklist.txt file and remove any IdPs listed
-            $globalblacklistfile = '/var/www/html/include/blacklist.txt';
-            $globalblackidps = Util::readArrayFromFile($globalblacklistfile);
-            foreach (array_keys($globalblackidps) as $blackidp) {
-                unset($retarray[(string)$blackidp]);
-            }
         }
 
         // Fix for CIL-174 - As suggested by Keith Hazelton, replace commas and

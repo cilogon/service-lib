@@ -408,7 +408,7 @@ EOT;
                     "/ancestor::EntityDescriptor"
                 );
 
-                // CIL-401 - Read in the global blacklist.txt file. 
+                // CIL-401 - Read in the global blacklist.txt file.
                 // Don't add a <Whitelsited> tag for IdPs in this file.
                 $blackidps = Util::readArrayFromFile(
                     '/var/www/html/include/blacklist.txt'
@@ -666,7 +666,7 @@ EOT;
                         }
                     }
 
-                    // Add a <Whitelisted> block for all IdPs 
+                    // Add a <Whitelisted> block for all IdPs
                     // not in the blacklist.txt file.
                     if (!array_key_exists($entityID, $blackidps)) {
                         $this->addNode($dom, $idp, 'Whitelisted', '1');

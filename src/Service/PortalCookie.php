@@ -112,10 +112,10 @@ class PortalCookie
                 $this->set('ut', time()); // Save update time
                 $serial = serialize($this->portalarray);
                 // Special check: If the serialization of the cookie is
-                // more than 3000 bytes, the resulting base64 encoded string
+                // more than 2500 bytes, the resulting base64 encoded string
                 // may be too big (>4K). So scan through all portal entries
                 // and delete the oldest one until the size is small enough.
-                while (strlen($serial) > 3000) {
+                while (strlen($serial) > 2500) {
                     $smallvalue = 5000000000; // Unix time = Jun 11, 2128
                     $smallportal = '';
                     foreach ($this->portalarray as $k => $v) {

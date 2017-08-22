@@ -2374,6 +2374,7 @@ IdPs for the skin.'
             "poloc.ncsa.illinois.edu"        => "test.cilogon.org" ,
             "polot.ncsa.illinois.edu"        => "test.cilogon.org" ,
             "polo-staging.ncsa.illinois.edu" => "test.cilogon.org" ,
+            "polod.ncsa.illinois.edu"        => "dev.cilogon.org" ,
         );
         $localhost = php_uname('n');
         if (array_key_exists($localhost, $hostnames)) {

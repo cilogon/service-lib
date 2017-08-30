@@ -72,12 +72,9 @@ class ShibError
      * passed as parameters to the 'redirectErrors' handler URL, i.e.
      * in the $_GET global variable.
      *
-     * @param string|null $redirectUrl In case of Shibboleth error, redirect
-     *        to this URL. If null, then print out error to user.
-     *
      * @return ShibError A new ShibError object.
      */
-    public function __construct($redirectUrl = null)
+    public function __construct()
     {
         $this->errorarray = array();
         foreach (static::$errorparams as $param) {
@@ -101,8 +98,6 @@ class ShibError
                     $responseurl,
                     false
                 );
-            } elseif (!is_null($redirectUrl)) {
-                header('Location: ' . $redirectUrl);
             } else {
                 $this->printError();
             }

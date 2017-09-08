@@ -98,6 +98,14 @@ class ShibError
                     $responseurl,
                     false
                 );
+            // CIL-410 Temporary fix for /secure/testidp Shibboleth error.
+            // Check for error and redirect to /testidp .
+            } elseif (($this->errorarray['errorType'] == 'shibsp::ConfigurationException') &&
+                ($this->errorarray['errorText'] ==
+                    'None of the configured SessionInitiators handled the request.') &&
+                (preg_match('%/secure/testidp%', $this->errorarray['requestURL']))
+                ) {
+                header('Location: https://' . Util::getDN() . '/testidp/');
             } else {
                 $this->printError();
             }

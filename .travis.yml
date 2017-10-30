@@ -24,5 +24,5 @@ script:
   - ./vendor/bin/phpcs --standard=psr2 -sp src
 
 after_success:
-  - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+  - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.2/coveralls.phar
   - php coveralls.phar

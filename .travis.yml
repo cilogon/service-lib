@@ -5,12 +5,16 @@ php:
   - 7.0
   - 7.1
 
+env:
+  global:
+    secure: "NYLCLqWLpzufMyKJKsUn2m2Jmk7yW5o4z4joKXJnMvNYLDoIaBxIABGN9dlIJKnUehiFFgX+JiJEyLlQyt2/G4DvPgFtpzXiZ+Gv4zqM8LVhh35k49YKs/Pf2lODzsvKOIlfO9ZPvg8z+6Ep425sPW1Rd9KflRaSQrrZguqhKyDJfBMA8fQuGQcjfHov+IoilPOKywYpJlWLa6xX1SG3dNdpyVPX2XAvHJM3BWqoGqmBfFSH6x1oIMsNxBxgnoct8ZZT6hQLjdsicE4wZ/707dD/BuOYLx2J1Na4YSJ/3JpcAgbDHr/Jwnu4KOdn8xfaySqDYLNNv4cbOlgXpv+nx4SbF0TcAoj0uPILIxWLKPJ9F7IyA5k4IXVDpOIENDAblc37Pl/Keh3IZrWKHd0FVvUE09IIGF62ysHrEtjHkU92SGHa12K91puuXon4HO8FfCNkxRhgxLYvQNJgdef1TZV6+3dkxGwFXb4Q38qzkQtvF9QTRZkVmOBAFyDVqsopUt5mcAL7Y/We8CSMXMGyzqp6DvRYcJ/doYdB1I4H7B03lQBRsd+JlYveha8uAHCTYPFqBq0BhskNGaUUjhX7y6TV11bQ9HAVGmr4B3zuxuU15pEVxUuKHSM3jx/jHJzD6oVVgDSgbKEQePbdu58uM/KMAly4ymarB7jkGSaRG68="
+
 before_install:
-  - echo "extension=ldap.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - travis_retry composer config --global github-oauth.github.com "$GITHUB_TOKEN"
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source --dev
+  - travis_retry composer install --no-interaction --prefer-source
   - travis_retry phpenv rehash
 
 script:

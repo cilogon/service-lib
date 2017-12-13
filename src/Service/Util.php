@@ -888,39 +888,17 @@ Remote Address= ' . $remoteaddr . '
 
         // Save the passed-in variables to the session for later use
         // (e.g., by the error handler in handleGotUser).
-        if (strlen($firstname) > 0) {
-            static::setSessionVar('firstname', $firstname);
-        }
-        if (strlen($lastname) > 0) {
-            static::setSessionVar('lastname', $lastname);
-        }
-        if (strlen($displayname) > 0) {
-            static::setSessionVar('displayname', $displayname);
-        }
-        if (strlen($emailaddr) > 0) {
-            static::setSessionvar('emailaddr', $emailaddr);
-        }
-        if (strlen($loa) > 0) {
-            static::setSessionVar('loa', $loa);
-        }
-        if (strlen($eppn) > 0) {
-            static::setSessionVar('ePPN', $eppn);
-        }
-        if (strlen($eptid) > 0) {
-            static::setSessionVar('ePTID', $eptid);
-        }
-        if (strlen($openidid) > 0) {
-            static::setSessionVar('openidID', $openidid);
-        }
-        if (strlen($oidcid) > 0) {
-            static::setSessionVar('oidcID', $oidcid);
-        }
-        if (strlen($affiliation) > 0) {
-            static::setSessionVar('affiliation', $affiliation);
-        }
-        if (strlen($ou) > 0) {
-            static::setSessionVar('ou', $ou);
-        }
+        static::setSessionVar('firstname', $firstname);
+        static::setSessionVar('lastname', $lastname);
+        static::setSessionVar('displayname', $displayname);
+        static::setSessionvar('emailaddr', $emailaddr);
+        static::setSessionVar('loa', $loa);
+        static::setSessionVar('ePPN', $eppn);
+        static::setSessionVar('ePTID', $eptid);
+        static::setSessionVar('openidID', $openidid);
+        static::setSessionVar('oidcID', $oidcid);
+        static::setSessionVar('affiliation', $affiliation);
+        static::setSessionVar('ou', $ou);
         static::setSessionVar('idp', $providerId); // Enable error message
         static::setSessionVar('idpname', $providerName); // Enable check for Google
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
@@ -1064,6 +1042,7 @@ Remote Address= ' . $remoteaddr . '
                     $mailto
                 );
             }
+            static::unsetSessionVar('authntime');
         } else { // status is okay, set authntime
             static::setSessionVar('authntime', time());
         }

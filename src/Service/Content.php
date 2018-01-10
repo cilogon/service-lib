@@ -1023,6 +1023,31 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             $redirect_uri = $clientparams['redirect_uri'];
         }
 
+        // CIL-431 - If the OAuth2/OIDC $redirect_uri is set, then check for
+        // a match in the 'bypass.txt' file to see if we should
+        // automatically redirect to a specific IdP. Used mainly by campus
+        // gateways.
+        if (strlen($redirect_uri) > 0) {
+            $bypassidp = '';
+            $bypassarray = Util::readArrayFromFile(
+                Util::getServerVar('DOCUMENT_ROOT') . '/include/bypass.txt'
+            );
+            foreach ($bypassarray as $key => $value) {
+                if (preg_match($key, $redirect_uri)) {
+                    $bypassidp = $value;
+                    break;
+                }
+            }
+            if (strlen($bypassidp) > 0) { // Match found!
+                $providerId = $bypassidp;
+                $keepidp = 'checked';
+                // To skip the next code blocks, unset a few variables.
+                $forceinitialidp = 0;     // Skip checking this option
+                $selected_idp = '';       // Skip any passed-in option
+                $readidpcookies = false;  // Don't read in the IdP cookies
+            }
+        }
+
         // If the <forceinitialidp> option is set, use either the
         // <initialidp> or the 'selected_idp' as the providerId, and
         // use <forceinitialidp> as keepIdp. Otherwise, read the
@@ -1855,7 +1880,6 @@ IdPs for the skin.'
         $dbs = new DBService();
         if (($dbs->getUser($uid)) &&
             (!($dbs->status & 1))) {  // STATUS_OK codes are even
-
             $idpname = $dbs->idp_display_name;
             $first   = $dbs->first_name;
             $last    = $dbs->last_name;
@@ -1865,7 +1889,6 @@ IdPs for the skin.'
 
             if (($dbs->getLastArchivedUser($uid)) &&
                 (!($dbs->status & 1))) {  // STATUS_OK codes are even
-
                 $previdpname = $dbs->idp_display_name;
                 $prevfirst   = $dbs->first_name;
                 $prevlast    = $dbs->last_name;

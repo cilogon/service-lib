@@ -401,7 +401,7 @@ class Util
         // If storage.phpsessions == 'mysql', create a sessionmgr().
         $storetype = static::getConfigVar('storage.phpsessions');
 
-        if ($storetype == 'mysql') {
+        if (preg_match('/^mysql/', $storetype)) {
             $sessionmgr = new SessionMgr();
         }
 

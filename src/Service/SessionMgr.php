@@ -3,6 +3,7 @@
 namespace CILogon\Service;
 
 use CILogon\Service\DBProps;
+use CILogon\Service\Util;
 use DB;
 
 /**
@@ -97,13 +98,13 @@ class SessionMgr
     {
         $retval = true;  // Assume connect to database succeeded
 
-        $dbprops = new DBProps('mysql');
+        $storetype = Util::getConfigVar('storage.phpsessions');
+        $dbprops = new DBProps($storetype);
         $this->db = $dbprops->getDBConnect();
 
         if (is_null($this->db)) {
             $retval = false;
         }
-
         return $retval;
     }
 
@@ -158,7 +159,7 @@ class SessionMgr
                 $this->crc = strlen($retval) . crc32($retval);
             }
         }
-
+        settype($retval, 'string');
         return $retval;
     }
 

@@ -528,9 +528,11 @@ class TwoFactor
     private static function getQRCodeString($text)
     {
         $qr = new QrCode();
-        $qr->setText($text)->setSize(200)->setPadding(0);
+        $qr->setText($text);
+        $qr->setSize(200);
+        $qr->setMargin(0);
         return 'data:image/png;base64,' .
-            base64_encode($qr->get());
+            base64_encode($qr->writeString());
     }
 
     /**

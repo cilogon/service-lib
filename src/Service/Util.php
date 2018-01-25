@@ -673,6 +673,7 @@ class Util
             'loa'          => 'LOA',
             'affiliation'  => 'Affiliation',
             'ou'           => 'OU',
+            'memberof'     => 'MemberOf',
             'cilogon_skin' => 'Skin Name',
             'twofactor'    => 'Two-Factor',
             'authntime'    => 'Authn Time'
@@ -863,6 +864,7 @@ Remote Address= ' . $remoteaddr . '
      * @param string $oidcid (optional) User's OpenID Connect Identifier
      * @param string $affiliation (optional) User's affiliation
      * @param string $ou (optional) User's organizational unit (OU)
+     * @param string $memberof (optional) User's isMemberOf group info
      */
     public static function saveUserToDataStore(
         $remoteuser,
@@ -878,7 +880,8 @@ Remote Address= ' . $remoteaddr . '
         $openidid = '',
         $oidcid = '',
         $affiliation = '',
-        $ou = ''
+        $ou = '',
+        $memberof = ''
     ) {
         $dbs = new DBService();
 
@@ -899,6 +902,7 @@ Remote Address= ' . $remoteaddr . '
         static::setSessionVar('oidcID', $oidcid);
         static::setSessionVar('affiliation', $affiliation);
         static::setSessionVar('ou', $ou);
+        static::setSessionVar('memberof', $memberof);
         static::setSessionVar('idp', $providerId); // Enable error message
         static::setSessionVar('idpname', $providerName); // Enable check for Google
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
@@ -949,7 +953,8 @@ Remote Address= ' . $remoteaddr . '
                 $openidid,
                 $oidcid,
                 $affiliation,
-                $ou
+                $ou,
+                $memberof
             );
             static::setSessionVar('uid', $dbs->user_uid);
             static::setSessionVar('dn', $dbs->distinguished_name);
@@ -972,7 +977,6 @@ Remote Address= ' . $remoteaddr . '
         // If 'status' is not STATUS_OK*, then send an error email
         $status = static::getSessionVar('status');
         if ($status & 1) { // Bad status codes are odd
-
             // For missing parameter errors, log an error message
             if ($status ==
                 DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) {
@@ -1030,6 +1034,8 @@ Remote Address= ' . $remoteaddr . '
                         $affiliation : '<MISSING>') . "\n" .
                     'OU            = ' . ((strlen($ou) > 0) ?
                         $ou : '<MISSING>') . "\n" .
+                    'MemberOf      = ' . ((strlen($memberof) > 0) ?
+                        $memberof : '<MISSING>') . "\n" .
                     'Database UID  = ' . ((strlen(
                         $i = static::getSessionVar('uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .
@@ -1114,6 +1120,7 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('oidcID');
         static::unsetSessionVar('affiliation');
         static::unsetSessionVar('ou');
+        static::unsetSessionVar('memberof');
 
         // Current skin
         static::unsetSessionVar('cilogon_skin');

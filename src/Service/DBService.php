@@ -184,6 +184,11 @@ class DBService
     public $ou;
 
     /**
+     * @var string $member_of isMemberOf group information
+     */
+    public $member_of;
+
+    /**
      * @var string $serial_string CILogon serial string (e.g., A34201)
      */
     public $serial_string;
@@ -330,6 +335,7 @@ class DBService
         $this->two_factor = null;
         $this->affiliation = null;
         $this->ou = null;
+        $this->member_of = null;
     }
 
     /**
@@ -387,7 +393,8 @@ class DBService
      *        For more than 1 parameter, parameters can include:
      *            $remote_user, $idp, $idp_display_name,
      *            $first_name, $last_name, $display_name, $email,
-     *            $eppn, $eptid, $openid, $oidc, $affiliation, $ou
+     *            $eppn, $eptid, $openid, $oidc, $affiliation,
+     *            $ou, $member_of
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -401,9 +408,10 @@ class DBService
             $retval = $this->call('action=getUser&user_uid=' .
                 urlencode($args[0]));
         } elseif ($numargs > 1) {
-            $params = array('remote_user','idp','idp_display_name',
-                            'first_name','last_name','display_name','email',
-                            'eppn','eptid','open_id','oidc','affiliation','ou');
+            $params = array('remote_user', 'idp', 'idp_display_name',
+                            'first_name', 'last_name', 'display_name', 'email',
+                            'eppn', 'eptid', 'open_id', 'oidc', 'affiliation',
+                            'ou', 'member_of');
             $cmd = 'action=getUser';
             for ($i = 0; $i < $numargs; $i++) {
                 $arg = $args[$i];
@@ -782,6 +790,9 @@ class DBService
                     if (preg_match('/ou=([^\r\n]+)/', $output, $match)) {
                         $this->ou = urldecode($match[1]);
                     }
+                    if (preg_match('/member_of=([^\r\n]+)/', $output, $match)) {
+                        $this->member_of = urldecode($match[1]);
+                    }
                     if (preg_match('/serial_string=([^\r\n]+)/', $output, $match)) {
                         $this->serial_string = urldecode($match[1]);
                     }
@@ -886,6 +897,9 @@ class DBService
         }
         if (!is_null($this->ou)) {
             echo "ou=$this->ou\n";
+        }
+        if (!is_null($this->member_of)) {
+            echo "member_of=$this->member_of\n";
         }
         if (!is_null($this->serial_string)) {
             echo "serial_string=$this->serial_string\n";

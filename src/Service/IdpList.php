@@ -1087,6 +1087,7 @@ EOT;
         $shibarray['Level of Assurance'] = Util::getServerVar('HTTP_ASSURANCE');
         $shibarray['Affiliation'] = Util::getServerVar('HTTP_AFFILIATION');
         $shibarray['OU'] = Util::getServerVar('HTTP_OU');
+        $shibarray['Member'] = Util::getServerVar('HTTP_MEMBER');
         $shibarray['Authn Context'] = Util::getServerVar('HTTP_SHIB_AUTHNCONTEXT_CLASS');
 
         // Make sure to use only the first of multiple values.

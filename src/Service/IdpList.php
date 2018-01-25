@@ -1077,7 +1077,7 @@ EOT;
             $entityID = $matches[1] . $matches[2];
         }
         $shibarray['Identity Provider'] = $entityID;
-        $shibarray['User Identifier'] = Util::getServerVar('HTTP_REMOTE_USER');
+        $shibarray['User Identifier'] = Util::getServerVar('REMOTE_USER');
         $shibarray['ePPN'] = Util::getServerVar('HTTP_EPPN');
         $shibarray['ePTID'] = Util::getServerVar('HTTP_PERSISTENT_ID');
         $shibarray['First Name'] = Util::getServerVar('HTTP_GIVENNAME');

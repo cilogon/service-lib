@@ -413,16 +413,30 @@ class DBService
                             'eppn', 'eptid', 'open_id', 'oidc', 'affiliation',
                             'ou', 'member_of');
             $cmd = 'action=getUser';
+            $attr_arr = array();
             for ($i = 0; $i < $numargs; $i++) {
                 $arg = $args[$i];
                 if (strlen($arg) > 0) {
-                    $cmd .= '&' . $params[$i] . '=';
-                    // Convert idp_display_name, first_name, last_name to UTF-7
-                    if (($i == 2) || ($i == 3) || ($i == 4)) {
-                        $cmd .= urlencode(iconv('UTF-8', 'UTF-7', $arg));
+                    if ($i >= 13) {
+                        // Put params after $ou into JSON object
+                        $attr_arr[$params[$i]] = $arg;
                     } else {
-                        $cmd .= urlencode($arg);
+                        $cmd .= '&' . $params[$i] . '=';
+                        if (($i >= 2) && ($i <= 5)) {
+                            // Convert idp_display_name, first_name, last_name,
+                            // and display_name to UTF-7
+                            $cmd .= urlencode(iconv('UTF-8', 'UTF-7', $arg));
+                        } else {
+                            $cmd .= urlencode($arg);
+                        }
                     }
+                }
+            }
+            // If any elements in $attr_arr, append converted JSON object
+            if (count($attr_arr) > 0) {
+                if (($attr_json = json_encode($attr_arr, JSON_FORCE_OBJECT))
+                    !== false) {
+                    $cmd .= '&attr_json=' . urlencode($attr_json);
                 }
             }
             // Add 'us_idp' parameter for InCommon/Google (1) or eduGAIN (0)
@@ -724,6 +738,7 @@ class DBService
     {
         $success = false;
 
+        $attr_json = '';
         $ch = curl_init();
         if ($ch !== false) {
             $url = $this->getDBServiceURL() . '?' . $params;
@@ -790,8 +805,8 @@ class DBService
                     if (preg_match('/ou=([^\r\n]+)/', $output, $match)) {
                         $this->ou = urldecode($match[1]);
                     }
-                    if (preg_match('/member_of=([^\r\n]+)/', $output, $match)) {
-                        $this->member_of = urldecode($match[1]);
+                    if (preg_match('/attr_json=([^\r\n]+)/', $output, $match)) {
+                        $attr_json = urldecode($match[1]);
                     }
                     if (preg_match('/serial_string=([^\r\n]+)/', $output, $match)) {
                         $this->serial_string = urldecode($match[1]);
@@ -838,6 +853,17 @@ class DBService
             }
             curl_close($ch);
         }
+
+        // Convert $attr_json into array and extract elements into class members
+        if (strlen($attr_json) > 0) {
+            $attr_arr = json_decode($attr_json, true);
+            if (!is_null($attr_arr)) {
+                if (isset($attr_arr['member_of'])) {
+                    $this->member_of = $attr_arr['member_of'];
+                }
+            }
+        }
+
         return $success;
     }
 

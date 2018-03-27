@@ -674,6 +674,7 @@ class Util
             'affiliation'  => 'Affiliation',
             'ou'           => 'OU',
             'memberof'     => 'MemberOf',
+            'acr'          => 'AuthnContextClassRef',
             'cilogon_skin' => 'Skin Name',
             'twofactor'    => 'Two-Factor',
             'authntime'    => 'Authn Time'
@@ -865,6 +866,7 @@ Remote Address= ' . $remoteaddr . '
      * @param string $affiliation (optional) User's affiliation
      * @param string $ou (optional) User's organizational unit (OU)
      * @param string $memberof (optional) User's isMemberOf group info
+     * @param string $acr (optional) Authentication Context Class Ref
      */
     public static function saveUserToDataStore(
         $remoteuser,
@@ -881,7 +883,8 @@ Remote Address= ' . $remoteaddr . '
         $oidcid = '',
         $affiliation = '',
         $ou = '',
-        $memberof = ''
+        $memberof = '',
+        $acr = ''
     ) {
         $dbs = new DBService();
 
@@ -903,6 +906,7 @@ Remote Address= ' . $remoteaddr . '
         static::setSessionVar('affiliation', $affiliation);
         static::setSessionVar('ou', $ou);
         static::setSessionVar('memberof', $memberof);
+        static::setSessionVar('acr', $acr);
         static::setSessionVar('idp', $providerId); // Enable error message
         static::setSessionVar('idpname', $providerName); // Enable check for Google
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
@@ -954,7 +958,8 @@ Remote Address= ' . $remoteaddr . '
                 $oidcid,
                 $affiliation,
                 $ou,
-                $memberof
+                $memberof,
+                $acr
             );
             static::setSessionVar('uid', $dbs->user_uid);
             static::setSessionVar('dn', $dbs->distinguished_name);
@@ -1036,6 +1041,8 @@ Remote Address= ' . $remoteaddr . '
                         $ou : '<MISSING>') . "\n" .
                     'MemberOf      = ' . ((strlen($memberof) > 0) ?
                         $memberof : '<MISSING>') . "\n" .
+                    'ACR           = ' . ((strlen($acr) > 0) ?
+                        $acr : '<MISSING>') . "\n" .
                     'Database UID  = ' . ((strlen(
                         $i = static::getSessionVar('uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .
@@ -1121,6 +1128,7 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('affiliation');
         static::unsetSessionVar('ou');
         static::unsetSessionVar('memberof');
+        static::unsetSessionVar('acr');
 
         // Current skin
         static::unsetSessionVar('cilogon_skin');

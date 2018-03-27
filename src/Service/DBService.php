@@ -189,6 +189,11 @@ class DBService
     public $member_of;
 
     /**
+     * @var string $acr Authentication Context Class Ref
+     */
+    public $acr;
+
+    /**
      * @var string $serial_string CILogon serial string (e.g., A34201)
      */
     public $serial_string;
@@ -336,6 +341,7 @@ class DBService
         $this->affiliation = null;
         $this->ou = null;
         $this->member_of = null;
+        $this->acr = null;
     }
 
     /**
@@ -394,7 +400,7 @@ class DBService
      *            $remote_user, $idp, $idp_display_name,
      *            $first_name, $last_name, $display_name, $email,
      *            $eppn, $eptid, $openid, $oidc, $affiliation,
-     *            $ou, $member_of
+     *            $ou, $member_of, $acr
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -411,7 +417,7 @@ class DBService
             $params = array('remote_user', 'idp', 'idp_display_name',
                             'first_name', 'last_name', 'display_name', 'email',
                             'eppn', 'eptid', 'open_id', 'oidc', 'affiliation',
-                            'ou', 'member_of');
+                            'ou', 'member_of', 'acr');
             $cmd = 'action=getUser';
             $attr_arr = array();
             for ($i = 0; $i < $numargs; $i++) {
@@ -861,6 +867,9 @@ class DBService
                 if (isset($attr_arr['member_of'])) {
                     $this->member_of = $attr_arr['member_of'];
                 }
+                if (isset($attr_arr['acr'])) {
+                    $this->acr = $attr_arr['acr'];
+                }
             }
         }
 
@@ -926,6 +935,9 @@ class DBService
         }
         if (!is_null($this->member_of)) {
             echo "member_of=$this->member_of\n";
+        }
+        if (!is_null($this->acr)) {
+            echo "member_of=$this->acr\n";
         }
         if (!is_null($this->serial_string)) {
             echo "serial_string=$this->serial_string\n";

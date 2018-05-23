@@ -2602,24 +2602,31 @@ IdPs for the skin.'
         'let them know you are having having a problem logging on ' .
         'to CILogon.</p><blockquote><ul>';
 
-        $namefound = false;
+        $addrfound = false;
         $name = @$shibarray['Support Name'];
         $addr = @$shibarray['Support Address'];
         $addr = preg_replace('/^mailto:/', '', $addr);
-        if ((strlen($name) > 0) && (strlen($addr) > 0)) {
-            $namefound = true;
+
+        if (strlen($addr) > 0) {
+            $addrfound = true;
+            if (strlen($name) == 0) { // Use address if no name given
+                $name = $addr;
+            }
             $errorboxstr .= '<li> Support Contact: ' .
                 $name . ' &lt;<a href="mailto:' .
                 $addr . $emailmsg . '">' .
                 $addr . '</a>&gt;</li>';
         }
 
-        if (!$namefound) {
+        if (!$addrfound) {
             $name = @$shibarray['Technical Name'];
             $addr = @$shibarray['Technical Address'];
             $addr = preg_replace('/^mailto:/', '', $addr);
-            if ((strlen($name) > 0) && (strlen($addr) > 0)) {
-                $namefound = true;
+            if (strlen($addr) > 0) {
+                $addrfound = true;
+                if (strlen($name) == 0) { // Use address if no name given
+                    $name = $addr;
+                }
                 $errorboxstr .= '<li> Technical Contact: ' .
                     $name . ' &lt;<a href="mailto:' .
                     $addr . $emailmsg . '">' .
@@ -2627,11 +2634,14 @@ IdPs for the skin.'
             }
         }
 
-        if (!$namefound) {
+        if (!$addrfound) {
             $name = @$shibarray['Administrative Name'];
             $addr = @$shibarray['Administrative Address'];
             $addr = preg_replace('/^mailto:/', '', $addr);
-            if ((strlen($name) > 0) && (strlen($addr) > 0)) {
+            if (strlen($addr) > 0) {
+                if (strlen($name) == 0) { // Use address if no name given
+                    $name = $addr;
+                }
                 $errorboxstr .= '<li>Administrative Contact: ' .
                     $name . ' &lt;<a href="mailto:' .
                     $addr . $emailmsg.'">' .

@@ -73,7 +73,7 @@ class Skin
 
     /**
      * @var bool $skininitialized Have we initialized the skin by reading in
-            the forceskin.txt file?
+     *      the forceskin.txt file?
      */
     protected $skininitialized = false;
 

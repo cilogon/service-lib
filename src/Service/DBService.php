@@ -61,9 +61,9 @@ class DBService
 {
     /**
      * @var string DEFAULTDBSERVICEURL The main URL for the dbService.
-     *      Corresponds to the OAuth2 .war.
+     *      Corresponds to the OAuth .war.
      */
-    const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth2/dbService';
+    const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth/dbService';
 
     /**
      * @var string OAUTH1DBSERVICEURL The URL for the OAuth 1.0a dbService.

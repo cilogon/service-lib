@@ -61,14 +61,17 @@ class DBService
 {
     /**
      * @var string DEFAULTDBSERVICEURL The main URL for the dbService.
-     *      Corresponds to the OAuth 1.0a .war.
+     *      Corresponds to the OAuth2 .war.
      */
-    const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth/dbService';
+    const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth2/dbService';
 
     /**
-     * @var string DEFAULTDBSERVICEURL The new URL for the dbService, to be
-     *      used once Jeff has verified all dbService calls work with the
-     *      new OAuth 2.0 .war.
+     * @var string OAUTH1DBSERVICEURL The URL for the OAuth 1.0a dbService.
+     */
+    const OAUTH1DBSERVICEURL  = 'http://localhost:8080/oauth/dbService';
+
+    /**
+     * @var string OAUTH2DBSERVICEURL The URL for the OAuth 2 dbService.
      */
     const OAUTH2DBSERVICEURL  = 'http://localhost:8080/oauth2/dbService';
 
@@ -554,7 +557,7 @@ class DBService
     public function getPortalParameters($oauth_token)
     {
         $this->clearPortal();
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
+        $this->setDBServiceURL(static::OAUTH1DBSERVICEURL);
         return $this->call('action=getPortalParameter&oauth_token=' .
             urlencode($oauth_token));
     }

@@ -508,7 +508,7 @@ EOT;
                         $dom,
                         $idp,
                         'Organization_Name',
-                        ((strlen($Organization_Name) > 0) ? 
+                        ((strlen($Organization_Name) > 0) ?
                             $Organization_Name :
                             $Display_Name)
                     );
@@ -516,7 +516,7 @@ EOT;
                         $dom,
                         $idp,
                         'Display_Name',
-                        ((strlen($Display_Name) > 0) ? 
+                        ((strlen($Display_Name) > 0) ?
                             $Display_Name :
                             $Organization_Name)
                     );
@@ -698,11 +698,34 @@ EOT;
                     )) !== false)) {
                     $idpnodes = $dom2->getElementsByTagName('idp');
                     foreach ($idpnodes as $idpnode) {
+                        // Check if the entityID already exists. If so,
+                        // delete it from both the idps DOM and the idparray
+                        // and instead add the one from the testidplist.
+                        $entityID = $idpnode->attributes->item(0)->value;
+                        if (array_key_exists($entityID, $this->idparray)) {
+                            // Easy - simply delete the array entry for the
+                            // existing entityID
+                            unset($this->idparray[$entityID]);
+
+                            // Hard - search through the current DOM for a
+                            // matching entityID to get the DOMNode, which
+                            // can then be removed from the DOM.
+                            $curridpnodes = $dom->getElementsByTagName('idp');
+                            foreach ($curridpnodes as $curridpnode) {
+                                $currEntityID =
+                                    $curridpnode->attributes->item(0)->value;
+                                if ($currEntityID == $entityID) {
+                                    $idps->removeChild($curridpnode);
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Add the new idp node to the DOM
                         $node = $dom->importNode($idpnode, true);
                         $idps->appendChild($node);
 
                         // Add the testidplist nodes to the $idparray
-                        $entityID = $node->attributes->item(0)->value;
                         foreach ($node->childNodes as $child) {
                             if ($child->nodeName != '#text') {
                                 $this->idparray[$entityID][$child->nodeName] =

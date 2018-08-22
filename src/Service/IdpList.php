@@ -476,32 +476,50 @@ EOT;
 
                     // Search for the desired <idp> attribute sub-blocks
 
-                    // CIL-367 Prefer <OrganizationDisplayName>
+                    // Look for OrganizationDisplayName and mdui:DisplayName.
+                    $Organization_Name = '';
+                    $Display_Name = '';
+
                     $xp = $idx[0]->xpath(
                         "Organization/OrganizationDisplayName[starts-with(@xml:lang,'en')]"
                     );
                     if (($xp !== false) && (count($xp) > 0)) {
-                        $this->addNode(
-                            $dom,
-                            $idp,
-                            'Organization_Name',
-                            (string)$xp[0]
-                        );
-                    } else {
-                        // If we didn't find the OrganizationDisplayName,
-                        // look for mdui:DisplayName instead
-                        $xp = $sxe->xpath(
-                            "IDPSSODescriptor/Extensions/mdui:UIInfo/mdui:DisplayName[starts-with(@xml:lang,'en')]"
-                        );
-                        if (($xp !== false) && (count($xp) > 0)) {
-                            $this->addNode(
-                                $dom,
-                                $idp,
-                                'Organization_Name',
-                                (string)$xp[0]
-                            );
-                        }
+                        $Organization_Name = (string)$xp[0];
                     }
+
+                    $xp = $sxe->xpath(
+                        "IDPSSODescriptor/Extensions/mdui:UIInfo/mdui:DisplayName[starts-with(@xml:lang,'en')]"
+                    );
+                    if (($xp !== false) && (count($xp) > 0)) {
+                        $Display_Name = (string)$xp[0];
+                    }
+
+                    // If neither OrganizationDisplayName nor mdui:DisplayName
+                    // was found, then use the entityID as a last resort.
+                    if ((strlen($Organization_Name) == 0) &&
+                        (strlen($Display_Name) == 0)) {
+                        $Organization_Name = $entityID;
+                        $Display_Name = $entityID;
+                    }
+
+                    // Add nodes for both Organization_Name and Display_Name,
+                    // using the value of the other if one is empty.
+                    $this->addNode(
+                        $dom,
+                        $idp,
+                        'Organization_Name',
+                        ((strlen($Organization_Name) > 0) ? 
+                            $Organization_Name :
+                            $Display_Name)
+                    );
+                    $this->addNode(
+                        $dom,
+                        $idp,
+                        'Display_Name',
+                        ((strlen($Display_Name) > 0) ? 
+                            $Display_Name :
+                            $Organization_Name)
+                    );
 
                     $xp = $idx[0]->xpath('Organization/OrganizationURL');
                     if (($xp !== false) && (count($xp) > 0)) {

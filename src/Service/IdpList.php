@@ -1023,10 +1023,10 @@ EOT;
     /**
      * getInCommonIdPs
      *
-     * This method returns a two-dimensional array of InCommon IdPs. 
+     * This method returns a two-dimensional array of InCommon IdPs.
      * The primary key of the array is the entityID, the secondary key is
      * either 'Organization_Name' (corresponds to OrganizationDisplayName)
-     * or 'Display_Name' (corresponds to mdui:DisplayName). 
+     * or 'Display_Name' (corresponds to mdui:DisplayName).
      * If a non-null parameter is passed in it returns a subset of the
      * InCommon IdPs. 0 means list only non-whitelisted IdPs, 1 means list
      * only whitelisted IdPs, 2 means list only R&S IdPs.

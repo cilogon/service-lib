@@ -2485,8 +2485,8 @@ IdPs for the skin.'
         // Re-sort the retarray by Display_Name for correct alphabetization.
         uasort($retarray, function ($a, $b) {
             return strcasecmp(
-              $a['Display_Name'],
-              $b['Display_Name']
+                $a['Display_Name'],
+                $b['Display_Name']
             );
         });
 

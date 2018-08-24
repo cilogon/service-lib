@@ -345,13 +345,13 @@ class IdpList
      * sortDOM
      *
      * This method is called by create() to sort the newly created
-     * DOMDocument <idp> nodes by Organization_Name. It uses an XSL
+     * DOMDocument <idp> nodes by Display_Name. It uses an XSL
      * transformation to do the work. A new DOMDocument is created
      * and returned.
      *
-     * @param DOMDocument $dom A DOMDocument to be sorted by Organization_Name
+     * @param DOMDocument $dom A DOMDocument to be sorted by Display_Name
      * @return DOMDocument A new DOMDocument with the <idp> elements sorted by
-     *         Organization_Name.
+     *         Display_Name.
      */
     private function sortDOM($dom)
     {
@@ -362,7 +362,7 @@ class IdpList
             <xsl:template match="node() | @*">
               <xsl:copy>
                 <xsl:apply-templates select="node() | @*">
-                  <xsl:sort select="translate(Organization_Name,
+                  <xsl:sort select="translate(Display_Name,
                       'abcdefghijklmnopqrstuvwxyz',
                       'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
                   data-type="text" order="ascending"/>
@@ -735,12 +735,12 @@ EOT;
                     }
                 }
 
-                // Sort the DOMDocument and idparray by Organization_Name
+                // Sort the DOMDocument and idparray by Display_Name
                 $this->idpdom = $this->sortDOM($dom);
                 uasort($this->idparray, function ($a, $b) {
                     return strcasecmp(
-                        $a['Organization_Name'],
-                        $b['Organization_Name']
+                        $a['Display_Name'],
+                        $b['Display_Name']
                     );
                 });
 
@@ -834,6 +834,25 @@ EOT;
         $retval = '';
         if (isset($this->idparray[$entityID]['Organization_Name'])) {
             $retval = $this->idparray[$entityID]['Organization_Name'];
+        }
+        return $retval;
+    }
+
+    /**
+     * getDisplayName
+     *
+     * This function returns the Display_Name of the selected
+     * $entityID.
+     *
+     * @param string $entityID The entityID to search for
+     * @return string The Display_Name for the $entityID. Return
+     *         string is empty if no matching $entityID found.
+     */
+    public function getDisplayName($entityID)
+    {
+        $retval = '';
+        if (isset($this->idparray[$entityID]['Display_Name'])) {
+            $retval = $this->idparray[$entityID]['Display_Name'];
         }
         return $retval;
     }
@@ -1004,20 +1023,21 @@ EOT;
     /**
      * getInCommonIdPs
      *
-     * This method returns an array of InCommon IdPs where the keys
-     * of the array are the entityIDs and the values are the pretty
-     * print Organization Names. If a non-null parameter is passed in
-     * it returns a subset of the InCommon IdPs. 0 means list only
-     * non-whitelisted IdPs, 1 means list only whitelisted IdPs,
-     * 2 means list only R&S IdPs.
+     * This method returns a two-dimensional array of InCommon IdPs. 
+     * The primary key of the array is the entityID, the secondary key is
+     * either 'Organization_Name' (corresponds to OrganizationDisplayName)
+     * or 'Display_Name' (corresponds to mdui:DisplayName). 
+     * If a non-null parameter is passed in it returns a subset of the
+     * InCommon IdPs. 0 means list only non-whitelisted IdPs, 1 means list
+     * only whitelisted IdPs, 2 means list only R&S IdPs.
      *
      * @param int $filter
      *        null => all InCommonIdPs
      *        0    => non-whitelisted InCommon IdPs
      *        1    => whitelisted InCommon IdPs
      *        2    => R&S InCommon IdPs
-     * $return array An array of InCommon IdPs, possibly filtered by
-     *         whitelisted / non-whitelisted / R&S.
+     * $return array An array of InCommon IdP Organization Names and Display
+     *         Names, possibly filtered by whitelisted / non-whitelisted / R&S.
      */
     public function getInCommonIdPs($filter = null)
     {
@@ -1033,7 +1053,8 @@ EOT;
                  (!$this->isRandS($key)))) {
                 continue;
             }
-            $retarr[$key] = $this->idparray[$key]['Organization_Name'];
+            $retarr[$key]['Organization_Name'] = $this->idparray[$key]['Organization_Name'];
+            $retarr[$key]['Display_Name'] = $this->idparray[$key]['Display_Name'];
         }
 
         return $retarr;
@@ -1145,6 +1166,7 @@ EOT;
         // of the organization, and contact information.
         $attrarray = array(
             'Organization_Name',
+            'Display_Name',
             'Home_Page',
             'Support_Name',
             'Support_Address',

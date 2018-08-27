@@ -338,12 +338,12 @@ class Content
            '>
         ';
 
-        foreach ($idps as $entityId => $idpName) {
+        foreach ($idps as $entityId => $names) {
             echo '    <option value="' , $entityId , '"';
             if ($entityId == $providerId) {
                 echo ' selected="selected"';
             }
-            echo '>' , Util::htmlent($idpName) , '</option>' , "\n    ";
+            echo '>' , Util::htmlent($names['Display_Name']) , '</option>' , "\n    ";
         }
 
         echo '  </select>
@@ -2427,6 +2427,9 @@ IdPs for the skin.'
      * @param bool $incommonidps (Optional) Show all InCommon IdPs in
      *        selection list? Defaults to false, which means show only
      *        whitelisted IdPs.
+     * @return array A two-dimensional array where the primary key is the
+     *         entityID and the secondary key is either 'Display_Name'
+     *         or 'Organization_Name'.
      */
     public static function getCompositeIdPList($incommonidps = false)
     {
@@ -2440,7 +2443,8 @@ IdPs for the skin.'
 
             // Add all OAuth2 IdPs to the list
             foreach (Util::$oauth2idps as $key => $value) {
-                $retarray[Util::getAuthzUrl($value)] = $value;
+                $retarray[Util::getAuthzUrl($value)]['Organization_Name'] = $value;
+                $retarray[Util::getAuthzUrl($value)]['Display_Name'] = $value;
             }
 
             // Check to see if the skin's config.xml has a whitelist of IDPs.
@@ -2448,7 +2452,7 @@ IdPs for the skin.'
             // config.xml's whitelist.
             $skin = Util::getSkin();
             if ($skin->hasIdpWhitelist()) {
-                foreach ($retarray as $entityId => $displayName) {
+                foreach ($retarray as $entityId => $names) {
                     if (!$skin->idpWhitelisted($entityId)) {
                         unset($retarray[$entityId]);
                     }
@@ -2465,14 +2469,26 @@ IdPs for the skin.'
         }
 
         // Fix for CIL-174 - As suggested by Keith Hazelton, replace commas and
-        // hyphens with just commas. Resort list for correct alphabetization.
+        // hyphens with just commas.
         $regex = '/(University of California)\s*[,-]\s*/';
-        foreach ($retarray as $entityId => $idpName) {
-            if (preg_match($regex, $idpName)) {
-                $retarray[$entityId] = preg_replace($regex, '$1, ', $idpName);
+        foreach ($retarray as $entityId => $names) {
+            if (preg_match($regex, $names['Organization_Name'])) {
+                $retarray[$entityId]['Organization_Name'] =
+                    preg_replace($regex, '$1, ', $names['Organization_Name']);
+            }
+            if (preg_match($regex, $names['Display_Name'])) {
+                $retarray[$entityId]['Display_Name'] =
+                    preg_replace($regex, '$1, ', $names['Display_Name']);
             }
         }
-        uasort($retarray, 'strcasecmp');
+
+        // Re-sort the retarray by Display_Name for correct alphabetization.
+        uasort($retarray, function ($a, $b) {
+            return strcasecmp(
+                $a['Display_Name'],
+                $b['Display_Name']
+            );
+        });
 
         return $retarray;
     }

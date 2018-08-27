@@ -27,10 +27,10 @@ class DBProps
      *
      * The constuctor sets the $dbtype class variable.
      *
-     * @param string $db Database type, either 'mysql' or 'pgsql'.
-     *        Defaults to 'mysql'.
+     * @param string $db Database type, one of
+     *        'mysql', 'mysqli', or 'pgsql'.
      */
-    public function __construct($db = 'mysql')
+    public function __construct($db)
     {
         $this->dbtype = $db;
     }
@@ -135,6 +135,7 @@ class DBProps
         );
 
         $opts = array(
+            'ssl'         => true,
             'persistent'  => true,
             'portability' => DB_PORTABILITY_ALL
         );

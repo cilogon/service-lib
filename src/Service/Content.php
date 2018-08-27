@@ -1295,7 +1295,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 'Location: https://' . static::getMachineHostname() .
                 '/Shibboleth.sso/Login?' .
                 'target=' . urlencode(
-                    'https://' . static::getMachineHostname() .
+                    'https://' . static::getMachineHostname($providerId) .
                     '/secure/getuser/'
                 );
 
@@ -2392,25 +2392,35 @@ IdPs for the skin.'
      * file. In case the local machine hostname cannot be found in the
      * $hostnames array, 'cilogon.org' is returned by default.
      *
+     * @param string $idp The entityID of the IdP used for potential
+     *        special handling (e.g., for Syngenta).
      * @return string The full cilogon-specific hostname of this host.
      */
-    public static function getMachineHostname()
+    public static function getMachineHostname($idp = '')
     {
         $retval = 'cilogon.org';
-        $hostnames = array(
-            "polo1.ncsa.illinois.edu"        => "polo1.cilogon.org" ,
-            "poloa.ncsa.illinois.edu"        => "polo1.cilogon.org" ,
-            "polo2.ncsa.illinois.edu"        => "polo2.cilogon.org" ,
-            "polob.ncsa.illinois.edu"        => "polo2.cilogon.org" ,
-            "fozzie.nics.utk.edu"            => "polo3.cilogon.org" ,
-            "poloc.ncsa.illinois.edu"        => "test.cilogon.org" ,
-            "polot.ncsa.illinois.edu"        => "test.cilogon.org" ,
-            "polo-staging.ncsa.illinois.edu" => "test.cilogon.org" ,
-            "polod.ncsa.illinois.edu"        => "dev.cilogon.org" ,
-        );
-        $localhost = php_uname('n');
-        if (array_key_exists($localhost, $hostnames)) {
-            $retval = $hostnames[$localhost];
+        // For Syngenta, use just a single 'hostname' value to match their
+        // Active Directory configuration for CILogon's
+        // assertionConsumerService URL.
+        if ($idp == 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/') {
+            $retval = 'test.cilogon.org'; // Change to cilogon.org for production
+        // Otherwise, map the local hostname to a *.cilogon.org domain name.
+        } else {
+            $hostnames = array(
+                "polo1.ncsa.illinois.edu"        => "polo1.cilogon.org" ,
+                "poloa.ncsa.illinois.edu"        => "polo1.cilogon.org" ,
+                "polo2.ncsa.illinois.edu"        => "polo2.cilogon.org" ,
+                "polob.ncsa.illinois.edu"        => "polo2.cilogon.org" ,
+                "fozzie.nics.utk.edu"            => "polo3.cilogon.org" ,
+                "poloc.ncsa.illinois.edu"        => "test.cilogon.org" ,
+                "polot.ncsa.illinois.edu"        => "test.cilogon.org" ,
+                "polo-staging.ncsa.illinois.edu" => "test.cilogon.org" ,
+                "polod.ncsa.illinois.edu"        => "dev.cilogon.org" ,
+            );
+            $localhost = php_uname('n');
+            if (array_key_exists($localhost, $hostnames)) {
+                $retval = $hostnames[$localhost];
+            }
         }
         return $retval;
     }

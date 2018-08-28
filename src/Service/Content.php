@@ -1291,13 +1291,9 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             Util::getCsrf()->setCookieAndSession();
 
             // Set up the 'header' string for redirection thru mod_shib
-            $redirect =
-                'Location: https://' . static::getMachineHostname() .
-                '/Shibboleth.sso/Login?' .
-                'target=' . urlencode(
-                    'https://' . static::getMachineHostname($providerId) .
-                    '/secure/getuser/'
-                );
+            $mhn = static::getMachineHostname($providerId);
+            $redirect = "Location: https://$mhn/Shibboleth.sso/Login?target=" .
+                urlencode("https://$mhn/secure/getuser/");
 
             if (strlen($providerId) > 0) {
                 // Use special NIHLogin Shibboleth SessionInitiator for acsByIndex

@@ -68,6 +68,23 @@ class Content
 
         $skin->printSkinLink();
 
+        /****************************************************************/
+        /* TEMPORARY - Show banner text for transition of Syngenta IdP  */
+        /* from test.cilogon.org to cilogon.org.                        */
+        /****************************************************************/
+        if (preg_match('/^sprout/i', $skin->getSkinName())) {
+            define(
+                'BANNER_TEXT',
+                'On 2018-09-06 12:00 UTC, the Syngenta Identity Provider
+                (IdP) will be reconfigured to use the production
+                cilogon.org server instead of test.cilogon.org. As the
+                transition involves configuration changes for several
+                components, the Syngenta IdP may be unavailable during
+                the transition. Please use the NCSA IdP as an
+                alternative. We apologize for the inconvenience.'
+            );
+        }
+
         $deployjava = $skin->getConfigOption('deployjava');
         if ((!is_null($deployjava)) && ((int)$deployjava == 1)) {
             echo '<script type="text/javascript" src="/include/deployJava.js"></script>';
@@ -2395,11 +2412,11 @@ IdPs for the skin.'
     public static function getMachineHostname($idp = '')
     {
         $retval = 'cilogon.org';
-        // For Syngenta, use just a single 'hostname' value to match their
-        // Active Directory configuration for CILogon's
+        // CIL-439 For Syngenta, use just a single 'hostname' value to
+        // match their Active Directory configuration for CILogon's
         // assertionConsumerService URL.
         if ($idp == 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/') {
-            $retval = 'test.cilogon.org'; // Change to cilogon.org for production
+            $retval = 'cilogon.org'; // Set to cilogon.org for production
         // Otherwise, map the local hostname to a *.cilogon.org domain name.
         } else {
             $hostnames = array(

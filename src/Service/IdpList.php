@@ -1166,7 +1166,6 @@ EOT;
         // of the organization, and contact information.
         $attrarray = array(
             'Organization_Name',
-            'Display_Name',
             'Home_Page',
             'Support_Name',
             'Support_Address',

@@ -911,6 +911,16 @@ Remote Address= ' . $remoteaddr . '
         static::setSessionVar('idpname', $providerName); // Enable check for Google
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
 
+        // CACC-238 - Set loa to "silver" if the following are true:
+        // (1) loa contains  https://refeds.org/assurance/profile/cappuccino
+        // (2) acr is either https://refeds.org/profile/sfa or
+        //                   https://refeds.org/profile/mfa
+        if ((preg_match('%https://refeds.org/assurance/profile/cappuccino%', $loa)) &&
+            (preg_match('%https://refeds.org/profile/[ms]fa%', $acr))) {
+            $loa = 'http://incommonfederation.org/assurance/silver';
+            static::setSessionVar('loa', $loa);
+        }
+
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/eppn/eptid/openidid/oidcid
         if (((strlen($remoteuser) > 0) ||

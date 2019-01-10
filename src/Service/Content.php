@@ -1475,6 +1475,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         $ou           = Util::getSessionVar('ou');
         $memberof     = Util::getSessionVar('memberof');
         $acr          = Util::getSessionVar('acr');
+        $entitlement  = Util::getSessionVar('entitlement');
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $failureuri   = Util::getSessionVar('failureuri');
 
@@ -1630,6 +1631,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                         $ou,
                         $memberof,
                         $acr,
+                        $entitlement,
                         $clientparams,
                         $redirect,
                         $redirectform
@@ -1681,6 +1683,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 $ou,
                 $memberof,
                 $acr,
+                $entitlement,
                 $clientparams,
                 $redirect,
                 $redirectform
@@ -2520,6 +2523,7 @@ IdPs for the skin.'
      * @param string $ou
      * @param string $memberof
      * @param string $acr
+     * @param string $entitlement
      * @param string $clientparams
      * @param string $redirect
      * @param string $redirectform (Optional)
@@ -2537,6 +2541,7 @@ IdPs for the skin.'
         $ou,
         $memberof,
         $acr,
+        $entitlement,
         $clientparams,
         $redirect,
         $redirectform = ''

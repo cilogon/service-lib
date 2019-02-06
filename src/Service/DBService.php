@@ -343,6 +343,10 @@ class DBService
         $this->display_name = null;
         $this->email = null;
         $this->distinguished_name = null;
+        $this->eppn = null;
+        $this->eptid = null;
+        $this->open_id = null;
+        $this->oidc = null;
         $this->serial_string = null;
         $this->create_time = null;
         $this->two_factor = null;

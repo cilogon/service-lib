@@ -797,7 +797,7 @@ class DBService
                     if (preg_match('/last_name=([^\r\n]+)/', $output, $match)) {
                         $this->last_name = urldecode($match[1]);
                     }
-                    if (preg_match('/display_name=([^\r\n]+)/', $output, $match)) {
+                    if (preg_match('/[^_]display_name=([^\r\n]+)/', $output, $match)) {
                         $this->display_name = urldecode($match[1]);
                     }
                     if (preg_match('/email=([^\r\n]+)/', $output, $match)) {

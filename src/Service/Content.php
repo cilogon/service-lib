@@ -2006,6 +2006,9 @@ IdPs for the skin.'
                     </blockquote>
                     </p>
                     ';
+
+                    // Special log message for Subject DN change
+                    $log->info("##### DN CHANGE ##### prevdn='$prevdn' newdn='$dn'");
                 }
 
                 if ($email != $prevemail) {

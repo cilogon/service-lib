@@ -143,10 +143,12 @@ class Skin
         $this->skinname = '';
         $skinvar = '';
 
-        // Check for matching IdP, callbackURI (OAuth1), or
-        // redirect_uri (OAuth2) in the forceskin.txt file.
+        // Check for matching IdP, callbackURI (OAuth1),
+        // redirect_uri (OAuth2), or client_id (OAuth2)
+        // in the forceskin.txt file.
         $uristocheck = array(
             Util::getGetVar('redirect_uri'),
+            Util::getGetVar('client_id'),
             Util::getSessionVar('callbackuri'),
             Util::getSessionVar('idp')
         );

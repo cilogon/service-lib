@@ -1007,14 +1007,16 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         $keepidp = '';
         $selected_idp = '';
         $redirect_uri = '';
+        $client_id = '';
         $callbackuri = Util::getSessionVar('callbackuri');
         $readidpcookies = true;  // Assume config options are not set
         $skin = Util::getSkin();
         $forceinitialidp = (int)$skin->getConfigOption('forceinitialidp');
         $initialidp = (string)$skin->getConfigOption('initialidp');
 
-        // If this is a OIDC transaction, get the selected_idp and
-        // redirect_uri parameters from the session var clientparams.
+        // If this is a OIDC transaction, get the selected_idp,
+        // redirect_uri, and client_id parameters from the session
+        // var clientparams.
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         if (isset($clientparams['selected_idp'])) {
             $selected_idp = $clientparams['selected_idp'];
@@ -1022,18 +1024,22 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         if (isset($clientparams['redirect_uri'])) {
             $redirect_uri = $clientparams['redirect_uri'];
         }
+        if (isset($clientparams['client_id'])) {
+            $client_id = $clientparams['client_id'];
+        }
 
-        // CIL-431 - If the OAuth2/OIDC $redirect_uri is set, then check for
-        // a match in the 'bypass.txt' file to see if we should
-        // automatically redirect to a specific IdP. Used mainly by campus
-        // gateways.
-        if (strlen($redirect_uri) > 0) {
+        // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
+        // then check for a match in the 'bypass.txt' file to see if we
+        // should automatically redirect to a specific IdP. Used mainly
+        // by campus gateways.
+        if ((strlen($redirect_uri) > 0) || (strlen($client_id) > 0)) {
             $bypassidp = '';
             $bypassarray = Util::readArrayFromFile(
                 Util::getServerVar('DOCUMENT_ROOT') . '/include/bypass.txt'
             );
             foreach ($bypassarray as $key => $value) {
-                if (preg_match($key, $redirect_uri)) {
+                if ((preg_match($key, $redirect_uri)) ||
+                    (preg_match($key, $client_id))) {
                     $bypassidp = $value;
                     break;
                 }
@@ -1059,8 +1065,9 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             $afii=$skin->getConfigOption('portallistaction', 'allowforceinitialidp');
             if ((is_null($afii)) || // Option not set, no need to check portal list
                 (((int)$afii == 1) &&
-                  (($skin->inPortalList($callbackuri)) ||
-                   ($skin->inPortalList($redirect_uri))))) {
+                  (($skin->inPortalList($redirect_uri)) ||
+                   ($skin->inPortalList($client_id)) ||
+                   ($skin->inPortalList($callbackuri))))) {
                 // 'selected_idp' takes precedence over <initialidp>
                 if (strlen($selected_idp) > 0) {
                     $providerId = $selected_idp;

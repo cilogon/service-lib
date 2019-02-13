@@ -825,6 +825,7 @@ class DBService
                         $this->ou = urldecode($match[1]);
                     }
                     if (preg_match('/attr_json=([^\r\n]+)/', $output, $match)) {
+                        // Decode $attr_json into class members later
                         $attr_json = urldecode($match[1]);
                     }
                     if (preg_match('/serial_string=([^\r\n]+)/', $output, $match)) {
@@ -882,6 +883,9 @@ class DBService
                 }
                 if (isset($attr_arr['acr'])) {
                     $this->acr = $attr_arr['acr'];
+                }
+                if (isset($attr_arr['entitlement'])) {
+                    $this->entitlement = $attr_arr['entitlement'];
                 }
             }
         }

@@ -2019,8 +2019,8 @@ IdPs for the skin.'
                     // Temporarily send email alert
                     Util::sendErrorAlert(
                         'DN Change on ' . static::getMachineHostname(),
-                        "DN change for uid='$uid':\n" . 
-                        "prevdn='$prevdn'\n" . 
+                        "DN change for uid='$uid':\n" .
+                        "prevdn='$prevdn'\n" .
                         "newdn='$dn'"
                     );
                 }

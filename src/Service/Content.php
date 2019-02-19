@@ -2564,7 +2564,7 @@ IdPs for the skin.'
         $clientparams,
         $redirect,
         $redirectform = '',
-        $edugainandgetcert = ''
+        $edugainandgetcert = false
     ) {
         $errorboxstr =
         '<p>There was a problem logging on. Your identity

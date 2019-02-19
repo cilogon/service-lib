@@ -1641,7 +1641,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                         $entitlement,
                         $clientparams,
                         $redirect,
-                        $redirectform
+                        $redirectform,
+                        static::isEduGAINAndGetCert($idp, $idpname)
                     );
                 }
             } else {
@@ -2544,8 +2545,8 @@ IdPs for the skin.'
      * @param string $entitlement
      * @param string $clientparams
      * @param string $redirect
-     * @param string $redirectform (Optional)
-     * @param bool   $edugainandgetcert (Optional)
+     * @param string $redirectform
+     * @param bool   $edugainandgetcert
      */
     public static function printAttributeReleaseErrorMessage(
         $ePPN,
@@ -2563,8 +2564,8 @@ IdPs for the skin.'
         $entitlement,
         $clientparams,
         $redirect,
-        $redirectform = '',
-        $edugainandgetcert = false
+        $redirectform,
+        $edugainandgetcert
     ) {
         $errorboxstr =
         '<p>There was a problem logging on. Your identity

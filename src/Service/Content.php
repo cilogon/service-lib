@@ -1693,7 +1693,8 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 $entitlement,
                 $clientparams,
                 $redirect,
-                $redirectform
+                $redirectform,
+                true
             );
 
             echo '
@@ -2544,6 +2545,7 @@ IdPs for the skin.'
      * @param string $clientparams
      * @param string $redirect
      * @param string $redirectform (Optional)
+     * @param bool   $edugainandgetcert (Optional)
      */
     public static function printAttributeReleaseErrorMessage(
         $ePPN,
@@ -2561,7 +2563,8 @@ IdPs for the skin.'
         $entitlement,
         $clientparams,
         $redirect,
-        $redirectform = ''
+        $redirectform = '',
+        $edugainandgetcert = ''
     ) {
         $errorboxstr =
         '<p>There was a problem logging on. Your identity
@@ -2601,9 +2604,10 @@ IdPs for the skin.'
             '</td></tr>';
             $missingattrs .= '%0D%0A    mail (email address)';
         }
-        // CIL-326 - For eduGAIN IdPs, check for R&S and SIRTFI
+        // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
+        // print out missing R&S and SIRTFI values
         $idplist = Util::getIdpList();
-        if (!$idplist->isRegisteredByInCommon($idp)) {
+        if ($edugainandgetcert) {
             if (!$idplist->isREFEDSRandS($idp)) {
                 $errorboxstr .=
                 '<tr><th><a target="_blank"

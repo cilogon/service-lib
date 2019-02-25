@@ -135,7 +135,6 @@ class DBProps
         );
 
         $opts = array(
-            'ssl'         => true,
             'persistent'  => true,
             'portability' => DB_PORTABILITY_ALL
         );

@@ -694,6 +694,7 @@ CILogon Service - ' . $summary . '
 
 Session Variables
 -----------------
+Timestamp     = ' . date(DATE_ATOM) . '
 Server Host   = ' . static::getHN() . '
 Remote Address= ' . $remoteaddr . '
 ' . (($remotehost !== false) ? "Remote Host   = $remotehost" : '') . '

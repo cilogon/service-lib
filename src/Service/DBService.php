@@ -440,14 +440,7 @@ class DBService
                         // Put params after $ou into JSON object
                         $attr_arr[$params[$i]] = $arg;
                     } else {
-                        $cmd .= '&' . $params[$i] . '=';
-                        if (($i >= 2) && ($i <= 5)) {
-                            // Convert idp_display_name, first_name, last_name,
-                            // and display_name to UTF-7
-                            $cmd .= urlencode(iconv('UTF-8', 'UTF-7', $arg));
-                        } else {
-                            $cmd .= urlencode($arg);
-                        }
+                        $cmd .= '&' . $params[$i] . '=' . urlencode($arg);
                     }
                 }
             }

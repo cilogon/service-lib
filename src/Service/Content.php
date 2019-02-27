@@ -2018,13 +2018,6 @@ IdPs for the skin.'
 
                     // Special log message for Subject DN change
                     $log->info("##### DN CHANGE ##### prevdn='$prevdn' newdn='$dn'");
-                    // Temporarily send email alert
-                    Util::sendErrorAlert(
-                        'DN Change on ' . static::getMachineHostname(),
-                        "DN change for uid='$uid':\n" .
-                        "prevdn='$prevdn'\n" .
-                        "newdn='$dn'"
-                    );
                 }
 
                 if ($email != $prevemail) {

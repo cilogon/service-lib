@@ -211,6 +211,25 @@ class Util
     }
 
     /**
+     * getGetOrPostVar
+     *
+     * This function looks for a $_GET or $_POST variable, with
+     * preference given to $_GET if both are present.
+     *
+     * @param string $var The $_GET or $_POST variable to query.
+     * @return string The value of the $_GET or $_POST variable
+     *         if present. Empty string if variable is not set.
+     */
+    public static function getGetOrPostVar($var)
+    {
+        $retval = static::getGetVar($var);
+        if (empty($retval)) {
+            $retval = static::getPostVar($var);
+        }
+        return $retval;
+    }
+
+    /**
      * getCookieVar
      *
      * This function returns the value of a given cookie.

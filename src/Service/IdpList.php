@@ -684,6 +684,44 @@ EOT;
                         }
                     }
 
+                    // CIL-558 Check for <SingleLogoutService>
+                    $Logout = '';
+                    // First, check for HTTP-Redirect version
+                    $xp = $sxe->xpath("IDPSSODescriptor/SingleLogoutService" .
+                        "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']");
+                    if (($xp !== false) && (count($xp) > 0)) {
+                        $Logout = (string)($xp[0]->attributes())['Location'];
+                    }
+                    // If no HTTP-Redirect, check for HTTP-POST
+                    if (empty($Logout)) {
+                        $xp = $sxe->xpath("IDPSSODescriptor/SingleLogoutService" .
+                            "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']");
+                        if (($xp !== false) && (count($xp) > 0)) {
+                            $Logout = (string)($xp[0]->attributes())['Location'];
+                        }
+                    }
+                    // Finally, a hack for Shibboleth-based IdPs.
+                    // Check for <SingleSignOnService> HTTP-Redirect
+                    // and regex for the built-in Simple Logout URL.
+                    if (empty($Logout)) {
+                        $xp = $sxe->xpath("IDPSSODescriptor/SingleSignOnService" .
+                            "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']");
+                        if (($xp !== false) && (count($xp) > 0)) {
+                            $tmp = (string)($xp[0]->attributes())['Location'];
+                            if (preg_match('|^(.*)/profile/|', $tmp, $matches)) {
+                                $Logout = $matches[1] . '/profile/Logout';
+                            }
+                        }
+                    }
+                    if (!empty($Logout)) {
+                        // If Shib IdP, transform URL into Simple Logout URL
+                        // https://wiki.shibboleth.net/confluence/x/AAJSAQ
+                        if (preg_match('|^(.*)/profile/|', $Logout, $matches)) {
+                            $Logout = $matches[1] . '/profile/Logout';
+                        }
+                        $this->addNode($dom, $idp, 'Logout', $Logout);
+                    }
+
                     // Add a <Whitelisted> block for all IdPs
                     // not in the blacklist.txt file.
                     if (!array_key_exists($entityID, $blackidps)) {
@@ -853,6 +891,24 @@ EOT;
         $retval = '';
         if (isset($this->idparray[$entityID]['Display_Name'])) {
             $retval = $this->idparray[$entityID]['Display_Name'];
+        }
+        return $retval;
+    }
+
+    /**
+     * getLogout
+     *
+     * This function returns the Logout URL of the selected $entityID.
+     *
+     * @param string $entityID The entityID to search for
+     * @return string The Logout  URLfor the $entityID. Return
+     *         string is empty if no matching $entityID found.
+     */
+    public function getLogout($entityID)
+    {
+        $retval = '';
+        if (isset($this->idparray[$entityID]['Logout'])) {
+            $retval = $this->idparray[$entityID]['Logout'];
         }
         return $retval;
     }

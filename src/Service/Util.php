@@ -866,130 +866,100 @@ Remote Address= ' . $remoteaddr . '
      * This function is called when a user logs on to save identity
      * information to the datastore. As it is used by both Shibboleth
      * and OpenID Identity Providers, some parameters passed in may
-     * be blank (empty string). The function verifies that the minimal
+     * be blank (empty string). If the function verifies that the minimal
      * sets of parameters are valid, the dbservice servlet is called
      * to save the user info. Then various session variables are set
      * for use by the program later on. In case of error, an email
      * alert is sent showing the missing parameters.
      *
-     * @param string $remoteuser The REMOTE_USER from HTTP headers
-     * @param string $providerId The provider IdP Identifier / URL endpoint
-     * @param string providerName The pretty print provider IdP name
-     * @param string $firstname The user's first name
-     * @param string $lastname The user's last name
-     * @param string $displayname The user's display name
-     * @param string $emailaddr The user's email address
-     * @param string $loa The level of assurance (e.g., openid/basic/silver)
-     * @param string $eppn (optional) User's ePPN (for SAML IdPs)
-     * @param string $eptid (optional) User's ePTID (for SAML IdPs)
-     * @param string $openidid (optional) User's OpenID 2.0 Identifier
-     * @param string $oidcid (optional) User's OpenID Connect Identifier
-     * @param string $affiliation (optional) User's affiliation
-     * @param string $ou (optional) User's organizational unit (OU)
-     * @param string $memberof (optional) User's isMemberOf group info
-     * @param string $acr (optional) Authentication Context Class Ref
-     * @param string $entitlement (optional) User's entitlement
+     * @param mixed $args Variable number of paramters ordered as follows:
+     *     remoteuser -The REMOTE_USER from HTTP headers
+     *     idp - The provider IdP Identifier / URL endpoint
+     *     idpname - The pretty print provider IdP name
+     *     firstname - The user's first name
+     *     lastname - The user's last name
+     *     displayname - The user's display name
+     *     emailaddr-  The user's email address
+     *     loa - The level of assurance (e.g., openid/basic/silver)
+     *     ePPN - User's ePPN (for SAML IdPs)
+     *     ePTID - User's ePTID (for SAML IdPs)
+     *     openidID - User's OpenID 2.0 Identifier (Google deprecated)
+     *     oidcID - User's OpenID Connect Identifier
+     *     affiliation - User's affiliation
+     *     ou - User's organizational unit (OU)
+     *     memberof - User's isMemberOf group info
+     *     acr - Authentication Context Class Ref
+     *     entitlement - User's entitlement
      */
-    public static function saveUserToDataStore(
-        $remoteuser,
-        $providerId,
-        $providerName,
-        $firstname,
-        $lastname,
-        $displayname,
-        $emailaddr,
-        $loa,
-        $eppn = '',
-        $eptid = '',
-        $openidid = '',
-        $oidcid = '',
-        $affiliation = '',
-        $ou = '',
-        $memberof = '',
-        $acr = '',
-        $entitlement = ''
-    ) {
+    public static function saveUserToDataStore(...$args)
+    {
         $dbs = new DBService();
 
-        // Keep original values of providerName and providerId
-        $databaseProviderName = $providerName;
-        $databaseProviderId   = $providerId;
-
         // Save the passed-in variables to the session for later use
-        // (e.g., by the error handler in handleGotUser).
-        static::setSessionVar('firstname', $firstname);
-        static::setSessionVar('lastname', $lastname);
-        static::setSessionVar('displayname', $displayname);
-        static::setSessionvar('emailaddr', $emailaddr);
-        static::setSessionVar('loa', $loa);
-        static::setSessionVar('ePPN', $eppn);
-        static::setSessionVar('ePTID', $eptid);
-        static::setSessionVar('openidID', $openidid);
-        static::setSessionVar('oidcID', $oidcid);
-        static::setSessionVar('affiliation', $affiliation);
-        static::setSessionVar('ou', $ou);
-        static::setSessionVar('memberof', $memberof);
-        static::setSessionVar('acr', $acr);
-        static::setSessionVar('entitlement', $entitlement);
-        static::setSessionVar('idp', $providerId); // Enable error message
-        static::setSessionVar('idpname', $providerName); // Enable check for Google
+        // (e.g., by the error handler in handleGotUser). Then get these
+        // session variables into local vars for ease of use.
+        static::setUserAttributeSessionVars(...$args);
+        $remoteuser  = static::getSessionVar('remoteuser');
+        $idp         = static::getSessionVar('idp');
+        $idpname     = static::getSessionVar('idpname');
+        $firstname   = static::getSessionVar('firstname');
+        $lastname    = static::getSessionVar('lastname');
+        $displayname = static::getSessionVar('displayname');
+        $emailaddr   = static::getSessionvar('emailaddr');
+        $loa         = static::getSessionVar('loa');
+        $ePPN        = static::getSessionVar('ePPN');
+        $ePTID       = static::getSessionVar('ePTID');
+        $openidID    = static::getSessionVar('openidID');
+        $oidcID      = static::getSessionVar('oidcID');
+        $affiliation = static::getSessionVar('affiliation');
+        $ou          = static::getSessionVar('ou');
+        $memberof    = static::getSessionVar('memberof');
+        $acr         = static::getSessionVar('acr');
+        $entitlement = static::getSessionVar('entitlement');
+
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
 
-        // CACC-238 - Set loa to "silver" if the following are true:
-        // (1) loa contains  https://refeds.org/assurance/profile/cappuccino
-        // (2) acr is either https://refeds.org/profile/sfa or
-        //                   https://refeds.org/profile/mfa
-        if ((preg_match('%https://refeds.org/assurance/profile/cappuccino%', $loa)) &&
-            (preg_match('%https://refeds.org/profile/[ms]fa%', $acr))) {
-            $loa = 'http://incommonfederation.org/assurance/silver';
-            static::setSessionVar('loa', $loa);
-        }
-
         // Make sure parameters are not empty strings, and email is valid
-        // Must have at least one of remoteuser/eppn/eptid/openidid/oidcid
+        // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
         if (((strlen($remoteuser) > 0) ||
-               (strlen($eppn) > 0) ||
-               (strlen($eptid) > 0) ||
-               (strlen($openidid) > 0) ||
-               (strlen($oidcid) > 0)) &&
-            (strlen($databaseProviderId) > 0) &&
-            (strlen($databaseProviderName) > 0)  &&
+               (strlen($ePPN) > 0) ||
+               (strlen($ePTID) > 0) ||
+               (strlen($openidID) > 0) ||
+               (strlen($oidcID) > 0)) &&
+            (strlen($idp) > 0) &&
+            (strlen($idpname) > 0)  &&
             (strlen($firstname) > 0) &&
             (strlen($lastname) > 0) &&
             (strlen($emailaddr) > 0) &&
             (filter_var($emailaddr, FILTER_VALIDATE_EMAIL))) {
             // For the new Google OAuth 2.0 endpoint, we want to keep the
             // old Google OpenID endpoint URL in the database (so user does
-            // not get a new certificate subject DN). Change the providerId
-            // and providerName to the old Google OpenID values.
-            if (($databaseProviderName == 'Google+') ||
-                ($databaseProviderId == static::getAuthzUrl('Google'))) {
-                $databaseProviderName = 'Google';
-                $databaseProviderId = 'https://www.google.com/accounts/o8/id';
+            // not get a new certificate subject DN). Change the idp
+            // and idpname to the old Google OpenID values.
+            if (($idpname == 'Google+') ||
+                ($idp == static::getAuthzUrl('Google'))) {
+                $idpname = 'Google';
+                $idp = 'https://www.google.com/accounts/o8/id';
             }
 
             // In the database, keep a consistent ProviderId format: only
             // allow 'http' (not 'https') and remove any 'www.' prefix.
             if ($loa == 'openid') {
-                $databaseProviderId = preg_replace(
-                    '%^https://(www\.)?%',
-                    'http://',
-                    $databaseProviderId
-                );
+                $idp = preg_replace('%^https://(www\.)?%', 'http://', $idp);
             }
 
             $result = $dbs->getUser(
                 $remoteuser,
-                $databaseProviderId,
-                $databaseProviderName,
+                $idp,
+                $idpname,
                 $firstname,
                 $lastname,
                 $displayname,
                 $emailaddr,
-                $eppn,
-                $eptid,
-                $openidid,
-                $oidcid,
+                $ePPN,
+                $ePTID,
+                $openidID,
+                $oidcID,
                 $affiliation,
                 $ou,
                 $memberof,
@@ -1028,7 +998,7 @@ Remote Address= ' . $remoteaddr . '
             // LIGO (e.g., missing parameter error), send email alert.
             if (($status !=
                     DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) ||
-                (preg_match('/ligo\.org/', $databaseProviderId))) {
+                (preg_match('/ligo\.org/', $idp))) {
                 $mailto = 'alerts@cilogon.org';
 
                 // Set $disableligoalerts = true to stop LIGO failures
@@ -1037,7 +1007,7 @@ Remote Address= ' . $remoteaddr . '
                 $disableligoalerts = false;
 
                 // Fixes CIL-205 - Notify LIGO about IdP login errors
-                if (preg_match('/ligo\.org/', $databaseProviderId)) {
+                if (preg_match('/ligo\.org/', $idp)) {
                     if ($disableligoalerts) {
                         $mailto = '';
                     }
@@ -1050,10 +1020,10 @@ Remote Address= ' . $remoteaddr . '
                         (($loa == 'openid') ? '' : '/secure') . '/getuser/',
                     'Remote_User   = ' . ((strlen($remoteuser) > 0) ?
                         $remoteuser : '<MISSING>') . "\n" .
-                    'IdP ID        = ' . ((strlen($databaseProviderId) > 0) ?
-                        $databaseProviderId : '<MISSING>') . "\n" .
-                    'IdP Name      = ' . ((strlen($databaseProviderName) > 0) ?
-                        $databaseProviderName : '<MISSING>') . "\n" .
+                    'IdP ID        = ' . ((strlen($idp) > 0) ?
+                        $idp : '<MISSING>') . "\n" .
+                    'IdP Name      = ' . ((strlen($idpname) > 0) ?
+                        $idpname : '<MISSING>') . "\n" .
                     'First Name    = ' . ((strlen($firstname) > 0) ?
                         $firstname : '<MISSING>') . "\n" .
                     'Last Name     = ' . ((strlen($lastname) > 0) ?
@@ -1062,14 +1032,14 @@ Remote Address= ' . $remoteaddr . '
                         $displayname : '<MISSING>') . "\n" .
                     'Email Address = ' . ((strlen($emailaddr) > 0) ?
                         $emailaddr : '<MISSING>') . "\n" .
-                    'ePPN          = ' . ((strlen($eppn) > 0) ?
-                        $eppn : '<MISSING>') . "\n" .
-                    'ePTID         = ' . ((strlen($eptid) > 0) ?
-                        $eptid : '<MISSING>') . "\n" .
-                    'OpenID ID     = ' . ((strlen($openidid) > 0) ?
-                        $openidid : '<MISSING>') . "\n" .
-                    'OIDC ID       = ' . ((strlen($oidcid) > 0) ?
-                        $oidcid : '<MISSING>') . "\n" .
+                    'ePPN          = ' . ((strlen($ePPN) > 0) ?
+                        $ePPN : '<MISSING>') . "\n" .
+                    'ePTID         = ' . ((strlen($ePTID) > 0) ?
+                        $ePTID : '<MISSING>') . "\n" .
+                    'OpenID ID     = ' . ((strlen($openidID) > 0) ?
+                        $openidID : '<MISSING>') . "\n" .
+                    'OIDC ID       = ' . ((strlen($oidcID) > 0) ?
+                        $oidcID : '<MISSING>') . "\n" .
                     'Affiliation   = ' . ((strlen($affiliation) > 0) ?
                         $affiliation : '<MISSING>') . "\n" .
                     'OU            = ' . ((strlen($ou) > 0) ?
@@ -1101,6 +1071,36 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('requestsilver');
 
         static::getCsrf()->setCookieAndSession();
+    }
+
+    /**
+     * setUserAttributeSessionVars
+     *
+     * This method is called by saveUserToDatastore to put the passsed-in
+     * variables into the PHP session for later use.
+     *
+     * @param mixed $args Variable number of user attribute paramters
+     *        ordered as shown in the $attrs array below.
+     */
+    public static function setUserAttributeSessionVars(...$args)
+    {
+        $attrs = array('remoteuser', 'idp', 'idpname', 'firstname',
+                       'lastname', 'displayname', 'emailaddr',
+                       'loa', 'ePPN', 'ePITD', 'openidID', 'oidcID',
+                       'affiliation', 'ou', 'memberof', 'acr',
+                       'entitlement');
+        for ($i = 0; $i < count($args); $i++) {
+            static::setSessionVar($attrs[$i], $args[$i]);
+        }
+
+        // CACC-238 - Set loa to "silver" if the following are true:
+        // (1) loa contains  https://refeds.org/assurance/profile/cappuccino
+        // (2) acr is either https://refeds.org/profile/sfa or
+        //                   https://refeds.org/profile/mfa
+        if ((preg_match('%https://refeds.org/assurance/profile/cappuccino%', static::getSessionVar('loa'))) &&
+            (preg_match('%https://refeds.org/profile/[ms]fa%', static::getSessionVar('acr')))) {
+            static::setSessionVar('loa', 'http://incommonfederation.org/assurance/silver');
+        }
     }
 
     /**

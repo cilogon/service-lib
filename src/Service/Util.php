@@ -1089,7 +1089,8 @@ Remote Address= ' . $remoteaddr . '
                        'loa', 'ePPN', 'ePITD', 'openidID', 'oidcID',
                        'affiliation', 'ou', 'memberof', 'acr',
                        'entitlement');
-        for ($i = 0; $i < count($args); $i++) {
+        $numargs = count($args);
+        for ($i = 0; $i < $numargs; $i++) {
             static::setSessionVar($attrs[$i], $args[$i]);
         }
 

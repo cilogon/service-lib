@@ -695,6 +695,7 @@ class Util
             'memberof'     => 'MemberOf',
             'acr'          => 'AuthnContextClassRef',
             'entitlement'  => 'Entitlement',
+            'itrustuin'    => 'iTrustUIN',
             'cilogon_skin' => 'Skin Name',
             'twofactor'    => 'Two-Factor',
             'authntime'    => 'Authn Time'
@@ -890,6 +891,7 @@ Remote Address= ' . $remoteaddr . '
      *     memberof - User's isMemberOf group info
      *     acr - Authentication Context Class Ref
      *     entitlement - User's entitlement
+     *     itrustuin - User's univerity ID number
      */
     public static function saveUserToDataStore(...$args)
     {
@@ -916,6 +918,7 @@ Remote Address= ' . $remoteaddr . '
         $memberof    = static::getSessionVar('memberof');
         $acr         = static::getSessionVar('acr');
         $entitlement = static::getSessionVar('entitlement');
+        $itrustuin   = static::getSessionVar('itrustuin');
 
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
 
@@ -964,7 +967,8 @@ Remote Address= ' . $remoteaddr . '
                 $ou,
                 $memberof,
                 $acr,
-                $entitlement
+                $entitlement,
+                $itrustuin
             );
             static::setSessionVar('uid', $dbs->user_uid);
             static::setSessionVar('dn', $dbs->distinguished_name);
@@ -1050,6 +1054,8 @@ Remote Address= ' . $remoteaddr . '
                         $acr : '<MISSING>') . "\n" .
                     'Entitlement   = ' . ((strlen($entitlement) > 0) ?
                         $entitlement : '<MISSING>') . "\n" .
+                    'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?
+                        $itrustuin : '<MISSING>') . "\n" .
                     'Database UID  = ' . ((strlen(
                         $i = static::getSessionVar('uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .
@@ -1088,7 +1094,7 @@ Remote Address= ' . $remoteaddr . '
                        'lastname', 'displayname', 'emailaddr',
                        'loa', 'ePPN', 'ePITD', 'openidID', 'oidcID',
                        'affiliation', 'ou', 'memberof', 'acr',
-                       'entitlement');
+                       'entitlement', 'itrustuin');
         $numargs = count($args);
         for ($i = 0; $i < $numargs; $i++) {
             static::setSessionVar($attrs[$i], $args[$i]);
@@ -1168,6 +1174,7 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('memberof');
         static::unsetSessionVar('acr');
         static::unsetSessionVar('entitlement');
+        static::unsetSessionVar('itrustuin');
 
         // Current skin
         static::unsetSessionVar('cilogon_skin');

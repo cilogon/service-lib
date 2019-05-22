@@ -202,6 +202,11 @@ class DBService
     public $entitlement;
 
     /**
+     * @var string $itrustuin Person's univeristy ID number
+     */
+    public $itrustuin;
+
+    /**
      * @var string $serial_string CILogon serial string (e.g., A34201)
      */
     public $serial_string;
@@ -355,6 +360,7 @@ class DBService
         $this->member_of = null;
         $this->acr = null;
         $this->entitlement = null;
+        $this->itrustuin = null;
     }
 
     /**
@@ -413,7 +419,7 @@ class DBService
      *            $remote_user, $idp, $idp_display_name,
      *            $first_name, $last_name, $display_name, $email,
      *            $eppn, $eptid, $openid, $oidc, $affiliation,
-     *            $ou, $member_of, $acr, $entitlement
+     *            $ou, $member_of, $acr, $entitlement, $itrustuin
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -430,7 +436,8 @@ class DBService
             $params = array('remote_user', 'idp', 'idp_display_name',
                             'first_name', 'last_name', 'display_name', 'email',
                             'eppn', 'eptid', 'open_id', 'oidc', 'affiliation',
-                            'ou', 'member_of', 'acr', 'entitlement');
+                            'ou', 'member_of', 'acr', 'entitlement',
+                            'itrustuin');
             $cmd = 'action=getUser';
             $attr_arr = array();
             for ($i = 0; $i < $numargs; $i++) {
@@ -880,6 +887,9 @@ class DBService
                 if (isset($attr_arr['entitlement'])) {
                     $this->entitlement = $attr_arr['entitlement'];
                 }
+                if (isset($attr_arr['itrustuin'])) {
+                    $this->itrustuin = $attr_arr['itrustuin'];
+                }
             }
         }
 
@@ -951,6 +961,9 @@ class DBService
         }
         if (!is_null($this->entitlement)) {
             echo "entitlement=$this->entitlement\n";
+        }
+        if (!is_null($this->itrustuin)) {
+            echo "itrustuin=$this->itrustuin\n";
         }
         if (!is_null($this->serial_string)) {
             echo "serial_string=$this->serial_string\n";

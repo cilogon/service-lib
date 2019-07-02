@@ -104,6 +104,43 @@ class DBService
         'STATUS_CLIENT_NOT_FOUND'          => 0xFFFFF,
         'STATUS_TRANSACTION_NOT_FOUND'     => 0x10001,
         'STATUS_EPTID_MISMATCH'            => 0x100001,
+        'STATUS_EXPIRED_TOKEN'             => 0x10003,
+        'STATUS_CREATE_TRANSACTION_FAILED' => 0x10005,
+        'STATUS_UNKNOWN_CALLBACK'          => 0x10007,
+        'STATUS_MISSING_CLIENT_ID'         => 0x10009,
+        'STATUS_NO_REGISTERED_CALLBACKS'   => 0x1000B,
+        'STATUS_UNKNOWN_CLIENT'            => 0x1000D,
+        'STATUS_UNAPPROVED_CLIENT'         => 0x1000F
+    );
+
+    public static $STATUS_TEXT = array(
+        'STATUS_OK'                        => 'Status OK.',
+        'STATUS_ACTION_NOT_FOUND'          => 'Action not found.',
+        'STATUS_NEW_USER'                  => 'New user created.',
+        'STATUS_USER_UPDATED'              => 'User data updated.',
+        'STATUS_USER_NOT_FOUND'            => 'User not found.',
+        'STATUS_USER_EXISTS'               => 'User exists.',
+        'STATUS_USER_EXISTS_ERROR'         => 'User already exists.',
+        'STATUS_USER_NOT_FOUND_ERROR'      => 'User not found.',
+        'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
+        'STATUS_IDP_SAVE_FAILED'           => 'Could not save IdPs.',
+        'STATUS_DUPLICATE_PARAMETER_FOUND' => 'Duplicate parameter.',
+        'STATUS_INTERNAL_ERROR'            => 'Internal error.',
+        'STATUS_SAVE_IDP_FAILED'           => 'Could not save IdP.',
+        'STATUS_MALFORMED_INPUT_ERROR'     => 'Malformed input.',
+        'STATUS_MISSING_PARAMETER_ERROR'   => 'Missing parameter.',
+        'STATUS_NO_REMOTE_USER'            => 'Missing Remote User.',
+        'STATUS_NO_IDENTITY_PROVIDER'      => 'Missing IdP.',
+        'STATUS_CLIENT_NOT_FOUND'          => 'Missing client.',
+        'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
+        'STATUS_EPTID_MISMATCH'            => 'EPTID mismatch.',
+        'STATUS_EXPIRED_TOKEN'             => 'Expired token.',
+        'STATUS_CREATE_TRANSACTION_FAILED' => 'Failed to initialize OIDC flow.',
+        'STATUS_UNKNOWN_CALLBACK'          => 'The redirect_uri does not match a registered callback URI.',
+        'STATUS_MISSING_CLIENT_ID'         => 'Missing client_id parameter.',
+        'STATUS_NO_REGISTERED_CALLBACKS'   => 'No registered callback URIs.',
+        'STATUS_UNKNOWN_CLIENT'            => 'Unknown client_id.',
+        'STATUS_UNAPPROVED_CLIENT'         => 'Client has not been approved.'
     );
 
     /**

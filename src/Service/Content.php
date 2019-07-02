@@ -285,15 +285,22 @@ class Content
         // Check if an OIDC client selected an IdP for the transaction.
         // If so, verify that the IdP is in the list of available IdPs.
         $useselectedidp = false;
-        $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
-        if (isset($clientparams['selected_idp'])) {
-            $selected_idp = $clientparams['selected_idp'];
-            if ((strlen($selected_idp) > 0) && (isset($idps[$selected_idp]))) {
-                $useselectedidp = true;
-                $providerId = $selected_idp;
-                // Update the IdP selection list to show only this one IdP
-                $idps = array($selected_idp => $idps[$selected_idp]);
+        $idphintlist = static::getIdphintList($idps);
+        if (!empty($idphintlist)) {
+            $useselectedidp = true;
+            $providerId = $idphintlist[0];
+            // Update the IdP selection list to show just the idphintlist.
+            foreach ($idphintlist as $value) {
+                $newidps[$value] = $idps[$value];
             }
+            $idps = $newidps;
+            // Re-sort the $idps by Display_Name for correct alphabetization.
+            uasort($idps, function ($a, $b) {
+                return strcasecmp(
+                    $a['Display_Name'],
+                    $b['Display_Name']
+                );
+            });
         }
 
         echo '
@@ -316,16 +323,16 @@ class Content
           ' Identity Provider:</p>
           ';
 
-          // See if the skin has set a size for the IdP <select> list
-          $selectsize = 4;
+        // See if the skin has set a size for the IdP <select> list
+        $selectsize = 4;
         $ils = $skin->getConfigOption('idplistsize');
         if ((!is_null($ils)) && ((int)$ils > 0)) {
             $selectsize = (int)$ils;
         }
 
-        // When selected_idp is used, list size should always be 1.
+        // When selected_idp is used, list size may be smaller
         if ($useselectedidp) {
-            $selectsize = 1;
+            $selectsize = min($selectsize, count($idps));
         }
 
         echo '
@@ -1014,18 +1021,20 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         $forceinitialidp = (int)$skin->getConfigOption('forceinitialidp');
         $initialidp = (string)$skin->getConfigOption('initialidp');
 
-        // If this is a OIDC transaction, get the selected_idp,
-        // redirect_uri, and client_id parameters from the session
-        // var clientparams.
+        // If this is a OIDC transaction, get the redirect_uri and
+        // client_id parameters from the session var clientparams.
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
-        if (isset($clientparams['selected_idp'])) {
-            $selected_idp = $clientparams['selected_idp'];
-        }
         if (isset($clientparams['redirect_uri'])) {
             $redirect_uri = $clientparams['redirect_uri'];
         }
         if (isset($clientparams['client_id'])) {
             $client_id = $clientparams['client_id'];
+        }
+
+        // Use the first element of the idphint list as the selected_idp.
+        $idphintlist = static::getIdphintList();
+        if (!empty($idphintlist)) {
+            $selected_idp = $idphintlist[0];
         }
 
         // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
@@ -1055,9 +1064,9 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         }
 
         // If the <forceinitialidp> option is set, use either the
-        // <initialidp> or the 'selected_idp' as the providerId, and
-        // use <forceinitialidp> as keepIdp. Otherwise, read the
-        // cookies 'providerId' and 'keepidp'.
+        // <initialidp> or the selected_idp as the providerId, and use
+        // <forceinitialidp> as keepIdp. Otherwise, read the cookies
+        // 'providerId' and 'keepidp'.
         if (($forceinitialidp == 1) &&
             ((strlen($initialidp) > 0) || (strlen($selected_idp) > 0))) {
             // If the <allowforceinitialidp> option is set, then make sure
@@ -2788,5 +2797,85 @@ IdPs for the skin.'
         }
 
         return $retval;
+    }
+
+    /**
+     * getIdphintList
+     *
+     * This function adds support for AARC-G049 "IdP Hinting". It
+     * searches both the GET query parameters and the OIDC client
+     * parameters passed to the 'authorize' endpoint for a parameter
+     * named either 'selected_idp' or 'idphint'. This parameter can be
+     * a single entityId or a comma-separated list of entityIds.
+     * The entries in the list are processed to remove any 'chained'
+     * idphints and also to transform OIDC 'issuer' values into
+     * CILogon-specific 'entityIds' as used in the 'Select an IdP'
+     * list. Any idps which are not in the current skin's 'Select
+     * an IdP' list are removed. The resulting processed list of
+     * entityIds is returned, which may be an empty array.
+     *
+     * @param array $idps (Optional) A list of valid (i.e., whitelisted) IdPs.
+     *        If this list is empty, then use the current skin's IdP list.
+     * @return array A list of entityIds / OIDC provider URLs extracted from
+     *         a passed-in parameter 'selected_idp' or 'idphint'. This array
+     *         may be empty if no such parameter was found, or if the
+     *         entityIds in the list were not valid.
+     */
+    public static function getIdphintList($idps = [])
+    {
+        // Check for either 'selected_idp' or 'idphint' parameter that was
+        // passed in via a query parameter, either for an OAuth transaction
+        // or just 'normally'. Note that if both 'selected_idp' and
+        // 'idphint' were passed, 'idphint' takes priority.
+
+        $hintarray = array();
+        $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
+
+        $hintstr = '';
+        if (!empty(@$clientparams['idphint'])) {
+            $hintstr = $clientparams['idphint'];
+        } elseif (!empty(Util::getGetVar('idphint'))) {
+            $hintstr = Util::getGetVar('idphint');
+        } elseif (!empty(@$clientparams['selected_idp'])) {
+            $hintstr = $clientparams['selected_idp'];
+        } elseif (!empty(Util::getGetVar('selected_idp'))) {
+            $hintstr = Util::getGetVar('selected_idp');
+        }
+
+        if (!empty($hintstr)) {
+            // Split on comma to account for multiple idps
+            $hintarray = explode(',', $hintstr);
+
+            // Process the list of IdPs to transform them appropriately.
+            foreach ($hintarray as &$value) {
+                // Check for 'chained' idp hints, and remove the GET params.
+                if (preg_match('%([^\?]*)\?%', $value, $matches)) {
+                    $value = $matches[1];
+                }
+                // Also, check for OIDC issuers and transform them into
+                // CILogon-specific values used in the 'Select an IdP' list.
+                if (preg_match('%https://accounts.google.com%', $value)) {
+                    $value = 'https://accounts.google.com/o/oauth2/auth';
+                } elseif (preg_match('%https://github.com%', $value)) {
+                    $value = 'https://github.com/login/oauth/authorize';
+                } elseif (preg_match('%https://orcid.org%', $value)) {
+                    $value = 'https://orcid.org/oauth/authorize';
+                }
+            }
+            unset($value); // Break the reference with the last element.
+
+            // Remove any non-whitelisted IdPs from the hintarray.
+            if (empty($idps)) {
+                $idps = static::getCompositeIdPList();
+            }
+            foreach ($hintarray as $value) {
+                if (!isset($idps[$value])) {
+                    if (($key = array_search($value, $hintarray)) !== false) {
+                        unset($hintarray[$key]);
+                    }
+                }
+            }
+        }
+        return $hintarray;
     }
 }

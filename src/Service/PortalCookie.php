@@ -3,6 +3,7 @@
 namespace CILogon\Service;
 
 use CILogon\Service\Util;
+use CILogon\Service\Content;
 
 /**
  * PortalCookie
@@ -178,11 +179,16 @@ class PortalCookie
             if ((isset($clientparams['client_id'])) &&
                 (isset($clientparams['redirect_uri'])) &&
                 (isset($clientparams['scope']))) {
+                // Use the first element of the idphint list as the selected_idp.
+                $selected_idp = '';
+                $idphintlist = Content::getIdphintList();
+                if (!empty($idphintlist)) {
+                    $selected_idp = $idphintlist[0];
+                }
                 $retval = $clientparams['client_id'] . ';' .
                           $clientparams['redirect_uri'] . ';' .
                           $clientparams['scope'] .
-                          (isset($clientparams['selected_idp']) ?  ';' .
-                                 $clientparams['selected_idp'] : '');
+                          (empty($selected_idp) ? '' : ';' . $selected_idp);
             }
         }
         return $retval;

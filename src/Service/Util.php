@@ -1222,4 +1222,73 @@ Remote Address= ' . $remoteaddr . '
         }
         return $retval;
     }
+
+    /**
+     * isEduGAINAndGetCert
+     *
+     * This function checks to see if the current session IdP is an
+     * eduGAIN IdP (i.e., not Registered By InCommon) and the IdP does not
+     * have both the REFEDS R&S and SIRTFI extensions in metadata. If so,
+     * check to see if the transaction could be used to fetch a
+     * certificate. (The only time the transaction is not used to fetch
+     * a cert is during OIDC without the 'getcert' scope.) If all that is
+     * true, then return true. Otherwise return false.
+     *
+     * @param string $idp (optional) The IdP entityID. If empty, read value
+     *        from PHP session.
+     * @param string $idpname (optional) The IdP display name. If empty,
+     *        read value from PHP session.
+     * @return bool True if the current IdP is an eduGAIN IdP without
+     *         both REFEDS R&S and SIRTFI, AND the session could be
+     *         used to get a certificate.
+     */
+    public static function isEduGAINAndGetCert($idp = '', $idpname = '')
+    {
+        $retval = false; // Assume not eduGAIN IdP and getcert
+
+        // If $idp or $idpname not passed in, get from current session.
+        if (strlen($idp) == 0) {
+            $idp = static::getSessionVar('idp');
+        }
+        if (strlen($idpname) == 0) {
+            $idpname = static::getSessionVar('idpname');
+        }
+
+        // Check if this was an OIDC transaction, and if the
+        // 'getcert' scope was requested.
+        $oidcscopegetcert = false;
+        $oidctrans = false;
+        $clientparams = json_decode(static::getSessionVar('clientparams'), true);
+        if (isset($clientparams['scope'])) {
+            $oidctrans = true;
+            if (preg_match(
+                '/edu\.uiuc\.ncsa\.myproxy\.getcert/',
+                $clientparams['scope']
+            )) {
+                $oidcscopegetcert = true;
+            }
+        }
+
+        // First, make sure $idp was set and is not an OAuth2 IdP.
+        $idplist = static::getIdpList();
+        if (((strlen($idp) > 0) &&
+            (strlen($idpname) > 0) &&
+            (!in_array($idpname, static::$oauth2idps))) &&
+                (
+                // Next, check for eduGAIN without REFEDS R&S and SIRTFI
+                ((!$idplist->isRegisteredByInCommon($idp)) &&
+                       ((!$idplist->isREFEDSRandS($idp)) ||
+                        (!$idplist->isSIRTFI($idp))
+                       )
+                ) &&
+                // Next, check if user could get X509 cert,
+                // i.e., OIDC getcert scope, or a non-OIDC
+                // transaction such as PKCS12, JWS, or OAuth 1.0a
+                ($oidcscopegetcert || !$oidctrans)
+                )
+            ) {
+            $retval = true;
+        }
+        return $retval;
+    }
 }

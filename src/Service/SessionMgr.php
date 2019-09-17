@@ -179,7 +179,7 @@ class SessionMgr
      */
     public function write($session_id, $session_data)
     {
-        $retval= true; // Assume write to database succeeded
+        $retval = true; // Assume write to database succeeded
 
         if (is_null($this->db)) {  // Can't write to a null database
             $retval = false;
@@ -189,7 +189,7 @@ class SessionMgr
             $quoteid = $this->db->quoteSmart($session_id);
             $query = '';
             if ((!is_null($this->crc)) &&
-                ($this->crc === (strlen($session_data).crc32($session_data)))) {
+                ($this->crc === (strlen($session_data) . crc32($session_data)))) {
                 // $_SESSION hasn't been touched, so update the expires column
                 $query = "UPDATE phpsessions SET expires = $newtime " .
                          "WHERE id = $quoteid";
@@ -204,12 +204,12 @@ class SessionMgr
                     $quotedata = $this->db->quoteSmart($session_data);
                     if (intval($result) == 0) {
                         // Insert a new row into the table
-                        $query = "INSERT INTO phpsessions (id,data,expires) ".
+                        $query = "INSERT INTO phpsessions (id,data,expires) " .
                                  "VALUES($quoteid,$quotedata,$newtime)";
                     } else {
                         // Update existing row with new data and expires
                         $query = "UPDATE phpsessions " .
-                                 "SET data = $quotedata, expires = $newtime ".
+                                 "SET data = $quotedata, expires = $newtime " .
                                  "WHERE id = $quoteid";
                     }
                 }

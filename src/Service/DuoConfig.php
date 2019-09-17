@@ -38,7 +38,7 @@ class DuoConfig
             array('host','ikey','skey','akey','name','ikey-rest','skey-rest');
 
         foreach ($duoparamnames as $val) {
-            $config = Util::getConfigVar('duo.'.$val);
+            $config = Util::getConfigVar('duo.' . $val);
             if (strlen($config) > 0) {
                 $this->param[$val] = $config;
             }

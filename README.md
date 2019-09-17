@@ -7,12 +7,12 @@
 
 This package contains the library used by the [CILogon Service](https://github.com/cilogon/service).
 
-This package is compliant with [PSR-1][], [PSR-2][] and [PSR-4][]. If you notice compliance oversights, please send
+This package is compliant with [PSR-1][], [PSR-4][], and [PSR-12][]. If you notice compliance oversights, please send
 a patch via pull request.
 
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
-[PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
+[PSR-12]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-12-extended-coding-style-guide.md
 
 ## Requirements
 

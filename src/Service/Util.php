@@ -264,7 +264,7 @@ class Util
         if ($exp > 0) {
             $exp += time();
         }
-        setcookie($cookie, $value, $exp, '/', '.'.static::getDN(), true);
+        setcookie($cookie, $value, $exp, '/', '.' . static::getDN(), true);
         $_COOKIE[$cookie] = $value;
     }
 
@@ -279,7 +279,7 @@ class Util
      */
     public static function unsetCookieVar($cookie)
     {
-        setcookie($cookie, '', 1, '/', '.'.static::getDN(), true);
+        setcookie($cookie, '', 1, '/', '.' . static::getDN(), true);
         unset($_COOKIE[$cookie]);
     }
 
@@ -425,7 +425,7 @@ class Util
         }
 
         ini_set('session.cookie_secure', true);
-        ini_set('session.cookie_domain', '.'.static::getDN());
+        ini_set('session.cookie_domain', '.' . static::getDN());
         session_start();
         if ((!isset($_SESSION['lastaccess']) ||
             (time() - $_SESSION['lastaccess']) > 60)) {
@@ -462,12 +462,12 @@ class Util
             $retval = '';
         }
         if ((strlen($retval) == 0) ||
-            ($stripfile && ($retval[strlen($retval)-1] != '/'))) {
+            ($stripfile && ($retval[strlen($retval) - 1] != '/'))) {
             $retval .= '/';  // Append a slash if necessary
         }
         if ($prependhttp) {  // Prepend http(s)://hostname
             $retval = 'http' .
-                      ((strtolower(static::getServerVar('HTTPS')) == 'on')?'s':'') .
+                      ((strtolower(static::getServerVar('HTTPS')) == 'on') ? 's' : '') .
                       '://' . static::getServerVar('HTTP_HOST') . $retval;
         }
         return $retval;
@@ -496,7 +496,7 @@ class Util
         if (is_readable($filename)) {
             $lines = file(
                 $filename,
-                FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES
+                FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES
             );
             foreach ($lines as $line) {
                 if (substr($line, 0, 1) != '#') { // Skip '#' comment lines
@@ -571,7 +571,7 @@ class Util
     public static function parseGridShibConf(
         $conffile = '/usr/local/gridshib-ca/conf/gridshib-ca.conf'
     ) {
-        $conf = new Config;
+        $conf = new Config();
         $root = $conf->parseConfig($conffile, 'Apache');
         $gridshibconf = array();
         if (!(PEAR::isError($root))) {
@@ -624,13 +624,13 @@ class Util
             $objects = scandir($dir);
             foreach ($objects as $object) {
                 if ($object != "." && $object != "..") {
-                    if (filetype($dir."/".$object) == "dir") {
-                        static::deleteDir($dir."/".$object);
+                    if (filetype($dir . "/" . $object) == "dir") {
+                        static::deleteDir($dir . "/" . $object);
                     } else {
                         if ($shred) {
-                            @exec('/bin/env /usr/bin/shred -u -z '.$dir."/".$object);
+                            @exec('/bin/env /usr/bin/shred -u -z ' . $dir . "/" . $object);
                         } else {
-                            @unlink($dir."/".$object);
+                            @unlink($dir . "/" . $object);
                         }
                     }
                 }
@@ -654,7 +654,7 @@ class Util
      */
     public static function htmlent($str)
     {
-        return htmlentities($str, ENT_COMPAT|ENT_HTML401, 'UTF-8');
+        return htmlentities($str, ENT_COMPAT | ENT_HTML401, 'UTF-8');
     }
 
     /**

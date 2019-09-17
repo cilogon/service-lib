@@ -145,7 +145,7 @@ class PortalCookie
                     $iv
                 );
                 if (strlen($data) > 0) {
-                    $b64 = base64_encode($iv.$data); // Prepend IV to data
+                    $b64 = base64_encode($iv . $data); // Prepend IV to data
                     if ($b64 !== false) {
                         Util::setCookieVar(static::COOKIENAME, $b64);
                     }

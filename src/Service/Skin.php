@@ -193,7 +193,7 @@ class Skin
         if (strlen($skinvar) > 0) {
             $basedir = Util::getServerVar('DOCUMENT_ROOT') . '/skin';
             if ($handle = opendir($basedir)) {
-                while ((false !== ($file=readdir($handle))) && (!$found)) {
+                while ((false !== ($file = readdir($handle))) && (!$found)) {
                     if (($file != '.') && ($file != '..') &&
                         (is_dir($basedir . '/' . $file)) &&
                         (strcasecmp($skinvar, $file) == 0)) {

@@ -94,7 +94,7 @@ class TimeIt
                 $this->fh,
                 "%8.4f" . "\t" . "%8.4f" . "\n",
                 $currtime,
-                ($currtime-$this->lasttime)
+                ($currtime - $this->lasttime)
             );
         }
         $this->closeFile();
@@ -201,7 +201,7 @@ class TimeIt
                 $this->fh,
                 "%8.4f" . "\t" . "%8.4f" . "\n",
                 $currtime,
-                ($currtime-$this->lasttime)
+                ($currtime - $this->lasttime)
             );
         }
         $this->lasttime = $this->getTime() - $this->firsttime;

@@ -1071,7 +1071,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             ((strlen($initialidp) > 0) || (strlen($selected_idp) > 0))) {
             // If the <allowforceinitialidp> option is set, then make sure
             // the callback / redirect uri is in the portal list.
-            $afii=$skin->getConfigOption('portallistaction', 'allowforceinitialidp');
+            $afii = $skin->getConfigOption('portallistaction', 'allowforceinitialidp');
             if ((is_null($afii)) || // Option not set, no need to check portal list
                 (((int)$afii == 1) &&
                   (($skin->inPortalList($redirect_uri)) ||
@@ -1185,7 +1185,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
 
         echo '
           <input type="submit" name="submit" class="helpbutton" value="' ,
-          (Util::getSessionVar('showhelp')=='on' ? 'Hide':'Show') , '&#10; Help " />
+          (Util::getSessionVar('showhelp') == 'on' ? 'Hide' : 'Show') , '&#10; Help " />
           </form>
         </div>
         ';
@@ -1328,7 +1328,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 Util::unsetSessionVar('forceauthn');
                 if ($forceauthn) {
                     $redirect .= '&forceAuthn=true';
-                } elseif (strlen($forceauthn)==0) {
+                } elseif (strlen($forceauthn) == 0) {
                     // 'forceauth' was not set to '0' in the session, so
                     // check the skin's option instead.
                     $forceauthn = Util::getSkin()->getConfigOption('forceauthn');
@@ -1404,7 +1404,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
             Util::unsetSessionVar('forceauthn');
             if ($forceauthn) {
                 $extraparams['approval_prompt'] = 'force';
-            } elseif (strlen($forceauthn)==0) {
+            } elseif (strlen($forceauthn) == 0) {
                 // 'forceauth' was not set to '0' in the session, so
                 // check the skin's option instead.
                 $forceauthn = Util::getSkin()->getConfigOption('forceauthn');
@@ -1512,7 +1512,7 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         }
         // Next, check for OAuth 1.0a
         if ((strlen($redirect) == 0) && (strlen($failureuri) > 0)) {
-            $redirect = $failureuri. "?reason=missing_attributes";
+            $redirect = $failureuri . "?reason=missing_attributes";
         }
 
         // If empty 'uid' or 'status' or odd-numbered status code, error!
@@ -1806,10 +1806,10 @@ IdPs for the skin.'
                     // Check initialremember skin option PLUS no portal cookie
                     $initialremember =
                         $skin->getConfigOption('delegate', 'initialremember');
-                    if ((!is_null($initialremember)) && ((int)$initialremember==1)) {
+                    if ((!is_null($initialremember)) && ((int)$initialremember == 1)) {
                         $pc = new PortalCookie();
                         $portallifetime = $pc->get('lifetime');
-                        if ((strlen($portallifetime)==0) || ($portallifetime==0)) {
+                        if ((strlen($portallifetime) == 0) || ($portallifetime == 0)) {
                             $status = DBService::$STATUS['STATUS_OK'];
                         }
                     }
@@ -1957,8 +1957,8 @@ IdPs for the skin.'
                     echo '
                     <tr' , ($tablerowodd ? ' class="odd"' : '') , '>
                       <th>Organization Name:</th>
-                      <td>'.$previdpname.'</td>
-                      <td>'.$idpname.'</td>
+                      <td>' . $previdpname . '</td>
+                      <td>' . $idpname . '</td>
                     </tr>
                     ';
                     $tablerowodd = !$tablerowodd;
@@ -1968,8 +1968,8 @@ IdPs for the skin.'
                     echo '
                     <tr' , ($tablerowodd ? ' class="odd"' : '') , '>
                       <th>First Name:</th>
-                      <td>'.Util::htmlent($prevfirst).'</td>
-                      <td>'.Util::htmlent($first).'</td>
+                      <td>' . Util::htmlent($prevfirst) . '</td>
+                      <td>' . Util::htmlent($first) . '</td>
                     </tr>
                     ';
                     $tablerowodd = !$tablerowodd;
@@ -1979,8 +1979,8 @@ IdPs for the skin.'
                     echo '
                     <tr' , ($tablerowodd ? ' class="odd"' : '') , '>
                       <th>Last Name:</th>
-                      <td>'.Util::htmlent($prevlast).'</td>
-                      <td>'.Util::htmlent($last).'</td>
+                      <td>' . Util::htmlent($prevlast) . '</td>
+                      <td>' . Util::htmlent($last) . '</td>
                     </tr>
                     ';
                     $tablerowodd = !$tablerowodd;
@@ -1990,8 +1990,8 @@ IdPs for the skin.'
                     echo '
                     <tr' , ($tablerowodd ? ' class="odd"' : '') , '>
                       <th>Email Address:</th>
-                      <td>'.$prevemail.'</td>
-                      <td>'.$email.'</td>
+                      <td>' . $prevemail . '</td>
+                      <td>' . $email . '</td>
                     </tr>
                     ';
                     $tablerowodd = !$tablerowodd;
@@ -2204,7 +2204,7 @@ IdPs for the skin.'
                 $match
             )) {
                 $cert2 = "-----BEGIN RSA PRIVATE KEY-----" .
-                         $match[2] . "-----END RSA PRIVATE KEY-----\n".
+                         $match[2] . "-----END RSA PRIVATE KEY-----\n" .
                          "-----BEGIN CERTIFICATE-----" .
                          $match[1] . "-----END CERTIFICATE-----";
             }
@@ -2234,9 +2234,9 @@ IdPs for the skin.'
                 if (($size !== false) && ($size > 0)) {
                     $p12link = 'https://' . static::getMachineHostname() .
                                '/pkcs12/' . $p12dir . '/usercred.p12';
-                    $p12 = (time()+300) . " " . $p12link;
+                    $p12 = (time() + 300) . " " . $p12link;
                     Util::setSessionVar('p12', $p12);
-                    $log->info('Generated New User Certificate="'.$p12link.'"');
+                    $log->info('Generated New User Certificate="' . $p12link . '"');
                     //CIL-507 Special Log Message For XSEDE
                     $log->info('USAGE email="' .
                         Util::getSessionVar('emailaddr') . '" client="PKCS12"');
@@ -2585,7 +2585,7 @@ IdPs for the skin.'
             $errorboxstr .=
             '<tr><th>ePTID:</th><td>MISSING</td></tr>
             <tr><th>ePPN:</th><td>MISSING</td></tr>';
-            $missingattrs .= '%0D%0A    eduPersonPrincipalName'.
+            $missingattrs .= '%0D%0A    eduPersonPrincipalName' .
                              '%0D%0A    eduPersonTargetedID ';
         }
         if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
@@ -2703,7 +2703,7 @@ IdPs for the skin.'
                 }
                 $errorboxstr .= '<li>Administrative Contact: ' .
                     $name . ' &lt;<a href="mailto:' .
-                    $addr . $emailmsg.'">' .
+                    $addr . $emailmsg . '">' .
                     $addr . '</a>&gt</li>';
             }
         }

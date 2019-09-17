@@ -118,11 +118,11 @@ class ShibError
                 if (array_key_exists('redirect_uri', $clientparams)) {
                     Util::unsetAllUserSessionVars();
                     header('Location: ' . $clientparams['redirect_uri'] .
-                        (preg_match('/\?/', $clientparams['redirect_uri'])?'&':'?') .
+                        (preg_match('/\?/', $clientparams['redirect_uri']) ? '&' : '?') .
                         'error=access_denied&error_description=' .
                         'User%20denied%20authorization%20request' .
                         ((array_key_exists('state', $clientparams)) ?
-                            '&state='.$clientparams['state'] : ''));
+                            '&state=' . $clientparams['state'] : ''));
                 } elseif (strlen($failureuri) > 0) {
                     Util::unsetAllUserSessionVars();
                     header('Location: ' . $failureuri . '?reason=cancel');
@@ -171,7 +171,7 @@ class ShibError
         $errorstr1 = '';  // For logging - one line
         $errorstr2 = '';  // For HTML and email - multi-line
         foreach ($this->errorarray as $key => $value) {
-            $errorstr1 .= Util::htmlent($key.'="' . $value . '" ');
+            $errorstr1 .= Util::htmlent($key . '="' . $value . '" ');
             $errorstr2 .= Util::htmlent(sprintf("%-14s= %s\n", $key, $value));
         }
 

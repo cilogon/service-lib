@@ -236,11 +236,11 @@ class Content
      *
      * @param bool $showremember (Optional) Show the 'Remember this
      *        selection' checkbox? Defaults to true.
-     * @param bool $incommonidps (Optional) Show all InCommon IdPs in
+     * @param bool $samlidps (Optional) Show all SAML-based IdPs in
      *        selection list? Defaults to false, which means show
      *        only whitelisted IdPs.
      */
-    public static function printWAYF($showremember = true, $incommonidps = false)
+    public static function printWAYF($showremember = true, $samlidps = false)
     {
         $helptext = 'Check this box to bypass the welcome page on ' .
             'subsequent visits and proceed directly to the selected ' .
@@ -249,7 +249,7 @@ class Content
         $searchtext = "Enter characters to search for in the list above.";
 
         // Get an array of IdPs
-        $idps = static::getCompositeIdPList($incommonidps);
+        $idps = static::getCompositeIdPList($samlidps);
 
         $skin = Util::getSkin();
 
@@ -427,7 +427,7 @@ class Content
           <div>
           ';
 
-            if ($incommonidps) { // InCommon IdPs only means running from /testidp/
+            if ($samlidps) { // SAML-based IdPs only means running from /testidp/
                 echo '
                 <p>
                 CILogon facilitates secure access to CyberInfrastructure
@@ -2460,22 +2460,36 @@ IdPs for the skin.'
      * IdPs based on the skin's whitelist/blacklist and the global
      * blacklist file. For the TestIdP page, the list is all InCommon IdPs.
      *
-     * @param bool $incommonidps (Optional) Show all InCommon IdPs in
+     * @param bool $samlidps (Optional) Show all SAML-based IdPs in
      *        selection list? Defaults to false, which means show only
      *        whitelisted IdPs.
      * @return array A two-dimensional array where the primary key is the
      *         entityID and the secondary key is either 'Display_Name'
      *         or 'Organization_Name'.
      */
-    public static function getCompositeIdPList($incommonidps = false)
+    public static function getCompositeIdPList($samlidps = false)
     {
         $retarray = array();
 
         $idplist = Util::getIdpList();
-        if ($incommonidps) { // Get all InCommon IdPs only
-            $retarray = $idplist->getInCommonIdPs();
-        } else { // Get the whitelisted InCommon IdPs, plus maybe OAuth2 IdPs
-            $retarray = $idplist->getWhitelistedIdPs();
+        if ($samlidps) { // Get all SAML-based IdPs only
+            $retarray = $idplist->getSAMLIdPs();
+        } else { // Get the selected InCommon IdPs, plus maybe OAuth2 IdPs
+            $skin = Util::getSkin();
+
+            // Check if the skin's config.xml has set the
+            // 'registeredbyincommonidps' option, which restricts the SAML-
+            // based IdPs to those with the <Registered_By_InCommon> tag.
+            // Otherwise, just get the SAML-based IdPs that have the
+            // <Whitelisted> tag. Note that the skin's <idpwhitelist>
+            // is still consulted in either case (below).
+            $registeredbyincommonidps = $skin->getConfigOption('registeredbyincommonidps');
+            if ((!is_null($registeredbyincommonidps)) &&
+                ((int)$registeredbyincommonidps == 1)) {
+                $retarray = $idplist->getRegisteredByInCommonIdPs();
+            } else {
+                $retarray = $idplist->getWhitelistedIdPs();
+            }
 
             // Add all OAuth2 IdPs to the list
             foreach (Util::$oauth2idps as $key => $value) {
@@ -2486,7 +2500,6 @@ IdPs for the skin.'
             // Check to see if the skin's config.xml has a whitelist of IDPs.
             // If so, go thru master IdP list and keep only those IdPs in the
             // config.xml's whitelist.
-            $skin = Util::getSkin();
             if ($skin->hasIdpWhitelist()) {
                 foreach ($retarray as $entityId => $names) {
                     if (!$skin->idpWhitelisted($entityId)) {

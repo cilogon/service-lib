@@ -11,7 +11,7 @@ use SimpleXMLElement;
 /**
  * IdpList
  *
- * This class manages the list of InCommon IdPs and their
+ * This class manages the list of SAML-based IdPs and their
  * attributes of interest. Since the InCommon-metadata.xml
  * file is rather large and slow to parse using xpath
  * queries, this class creates/reads/writes a smaller
@@ -1077,9 +1077,9 @@ EOT;
     }
 
     /**
-     * getInCommonIdPs
+     * getSAMLIdPs
      *
-     * This method returns a two-dimensional array of InCommon IdPs.
+     * This method returns a two-dimensional array of SAML-based IdPs.
      * The primary key of the array is the entityID, the secondary key is
      * either 'Organization_Name' (corresponds to OrganizationDisplayName)
      * or 'Display_Name' (corresponds to mdui:DisplayName).
@@ -1088,14 +1088,15 @@ EOT;
      * only whitelisted IdPs, 2 means list only R&S IdPs.
      *
      * @param int $filter
-     *        null => all InCommonIdPs
-     *        0    => non-whitelisted InCommon IdPs
-     *        1    => whitelisted InCommon IdPs
-     *        2    => R&S InCommon IdPs
-     * $return array An array of InCommon IdP Organization Names and Display
+     *        null => all SAML-based IdPs
+     *        0    => non-whitelisted SAML-based IdPs
+     *        1    => whitelisted SAML-based IdPs
+     *        2    => R&S SAML-based IdPs
+     *        3    => whitelisted "Registered By InCommon" IdPs
+     * $return array An array of SAML-based IdP Organization Names and Display
      *         Names, possibly filtered by whitelisted / non-whitelisted / R&S.
      */
-    public function getInCommonIdPs($filter = null)
+    public function getSAMLIdPs($filter = null)
     {
         $retarr = array();
 
@@ -1106,7 +1107,11 @@ EOT;
                 (($filter === 1) &&
                  (!$this->isWhitelisted($key))) ||
                 (($filter === 2) &&
-                 (!$this->isRandS($key)))) {
+                 (!$this->isRandS($key))) ||
+                (($filter === 3) &&
+                 (!$this->isRegisteredByInCommon($key)) ||
+                 (!$this->isWhitelisted($key)))
+               ) {
                 continue;
             }
             $retarr[$key]['Organization_Name'] = $this->idparray[$key]['Organization_Name'];
@@ -1121,13 +1126,14 @@ EOT;
      *
      * This method returns an array of non-whitelisted IdPs where the
      * keys of the array are the entityIDs and the values are the
-     * pretty print Organization Names.
+     * pretty print Organization Names. Note that this essentially
+     * returns the IdPs in the blacklist.txt file.
      *
      * @return array An array of non-whitelisted IdPs.
      */
     public function getNonWhitelistedIdPs()
     {
-        return $this->getInCommonIdPs(0);
+        return $this->getSAMLIdPs(0);
     }
 
     /**
@@ -1135,13 +1141,14 @@ EOT;
      *
      * This method returns an array of whitelisted IdPs where the keys
      * of the array are the entityIDs and the values are the
-     * pretty print Organization Names.
+     * pretty print Organization Names. Note that this returns all of the
+     * IdPs not in the blacklist.txt file.
      *
      * @return array An array of whitelisted IdPs.
      */
     public function getWhitelistedIdPs()
     {
-        return $this->getInCommonIdPs(1);
+        return $this->getSAMLIdPs(1);
     }
 
     /**
@@ -1155,7 +1162,21 @@ EOT;
      */
     public function getRandSIdPs()
     {
-        return $this->getInCommonIdPs(2);
+        return $this->getSAMLIdPs(2);
+    }
+
+    /**
+     * getRegisteredByInCommonIdPs
+     *
+     * This method returns an array of IdPs that have been tagged as
+     * "Registered_By_InCommon". The keys of the array are the entityIDs
+     * and the values are the pretty print Organization Names.
+     *
+     * @return array An array of Research and Scholarship (R&S) IdPs.
+     */
+    public function getRegisteredByInCommonIdPs()
+    {
+        return $this->getSAMLIdPs(3);
     }
 
     /**

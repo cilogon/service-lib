@@ -1209,7 +1209,7 @@ Remote Address= ' . $remoteaddr . '
      * @param function $func The function to call if the current session is
      *        successfully verified.
      * @param array $params (Optional) An array of parameters to pass to the
-     8        function. Defaults to empty array, meaning zero parameters.
+     *        function. Defaults to empty array, meaning zero parameters.
      */
     public static function verifySessionAndCall($func, $params = array())
     {

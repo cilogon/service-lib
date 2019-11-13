@@ -1092,7 +1092,7 @@ Remote Address= ' . $remoteaddr . '
     {
         $attrs = array('remoteuser', 'idp', 'idpname', 'firstname',
                        'lastname', 'displayname', 'emailaddr',
-                       'loa', 'ePPN', 'ePITD', 'openidID', 'oidcID',
+                       'loa', 'ePPN', 'ePTID', 'openidID', 'oidcID',
                        'affiliation', 'ou', 'memberof', 'acr',
                        'entitlement', 'itrustuin');
         $numargs = count($args);

@@ -548,39 +548,6 @@ class Util
     }
 
     /**
-     * parseGridShibConf
-     *
-     * This function parses the gridshib-ca.conf file and returns an
-     * array containing the various options. It uses the PHP
-     * PEAR::Config package to parse the config file. The
-     * gridshib-ca.conf file is MOSTLY an Apache-style config file.
-     * However, each option has an extra ' = ' prepended, so you will
-     * need to strip these off each config option. For example, to get
-     * the 'MaximumCredLifetime' value which is in the 'CA' section,
-     * you would do the following:
-     *     $gridshibconf = Util::parseGridShibConf();
-     *     $life = preg_replace('%^\s*=\s*%','',
-     *             $gridshibconf['root']['CA']['MaximumCredLifetime']);
-     *
-     * @param string $conffile (Optional) Full path location of
-     *        gridshib-ca.conf file. Defaults to
-     *        '/usr/local/gridshib-ca/conf/gridshib-ca.conf'.
-     * @return array An array containing the various configuration
-     *         parameters in the gridshib-ca.conf file.
-     */
-    public static function parseGridShibConf(
-        $conffile = '/usr/local/gridshib-ca/conf/gridshib-ca.conf'
-    ) {
-        $conf = new Config();
-        $root = $conf->parseConfig($conffile, 'Apache');
-        $gridshibconf = array();
-        if (!(PEAR::isError($root))) {
-            $gridshibconf = $root->toArray();
-        }
-        return $gridshibconf;
-    }
-
-    /**
      * tempDir
      *
      * This function creates a temporary subdirectory within the
@@ -1121,7 +1088,6 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('submit');
 
         // Specific to 'Download Certificate' page
-        static::unsetSessionVar('activation');
         static::unsetSessionVar('p12');
         static::unsetSessionVar('p12lifetime');
         static::unsetSessionVar('p12multiplier');

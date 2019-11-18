@@ -92,7 +92,6 @@ class Loggit
                         );
         // Always print out certain cookies, if available
         $cookies = array('providerId',
-                         'CSRFProtection'
                         );
 
         $envstr = ' ';

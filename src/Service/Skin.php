@@ -276,8 +276,8 @@ class Skin
      * idps, call $idps = getConfigOption('idpblacklist') and then
      * iterate over $idps with foreach($idps as $idp) { ... }.  To get
      * a single subblock value such as the initial lifetime number for
-     * the GridShib-CA client, call $gscanum =
-     * (int)getConfigOption('gsca','initiallifetime','number'). Note
+     * the PKCS12 download option, call $life =
+     * (int)getConfigOption('pkcs12','initiallifetime','number'). Note
      * that you should explicitly cast the values to int, string,
      * float, etc., when you use them.
      */

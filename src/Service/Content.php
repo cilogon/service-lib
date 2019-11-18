@@ -35,16 +35,13 @@ class Content
      *
      * @param string $title The text in the window's titlebar
      * @param string $extra Optional extra text to go in the <head> block
-     * @param bool $csrfcookie Set the CSRF and CSRFProtetion cookies.
-     *        Defaults to true.
+     * @param bool $csrfcookie Set the CSRF cookie. Defaults to true.
      */
     public static function printHeader($title = '', $extra = '', $csrfcookie = true)
     {
         if ($csrfcookie) {
             $csrf = Util::getCsrf();
             $csrf->setTheCookie();
-            // Set the CSRF cookie used by GridShib-CA
-            Util::setCookieVar('CSRFProtection', $csrf->getTokenValue(), 0);
         }
 
         // Find the 'Powered By CILogon' image if specified by the skin
@@ -186,22 +183,16 @@ class Content
      * submit buttons.  The first parameter is used for the 'action' value
      * of the <form>.  If omitted, getScriptDir() is called to get the
      * location of the current script.  This function outputs a hidden csrf
-     * field in the form block.  If the second parameter is given and set
-     * to true, then an additional hidden input element is output to be
-     * utilized by the GridShib-CA client.
+     * field in the form block.
      *
      * @param string $action (Optional) The value of the form's 'action'
      *        parameter. Defaults to getScriptDir().
      * @param string $method (Optional) The <form> 'method', one of 'get' or
      *        'post'. Defaults to 'post'.
-     * @param bool $gsca  (Optional) True if extra hidden tags should be
-     *        output for the GridShib-CA client application.
-     *        Defaults to false.
      */
     public static function printFormHead(
         $action = '',
-        $method = 'post',
-        $gsca = false
+        $method = 'post'
     ) {
         static $formnum = 0;
 
@@ -215,14 +206,6 @@ class Content
         ';
         $csrf = Util::getCsrf();
         echo $csrf->hiddenFormElement();
-
-        if ($gsca) {
-            // Output hidden form element for GridShib-CA
-            echo '
-            <input type="hidden" name="CSRFProtection" value="' .
-            $csrf->getTokenValue() . '" />
-            ';
-        }
     }
 
     /**
@@ -2375,7 +2358,7 @@ IdPs for the skin.'
      *
      * @param string $section The XML section block from which to read the
      *        minlifetime and maxlifetime values. Can be one of the
-     *        following: 'pkcs12', 'gsca', or 'delegate'.
+     *        following: 'pkcs12' or 'delegate'.
      * @param int $defaultmaxlifetime Default maxlifetime (in hours) for the
      *        credential.
      * @return array An array consisting of two entries: the minimum and

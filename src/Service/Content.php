@@ -1799,33 +1799,11 @@ IdPs for the skin.'
                     "htmlentites(DN) = $htmldn\n"
                 );
             }
-
-            if (isset($clientparams['code'])) {
-                // OIDC authorization code flow always skips New User page
-                $status = DBService::$STATUS['STATUS_OK'];
-            } elseif (strlen($callbackuri) > 0) {
-                // Delegation code flow might skip New User page
-                if ((!is_null($forceremember)) && ((int)$forceremember == 1)) {
-                    // Check forcerememeber skin option to skip new user page
-                    $status = DBService::$STATUS['STATUS_OK'];
-                } else {
-                    // Check initialremember skin option PLUS no portal cookie
-                    $initialremember =
-                        $skin->getConfigOption('delegate', 'initialremember');
-                    if ((!is_null($initialremember)) && ((int)$initialremember == 1)) {
-                        $pc = new PortalCookie();
-                        $portallifetime = $pc->get('lifetime');
-                        if ((strlen($portallifetime) == 0) || ($portallifetime == 0)) {
-                            $status = DBService::$STATUS['STATUS_OK'];
-                        }
-                    }
-                }
-            }
         }
 
         // For a new user, or if the user got new attributes, just log it.
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
-            $log->info('New User page.');
+            $log->info('New User.');
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {
             $log->info('User IdP attributes changed.');
         }

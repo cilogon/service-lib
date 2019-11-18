@@ -21,7 +21,6 @@ script:
   - mkdir -p build/logs
   - ./vendor/bin/parallel-lint src
   - ./vendor/bin/phpunit --coverage-text
-  - ./vendor/bin/phpcs --standard=psr12 -sp src
 
 after_success:
   - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.2/coveralls.phar

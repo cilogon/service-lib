@@ -194,9 +194,11 @@ class Skin
             $basedir = Util::getServerVar('DOCUMENT_ROOT') . '/skin';
             if ($handle = opendir($basedir)) {
                 while ((false !== ($file = readdir($handle))) && (!$found)) {
-                    if (($file != '.') && ($file != '..') &&
+                    if (
+                        ($file != '.') && ($file != '..') &&
                         (is_dir($basedir . '/' . $file)) &&
-                        (strcasecmp($skinvar, $file) == 0)) {
+                        (strcasecmp($skinvar, $file) == 0)
+                    ) {
                         $this->skinname = $file;
                         Util::setSessionVar('cilogon_skin', $file);
                         $found = true;
@@ -308,9 +310,11 @@ class Skin
      */
     public function printSkinLink()
     {
-        if ((strlen($this->skinname) > 0) &&
+        if (
+            (strlen($this->skinname) > 0) &&
             (is_readable(Util::getServerVar('DOCUMENT_ROOT') . '/skin/' .
-                         $this->skinname . '/skin.css'))) {
+                         $this->skinname . '/skin.css'))
+        ) {
             echo '
             <link rel="stylesheet" type="text/css"
              href="/skin/' , $this->skinname , '/skin.css" />
@@ -434,8 +438,10 @@ class Skin
     public function idpAvailable($entityId)
     {
         $retval = false;   // Assume IdP is not available in the WAYF
-        if (($this->idpWhitelisted($entityId)) &&
-            (!$this->idpBlacklisted($entityId))) {
+        if (
+            ($this->idpWhitelisted($entityId)) &&
+            (!$this->idpBlacklisted($entityId))
+        ) {
             $retval = true;
         }
         return $retval;

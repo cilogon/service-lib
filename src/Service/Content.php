@@ -48,9 +48,11 @@ class Content
         $poweredbyimg = "/images/poweredbycilogon.png";
         $skin = Util::getSkin();
         $skinpoweredbyimg = (string)$skin->getConfigOption('poweredbyimg');
-        if ((!is_null($skinpoweredbyimg)) &&
+        if (
+            (!is_null($skinpoweredbyimg)) &&
             (strlen($skinpoweredbyimg) > 0) &&
-            (is_readable('/var/www/html' . $skinpoweredbyimg))) {
+            (is_readable('/var/www/html' . $skinpoweredbyimg))
+        ) {
             $poweredbyimg = $skinpoweredbyimg;
         }
 
@@ -442,8 +444,10 @@ class Content
                 ';
 
                 $googleauthz = Util::getAuthzUrl('Google');
-                if ((isset($idps[$googleauthz])) &&
-                    ($skin->idpAvailable($googleauthz))) {
+                if (
+                    (isset($idps[$googleauthz])) &&
+                    ($skin->idpAvailable($googleauthz))
+                ) {
                     echo '
                   <p>
                   If you have a <a target="_blank"
@@ -454,8 +458,10 @@ class Content
                   ';
                 }
                 $githubauthz = Util::getAuthzUrl('GitHub');
-                if ((isset($idps[$githubauthz])) &&
-                    ($skin->idpAvailable($githubauthz))) {
+                if (
+                    (isset($idps[$githubauthz])) &&
+                    ($skin->idpAvailable($githubauthz))
+                ) {
                     echo '
                   <p>
                   If you have a <a target="_blank"
@@ -466,8 +472,10 @@ class Content
                   ';
                 }
                 $orcidauthz = Util::getAuthzUrl('ORCID');
-                if ((isset($idps[$orcidauthz])) &&
-                    ($skin->idpAvailable($orcidauthz))) {
+                if (
+                    (isset($idps[$orcidauthz])) &&
+                    ($skin->idpAvailable($orcidauthz))
+                ) {
                     echo '
                   <p>
                   If you have a <a target="_blank"
@@ -880,8 +888,10 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
     public static function handleDuoSecurityLogin()
     {
         $sig_response = Util::getPostVar('sig_response');
-        if ((strlen($sig_response) > 0) &&
-            (TwoFactor::isDuoCodeValid($sig_response))) {
+        if (
+            (strlen($sig_response) > 0) &&
+            (TwoFactor::isDuoCodeValid($sig_response))
+        ) {
             static::gotUserSuccess();
         } else {
             TwoFactor::printPage('duo');
@@ -1030,8 +1040,10 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
                 Util::getServerVar('DOCUMENT_ROOT') . '/include/bypass.txt'
             );
             foreach ($bypassarray as $key => $value) {
-                if ((preg_match($key, $redirect_uri)) ||
-                    (preg_match($key, $client_id))) {
+                if (
+                    (preg_match($key, $redirect_uri)) ||
+                    (preg_match($key, $client_id))
+                ) {
                     $bypassidp = $value;
                     break;
                 }
@@ -1050,16 +1062,20 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         // <initialidp> or the selected_idp as the providerId, and use
         // <forceinitialidp> as keepIdp. Otherwise, read the cookies
         // 'providerId' and 'keepidp'.
-        if (($forceinitialidp == 1) &&
-            ((strlen($initialidp) > 0) || (strlen($selected_idp) > 0))) {
+        if (
+            ($forceinitialidp == 1) &&
+            ((strlen($initialidp) > 0) || (strlen($selected_idp) > 0))
+        ) {
             // If the <allowforceinitialidp> option is set, then make sure
             // the callback / redirect uri is in the portal list.
             $afii = $skin->getConfigOption('portallistaction', 'allowforceinitialidp');
-            if ((is_null($afii)) || // Option not set, no need to check portal list
+            if (
+                (is_null($afii)) || // Option not set, no need to check portal list
                 (((int)$afii == 1) &&
                   (($skin->inPortalList($redirect_uri)) ||
                    ($skin->inPortalList($client_id)) ||
-                   ($skin->inPortalList($callbackuri))))) {
+                   ($skin->inPortalList($callbackuri))))
+            ) {
                 // 'selected_idp' takes precedence over <initialidp>
                 if (strlen($selected_idp) > 0) {
                     $providerId = $selected_idp;
@@ -1209,10 +1225,12 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
         $authntime = Util::getSessionVar('authntime');
 
 
-        if ((strlen($uid) > 0) && (strlen($idp) > 0) &&
+        if (
+            (strlen($uid) > 0) && (strlen($idp) > 0) &&
             (strlen($idpname) > 0) && (strlen($status) > 0) &&
             (strlen($dn) > 0) && (strlen($authntime) > 0) &&
-            (!($status & 1))) {  // All STATUS_OK codes are even
+            (!($status & 1))
+        ) {  // All STATUS_OK codes are even
             if ((strlen($providerId) == 0) || ($providerId == $idp)) {
                 $retval = true;
             }
@@ -1322,8 +1340,10 @@ this user\'s registration at https://' . $duoconfig->param['host'] . ' .';
 
                 // If Silver IdP or 'Request Silver' checked, send extra parameter
                 if ($allowsilver) {
-                    if ((Util::getIdpList()->isSilver($providerId)) ||
-                        (strlen(Util::getPostVar('silveridp')) > 0)) {
+                    if (
+                        (Util::getIdpList()->isSilver($providerId)) ||
+                        (strlen(Util::getPostVar('silveridp')) > 0)
+                    ) {
                         Util::setSessionVar('requestsilver', '1');
                         $redirect .= '&authnContextClassRef=' .
                             urlencode('http://id.incommon.org/assurance/silver');
@@ -1762,9 +1782,11 @@ IdPs for the skin.'
         $skin = Util::getSkin();
         $forceremember = $skin->getConfigOption('delegate', 'forceremember');
 
-        if (($status == DBService::$STATUS['STATUS_NEW_USER']) &&
+        if (
+            ($status == DBService::$STATUS['STATUS_NEW_USER']) &&
             ((strlen($callbackuri) > 0) ||
-             (isset($clientparams['code'])))) {
+             (isset($clientparams['code'])))
+        ) {
             // Extra check for new users: see if any HTML entities
             // are in the user name. If so, send an email alert.
             $dn = Util::getSessionVar('dn');
@@ -1890,8 +1912,10 @@ IdPs for the skin.'
 
         $uid = Util::getSessionVar('uid');
         $dbs = new DBService();
-        if (($dbs->getUser($uid)) &&
-            (!($dbs->status & 1))) {  // STATUS_OK codes are even
+        if (
+            ($dbs->getUser($uid)) &&
+            (!($dbs->status & 1))
+        ) {  // STATUS_OK codes are even
             $idpname = $dbs->idp_display_name;
             $first   = $dbs->first_name;
             $last    = $dbs->last_name;
@@ -1899,8 +1923,10 @@ IdPs for the skin.'
             $dn      = $dbs->distinguished_name;
             $dn      = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
 
-            if (($dbs->getLastArchivedUser($uid)) &&
-                (!($dbs->status & 1))) {  // STATUS_OK codes are even
+            if (
+                ($dbs->getLastArchivedUser($uid)) &&
+                (!($dbs->status & 1))
+            ) {  // STATUS_OK codes are even
                 $previdpname = $dbs->idp_display_name;
                 $prevfirst   = $dbs->first_name;
                 $prevlast    = $dbs->last_name;
@@ -1985,9 +2011,11 @@ IdPs for the skin.'
                 </div>
                 ';
 
-                if (($idpname != $previdpname) ||
+                if (
+                    ($idpname != $previdpname) ||
                     ($first != $prevfirst) ||
-                    ($last != $prevlast)) {
+                    ($last != $prevlast)
+                ) {
                     echo '
                     <p>
                     The above changes to your attributes will cause your
@@ -2178,14 +2206,16 @@ IdPs for the skin.'
             // key must appear BEFORE the public certificate. But MyProxy
             // returns the private key AFTER. So swap them around.
             $cert2 = '';
-            if (preg_match(
-                '/-----BEGIN CERTIFICATE-----([^-]+)' .
-                '-----END CERTIFICATE-----[^-]*' .
-                '-----BEGIN RSA PRIVATE KEY-----([^-]+)' .
-                '-----END RSA PRIVATE KEY-----/',
-                $cert,
-                $match
-            )) {
+            if (
+                preg_match(
+                    '/-----BEGIN CERTIFICATE-----([^-]+)' .
+                    '-----END CERTIFICATE-----[^-]*' .
+                    '-----BEGIN RSA PRIVATE KEY-----([^-]+)' .
+                    '-----END RSA PRIVATE KEY-----/',
+                    $cert,
+                    $match
+                )
+            ) {
                 $cert2 = "-----BEGIN RSA PRIVATE KEY-----" .
                          $match[2] . "-----END RSA PRIVATE KEY-----\n" .
                          "-----BEGIN CERTIFICATE-----" .
@@ -2334,12 +2364,14 @@ IdPs for the skin.'
         $newdn = $dn;
         $dnformat = (string)Util::getSkin()->getConfigOption('dnformat');
         if (!is_null($dnformat)) {
-            if (($dnformat == 'rfc2253') &&
+            if (
+                ($dnformat == 'rfc2253') &&
                 (preg_match(
                     '%/DC=(.*)/DC=(.*)/C=(.*)/O=(.*)/CN=(.*)%',
                     $dn,
                     $match
-                ))) {
+                ))
+            ) {
                 array_shift($match);
                 $m = array_reverse(Net_LDAP2_Util::escape_dn_value($match));
                 $newdn = "CN=$m[0],O=$m[1],C=$m[2],DC=$m[3],DC=$m[4]";
@@ -2467,8 +2499,10 @@ IdPs for the skin.'
             // <Whitelisted> tag. Note that the skin's <idpwhitelist>
             // is still consulted in either case (below).
             $registeredbyincommonidps = $skin->getConfigOption('registeredbyincommonidps');
-            if ((!is_null($registeredbyincommonidps)) &&
-                ((int)$registeredbyincommonidps == 1)) {
+            if (
+                (!is_null($registeredbyincommonidps)) &&
+                ((int)$registeredbyincommonidps == 1)
+            ) {
                 $retarray = $idplist->getRegisteredByInCommonIdPs();
             } else {
                 $retarray = $idplist->getWhitelistedIdPs();
@@ -2594,8 +2628,10 @@ IdPs for the skin.'
             '<tr><th>Last Name:</th><td>MISSING</td></tr>';
             $missingattrs .= '%0D%0A    sn (last name)';
         }
-        if ((strlen($displayname) == 0) &&
-            ((strlen($firstname) == 0) || (strlen($lastname) == 0))) {
+        if (
+            (strlen($displayname) == 0) &&
+            ((strlen($firstname) == 0) || (strlen($lastname) == 0))
+        ) {
             $errorboxstr .=
             '<tr><th>Display Name:</th><td>MISSING</td></tr>';
             $missingattrs .= '%0D%0A    displayName';
@@ -2628,8 +2664,10 @@ IdPs for the skin.'
         }
         $student = false;
         $errorboxstr .= '</table></blockquote>';
-        if ((strlen($emailaddr) == 0) &&
-            (preg_match('/student@/', $affiliation))) {
+        if (
+            (strlen($emailaddr) == 0) &&
+            (preg_match('/student@/', $affiliation))
+        ) {
             $student = true;
             $errorboxstr .= '<p><b>If you are a student</b>, ' .
             'you may need to ask your identity provider ' .

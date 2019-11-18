@@ -53,7 +53,7 @@ class CSRF
      * @var string DEFAULTTOKENNAME The default token name can be
      *      overridden in the constructor.
      */
-    const DEFAULTTOKENNAME = "CSRF";
+    public const DEFAULTTOKENNAME = "CSRF";
 
     /**
      * @var string $tokenname The 'name' of the CSRF token, as saved
@@ -244,9 +244,11 @@ class CSRF
 
         $csrfcookievalue = $this->getTheCookie();
         $csrfformvalue = Util::getPostVar($this->getTokenName());
-        if ((strlen($csrfcookievalue) > 0) &&
+        if (
+            (strlen($csrfcookievalue) > 0) &&
             (strlen($csrfformvalue) > 0) &&
-            (strcmp($csrfcookievalue, $csrfformvalue) == 0)) {
+            (strcmp($csrfcookievalue, $csrfformvalue) == 0)
+        ) {
             $retval = true;
         }
 
@@ -272,9 +274,11 @@ class CSRF
 
         $csrfcookievalue = $this->getTheCookie();
         $csrfsesionvalue = $this->getTheSession();
-        if ((strlen($csrfcookievalue) > 0) &&
+        if (
+            (strlen($csrfcookievalue) > 0) &&
             (strlen($csrfsesionvalue) > 0) &&
-            (strcmp($csrfcookievalue, $csrfsesionvalue) == 0)) {
+            (strcmp($csrfcookievalue, $csrfsesionvalue) == 0)
+        ) {
             $retval = true;
         }
 

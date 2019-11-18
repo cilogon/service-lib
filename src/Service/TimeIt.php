@@ -30,7 +30,7 @@ class TimeIt
      * @var string DEFAULTFILENAME  Set the output file location to
      *      correspond to your particular set up.
      */
-    const DEFAULTFILENAME = "/tmp/timing.txt";
+    public const DEFAULTFILENAME = "/tmp/timing.txt";
 
     /**
      * @var string $timingfilename File name of the timing file

@@ -188,8 +188,10 @@ class SessionMgr
             $newtime = $time + get_cfg_var('session.gc_maxlifetime');
             $quoteid = $this->db->quoteSmart($session_id);
             $query = '';
-            if ((!is_null($this->crc)) &&
-                ($this->crc === (strlen($session_data) . crc32($session_data)))) {
+            if (
+                (!is_null($this->crc)) &&
+                ($this->crc === (strlen($session_data) . crc32($session_data)))
+            ) {
                 // $_SESSION hasn't been touched, so update the expires column
                 $query = "UPDATE phpsessions SET expires = $newtime " .
                          "WHERE id = $quoteid";

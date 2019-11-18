@@ -41,7 +41,7 @@ class PortalCookie
      * @var string COOKIENAME The token name is const to be accessible from
      *      removeTheCookie.
      */
-    const COOKIENAME = "portalparams";
+    public const COOKIENAME = "portalparams";
 
     /**
      * @var array $portalarray An array of arrays. First index is portal name.
@@ -176,9 +176,11 @@ class PortalCookie
                 Util::getSessionVar('clientparams'),
                 true
             );
-            if ((isset($clientparams['client_id'])) &&
+            if (
+                (isset($clientparams['client_id'])) &&
                 (isset($clientparams['redirect_uri'])) &&
-                (isset($clientparams['scope']))) {
+                (isset($clientparams['scope']))
+            ) {
                 // Use the first element of the idphint list as the selected_idp.
                 $selected_idp = '';
                 $idphintlist = Content::getIdphintList();
@@ -223,9 +225,11 @@ class PortalCookie
     {
         $retval = '';
         $name = $this->getPortalName();
-        if ((strlen($name) > 0) &&
+        if (
+            (strlen($name) > 0) &&
             (isset($this->portalarray[$name])) &&
-            (isset($this->portalarray[$name][$param]))) {
+            (isset($this->portalarray[$name][$param]))
+        ) {
             $retval = $this->portalarray[$name][$param];
         }
         return $retval;

@@ -77,20 +77,20 @@ class IdpList
      * @var string DEFAULTIDPFILENAME The full path/filename of the
      *      generated list of IdPs in JSON format
      */
-    const DEFAULTIDPFILENAME = '/var/www/html/include/idplist.json';
+    public const DEFAULTIDPFILENAME = '/var/www/html/include/idplist.json';
 
     /**
      * @var string DEFAULTINCOMMONFILENAME The full path/filename of the
      *      InCommon metadata XML file.
      */
-    const DEFAULTINCOMMONFILENAME =
+    public const DEFAULTINCOMMONFILENAME =
         '/var/cache/shibboleth/InCommon-metadata.xml';
 
     /**
      * @var string TESTIDPFILENAME The fill path/filename of the XML file
      *      containing test IdPs.
      */
-    const TESTIDPFILENAME = '/var/www/html/include/testidplist.xml';
+    public const TESTIDPFILENAME = '/var/www/html/include/testidplist.xml';
 
     /**
      * @var DOMDocument $idpdom A DOMDocument which holds the list of IdP
@@ -184,8 +184,10 @@ class IdpList
         $retval = false;  // Assume read failed
 
         $filename = $this->getFilename();
-        if ((is_readable($filename)) &&
-            (($dom = DOMDocument::load($filename, LIBXML_NOBLANKS)) !== false)) {
+        if (
+            (is_readable($filename)) &&
+            (($dom = DOMDocument::load($filename, LIBXML_NOBLANKS)) !== false)
+        ) {
             $this->idpdom = $dom;
             $this->idpdom->preserveWhiteSpace = false;
             $this->idpdom->formatOutput = true;
@@ -216,9 +218,11 @@ class IdpList
         $retval = false;  // Assume read/json_decode failed
 
         $filename = $this->getFilename();
-        if ((is_readable($filename)) &&
+        if (
+            (is_readable($filename)) &&
             (($contents = file_get_contents($filename)) !== false) &&
-            (($tempjson = json_decode($contents, true)) !== null)) {
+            (($tempjson = json_decode($contents, true)) !== null)
+        ) {
             $this->idparray = $tempjson;
             $retval = true;
         } else {
@@ -273,8 +277,10 @@ class IdpList
             $this->idpdom->formatOutput = true;
             $filename = $this->getFilename();
             $tmpfname = tempnam('/tmp', 'IDP');
-            if (($this->idpdom->save($tmpfname) > 0) &&
-                (@rename($tmpfname, $filename))) {
+            if (
+                ($this->idpdom->save($tmpfname) > 0) &&
+                (@rename($tmpfname, $filename))
+            ) {
                 chmod($filename, 0664);
                 $retval = true;
             } else {
@@ -303,8 +309,10 @@ class IdpList
             $filename = $this->getFilename();
             $tmpfname = tempnam('/tmp', 'JSON');
             $json = json_encode($this->idparray, JSON_FORCE_OBJECT);
-            if (((file_put_contents($tmpfname, $json)) !== false) &&
-                (@rename($tmpfname, $filename))) {
+            if (
+                ((file_put_contents($tmpfname, $json)) !== false) &&
+                (@rename($tmpfname, $filename))
+            ) {
                 chmod($filename, 0664);
                 $retval = true;
             } else {
@@ -496,8 +504,10 @@ EOT;
 
                     // If neither OrganizationDisplayName nor mdui:DisplayName
                     // was found, then use the entityID as a last resort.
-                    if ((strlen($Organization_Name) == 0) &&
-                        (strlen($Display_Name) == 0)) {
+                    if (
+                        (strlen($Organization_Name) == 0) &&
+                        (strlen($Display_Name) == 0)
+                    ) {
                         $Organization_Name = $entityID;
                         $Display_Name = $entityID;
                     }
@@ -676,8 +686,10 @@ EOT;
                                 $refedsrands = true;
                                 $this->addNode($dom, $idp, 'REFEDS_RandS', '1');
                             }
-                            if ((!$addedrands) &&
-                                ($incommonrands || $refedsrands)) {
+                            if (
+                                (!$addedrands) &&
+                                ($incommonrands || $refedsrands)
+                            ) {
                                 $addedrands = true;
                                 $this->addNode($dom, $idp, 'RandS', '1');
                             }
@@ -730,10 +742,12 @@ EOT;
                 }
 
                 // Read in any test IdPs and add them to the list
-                if ((is_readable(static::TESTIDPFILENAME)) &&
+                if (
+                    (is_readable(static::TESTIDPFILENAME)) &&
                     (($dom2 = DOMDocument::load(
                         static::TESTIDPFILENAME
-                    )) !== false)) {
+                    )) !== false)
+                ) {
                     $idpnodes = $dom2->getElementsByTagName('idp');
                     foreach ($idpnodes as $idpnode) {
                         // Check if the entityID already exists. If so,
@@ -1101,7 +1115,8 @@ EOT;
         $retarr = array();
 
         foreach ($this->idparray as $key => $value) {
-            if ((!is_null($filter)) &&
+            if (
+                (!is_null($filter)) &&
                 (($filter === 0) &&
                  ($this->isWhitelisted($key))) ||
                 (($filter === 1) &&
@@ -1111,7 +1126,7 @@ EOT;
                 (($filter === 3) &&
                  (!$this->isRegisteredByInCommon($key)) ||
                  (!$this->isWhitelisted($key)))
-               ) {
+            ) {
                 continue;
             }
             $retarr[$key]['Organization_Name'] = $this->idparray[$key]['Organization_Name'];
@@ -1208,11 +1223,13 @@ EOT;
             $entityID = Util::getServerVar('HTTP_SHIB_IDENTITY_PROVIDER');
         }
         // CIL-254 - For LIGO backup IdPs, remap entityID to the main IdP
-        if (preg_match(
-            '%(https://login)[^\.]*(.ligo.org/idp/shibboleth)%',
-            $entityID,
-            $matches
-        )) {
+        if (
+            preg_match(
+                '%(https://login)[^\.]*(.ligo.org/idp/shibboleth)%',
+                $entityID,
+                $matches
+            )
+        ) {
             $entityID = $matches[1] . $matches[2];
         }
         $shibarray['Identity Provider'] = $entityID;

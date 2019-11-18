@@ -79,8 +79,10 @@ class Loggit
                          '141.142.234.38',  // falco
                          '192.249.7.62'     // fozzie
                         );
-        if ((isset($_SERVER['REMOTE_ADDR'])) &&
-            (in_array($_SERVER['REMOTE_ADDR'], $dontlog))) {
+        if (
+            (isset($_SERVER['REMOTE_ADDR'])) &&
+            (in_array($_SERVER['REMOTE_ADDR'], $dontlog))
+        ) {
             return;
         }
 

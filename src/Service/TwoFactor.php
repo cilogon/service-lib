@@ -369,8 +369,10 @@ class TwoFactor
 
             // If user registered and verified Google Authenticator,
             // proceed to the Google Authenticator Login page.
-            if ((self::isRegistered('ga')) &&
-                (self::isVerified('ga'))) {
+            if (
+                (self::isRegistered('ga')) &&
+                (self::isVerified('ga'))
+            ) {
                 self::printGALoginPage();
             } else {
                 self::printGARegisterPage();
@@ -876,10 +878,12 @@ CILogon Service - ' . $summary . '
                     self::write();
                     $valid = true;
                 } else { // Check if entered passcode is valid
-                    if ((($tftype == 'ga') &&
+                    if (
+                        (($tftype == 'ga') &&
                          (self::isGACodeValid($code))) ||
                         (($tftype == 'duo') &&
-                         (self::isDuoCodeValidREST($code)))) {
+                         (self::isDuoCodeValidREST($code)))
+                    ) {
                         $valid = true;
                     }
                 }

@@ -156,8 +156,10 @@ class DuoConfig
     {
         $retval = false;
         $result = $this->call('get', '/rest/v1/ping');
-        if (($result !== false) && ($result['stat'] == 'OK') &&
-            ($result['response'] == 'pong')) {
+        if (
+            ($result !== false) && ($result['stat'] == 'OK') &&
+            ($result['response'] == 'pong')
+        ) {
             $retval = true;
         }
         return $retval;
@@ -177,8 +179,10 @@ class DuoConfig
     {
         $retval = false;
         $result = $this->call('get', '/rest/v1/check');
-        if (($result !== false) && ($result['stat'] == 'OK') &&
-             ($result['response'] == 'valid')) {
+        if (
+            ($result !== false) && ($result['stat'] == 'OK') &&
+             ($result['response'] == 'valid')
+        ) {
             $retval = true;
         }
         return $retval;
@@ -231,8 +235,10 @@ class DuoConfig
         $factorval = '';
         $preauth = $this->preauth($user);
         if ($preauth !== false) {
-            if ((strlen($factor) == 6) ||  // Use 6-digit passcode
-                (strlen($factor) == 7)) {  // For SMS, use 1 letter + 6 digits
+            if (
+                (strlen($factor) == 6) ||  // Use 6-digit passcode
+                (strlen($factor) == 7)
+            ) {  // For SMS, use 1 letter + 6 digits
                 $factorval = $factor;
             } else {
                 // User selected an alternate method (e.g., 'push')
@@ -246,8 +252,10 @@ class DuoConfig
                                 'factor' => 'auto' ,
                                 'user'   => $user);
                 $result = $this->call('post', '/rest/v1/auth', $params);
-                if (($result !== false) && ($result['stat'] == 'OK') &&
-                    ($result['response']['result'] == 'allow')) {
+                if (
+                    ($result !== false) && ($result['stat'] == 'OK') &&
+                    ($result['response']['result'] == 'allow')
+                ) {
                     $retval = true;
                 }
             }

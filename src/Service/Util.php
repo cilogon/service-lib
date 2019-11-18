@@ -134,8 +134,10 @@ class Util
         if (is_null(static::$ini_array)) {
             static::$ini_array = @parse_ini_file(CILOGON_INI_FILE);
         }
-        if ((is_array(static::$ini_array)) &&
-            (array_key_exists($config, static::$ini_array))) {
+        if (
+            (is_array(static::$ini_array)) &&
+            (array_key_exists($config, static::$ini_array))
+        ) {
             $retval = static::$ini_array[$config];
         }
         return $retval;
@@ -427,8 +429,10 @@ class Util
         ini_set('session.cookie_secure', true);
         ini_set('session.cookie_domain', '.' . static::getDN());
         session_start();
-        if ((!isset($_SESSION['lastaccess']) ||
-            (time() - $_SESSION['lastaccess']) > 60)) {
+        if (
+            (!isset($_SESSION['lastaccess']) ||
+            (time() - $_SESSION['lastaccess']) > 60)
+        ) {
             $_SESSION['lastaccess'] = time();
         }
     }
@@ -461,8 +465,10 @@ class Util
         if ($retval == '.') {
             $retval = '';
         }
-        if ((strlen($retval) == 0) ||
-            ($stripfile && ($retval[strlen($retval) - 1] != '/'))) {
+        if (
+            (strlen($retval) == 0) ||
+            ($stripfile && ($retval[strlen($retval) - 1] != '/'))
+        ) {
             $retval .= '/';  // Append a slash if necessary
         }
         if ($prependhttp) {  // Prepend http(s)://hostname
@@ -891,7 +897,8 @@ Remote Address= ' . $remoteaddr . '
 
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
-        if (((strlen($remoteuser) > 0) ||
+        if (
+            ((strlen($remoteuser) > 0) ||
                (strlen($ePPN) > 0) ||
                (strlen($ePTID) > 0) ||
                (strlen($openidID) > 0) ||
@@ -901,13 +908,16 @@ Remote Address= ' . $remoteaddr . '
             (strlen($firstname) > 0) &&
             (strlen($lastname) > 0) &&
             (strlen($emailaddr) > 0) &&
-            (filter_var($emailaddr, FILTER_VALIDATE_EMAIL))) {
+            (filter_var($emailaddr, FILTER_VALIDATE_EMAIL))
+        ) {
             // For the new Google OAuth 2.0 endpoint, we want to keep the
             // old Google OpenID endpoint URL in the database (so user does
             // not get a new certificate subject DN). Change the idp
             // and idpname to the old Google OpenID values.
-            if (($idpname == 'Google+') ||
-                ($idp == static::getAuthzUrl('Google'))) {
+            if (
+                ($idpname == 'Google+') ||
+                ($idp == static::getAuthzUrl('Google'))
+            ) {
                 $idpname = 'Google';
                 $idp = 'https://www.google.com/accounts/o8/id';
             }
@@ -959,17 +969,21 @@ Remote Address= ' . $remoteaddr . '
         $status = static::getSessionVar('status');
         if ($status & 1) { // Bad status codes are odd
             // For missing parameter errors, log an error message
-            if ($status ==
-                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) {
+            if (
+                $status ==
+                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']
+            ) {
                 $log = new Loggit();
                 $log->error('STATUS_MISSING_PARAMETER_ERROR', true);
             }
 
             // For other dbservice errors OR for any error involving
             // LIGO (e.g., missing parameter error), send email alert.
-            if (($status !=
+            if (
+                ($status !=
                     DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) ||
-                (preg_match('/ligo\.org/', $idp))) {
+                (preg_match('/ligo\.org/', $idp))
+            ) {
                 $mailto = 'alerts@cilogon.org';
 
                 // Set $disableligoalerts = true to stop LIGO failures
@@ -1071,8 +1085,10 @@ Remote Address= ' . $remoteaddr . '
         // (1) loa contains  https://refeds.org/assurance/profile/cappuccino
         // (2) acr is either https://refeds.org/profile/sfa or
         //                   https://refeds.org/profile/mfa
-        if ((preg_match('%https://refeds.org/assurance/profile/cappuccino%', static::getSessionVar('loa'))) &&
-            (preg_match('%https://refeds.org/profile/[ms]fa%', static::getSessionVar('acr')))) {
+        if (
+            (preg_match('%https://refeds.org/assurance/profile/cappuccino%', static::getSessionVar('loa'))) &&
+            (preg_match('%https://refeds.org/profile/[ms]fa%', static::getSessionVar('acr')))
+        ) {
             static::setSessionVar('loa', 'http://incommonfederation.org/assurance/silver');
         }
     }
@@ -1227,17 +1243,20 @@ Remote Address= ' . $remoteaddr . '
         $clientparams = json_decode(static::getSessionVar('clientparams'), true);
         if (isset($clientparams['scope'])) {
             $oidctrans = true;
-            if (preg_match(
-                '/edu\.uiuc\.ncsa\.myproxy\.getcert/',
-                $clientparams['scope']
-            )) {
+            if (
+                preg_match(
+                    '/edu\.uiuc\.ncsa\.myproxy\.getcert/',
+                    $clientparams['scope']
+                )
+            ) {
                 $oidcscopegetcert = true;
             }
         }
 
         // First, make sure $idp was set and is not an OAuth2 IdP.
         $idplist = static::getIdpList();
-        if (((strlen($idp) > 0) &&
+        if (
+            ((strlen($idp) > 0) &&
             (strlen($idpname) > 0) &&
             (!in_array($idpname, static::$oauth2idps))) &&
                 (
@@ -1252,7 +1271,7 @@ Remote Address= ' . $remoteaddr . '
                 // transaction such as PKCS12, JWS, or OAuth 1.0a
                 ($oidcscopegetcert || !$oidctrans)
                 )
-            ) {
+        ) {
             $retval = true;
         }
         return $retval;

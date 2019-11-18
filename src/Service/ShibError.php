@@ -101,18 +101,20 @@ class ShibError
                 Util::unsetSessionVar('requestsilver');
             // CIL-410 Temporary fix for /secure/testidp Shibboleth error.
             // Check for error and redirect to /testidp .
-            } elseif (($this->errorarray['errorType'] == 'shibsp::ConfigurationException') &&
+            } elseif (
+                ($this->errorarray['errorType'] == 'shibsp::ConfigurationException') &&
                 ($this->errorarray['errorText'] ==
                     'None of the configured SessionInitiators handled the request.') &&
                 (preg_match('%/secure/testidp%', $this->errorarray['requestURL']))
-                ) {
+            ) {
                 header('Location: https://' . Util::getDN() . '/testidp/');
             // CIL-480 Check for user IdP login failure and OAuth transaction
             // and redirect appropriately
-            } elseif (($this->errorarray['errorType'] == 'opensaml::FatalProfileException') &&
+            } elseif (
+                ($this->errorarray['errorType'] == 'opensaml::FatalProfileException') &&
                 ($this->errorarray['errorText'] == 'SAML response reported an IdP error.') &&
                 ($this->errorarray['statusCode2'] == 'urn:oasis:names:tc:SAML:2.0:status:AuthnFailed')
-                ) {
+            ) {
                 $clientparams = json_decode(Util::getSessionVar('clientparams'), true); // OAuth 2.0
                 $failureuri = Util::getSessionVar('failureuri'); // OAuth 1.0a
                 if (array_key_exists('redirect_uri', $clientparams)) {

@@ -63,17 +63,17 @@ class DBService
      * @var string DEFAULTDBSERVICEURL The main URL for the dbService.
      *      Corresponds to the OAuth2 .war.
      */
-    const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth2/dbService';
+    public const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth2/dbService';
 
     /**
      * @var string OAUTH1DBSERVICEURL The URL for the OAuth 1.0a dbService.
      */
-    const OAUTH1DBSERVICEURL  = 'http://localhost:8080/oauth/dbService';
+    public const OAUTH1DBSERVICEURL  = 'http://localhost:8080/oauth/dbService';
 
     /**
      * @var string OAUTH2DBSERVICEURL The URL for the OAuth 2 dbService.
      */
-    const OAUTH2DBSERVICEURL  = 'http://localhost:8080/oauth2/dbService';
+    public const OAUTH2DBSERVICEURL  = 'http://localhost:8080/oauth2/dbService';
 
     /**
      * @var array $STATUS The various STATUS_* constants, originally from
@@ -490,8 +490,10 @@ class DBService
             }
             // If any elements in $attr_arr, append converted JSON object
             if (count($attr_arr) > 0) {
-                if (($attr_json = json_encode($attr_arr, JSON_FORCE_OBJECT))
-                    !== false) {
+                if (
+                    ($attr_json = json_encode($attr_arr, JSON_FORCE_OBJECT))
+                    !== false
+                ) {
                     $cmd .= '&attr_json=' . urlencode($attr_json);
                 }
             }
@@ -499,8 +501,10 @@ class DBService
             $us_idp = 0;
             $idp = $args[1];
             $idp_display_name = $args[2];
-            if ((Util::getIdpList()->isRegisteredByInCommon($idp)) ||
-                (in_array($idp_display_name, Util::$oauth2idps))) {
+            if (
+                (Util::getIdpList()->isRegisteredByInCommon($idp)) ||
+                (in_array($idp_display_name, Util::$oauth2idps))
+            ) {
                 $us_idp = 1;
             }
             $cmd .= "&us_idp=$us_idp";
@@ -654,8 +658,10 @@ class DBService
             while ($idpidx < $idpcount) { // Loop through all IdPs
                 $fiftyidx = 0;
                 $idplist = '';
-                while (($fiftyidx < 50) && // Send 50 IdPs at a time
-                       ($idpidx < $idpcount)) {
+                while (
+                    ($fiftyidx < 50) && // Send 50 IdPs at a time
+                       ($idpidx < $idpcount)
+                ) {
                     $idplist .=  '&idp_uid=' .
                                  urlencode($this->idp_uids[$idpidx]);
                     $fiftyidx++;

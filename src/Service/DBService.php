@@ -279,11 +279,6 @@ class DBService
     public $cilogon_portal_name;
 
     /**
-     * @var string $two_factor Two factor string used by TwoFactor.php
-     */
-    public $two_factor;
-
-    /**
      * @var array $idp_uids IdPs stored in the 'values' of the array
      */
     public $idp_uids;
@@ -550,48 +545,6 @@ class DBService
         $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
         return $this->call('action=removeUser&user_uid=' .
             urlencode($uid));
-    }
-
-    /**
-     * getTwoFactorInfo
-     *
-     * This method calls the 'getTwoFactorInfo' action of the servlet
-     * and sets the class member variables associated with the user's
-     * two-factor info appropriately. If the servlet returns correctly
-     * (i.e. an HTTP status code of 200), this method returns true.
-     * Note that this method isn't strictly necessary since the
-     * two_factor info data is returned when getUser is called.
-     *
-     * @param string $uid The database user identifier
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function getTwoFactorInfo($uid)
-    {
-        $this->two_factor = null;
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
-        return $this->call('action=getTwoFactorInfo&user_uid=' .
-            urlencode($uid));
-    }
-
-    /**
-     * setTwoFactorInfo
-     *
-     * This method calls the 'setTwoFactorInfo' action of the servlet
-     * and sets the class member variable associated with the user's
-     * two-factor info appropriately. If the servlet returns correctly
-     * (i.e. an HTTP status code of 200), this method returns true.
-     *
-     * @param string $uid The database user identifier
-     * @param string $two_factor (Optional) The two-factor info string.
-     *        Defaults to empty string.
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function setTwoFactorInfo($uid, $two_factor = '')
-    {
-        $this->two_factor = $two_factor;
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
-        return $this->call('action=setTwoFactorInfo&user_uid=' .
-            urlencode($uid) . '&two_factor=' . urlencode($two_factor));
     }
 
     /**

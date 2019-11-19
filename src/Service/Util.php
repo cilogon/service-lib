@@ -670,7 +670,6 @@ class Util
             'entitlement'  => 'Entitlement',
             'itrustuin'    => 'iTrustUIN',
             'cilogon_skin' => 'Skin Name',
-            'twofactor'    => 'Two-Factor',
             'authntime'    => 'Authn Time'
         );
 
@@ -949,7 +948,6 @@ Remote Address= ' . $remoteaddr . '
             );
             static::setSessionVar('uid', $dbs->user_uid);
             static::setSessionVar('dn', $dbs->distinguished_name);
-            static::setSessionVar('twofactor', $dbs->two_factor);
             static::setSessionVar('status', $dbs->status);
             if (!$result) {
                 static::sendErrorAlert(
@@ -1137,9 +1135,6 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('uid');
         static::unsetSessionVar('dn');
         static::unsetSessionVar('authntime');
-
-        // Specific to 2FA
-        static::unsetSessionVar('twofactor');
 
         // Variables set by getuser
         static::unsetSessionVar('firstname');

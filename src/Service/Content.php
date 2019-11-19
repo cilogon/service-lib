@@ -1758,26 +1758,17 @@ IdPs for the skin.'
      * authenticated. In the case of two-factor authentication, the user
      * is first authenticated by the IdP, and then by the configured
      * two-factor authentication method. If the 'status' session variable is
-     * STATUS_OK then it checks if we have a new or changed user and prints
-     * that page as appropriate. Otherwise it continues to the MainPage.
+     * STATUS_OK then it checks if we have a new or changed user and logs
+     * appropriately. It then continues to the MainPage.
      */
     public static function gotUserSuccess()
     {
         $log = new Loggit();
         $status = Util::getSessionVar('status');
 
-        // If this is the first time the user has used the CILogon Service, we
-        // skip the New User page under the following circumstances.
-        // (1) We are using the OIDC authorization endpoint code flow (check for
-        // 'clientparams' session variable);
-        // (2) We are using the 'delegate' code flow (check for 'callbackuri'
-        // session variable), and one of the following applies:
-        //    (a) Skin has 'forceremember' set or
-        //    (b) Skin has 'initialremember' set and there is no cookie for the
-        //        current portal
-        // In these cases, we skip the New User page and proceed directly to the
-        // main page. Note that we still want to show the User Changed page to
-        // inform the user about updated DN strings.
+        // If this is the first time the user has used the CILogon Service,
+        // and the flow is OAuth-based, send an alert if the name contains
+        // any HTML entities.
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $callbackuri = Util::getSessionVar('callbackuri');
 
@@ -1800,6 +1791,7 @@ IdPs for the skin.'
         }
 
         // For a new user, or if the user got new attributes, just log it.
+        // Then proceed to the Main Page.
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
             $log->info('New User.');
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {

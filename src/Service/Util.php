@@ -395,7 +395,7 @@ class Util
      */
     public static function removeShibCookies()
     {
-        while (list($key, $val) = each($_COOKIE)) {
+        foreach ($_COOKIE as $key => $value) {
             if (strncmp($key, '_shib', strlen('_shib')) == 0) {
                 static::unsetCookieVar($key);
             }

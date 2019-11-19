@@ -697,7 +697,7 @@ EOT;
 
                 // Read in any test IdPs and add them to the list
                 if (
-                    (defined(TEST_IDP_XML) &&
+                    (defined('TEST_IDP_XML')) &&
                     (!empty(TEST_IDP_XML)) &&
                     (is_readable(TEST_IDP_XML)) &&
                     (($dom2 = DOMDocument::load(TEST_IDP_XML)) !== false)

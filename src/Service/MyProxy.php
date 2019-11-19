@@ -4,11 +4,6 @@ namespace CILogon\Service;
 
 use CILogon\Service\Util;
 
-define('MYPROXY_LOGON', '/usr/bin/myproxy-logon');
-define('MYPROXY_HOST', 'myproxy.cilogon.org');
-define('MYPROXY_PORT', '7512');
-define('MYPROXY_LIFETIME', '12');
-
 /**
  * MyProxy
  */
@@ -54,6 +49,15 @@ class MyProxy
         $env = ''
     ) {
         $retstr = '';
+
+        // Verify the myproxy-logon binary has been configured
+        if ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON))) {
+            Util::sendErrorAlert(
+                'getMyProxyCredential Error',
+                'MyProxy Error = myproxy-logon binary not configured'
+            );
+            return $retstr;
+        }
 
         // Make sure the username passed in is not empty
         if (strlen($username) == 0) {

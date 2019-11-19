@@ -18,7 +18,7 @@ use DB;
 class DBProps
 {
     /**
-     * @var string $dbtype Either 'mysql' or 'pgsql'
+     * @var string $dbtype Either 'mysqli' or 'pgsql'
      */
     private $dbtype;
 
@@ -27,8 +27,7 @@ class DBProps
      *
      * The constuctor sets the $dbtype class variable.
      *
-     * @param string $db Database type, one of
-     *        'mysql', 'mysqli', or 'pgsql'.
+     * @param string $db Database type, either 'mysqli' or 'pgsql'.
      */
     public function __construct($db)
     {
@@ -48,7 +47,7 @@ class DBProps
      */
     public function queryAttribute($attr)
     {
-        return Util::getConfigVar($this->dbtype . '.' . $attr);
+        return constant(strtoupper($this->dbtype) . '_' . strtoupper($attr));
     }
 
     /**
@@ -95,7 +94,7 @@ class DBProps
      *
      * This is a convenience method which calls queryAttribute to get
      * the hostspec, i.e., 'host:port' to connect to. If the hostspec
-     * has not been configured in cilogon_ini_file, return 'localhost'.
+     * has not been configured, return 'localhost'.
      *
      * @return string The hostspec type for the selected database type.
      *         Defaults to 'localhost'.
@@ -113,7 +112,7 @@ class DBProps
      * getDBConnect
      *
      * This function uses the PEAR DB module to connect to database
-     * using the parameters found in the cilogon_ini_file. Upon
+     * using the parameters found in config.secrets.php. Upon
      * success, it returns a DB connection returned by 'DB::connect'
      * suitable for future DB calls. If there is a problem connecting,
      * it returns null.

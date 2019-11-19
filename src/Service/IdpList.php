@@ -29,25 +29,6 @@ use SimpleXMLElement;
  * metadata) followed by write() (which writes the idplist
  * to file).
  *
- * There are several constants in the class that you
- * should set for your particular set up:
- *
- * DEFAULTIDPFILENAME - this is the full path and name
- *     of the processed IdP list file used by the CILogon
- *     Service. It should have read/write permissions for
- *     apache (via either owner or group).
- *
- * DEFAULTINCOMMONFILENAME - this is the full path and
- *     name of the InCommon metadata file used by the
- *     CILogon Service. It should have read permissions
- *     for apache (via either owner or group).
- *
- * TESTIDPFILENAME - this is the full path and name
- *     of an XML-formatted list of test IdPs. If found,
- *     these test IdPs will be added to the full IdP
- *     list when create()/write() is called. This file
- *     should have read/write permissions for apache.
- *
  * Note that this class previously defaulted to writing the idplist
  * as an XMl file and then reading that XML file back in. When all
  * InCommon and eduGAIN IdPs were 'whitelisted', the xpath queries
@@ -71,27 +52,6 @@ use SimpleXMLElement;
  */
 class IdpList
 {
-
-    // Set the constants to correspond to your particular set up.
-    /**
-     * @var string DEFAULTIDPFILENAME The full path/filename of the
-     *      generated list of IdPs in JSON format
-     */
-    public const DEFAULTIDPFILENAME = '/var/www/html/include/idplist.json';
-
-    /**
-     * @var string DEFAULTINCOMMONFILENAME The full path/filename of the
-     *      InCommon metadata XML file.
-     */
-    public const DEFAULTINCOMMONFILENAME =
-        '/var/cache/shibboleth/InCommon-metadata.xml';
-
-    /**
-     * @var string TESTIDPFILENAME The fill path/filename of the XML file
-     *      containing test IdPs.
-     */
-    public const TESTIDPFILENAME = '/var/www/html/include/testidplist.xml';
-
     /**
      * @var DOMDocument $idpdom A DOMDocument which holds the list of IdP
      *      entityIDs and their corresponding attributes.
@@ -106,13 +66,13 @@ class IdpList
 
     /**
      * @var string $idpfilename The name of the IdP list in JSON format.
-     *      Defaults to DEFAULTIDPFILENAME.
+     *      Defaults to DEFAULT_IDP_JSON.
      */
     protected $idpfilename;
 
     /**
      * @var string $incommonfilename The name of the InCommon metadata XML
-     *      file. Defaults to DEFAULTINCOMMONFILENAME.
+     *      file. Defaults to DEFAULT_INCOMMON_XML.
      */
     protected $incommonfilename;
 
@@ -126,17 +86,17 @@ class IdpList
      * written to file.
      *
      * @param string $idpfilename (Optional) The name of the idplist file to
-     *        read/write. Defaults to DEFAULTIDPFILENAME.
+     *        read/write. Defaults to DEFAULT_IDP_JSON.
      * @param string $incommonfilename (Optional) The name of the InCommon
-     *        metadata file to read. Defaults to DEFAULTINCOMMONFILENAME.
+     *        metadata file to read. Defaults to DEFAULT_INCOMMON_XML.
      * @param bool $createfile (Optional) Create idplist file if it doesn't
      *         exist? Defaults to true.
      * @param string $filetype (Optional) The type of file to read/write,
      *        one of 'xml' or 'json'. Defaults to 'json'.
      */
     public function __construct(
-        $idpfilename = self::DEFAULTIDPFILENAME,
-        $incommonfilename = self::DEFAULTINCOMMONFILENAME,
+        $idpfilename = DEFAULT_IDP_JSON,
+        $incommonfilename = DEFAULT_INCOMMON_XML,
         $createfile = true,
         $filetype = 'json'
     ) {
@@ -414,12 +374,6 @@ EOT;
                 $result = $xml->xpath(
                     "//EntityDescriptor/IDPSSODescriptor" .
                     "/ancestor::EntityDescriptor"
-                );
-
-                // CIL-401 - Read in the global blacklist.txt file.
-                // Don't add a <Whitelsited> tag for IdPs in this file.
-                $blackidps = Util::readArrayFromFile(
-                    '/var/www/html/include/blacklist.txt'
                 );
 
                 // Create a DOMDocument to build up the list of IdPs.
@@ -735,18 +689,18 @@ EOT;
                     }
 
                     // Add a <Whitelisted> block for all IdPs
-                    // not in the blacklist.txt file.
-                    if (!array_key_exists($entityID, $blackidps)) {
+                    // not in the BLACKLIST_IDP_ARRAY.
+                    if (!in_array($entityID, BLACKLIST_IDP_ARRAY)) {
                         $this->addNode($dom, $idp, 'Whitelisted', '1');
                     }
                 }
 
                 // Read in any test IdPs and add them to the list
                 if (
-                    (is_readable(static::TESTIDPFILENAME)) &&
-                    (($dom2 = DOMDocument::load(
-                        static::TESTIDPFILENAME
-                    )) !== false)
+                    (defined(TEST_IDP_XML) &&
+                    (!empty(TEST_IDP_XML) &&
+                    (is_readable(TEST_IDP_XML)) &&
+                    (($dom2 = DOMDocument::load(TEST_IDP_XML)) !== false)
                 ) {
                     $idpnodes = $dom2->getElementsByTagName('idp');
                     foreach ($idpnodes as $idpnode) {
@@ -1142,7 +1096,7 @@ EOT;
      * This method returns an array of non-whitelisted IdPs where the
      * keys of the array are the entityIDs and the values are the
      * pretty print Organization Names. Note that this essentially
-     * returns the IdPs in the blacklist.txt file.
+     * returns the IdPs in the BLACKLIST_IDP_ARRAY.
      *
      * @return array An array of non-whitelisted IdPs.
      */
@@ -1157,7 +1111,7 @@ EOT;
      * This method returns an array of whitelisted IdPs where the keys
      * of the array are the entityIDs and the values are the
      * pretty print Organization Names. Note that this returns all of the
-     * IdPs not in the blacklist.txt file.
+     * IdPs not in the BLACKLIST_IDP_ARRAY.
      *
      * @return array An array of whitelisted IdPs.
      */

@@ -75,7 +75,7 @@ class PortalCookie
                 $iv = substr($b64, 0, 16); // IV prepended to encrypted data
                 $b64a = substr($b64, 16);  // IV is 16 bytes, rest is data
                 if ((strlen($iv) > 0) && (strlen($b64a) > 0)) {
-                    $key = Util::getConfigVar('openssl.key');
+                    $key = OPENSSL_KEY;
                     if (strlen($key) > 0) {
                         $data = openssl_decrypt(
                             $b64a,
@@ -107,7 +107,7 @@ class PortalCookie
     public function write()
     {
         if (!empty($this->portalarray)) {
-            $key = Util::getConfigVar('openssl.key');
+            $key = OPENSSL_KEY;
             $iv = openssl_random_pseudo_bytes(16);  // IV is 16 bytes
             if ((strlen($key) > 0) && (strlen($iv) > 0)) {
                 $this->set('ut', time()); // Save update time

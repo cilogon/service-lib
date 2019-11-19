@@ -98,7 +98,7 @@ class SessionMgr
     {
         $retval = true;  // Assume connect to database succeeded
 
-        $storetype = Util::getConfigVar('storage.phpsessions');
+        $storetype = STORAGE_PHPSESSIONS;
         $dbprops = new DBProps($storetype);
         $this->db = $dbprops->getDBConnect();
 

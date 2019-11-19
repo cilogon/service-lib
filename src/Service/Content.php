@@ -10,16 +10,6 @@ use CILogon\Service\OAuth2Provider;
 use CILogon\Service\Loggit;
 use Net_LDAP2_Util;
 
-// If needed, set the 'Notification' banner text to a non-empty value
-// and uncomment the 'define' statement in order to display a
-// notification box at the top of each page.
-/*
-define('BANNER_TEXT',
-       'We are currently experiencing problems issuing certificates. We are
-       working on a solution. We apologize for the inconvenience.'
-);
-*/
-
 /**
  * Content
  */
@@ -99,7 +89,7 @@ class Content
         <div class="pagecontent">
          ';
 
-        if ((defined('BANNER_TEXT')) && (strlen(BANNER_TEXT) > 0)) {
+        if ((defined('BANNER_TEXT')) && (!empty(BANNER_TEXT))) {
             echo '
             <div class="noticebanner">' , BANNER_TEXT , '</div>
             ';
@@ -624,15 +614,12 @@ class Content
         }
 
         // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
-        // then check for a match in the 'bypass.txt' file to see if we
+        // then check for a match in the BYPASS_IDP_ARRAY to see if we
         // should automatically redirect to a specific IdP. Used mainly
         // by campus gateways.
         if ((strlen($redirect_uri) > 0) || (strlen($client_id) > 0)) {
             $bypassidp = '';
-            $bypassarray = Util::readArrayFromFile(
-                Util::getServerVar('DOCUMENT_ROOT') . '/include/bypass.txt'
-            );
-            foreach ($bypassarray as $key => $value) {
+            foreach (BYPASS_IDP_ARRAY as $key => $value) {
                 if (
                     (preg_match($key, $redirect_uri)) ||
                     (preg_match($key, $client_id))

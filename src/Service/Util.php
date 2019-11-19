@@ -13,9 +13,6 @@ use CILogon\Service\PortalCookie;
 use PEAR;
 use Config;
 
-// Full path to the php.ini-style config file for the CILogon Service
-define('CILOGON_INI_FILE', '/var/www/config/cilogon.ini');
-
 /**
  * Util
  *
@@ -113,34 +110,6 @@ class Util
             static::$skin = new Skin();
         }
         return static::$skin;
-    }
-
-    /**
-     * getConfigVar
-     *
-     * This function returns a sinle configuration vale from the
-     * CILOGON_INI_FILE, or empty string if no such configuration
-     * value is found in the file.
-     *
-     * @param string $config The config parameter to read from the
-     *        cilogon.ini file.
-     * @return string The value of the config parameter, or empty string
-     *         if no such parameter found in config.ini.
-     */
-    public static function getConfigVar($config)
-    {
-        $retval = '';
-        // Read in the config file into an array
-        if (is_null(static::$ini_array)) {
-            static::$ini_array = @parse_ini_file(CILOGON_INI_FILE);
-        }
-        if (
-            (is_array(static::$ini_array)) &&
-            (array_key_exists($config, static::$ini_array))
-        ) {
-            $retval = static::$ini_array[$config];
-        }
-        return $retval;
     }
 
     /**
@@ -412,15 +381,14 @@ class Util
      *
      * @param string $storetype (Optional) Storage location of the PHP
      *        session data, one of 'file' or 'mysql'. Defaults to null,
-     *        which means use the value of storage.phpsessions from the
-     *        cilogon.ini config file, or 'file' if no such
-     *        parameter configured.
+     *        which means use the value of STORAGE_PHPSESSIONS from the
+     *        config.php file, or 'file' if no such parameter configured.
      */
     public static function startPHPSession($storetype = null)
     {
         // No parameter given? Use the value read in from cilogon.ini file.
-        // If storage.phpsessions == 'mysql', create a sessionmgr().
-        $storetype = static::getConfigVar('storage.phpsessions');
+        // If STORAGE_PHPSESSIONS == 'mysqli', create a sessionmgr().
+        $storetype = STORAGE_PHPSESSIONS;
 
         if (preg_match('/^mysql/', $storetype)) {
             $sessionmgr = new SessionMgr();
@@ -476,80 +444,6 @@ class Util
                       ((strtolower(static::getServerVar('HTTPS')) == 'on') ? 's' : '') .
                       '://' . static::getServerVar('HTTP_HOST') . $retval;
         }
-        return $retval;
-    }
-
-    /**
-     * readArrayFromFile
-     *
-     * This function reads in the contents of a file into an array. It
-     * is assumed that the file contains lines of the form:
-     *     key value
-     * where 'key' and 'value' are separated by whitespace.  The 'key'
-     * portion of the string may not contain any whitespace, but the
-     * 'value' part of the line may contain whitespace. Any empty lines
-     * or lines starting with '#' (comments, without leading spaces)
-     * in the file are skipped.  Note that this assumes that each 'key'
-     * in the file is unique.  If there is any problem reading the
-     * file, the resulting array will be empty.
-     *
-     * @param string $filename The name of the file to read.
-     * @return array An array containing the contents of the file.
-     */
-    public static function readArrayFromFile($filename)
-    {
-        $retarray = array();
-        if (is_readable($filename)) {
-            $lines = file(
-                $filename,
-                FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES
-            );
-            foreach ($lines as $line) {
-                if (substr($line, 0, 1) != '#') { // Skip '#' comment lines
-                    $values = preg_split('/\s+/', $line, 2);
-                    $retarray[$values[0]] = @$values[1];
-                }
-            }
-        }
-
-        return $retarray;
-    }
-
-    /**
-     * writeArrayToFile
-     *
-     * This funtion writes an array (with key=>value pairs) to a file,
-     * each line will be of the form:
-     *     key value
-     * The 'key' and 'value' strings are separated by a space. Note
-     * that a 'key' may not contain any whitespace (e.g. tabs), but a
-     * 'value' may contain whitespace. To be super safe, the array is
-     * first written to a temporary file, which is then renamed to the
-     * final desired filename.
-     *
-     * @param string $filename The name of the file to write.
-     * @param array $thearray The array to be written to the file.
-     * @return bool True if successfully wrote file, false otherwise.
-     */
-    public static function writeArrayToFile($filename, $thearray)
-    {
-        $retval = false;  // Assume write failed
-        $tmpfnmae = tempnam('/tmp', 'ARR');
-        if ($fh = fopen($tmpfname, 'w')) {
-            if (flock($fh, LOCK_EX)) {
-                foreach ($thearray as $key => $value) {
-                    fwrite($fh, "$key $value\n");
-                }
-                flock($fh, LOCK_UN);
-            }
-            fclose($fh);
-            if (@rename($tmpfname, $filename)) {
-                $retval = true;
-            } else {
-                @unlink($tmpfname);
-            }
-        }
-
         return $retval;
     }
 

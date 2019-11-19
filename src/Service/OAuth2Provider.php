@@ -47,24 +47,22 @@ class OAuth2Provider
         $extraparams = array();
 
         // Set the client id and secret for the $idp
-        if ($idp == 'google') {
-            $client_id     = Util::getConfigVar('googleoauth2.clientid');
-            $client_secret = Util::getConfigVar('googleoauth2.clientsecret');
-            $classname     = 'League\OAuth2\Client\Provider\Google';
-            $this->authzUrlOpts = [ 'scope' => ['openid','email','profile'] ];
-            $extraparams = array('accessType' => 'offline');
-        } elseif ($idp == 'github') {
-            $client_id     = Util::getConfigVar('githuboauth2.clientid');
-            $client_secret = Util::getConfigVar('githuboauth2.clientsecret');
-            $classname     = 'League\OAuth2\Client\Provider\Github';
-            $this->authzUrlOpts = [ 'scope' => ['user:email'] ];
-        } elseif ($idp == 'orcid') {
-            $client_id     = Util::getConfigVar('orcidoauth2.clientid');
-            $client_secret = Util::getConfigVar('orcidoauth2.clientsecret');
-            $classname     = 'CILogon\OAuth2\Client\Provider\ORCID';
-        }
+        $client_id     = constant(strtoupper($idp) . '_OAUTH2_CLIENT_ID');
+        $client_secret = constant(strtoupper($idp) . '_OAUTH2_CLIENT_SECRET');
 
         if ((strlen($client_id) > 0) && (strlen($client_secret) > 0)) {
+            // Set options on a per-IdP basis
+            if ($idp == 'google') {
+                $classname     = 'League\OAuth2\Client\Provider\Google';
+                $this->authzUrlOpts = ['scope' => ['openid','email','profile']];
+                $extraparams = array('accessType' => 'offline');
+            } elseif ($idp == 'github') {
+                $classname     = 'League\OAuth2\Client\Provider\Github';
+                $this->authzUrlOpts = ['scope' => ['user:email']];
+            } elseif ($idp == 'orcid') {
+                $classname     = 'CILogon\OAuth2\Client\Provider\ORCID';
+            }
+
             $this->provider = new $classname(array_merge(array(
                 'clientId'     => $client_id,
                 'clientSecret' => $client_secret,

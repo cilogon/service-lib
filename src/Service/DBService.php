@@ -60,22 +60,6 @@ use CILogon\Service\Util;
 class DBService
 {
     /**
-     * @var string DEFAULTDBSERVICEURL The main URL for the dbService.
-     *      Corresponds to the OAuth2 .war.
-     */
-    public const DEFAULTDBSERVICEURL = 'http://localhost:8080/oauth2/dbService';
-
-    /**
-     * @var string OAUTH1DBSERVICEURL The URL for the OAuth 1.0a dbService.
-     */
-    public const OAUTH1DBSERVICEURL  = 'http://localhost:8080/oauth/dbService';
-
-    /**
-     * @var string OAUTH2DBSERVICEURL The URL for the OAuth 2 dbService.
-     */
-    public const OAUTH2DBSERVICEURL  = 'http://localhost:8080/oauth2/dbService';
-
-    /**
      * @var array $STATUS The various STATUS_* constants, originally from
      *      Store.pm. The keys of the array are strings corresponding to the
      *      constant names. The values of the array are the integer (hex)
@@ -317,7 +301,7 @@ class DBService
      * @param string $serviceurl (Optional) The URL of the database service
      *        servlet
      */
-    public function __construct($serviceurl = self::DEFAULTDBSERVICEURL)
+    public function __construct($serviceurl = DEFAULT_DBSERVICE_URL)
     {
         $this->clear();
         $this->setDBServiceURL($serviceurl);
@@ -459,7 +443,7 @@ class DBService
     {
         $retval = false;
         $this->clearUser();
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
+        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
         $numargs = count($args);
         if ($numargs == 1) {
             $retval = $this->call('action=getUser&user_uid=' .
@@ -523,7 +507,7 @@ class DBService
     public function getLastArchivedUser($uid)
     {
         $this->clearUser();
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
+        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
         return $this->call('action=getLastArchivedUser&user_uid=' .
             urlencode($uid));
     }
@@ -542,7 +526,7 @@ class DBService
     public function removeUser($uid)
     {
         $this->clearUser();
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
+        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
         return $this->call('action=removeUser&user_uid=' .
             urlencode($uid));
     }
@@ -561,7 +545,7 @@ class DBService
     public function getPortalParameters($oauth_token)
     {
         $this->clearPortal();
-        $this->setDBServiceURL(static::OAUTH1DBSERVICEURL);
+        $this->setDBServiceURL(OAUTH1_DBSERVICE_URL);
         return $this->call('action=getPortalParameter&oauth_token=' .
             urlencode($oauth_token));
     }
@@ -580,7 +564,7 @@ class DBService
     public function getIdps()
     {
         $this->clearIdps();
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
+        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
         return $this->call('action=getAllIdps');
     }
 
@@ -602,7 +586,7 @@ class DBService
     public function setIdps()
     {
         $retval = false;
-        $this->setDBServiceURL(static::DEFAULTDBSERVICEURL);
+        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
         $idpcount = count($this->idp_uids);
         $idpidx = 0;
         if ($idpcount > 0) {
@@ -687,7 +671,7 @@ class DBService
     public function getClient($cid)
     {
         $this->clearClient();
-        $this->setDBServiceURL(static::OAUTH2DBSERVICEURL);
+        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
         return $this->call('action=getClient&client_id=' .
             urlencode($cid));
     }
@@ -721,7 +705,7 @@ class DBService
         $loa = '',
         $myproxyinfo = ''
     ) {
-        $this->setDBServiceURL(static::OAUTH2DBSERVICEURL);
+        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
         return $this->call(
             'action=setTransactionState' .
             '&code=' . urlencode($code) .

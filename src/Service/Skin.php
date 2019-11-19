@@ -72,12 +72,6 @@ class Skin
     protected $forcearray;
 
     /**
-     * @var bool $skininitialized Have we initialized the skin by reading in
-     *      the forceskin.txt file?
-     */
-    protected $skininitialized = false;
-
-    /**
      *  __construct
      *
      * Default constructor. Calls init() to do the actual work.
@@ -108,14 +102,7 @@ class Skin
             Util::unsetSessionVar('cilogon_skin');
         }
 
-        // Read the forceskin.txt file into an array, just once
-        if (!$this->skininitialized) {
-            $this->skininitialized = true;
-            $this->forcearray = Util::readArrayFromFile(
-                Util::getServerVar('DOCUMENT_ROOT') . '/include/forceskin.txt'
-            );
-        }
-
+        $this->forcearray = FORCE_SKIN_ARRAY;
         $this->findSkinName();
         $this->readConfigFile();
         $this->setMyProxyInfo();
@@ -126,7 +113,7 @@ class Skin
      *
      * Get the name of the skin and store it in the class variable
      * $skinname.  This function checks for the name of the skin in
-     * several places: (1) The forceskin.txt file for a matching IdP
+     * several places: (1) The FORCE_SKIN_ARRAY for a matching IdP
      * entityID or portal callbackURL, (2) in a URL parameter (can be
      * '?skin=', '?cilogon_skin=', '?vo='), (3) cilogon_vo form input
      * variable (POST for ECP case), or (4) 'cilogon_skin' PHP session
@@ -145,7 +132,7 @@ class Skin
 
         // Check for matching IdP, callbackURI (OAuth1),
         // redirect_uri (OAuth2), or client_id (OAuth2)
-        // in the forceskin.txt file.
+        // in the FORCE_SKIN_ARRAY.
         $uristocheck = array(
             Util::getGetVar('redirect_uri'),
             Util::getGetVar('client_id'),
@@ -543,20 +530,20 @@ class Skin
     /**
      * getForceSkin
      *
-     * The forceskin.txt file contains 'uripattern skinname' pairs
-     * corresponding to IdP entityIDs or portal callbackurls that
-     * should have a particular skin force-applied. This function looks
-     * in the forceskin.txt file for a pattern-matched URI and returns
+     * The FORCE_SKIN_ARRAY contains 'uripattern'=>'skinname' pairs
+     * corresponding to IdP entityIDs, portal callbackurls, or client_ids
+     * that should have a particular skin force-applied. This function
+     * looks in the FORCE_SKIN_ARRAY for a pattern-matched URI and returns
      * the corresponding skin name if found. If not found, empty
      * string is returned.
      *
-     * @param string $uri A URI to search for in the forceskin.txt file.
+     * @param string $uri A URI to search for in the FORCE_SKIN_ARRAY.
      * @return string The skin name for the URI, or empty string if not
      *         found.
      */
     public function getForceSkin($uri)
     {
-        $retval = '';  // Assume uri is not in forceskin.txt
+        $retval = '';  // Assume uri is not in FORCE_SKIN_ARRAY
 
         foreach ($this->forcearray as $key => $value) {
             if (preg_match($key, $uri)) {

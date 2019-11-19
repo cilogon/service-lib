@@ -1339,6 +1339,8 @@ IdPs for the skin.'
                 Util::unsetCookieVar('providerId');
                 Util::unsetAllUserSessionVars();
                 printLogonPage();
+            } else { // Got user successfully
+                static::gotUserSuccess();
             }
         }
     }

@@ -66,11 +66,6 @@ class Content
 
         $skin->printSkinLink();
 
-        $deployjava = $skin->getConfigOption('deployjava');
-        if ((!is_null($deployjava)) && ((int)$deployjava == 1)) {
-            echo '<script type="text/javascript" src="/include/deployJava.js"></script>';
-        }
-
         echo '
         <script type="text/javascript" src="/include/cilogon.js"></script>
         ' ;

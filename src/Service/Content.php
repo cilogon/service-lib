@@ -1780,8 +1780,6 @@ IdPs for the skin.'
         // inform the user about updated DN strings.
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $callbackuri = Util::getSessionVar('callbackuri');
-        $skin = Util::getSkin();
-        $forceremember = $skin->getConfigOption('delegate', 'forceremember');
 
         if (
             ($status == DBService::$STATUS['STATUS_NEW_USER']) &&

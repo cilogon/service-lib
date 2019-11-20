@@ -613,11 +613,11 @@ class Content
             $selected_idp = $idphintlist[0];
         }
 
-        // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
-        // then check for a match in the BYPASS_IDP_ARRAY to see if we
-        // should automatically redirect to a specific IdP. Used mainly
-        // by campus gateways.
         if ((strlen($redirect_uri) > 0) || (strlen($client_id) > 0)) {
+            // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
+            // then check for a match in the BYPASS_IDP_ARRAY to see if we
+            // should automatically redirect to a specific IdP. Used mainly
+            // by campus gateways.
             $bypassidp = '';
             foreach (BYPASS_IDP_ARRAY as $key => $value) {
                 if (
@@ -628,7 +628,23 @@ class Content
                     break;
                 }
             }
-            if (strlen($bypassidp) > 0) { // Match found!
+
+            // CIL-613 - Next, check for a match in the ALLOW_BYPASS_ARRAY.
+            // If found, then allow the idphint/selected_idp to be used as the
+            // IdP to redirect to.
+            if (empty($bypassidp) && (!empty($selected_idp))) {
+                foreach (ALLOW_BYPASS_ARRAY as $value) {
+                    if (
+                        (preg_match($value, $redirect_uri)) ||
+                        (preg_match($value, $client_id))
+                    ) {
+                        $bypassidp = $selected_idp;
+                        break;
+                    }
+                }
+            }
+
+            if (!empty($bypassidp)) { // Match found!
                 $providerId = $bypassidp;
                 $keepidp = 'checked';
                 // To skip the next code blocks, unset a few variables.

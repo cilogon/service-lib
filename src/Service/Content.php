@@ -428,46 +428,37 @@ class Content
                 ';
 
                 $googleauthz = Util::getAuthzUrl('Google');
-                if (
-                    (isset($idps[$googleauthz])) &&
-                    ($skin->idpAvailable($googleauthz))
-                ) {
+                if (isset($idps[$googleauthz])) {
                     echo '
-                  <p>
-                  If you have a <a target="_blank"
-                  href="https://myaccount.google.com">Google</a>
-                  account, you can select it for
-                  authenticating to the CILogon Service.
-                  </p>
-                  ';
+                    <p>
+                    If you have a <a target="_blank"
+                    href="https://myaccount.google.com">Google</a>
+                    account, you can select it for
+                    authenticating to the CILogon Service.
+                    </p>
+                    ';
                 }
                 $githubauthz = Util::getAuthzUrl('GitHub');
-                if (
-                    (isset($idps[$githubauthz])) &&
-                    ($skin->idpAvailable($githubauthz))
-                ) {
+                if (isset($idps[$githubauthz])) {
                     echo '
-                  <p>
-                  If you have a <a target="_blank"
-                  href="https://github.com/settings/profile">GitHub</a>
-                  account, you can select it for
-                  authenticating to the CILogon Service.
-                  </p>
-                  ';
+                    <p>
+                    If you have a <a target="_blank"
+                    href="https://github.com/settings/profile">GitHub</a>
+                    account, you can select it for
+                    authenticating to the CILogon Service.
+                    </p>
+                    ';
                 }
                 $orcidauthz = Util::getAuthzUrl('ORCID');
-                if (
-                    (isset($idps[$orcidauthz])) &&
-                    ($skin->idpAvailable($orcidauthz))
-                ) {
+                if (isset($idps[$orcidauthz])) {
                     echo '
-                  <p>
-                  If you have a <a target="_blank"
-                  href="https://orcid.org/my-orcid">ORCID</a>
-                  account, you can select it for
-                  authenticating to the CILogon Service.
-                  </p>
-                  ';
+                    <p>
+                    If you have a <a target="_blank"
+                    href="https://orcid.org/my-orcid">ORCID</a>
+                    account, you can select it for
+                    authenticating to the CILogon Service.
+                    </p>
+                    ';
                 }
             }
 
@@ -1776,9 +1767,15 @@ IdPs for the skin.'
             }
 
             // Add all OAuth2 IdPs to the list
-            foreach (Util::$oauth2idps as $key => $value) {
-                $retarray[Util::getAuthzUrl($value)]['Organization_Name'] = $value;
-                $retarray[Util::getAuthzUrl($value)]['Display_Name'] = $value;
+            foreach (Util::$oauth2idps as $value) {
+                // CIL-617 Show OAuth2 IdPs only if client_id is configured
+                $client_id = constant(strtoupper($value) . '_OAUTH2_CLIENT_ID');
+                if (!empty($client_id)) {
+                    $retarray[Util::getAuthzUrl($value)]['Organization_Name'] =
+                        $value;
+                    $retarray[Util::getAuthzUrl($value)]['Display_Name'] =
+                        $value;
+                }
             }
 
             // Check to see if the skin's config.xml has a whitelist of IDPs.

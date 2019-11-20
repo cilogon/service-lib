@@ -365,7 +365,7 @@ EOT;
         if (is_readable($this->getInCommonFilename())) {
             // Read in the InCommon metadata file
             $xmlstr = @file_get_contents($this->getInCommonFilename());
-            if (strlen($xmlstr) > 0) {
+            if (!empty($xmlstr)) {
                 // Need to fix the namespace for Xpath queries to work
                 $xmlstr = str_replace('xmlns=', 'ns=', $xmlstr);
                 $xml = new SimpleXMLElement($xmlstr);
@@ -458,10 +458,7 @@ EOT;
 
                     // If neither OrganizationDisplayName nor mdui:DisplayName
                     // was found, then use the entityID as a last resort.
-                    if (
-                        (strlen($Organization_Name) == 0) &&
-                        (strlen($Display_Name) == 0)
-                    ) {
+                    if ((empty($Organization_Name)) && (empty($Display_Name))) {
                         $Organization_Name = $entityID;
                         $Display_Name = $entityID;
                     }
@@ -472,17 +469,17 @@ EOT;
                         $dom,
                         $idp,
                         'Organization_Name',
-                        ((strlen($Organization_Name) > 0) ?
-                            $Organization_Name :
-                            $Display_Name)
+                        ((empty($Organization_Name)) ?
+                            $Display_Name :
+                            $Organization_Name)
                     );
                     $this->addNode(
                         $dom,
                         $idp,
                         'Display_Name',
-                        ((strlen($Display_Name) > 0) ?
-                            $Display_Name :
-                            $Organization_Name)
+                        ((empty($Display_Name)) ?
+                            $Organization_Name :
+                            $Display_Name)
                     );
 
                     $xp = $idx[0]->xpath('Organization/OrganizationURL');
@@ -501,10 +498,9 @@ EOT;
                         "ContactPerson[@contactType='support']/SurName"
                     );
                     if (($xp !== false) && (count($xp) > 0)) {
-                        $name .= ((strlen($name) > 0) ? ' ' : '') .
-                            (string)($xp[0]);
+                        $name .= ((empty($name)) ? '' : ' ') . (string)($xp[0]);
                     }
-                    if (strlen($name) > 0) {
+                    if (!empty($name)) {
                         $this->addNode($dom, $idp, 'Support_Name', $name);
                     }
 
@@ -531,10 +527,9 @@ EOT;
                         "ContactPerson[@contactType='technical']/SurName"
                     );
                     if (($xp !== false) && (count($xp) > 0)) {
-                        $name .= ((strlen($name) > 0) ? ' ' : '') .
-                            (string)($xp[0]);
+                        $name .= ((empty($name)) ? '' : ' ') . (string)($xp[0]);
                     }
-                    if (strlen($name) > 0) {
+                    if (!empty($name)) {
                         $this->addNode($dom, $idp, 'Technical_Name', $name);
                     }
 
@@ -561,10 +556,9 @@ EOT;
                         "ContactPerson[@contactType='administrative']/SurName"
                     );
                     if (($xp !== false) && (count($xp) > 0)) {
-                        $name .= ((strlen($name) > 0) ? ' ' : '') .
-                            (string)($xp[0]);
+                        $name .= ((empty($name)) ? '' : ' ') . (string)($xp[0]);
                     }
-                    if (strlen($name) > 0) {
+                    if (!empty($name)) {
                         $this->addNode($dom, $idp, 'Administrative_Name', $name);
                     }
 
@@ -1173,7 +1167,7 @@ EOT;
 
         // Set the blob set of info, namely those shib attributes which
         // were given by the IdP when the user authenticated.
-        if (strlen($entityID) == 0) {
+        if (empty($entityID)) {
             $entityID = Util::getServerVar('HTTP_SHIB_IDENTITY_PROVIDER');
         }
         // CIL-254 - For LIGO backup IdPs, remap entityID to the main IdP

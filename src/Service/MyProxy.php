@@ -60,7 +60,7 @@ class MyProxy
         }
 
         // Make sure the username passed in is not empty
-        if (strlen($username) == 0) {
+        if (empty($username)) {
             Util::sendErrorAlert(
                 'getMyProxyCredential Error',
                 'MyProxy Error = Missing MyProxy username'
@@ -84,8 +84,8 @@ class MyProxy
         // set the USER_CERT_ENV variable to bundle the two parameters into a
         // single variable holding the two X509_USER_* environment variables.
         $USER_CERT_ENV = '';
-        if (strlen($usercert) > 0) {
-            if (strlen($userkey) == 0) {
+        if (!empty($usercert)) {
+            if (empty($userkey)) {
                 $userkey = $usercert;
             }
             $USER_CERT_ENV = 'X509_USER_CERT=' . escapeshellarg($usercert) .
@@ -105,10 +105,10 @@ class MyProxy
                " -t $lifetime" .
                ' -l ' . escapeshellarg($username) .
                ' -S -o -' .
-               ((strlen($certreq) > 0) ?
-                   (' --certreq - <<< ' . escapeshellarg($certreq)) : '') .
-               ((strlen($passphrase) > 0) ?
-                   (' <<< ' . escapeshellarg($passphrase)) : ' -n') .
+               ((empty($certreq)) ?
+                   '' : (' --certreq - <<< ' . escapeshellarg($certreq))) .
+               ((empty($passphrase)) ?
+                   ' -n' : (' <<< ' . escapeshellarg($passphrase))) .
                ' 2>&1';
         exec($cmd, $output, $return_val);
         $retstr = implode("\n", $output);

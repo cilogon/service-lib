@@ -39,7 +39,7 @@ class Content
         $skinpoweredbyimg = (string)$skin->getConfigOption('poweredbyimg');
         if (
             (!is_null($skinpoweredbyimg)) &&
-            (strlen($skinpoweredbyimg) > 0) &&
+            (!empty($skinpoweredbyimg)) &&
             (is_readable('/var/www/html' . $skinpoweredbyimg))
         ) {
             $poweredbyimg = $skinpoweredbyimg;
@@ -68,7 +68,7 @@ class Content
     <![endif]-->
         ';
 
-        if (strlen($extra) > 0) {
+        if (!empty($extra)) {
             echo $extra;
         }
 
@@ -116,7 +116,7 @@ class Content
      */
     public static function printFooter($footer = '')
     {
-        if (strlen($footer) > 0) {
+        if (!empty($footer)) {
             echo $footer;
         }
 
@@ -182,7 +182,7 @@ class Content
     ) {
         static $formnum = 0;
 
-        if (strlen($action) == 0) {
+        if (empty($action)) {
             $action = Util::getScriptDir();
         }
 
@@ -228,7 +228,7 @@ class Content
         $providerId = '';
         $pc = new PortalCookie();
         $pn = $pc->getPortalName();
-        if (strlen($pn) > 0) {
+        if (!empty($pn)) {
             $keepidp    = $pc->get('keepidp');
             $providerId = $pc->get('providerId');
         } else {
@@ -237,12 +237,12 @@ class Content
         }
 
         // Make sure previously selected IdP is in list of available IdPs.
-        if ((strlen($providerId) > 0) && (!isset($idps[$providerId]))) {
+        if ((!empty($providerId)) && (!isset($idps[$providerId]))) {
             $providerId = '';
         }
 
         // If no previous providerId, get from skin, or default to Google.
-        if (strlen($providerId) == 0) {
+        if (empty($providerId)) {
             $initialidp = (string)$skin->getConfigOption('initialidp');
             if ((!is_null($initialidp)) && (isset($idps[$initialidp]))) {
                 $providerId = $initialidp;
@@ -341,7 +341,7 @@ class Content
             <label for="keepidp" title="' , $helptext ,
             '" class="helpcursor">Remember this selection:</label>
             <input type="checkbox" name="keepidp" id="keepidp" ' ,
-            ((strlen($keepidp) > 0) ? 'checked="checked" ' : '') ,
+            ((empty($keepidp)) ? '' : 'checked="checked" ') ,
             'title="' , $helptext , '" class="helpcursor" />
             </p>
             ';
@@ -372,7 +372,7 @@ class Content
         ';
 
         $logonerror = Util::getSessionVar('logonerror');
-        if (strlen($logonerror) > 0) {
+        if (!empty($logonerror)) {
             echo "<p class=\"logonerror\">$logonerror</p>";
             Util::unsetSessionVar('logonerror');
         }
@@ -493,14 +493,14 @@ class Content
         // Set the cookie for keepidp if the checkbox was checked
         $pc = new PortalCookie();
         $pn = $pc->getPortalName();
-        if (strlen(Util::getPostVar('keepidp')) > 0) {
-            if (strlen($pn) > 0) {
+        if (!empty(Util::getPostVar('keepidp'))) {
+            if (!empty($pn)) {
                 $pc->set('keepidp', 'checked');
             } else {
                 Util::setCookieVar('keepidp', 'checked');
             }
         } else {
-            if (strlen($pn) > 0) {
+            if (!empty($pn)) {
                 $pc->set('keepidp', '');
             } else {
                 Util::unsetCookieVar('keepidp');
@@ -511,8 +511,8 @@ class Content
         $providerId = Util::getPostVar('providerId');
 
         // Set the cookie for the last chosen IdP and redirect to it if in list
-        if ((strlen($providerId) > 0) && (isset($idps[$providerId]))) {
-            if (strlen($pn) > 0) {
+        if ((!empty($providerId)) && (isset($idps[$providerId]))) {
+            if (!empty($pn)) {
                 $pc->set('providerId', $providerId);
                 $pc->write();
             } else {
@@ -526,7 +526,7 @@ class Content
                 static::redirectToGetShibUser($providerId);
             }
         } else { // IdP not in list, or no IdP selected
-            if (strlen($pn) > 0) {
+            if (!empty($pn)) {
                 $pc->set('providerId', '');
                 $pc->write();
             } else {
@@ -604,7 +604,7 @@ class Content
             $selected_idp = $idphintlist[0];
         }
 
-        if ((strlen($redirect_uri) > 0) || (strlen($client_id) > 0)) {
+        if ((!empty($redirect_uri)) || (!empty($client_id))) {
             // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
             // then check for a match in the BYPASS_IDP_ARRAY to see if we
             // should automatically redirect to a specific IdP. Used mainly
@@ -651,7 +651,7 @@ class Content
         // 'providerId' and 'keepidp'.
         if (
             ($forceinitialidp == 1) &&
-            ((strlen($initialidp) > 0) || (strlen($selected_idp) > 0))
+            ((!empty($initialidp)) || (!empty($selected_idp)))
         ) {
             // If the <allowforceinitialidp> option is set, then make sure
             // the callback / redirect uri is in the portal list.
@@ -664,7 +664,7 @@ class Content
                    ($skin->inPortalList($callbackuri))))
             ) {
                 // 'selected_idp' takes precedence over <initialidp>
-                if (strlen($selected_idp) > 0) {
+                if (!empty($selected_idp)) {
                     $providerId = $selected_idp;
                 } else {
                     $providerId = $initialidp;
@@ -680,7 +680,7 @@ class Content
         $pn = $pc->getPortalName();
         if ($readidpcookies) {
             // Check the portalcookie first, then the 'normal' cookies
-            if (strlen($pn) > 0) {
+            if (!empty($pn)) {
                 $keepidp    = $pc->get('keepidp');
                 $providerId = $pc->get('providerId');
             } else {
@@ -693,11 +693,11 @@ class Content
         // providerId is a whitelisted IdP or valid OpenID provider),
         // then skip the Logon page and proceed to the appropriate
         // getuser script.
-        if ((strlen($providerId) > 0) && (strlen($keepidp) > 0)) {
+        if ((!empty($providerId)) && (!empty($keepidp))) {
             // If selected_idp was specified at the OIDC authorize endpoint,
             // make sure that it matches the saved providerId. If not,
             // then show the Logon page and uncheck the keepidp checkbox.
-            if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
+            if ((empty($selected_idp)) || ($selected_idp == $providerId)) {
                 $providerName = Util::getAuthzIdP($providerId);
                 if (in_array($providerName, Util::$oauth2idps)) {
                     // Log in with an OAuth2 IdP
@@ -706,7 +706,7 @@ class Content
                     // Log in with InCommon
                     static::redirectToGetShibUser($providerId);
                 } else { // $providerId not in whitelist
-                    if (strlen($pn) > 0) {
+                    if (!empty($pn)) {
                         $pc->set('providerId', '');
                         $pc->write();
                     } else {
@@ -715,7 +715,7 @@ class Content
                     printLogonPage();
                 }
             } else { // selected_idp does not match saved providerId
-                if (strlen($pn) > 0) {
+                if (!empty($pn)) {
                     $pc->set('keepidp', '');
                     $pc->write();
                 } else {
@@ -747,7 +747,7 @@ class Content
     public static function printIcon($icon, $popuptext = '', $class = '')
     {
         echo '<span';
-        if (strlen($popuptext) > 0) {
+        if (!empty($popuptext)) {
             echo ' class="helpcursor ' , $class , '" title="' , $popuptext , '"';
         }
         echo '>&nbsp;<img src="/images/' , $icon , 'Icon.png"
@@ -813,12 +813,12 @@ class Content
 
 
         if (
-            (strlen($uid) > 0) && (strlen($idp) > 0) &&
-            (strlen($idpname) > 0) && (strlen($status) > 0) &&
-            (strlen($dn) > 0) && (strlen($authntime) > 0) &&
+            (!empty($uid)) && (!empty($idp)) &&
+            (!empty($idpname)) && (!empty($status)) &&
+            (!empty($dn)) && (!empty($authntime)) &&
             (!($status & 1))
         ) {  // All STATUS_OK codes are even
-            if ((strlen($providerId) == 0) || ($providerId == $idp)) {
+            if ((empty($providerId)) || ($providerId == $idp)) {
                 $retval = true;
             }
         }
@@ -874,7 +874,7 @@ class Content
     ) {
 
         // If providerId not set, try the cookie value
-        if (strlen($providerId) == 0) {
+        if (empty($providerId)) {
             $providerId = Util::getPortalOrNormalCookieVar('providerId');
         }
 
@@ -899,7 +899,7 @@ class Content
             $redirect = "Location: https://$mhn/Shibboleth.sso/Login?target=" .
                 urlencode("https://$mhn/secure/getuser/");
 
-            if (strlen($providerId) > 0) {
+            if (!empty($providerId)) {
                 // Use special NIHLogin Shibboleth SessionInitiator for acsByIndex
                 if ($providerId == 'urn:mace:incommon:nih.gov') {
                     $redirect = preg_replace(
@@ -916,7 +916,7 @@ class Content
                 Util::unsetSessionVar('forceauthn');
                 if ($forceauthn) {
                     $redirect .= '&forceAuthn=true';
-                } elseif (strlen($forceauthn) == 0) {
+                } elseif (empty($forceauthn)) {
                     // 'forceauth' was not set to '0' in the session, so
                     // check the skin's option instead.
                     $forceauthn = Util::getSkin()->getConfigOption('forceauthn');
@@ -929,7 +929,7 @@ class Content
                 if ($allowsilver) {
                     if (
                         (Util::getIdpList()->isSilver($providerId)) ||
-                        (strlen(Util::getPostVar('silveridp')) > 0)
+                        (!empty(Util::getPostVar('silveridp')))
                     ) {
                         Util::setSessionVar('requestsilver', '1');
                         $redirect .= '&authnContextClassRef=' .
@@ -969,7 +969,7 @@ class Content
         $responsesubmit = 'gotuser'
     ) {
         // If providerId not set, try the cookie value
-        if (strlen($providerId) == 0) {
+        if (empty($providerId)) {
             $providerId = Util::getPortalOrNormalCookieVar('providerId');
         }
 
@@ -994,7 +994,7 @@ class Content
             Util::unsetSessionVar('forceauthn');
             if ($forceauthn) {
                 $extraparams['approval_prompt'] = 'force';
-            } elseif (strlen($forceauthn) == 0) {
+            } elseif (empty($forceauthn)) {
                 // 'forceauth' was not set to '0' in the session, so
                 // check the skin's option instead.
                 $forceauthn = Util::getSkin()->getConfigOption('forceauthn');
@@ -1101,12 +1101,12 @@ class Content
             }
         }
         // Next, check for OAuth 1.0a
-        if ((strlen($redirect) == 0) && (strlen($failureuri) > 0)) {
+        if ((empty($redirect)) && (!empty($failureuri))) {
             $redirect = $failureuri . "?reason=missing_attributes";
         }
 
         // If empty 'uid' or 'status' or odd-numbered status code, error!
-        if ((strlen($uid) == 0) || (strlen($status) == 0) || ($status & 1)) {
+        if ((empty($uid)) || (empty($status)) || ($status & 1)) {
             // Got all session vars by now, so okay to unset.
             Util::unsetAllUserSessionVars();
 
@@ -1312,7 +1312,7 @@ class Content
             Util::getSkin()->init();  // Check for forced skin
             $idps = static::getCompositeIdPList();
             $providerId = Util::getSessionVar('idp');
-            if ((strlen($providerId) > 0) && (!isset($idps[$providerId]))) {
+            if ((!empty($providerId)) && (!isset($idps[$providerId]))) {
                 Util::setSessionVar(
                     'logonerror',
                     'Invalid IdP selected. Please try again.'
@@ -1355,7 +1355,7 @@ IdPs for the skin.'
 
         if (
             ($status == DBService::$STATUS['STATUS_NEW_USER']) &&
-            ((strlen($callbackuri) > 0) ||
+            ((!empty($callbackuri)) ||
              (isset($clientparams['code'])))
         ) {
             // Extra check for new users: see if any HTML entities
@@ -1402,7 +1402,7 @@ IdPs for the skin.'
             static::getMinMaxLifetimes('pkcs12', 9516);
         $p12lifetime   = Util::getPostVar('p12lifetime');
         $p12multiplier = Util::getPostVar('p12multiplier');
-        if (strlen($p12multiplier) == 0) {
+        if (empty($p12multiplier)) {
             $p12multiplier = 1;  // For ECP, p12lifetime is in hours
         }
         $lifetime = $p12lifetime * $p12multiplier;
@@ -1428,7 +1428,7 @@ IdPs for the skin.'
         $password1 = Util::getPostVar('password1');
         $password2 = Util::getPostVar('password2');
         $p12password = Util::getPostVar('p12password');  // For ECP clients
-        if (strlen($p12password) > 0) {
+        if (!empty($p12password)) {
             $password1 = $p12password;
             $password2 = $p12password;
         }
@@ -1456,10 +1456,10 @@ IdPs for the skin.'
         }
 
         $dn = Util::getSessionVar('dn');
-        if (strlen($dn) > 0) {
+        if (!empty($dn)) {
             // Append extra info, such as 'skin', to be processed by MyProxy
             $myproxyinfo = Util::getSessionVar('myproxyinfo');
-            if (strlen($myproxyinfo) > 0) {
+            if (!empty($myproxyinfo)) {
                 $dn .= " $myproxyinfo";
             }
             // Attempt to fetch a credential from the MyProxy server
@@ -1493,7 +1493,7 @@ IdPs for the skin.'
                          $match[1] . "-----END CERTIFICATE-----";
             }
 
-            if (strlen($cert2) > 0) { // Successfully got a certificate!
+            if (!empty($cert2)) { // Successfully got a certificate!
                 // Create a temporary directory in /var/www/html/pkcs12/
                 $tdirparent = '/var/www/html/pkcs12/';
                 $polonum = '3';   // Prepend the polo? number to directory
@@ -1875,36 +1875,36 @@ IdPs for the skin.'
 
         $missingattrs = '';
         // Show user which attributes are missing
-        if ((strlen($ePPN) == 0) && (strlen($ePTID) == 0)) {
+        if ((empty($ePPN)) && (empty($ePTID))) {
             $errorboxstr .=
             '<tr><th>ePTID:</th><td>MISSING</td></tr>
             <tr><th>ePPN:</th><td>MISSING</td></tr>';
             $missingattrs .= '%0D%0A    eduPersonPrincipalName' .
                              '%0D%0A    eduPersonTargetedID ';
         }
-        if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
+        if ((empty($firstname)) && (empty($displayname))) {
             $errorboxstr .=
             '<tr><th>First Name:</th><td>MISSING</td></tr>';
             $missingattrs .= '%0D%0A    givenName (first name)';
         }
-        if ((strlen($lastname) == 0) && (strlen($displayname) == 0)) {
+        if ((empty($lastname)) && (empty($displayname))) {
             $errorboxstr .=
             '<tr><th>Last Name:</th><td>MISSING</td></tr>';
             $missingattrs .= '%0D%0A    sn (last name)';
         }
         if (
-            (strlen($displayname) == 0) &&
-            ((strlen($firstname) == 0) || (strlen($lastname) == 0))
+            (empty($displayname)) &&
+            ((empty($firstname)) || (empty($lastname)))
         ) {
             $errorboxstr .=
             '<tr><th>Display Name:</th><td>MISSING</td></tr>';
             $missingattrs .= '%0D%0A    displayName';
         }
         $emailvalid = filter_var($emailaddr, FILTER_VALIDATE_EMAIL);
-        if ((strlen($emailaddr) == 0) || (!$emailvalid)) {
+        if ((empty($emailaddr)) || (!$emailvalid)) {
             $errorboxstr .=
             '<tr><th>Email Address:</th><td>' .
-            ((strlen($emailaddr) == 0) ? 'MISSING' : 'INVALID') .
+            ((empty($emailaddr)) ? 'MISSING' : 'INVALID') .
             '</td></tr>';
             $missingattrs .= '%0D%0A    mail (email address)';
         }
@@ -1928,10 +1928,7 @@ IdPs for the skin.'
         }
         $student = false;
         $errorboxstr .= '</table></blockquote>';
-        if (
-            (strlen($emailaddr) == 0) &&
-            (preg_match('/student@/', $affiliation))
-        ) {
+        if ((empty($emailaddr)) && (preg_match('/student@/', $affiliation))) {
             $student = true;
             $errorboxstr .= '<p><b>If you are a student</b>, ' .
             'you may need to ask your identity provider ' .
@@ -1964,9 +1961,9 @@ IdPs for the skin.'
         $addr = @$shibarray['Support Address'];
         $addr = preg_replace('/^mailto:/', '', $addr);
 
-        if (strlen($addr) > 0) {
+        if (!empty($addr)) {
             $addrfound = true;
-            if (strlen($name) == 0) { // Use address if no name given
+            if (empty($name)) { // Use address if no name given
                 $name = $addr;
             }
             $errorboxstr .= '<li> Support Contact: ' .
@@ -1979,9 +1976,9 @@ IdPs for the skin.'
             $name = @$shibarray['Technical Name'];
             $addr = @$shibarray['Technical Address'];
             $addr = preg_replace('/^mailto:/', '', $addr);
-            if (strlen($addr) > 0) {
+            if (!empty($addr)) {
                 $addrfound = true;
-                if (strlen($name) == 0) { // Use address if no name given
+                if (empty($name)) { // Use address if no name given
                     $name = $addr;
                 }
                 $errorboxstr .= '<li> Technical Contact: ' .
@@ -1995,8 +1992,8 @@ IdPs for the skin.'
             $name = @$shibarray['Administrative Name'];
             $addr = @$shibarray['Administrative Address'];
             $addr = preg_replace('/^mailto:/', '', $addr);
-            if (strlen($addr) > 0) {
-                if (strlen($name) == 0) { // Use address if no name given
+            if (!empty($addr)) {
+                if (empty($name)) { // Use address if no name given
                     $name = $addr;
                 }
                 $errorboxstr .= '<li>Administrative Contact: ' .

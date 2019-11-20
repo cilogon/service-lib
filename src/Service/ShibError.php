@@ -88,7 +88,7 @@ class ShibError
             // an error. Instead, try again without asking for silver.
             if (Util::getSessionVar('requestsilver') == '1') {
                 $responseurl = null;
-                if (strlen(Util::getSessionVar('responseurl')) > 0) {
+                if (!empty(Util::getSessionVar('responseurl'))) {
                     $responseurl = Util::getSessionVar('responseurl');
                 }
                 $providerId = Util::getPortalOrNormalCookieVar('providerId');
@@ -125,7 +125,7 @@ class ShibError
                         'User%20denied%20authorization%20request' .
                         ((array_key_exists('state', $clientparams)) ?
                             '&state=' . $clientparams['state'] : ''));
-                } elseif (strlen($failureuri) > 0) {
+                } elseif (!empty($failureuri)) {
                     Util::unsetAllUserSessionVars();
                     header('Location: ' . $failureuri . '?reason=cancel');
                 } else {
@@ -154,10 +154,10 @@ class ShibError
                 (isset($this->errorarray['errorType'])) &&
                 (isset($this->errorarray['errorText'])) &&
                 (isset($this->errorarray['now'])) &&
-                (strlen($this->errorarray['requestURL']) > 0) &&
-                (strlen($this->errorarray['errorType']) > 0) &&
-                (strlen($this->errorarray['errorText']) > 0) &&
-                (strlen($this->errorarray['now']) > 0));
+                (!empty($this->errorarray['requestURL'])) &&
+                (!empty($this->errorarray['errorType'])) &&
+                (!empty($this->errorarray['errorText'])) &&
+                (!empty($this->errorarray['now'])));
     }
 
     /**

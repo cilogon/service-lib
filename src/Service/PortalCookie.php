@@ -69,28 +69,32 @@ class PortalCookie
     public function read()
     {
         if (isset($_COOKIE[static::COOKIENAME])) {
-            $cookie = $_COOKIE[static::COOKIENAME];
-            $b64 = base64_decode($cookie);
-            if ($b64 !== false) {
-                $iv = substr($b64, 0, 16); // IV prepended to encrypted data
-                $b64a = substr($b64, 16);  // IV is 16 bytes, rest is data
-                if ((strlen($iv) > 0) && (strlen($b64a) > 0)) {
-                    $key = OPENSSL_KEY;
-                    if (strlen($key) > 0) {
-                        $data = openssl_decrypt(
+            $cookievar = $_COOKIE[static::COOKIENAME];
+            $serial = $cookievar;
+
+            // Attempt to un-base64 and decrypt portal array from cookie
+            if (defined('OPENSSL_KEY') && (!empty(OPENSSL_KEY))) {
+                $b64 = base64_decode($cookievar);
+                if ($b64 !== false) {
+                    $iv = substr($b64, 0, 16); // IV prepended to encrypted data
+                    $b64a = substr($b64, 16);  // IV is 16 bytes, rest is data
+                    if ((strlen($iv) > 0) && (strlen($b64a) > 0)) {
+                        $serial = openssl_decrypt(
                             $b64a,
                             'AES-128-CBC',
-                            $key,
+                            OPENSSL_KEY,
                             OPENSSL_RAW_DATA,
                             $iv
                         );
-                        if (strlen($data) > 0) {
-                            $unserial = unserialize($data);
-                            if ($unserial !== false) {
-                                $this->portalarray = $unserial;
-                            }
-                        }
                     }
+                }
+            }
+
+            // Unserialize the cookie data back into the portalarray
+            if (strlen($serial) > 0) {
+                $unserial = unserialize($serial);
+                if ($unserial !== false) {
+                    $this->portalarray = $unserial;
                 }
             }
         }
@@ -107,50 +111,55 @@ class PortalCookie
     public function write()
     {
         if (!empty($this->portalarray)) {
-            $key = OPENSSL_KEY;
-            $iv = openssl_random_pseudo_bytes(16);  // IV is 16 bytes
-            if ((strlen($key) > 0) && (strlen($iv) > 0)) {
-                $this->set('ut', time()); // Save update time
-                $serial = serialize($this->portalarray);
-                // Special check: If the serialization of the cookie is
-                // more than 2500 bytes, the resulting base64 encoded string
-                // may be too big (>4K). So scan through all portal entries
-                // and delete the oldest one until the size is small enough.
-                while (strlen($serial) > 2500) {
-                    $smallvalue = 5000000000; // Unix time = Jun 11, 2128
-                    $smallportal = '';
-                    foreach ($this->portalarray as $k => $v) {
-                        if (isset($v['ut'])) {
-                            if ($v['ut'] < $smallvalue) {
-                                $smallvalue = $v['ut'];
-                                $smallportal = $k;
-                            }
-                        } else { // 'ut' not set, delete it
+            $this->set('ut', time()); // Save update time
+            $serial = serialize($this->portalarray);
+            // Special check: If the serialization of the cookie is
+            // more than 2500 bytes, the resulting base64-encoded string
+            // may be too big (>4K). So scan through all portal entries
+            // and delete the oldest one until the size is small enough.
+            while (strlen($serial) > 2500) {
+                $smallvalue = 5000000000; // Unix time = Jun 11, 2128
+                $smallportal = '';
+                foreach ($this->portalarray as $k => $v) {
+                    if (isset($v['ut'])) {
+                        if ($v['ut'] < $smallvalue) {
+                            $smallvalue = $v['ut'];
                             $smallportal = $k;
-                            break;
                         }
+                    } else { // 'ut' not set, delete it
+                        $smallportal = $k;
+                        break;
                     }
-                    if (strlen($smallportal) > 0) {
-                        unset($this->portalarray[$smallportal]);
-                    } else {
-                        break; // Should never get here, but just in case
-                    }
-                    $serial = serialize($this->portalarray);
                 }
-                $data = openssl_encrypt(
-                    $serial,
-                    'AES-128-CBC',
-                    $key,
-                    OPENSSL_RAW_DATA,
-                    $iv
-                );
-                if (strlen($data) > 0) {
-                    $b64 = base64_encode($iv . $data); // Prepend IV to data
-                    if ($b64 !== false) {
-                        Util::setCookieVar(static::COOKIENAME, $b64);
+                if (strlen($smallportal) > 0) {
+                    unset($this->portalarray[$smallportal]);
+                } else {
+                    break; // Should never get here, but just in case
+                }
+                $serial = serialize($this->portalarray);
+            }
+            $cookievar = $serial;
+
+            // Attempt to encrypt and base64 the serialized portal array
+            if (defined('OPENSSL_KEY') && (!empty(OPENSSL_KEY))) {
+                $iv = openssl_random_pseudo_bytes(16);  // IV is 16 bytes
+                if (strlen($iv) > 0) {
+                    $data = openssl_encrypt(
+                        $cookievar,
+                        'AES-128-CBC',
+                        OPENSSL_KEY,
+                        OPENSSL_RAW_DATA,
+                        $iv
+                    );
+                    if (strlen($data) > 0) {
+                        $b64 = base64_encode($iv . $data); // Prepend IV to data
+                        if ($b64 !== false) {
+                            $cookievar = $b64;
+                        }
                     }
                 }
             }
+            Util::setCookieVar(static::COOKIENAME, $cookievar);
         }
     }
 

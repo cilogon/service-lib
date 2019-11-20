@@ -650,7 +650,7 @@ Remote Address= ' . $remoteaddr . '
      *
      * This function calculates and returns the 'hostname' for the
      * server. It first checks HTTP_HOST. If not set, it returns
-     * 'cilogon.org'. This is needed by command line scripts.
+     * DEFAULT_HOSTNAME. This is needed by command line scripts.
      *
      * @return string The 'Hostname' for the web server.
      */
@@ -658,7 +658,7 @@ Remote Address= ' . $remoteaddr . '
     {
         $thehostname = static::getServerVar('HTTP_HOST');
         if (strlen($thehostname) == 0) {
-            $thehostname = 'cilogon.org';
+            $thehostname = DEFAULT_HOSTNAME;
         }
         return $thehostname;
     }

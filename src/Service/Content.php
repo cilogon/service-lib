@@ -1459,7 +1459,7 @@ IdPs for the skin.'
             $cert = MyProxy::getMyProxyCredential(
                 $dn,
                 '',
-                'myproxy.cilogon.org,myproxy2.cilogon.org',
+                MYPROXY_HOST,
                 $port,
                 $lifetime,
                 '/var/www/config/hostcred.pem',
@@ -1687,15 +1687,15 @@ IdPs for the skin.'
      * getMachineHostname
      *
      * This function is utilized in the formation of the URL for the
-     * PKCS12 credential download link.  It returns a host-specific
-     * URL hostname by mapping the local machine hostname (as returned
+     * PKCS12 credential download link and for the Shibboleth Single Sign-on
+     * session initiator URL. It returns a host-specific URL
+     * hostname by mapping the local machine hostname (as returned
      * by 'uname -n') to an InCommon metadata cilogon.org hostname
-     * (e.g., polo2.cilogon.org). This function contains an array
-     * '$hostnames' where the values are the local machine hostname and
-     * the keys are the *.cilogon.org hostname. Since this array is
-     * fairly static, I didn't see the need to read it in from a config
-     * file. In case the local machine hostname cannot be found in the
-     * $hostnames array, 'cilogon.org' is returned by default.
+     * (e.g., polo2.cilogon.org). This function uses the HOSTNAME_ARRAY
+     * where the keys are the local machine hostname and
+     * the values are the external facing *.cilogon.org hostname.
+     * In case the local machine hostname cannot be found in the
+     * HOSTNAME_ARRAY, DEFAULT_HOSTNAME is returned.
      *
      * @param string $idp The entityID of the IdP used for potential
      *        special handling (e.g., for Syngenta).
@@ -1703,28 +1703,15 @@ IdPs for the skin.'
      */
     public static function getMachineHostname($idp = '')
     {
-        $retval = 'cilogon.org';
+        $retval = DEFAULT_HOSTNAME;
         // CIL-439 For Syngenta, use just a single 'hostname' value to
         // match their Active Directory configuration for CILogon's
-        // assertionConsumerService URL.
-        if ($idp == 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/') {
-            $retval = 'cilogon.org'; // Set to cilogon.org for production
-        // Otherwise, map the local hostname to a *.cilogon.org domain name.
-        } else {
-            $hostnames = array(
-                "polo1.ncsa.illinois.edu"        => "polo1.cilogon.org" ,
-                "poloa.ncsa.illinois.edu"        => "polo1.cilogon.org" ,
-                "polo2.ncsa.illinois.edu"        => "polo2.cilogon.org" ,
-                "polob.ncsa.illinois.edu"        => "polo2.cilogon.org" ,
-                "fozzie.nics.utk.edu"            => "polo3.cilogon.org" ,
-                "poloc.ncsa.illinois.edu"        => "test.cilogon.org" ,
-                "polot.ncsa.illinois.edu"        => "test.cilogon.org" ,
-                "polo-staging.ncsa.illinois.edu" => "test.cilogon.org" ,
-                "polod.ncsa.illinois.edu"        => "dev.cilogon.org" ,
-            );
+        // assertionConsumerService URL. Otherwise, map the local
+        // hostname to a *.cilogon.org domain name.
+        if ($idp != 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/') {
             $localhost = php_uname('n');
-            if (array_key_exists($localhost, $hostnames)) {
-                $retval = $hostnames[$localhost];
+            if (array_key_exists($localhost, HOSTNAME_ARRAY)) {
+                $retval = HOSTNAME_ARRAY[$localhost];
             }
         }
         return $retval;
@@ -1943,7 +1930,7 @@ IdPs for the skin.'
         $emailmsg = '?subject=Attribute Release Problem for CILogon' .
         '&cc=help@cilogon.org' .
         '&body=Hello, I am having trouble logging on to ' .
-        'https://cilogon.org/ using the ' . $idpname .
+        'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idpname .
         ' Identity Provider (IdP) ' .
         'due to the following missing attributes:%0D%0A' .
         $missingattrs;

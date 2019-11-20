@@ -878,14 +878,13 @@ Remote Address= ' . $remoteaddr . '
             ) {
                 $mailto = 'alerts@cilogon.org';
 
-                // Set $disableligoalerts = true to stop LIGO failures
+                // CIL-205 - Notify LIGO about IdP login errors.
+                // Set DISABLE_LIGO_ALERTS to true in the top-level
+                // config.php file to stop LIGO failures
                 // from being sent to 'alerts@cilogon.org', but still
                 // sent to 'cilogon-alerts@ligo.org'.
-                $disableligoalerts = false;
-
-                // Fixes CIL-205 - Notify LIGO about IdP login errors
                 if (preg_match('/ligo\.org/', $idp)) {
-                    if ($disableligoalerts) {
+                    if (DISABLE_LIGO_ALERTS) {
                         $mailto = '';
                     }
                     $mailto .= (empty($mailto) ? '' : ',') .

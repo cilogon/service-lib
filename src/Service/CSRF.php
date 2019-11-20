@@ -245,8 +245,8 @@ class CSRF
         $csrfcookievalue = $this->getTheCookie();
         $csrfformvalue = Util::getPostVar($this->getTokenName());
         if (
-            (!empty($csrfcookievalue)) &&
-            (!empty($csrfformvalue)) &&
+            (strlen($csrfcookievalue) > 0) &&
+            (strlen($csrfformvalue) > 0) &&
             (strcmp($csrfcookievalue, $csrfformvalue) == 0)
         ) {
             $retval = true;
@@ -275,8 +275,8 @@ class CSRF
         $csrfcookievalue = $this->getTheCookie();
         $csrfsesionvalue = $this->getTheSession();
         if (
-            (!empty($csrfcookievalue)) &&
-            (!empty($csrfsesionvalue)) &&
+            (strlen($csrfcookievalue) > 0) &&
+            (strlen($csrfsesionvalue) > 0) &&
             (strcmp($csrfcookievalue, $csrfsesionvalue) == 0)
         ) {
             $retval = true;
@@ -322,18 +322,18 @@ class CSRF
         if ($this->isCookieEqualToForm()) {
             $retval = Util::getPostVar($submit);
             // Hack for Duo Security - look for all uppercase e.g., 'SUBMIT'
-            if (empty($retval)) {
+            if (strlen($retval) == 0) {
                 $retval = Util::getPostVar(strtoupper($submit));
             }
         }
         // If <form> element missing or bad, check PHP session csrf variable
-        if ((empty($retval)) && ($this->isCookieEqualToSession())) {
+        if ((strlen($retval) == 0) && ($this->isCookieEqualToSession())) {
             $retval = Util::getSessionVar($submit);
             $this->removeTheSession();  // No need to use it again
         }
         // If csrf failed or no 'submit' element in <form> or session,
         // remove the csrf cookie.
-        if (empty($retval)) {
+        if (strlen($retval) == 0) {
             $this->removeTheCookie();
             $log = new Loggit();
             $log->info('CSRF check failed.');

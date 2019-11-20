@@ -102,7 +102,7 @@ class DBProps
     public function getHostspec()
     {
         $hostspec = $this->queryAttribute('hostspec');
-        if (empty($hostspec)) {
+        if (strlen($hostspec) == 0) {
             $hostspec = 'localhost';
         }
         return $hostspec;

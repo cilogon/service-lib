@@ -277,7 +277,7 @@ class Util
         $retval = '';
         $pc = new PortalCookie();
         $pn = $pc->getPortalName();
-        if (!empty($pn)) {
+        if (strlen($pn) > 0) {
             $retval = $pc->get($cookie);
         } else {
             $retval = static::getCookieVar($cookie);
@@ -326,8 +326,8 @@ class Util
     public static function setSessionVar($key, $value = '')
     {
         $retval = false;  // Assume we want to unset the session variable
-        if (!empty($key)) {  // Make sure session var name was passed in
-            if (!empty($value)) {
+        if (strlen($key) > 0) {  // Make sure session var name was passed in
+            if (strlen($value) > 0) {
                 $_SESSION[$key] = $value;
                 $retval = true;
             } else {
@@ -434,7 +434,7 @@ class Util
             $retval = '';
         }
         if (
-            (empty($retval)) ||
+            (strlen($retval) == 0) ||
             ($stripfile && ($retval[strlen($retval) - 1] != '/'))
         ) {
             $retval .= '/';  // Append a slash if necessary
@@ -587,7 +587,7 @@ Remote Address= ' . $remoteaddr . '
 ';
 
         foreach ($sessionvars as $svar => $sname) {
-            if (!empty($val = static::getSessionVar($svar))) {
+            if (strlen($val = static::getSessionVar($svar)) > 0) {
                 $mailmsg .= sprintf("%-14s= %s\n", $sname, $val);
             }
         }
@@ -619,25 +619,25 @@ Remote Address= ' . $remoteaddr . '
         $lastname = '';
 
         # Try to split the incoming $full name into first and last names
-        if (!empty($full)) {
+        if (strlen($full) > 0) {
             $names = preg_split('/\s+/', $full, 2);
             $firstname = @$names[0];
             $lastname =  @$names[1];
         }
 
         # If either first or last name blank, then use incoming $first and $last
-        if (empty($firstname)) {
+        if (strlen($firstname) == 0) {
             $firstname = $first;
         }
-        if (empty($lastname)) {
+        if (strlen($lastname) == 0) {
             $lastname = $last;
         }
 
         # Finally, if only a single name, copy first name <=> last name
-        if (empty($lastname)) {
+        if (strlen($lastname) == 0) {
             $lastname = $firstname;
         }
-        if (empty($firstname)) {
+        if (strlen($firstname) == 0) {
             $firstname = $lastname;
         }
 
@@ -657,7 +657,7 @@ Remote Address= ' . $remoteaddr . '
     public static function getHN()
     {
         $thehostname = static::getServerVar('HTTP_HOST');
-        if (empty($thehostname)) {
+        if (strlen($thehostname) == 0) {
             $thehostname = DEFAULT_HOSTNAME;
         }
         return $thehostname;
@@ -791,16 +791,16 @@ Remote Address= ' . $remoteaddr . '
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
         if (
-            ((!empty($remoteuser)) ||
-               (!empty($ePPN)) ||
-               (!empty($ePTID)) ||
-               (!empty($openidID)) ||
-               (!empty($oidcID))) &&
-            (!empty($idp)) &&
-            (!empty($idpname))  &&
-            (!empty($firstname)) &&
-            (!empty($lastname)) &&
-            (!empty($emailaddr)) &&
+            ((strlen($remoteuser) > 0) ||
+               (strlen($ePPN) > 0) ||
+               (strlen($ePTID) > 0) ||
+               (strlen($openidID) > 0) ||
+               (strlen($oidcID) > 0)) &&
+            (strlen($idp) > 0) &&
+            (strlen($idpname) > 0)  &&
+            (strlen($firstname) > 0) &&
+            (strlen($lastname) > 0) &&
+            (strlen($emailaddr) > 0) &&
             (filter_var($emailaddr, FILTER_VALIDATE_EMAIL))
         ) {
             // For the new Google OAuth 2.0 endpoint, we want to keep the
@@ -887,52 +887,56 @@ Remote Address= ' . $remoteaddr . '
                     if (DISABLE_LIGO_ALERTS) {
                         $mailto = '';
                     }
-                    $mailto .= (empty($mailto) ? '' : ',') .
+                    $mailto .= ((strlen($mailto) > 0) ? ',' : '') .
                         'cilogon-alerts@ligo.org';
                 }
 
                 static::sendErrorAlert(
                     'Failure in ' .
                         (($loa == 'openid') ? '' : '/secure') . '/getuser/',
-                    'Remote_User   = ' . ((empty($remoteuser)) ?
-                        '<MISSING>' : $remoteuser) . "\n" .
-                    'IdP ID        = ' . ((empty($idp)) ?
-                        '<MISSING>' : $idp) . "\n" .
-                    'IdP Name      = ' . ((empty($idpname)) ?
-                        '<MISSING>' : $idpname) . "\n" .
-                    'First Name    = ' . ((empty($firstname)) ?
-                        '<MISSING>' : $firstname) . "\n" .
-                    'Last Name     = ' . ((empty($lastname)) ?
-                        '<MISSING>' : $lastname) . "\n" .
-                    'Display Name  = ' . ((empty($displayname)) ?
-                        '<MISSING>' : $displayname) . "\n" .
-                    'Email Address = ' . ((empty($emailaddr)) ?
-                        '<MISSING>' : $emailaddr) . "\n" .
-                    'ePPN          = ' . ((empty($ePPN)) ?
-                        '<MISSING>' : $ePPN) . "\n" .
-                    'ePTID         = ' . ((empty($ePTID)) ?
-                        '<MISSING>' : $ePTID) . "\n" .
-                    'OpenID ID     = ' . ((empty($openidID)) ?
-                        '<MISSING>' : $openidID) . "\n" .
-                    'OIDC ID       = ' . ((empty($oidcID)) ?
-                        '<MISSING>' : $oidcID) . "\n" .
-                    'Affiliation   = ' . ((empty($affiliation)) ?
-                        '<MISSING>' : $affiliation) . "\n" .
-                    'OU            = ' . ((empty($ou)) ?
-                        '<MISSING>' : $ou) . "\n" .
-                    'MemberOf      = ' . ((empty($memberof)) ?
-                        '<MISSING>' : $memberof) . "\n" .
-                    'ACR           = ' . ((empty($acr)) ?
-                        '<MISSING>' : $acr) . "\n" .
-                    'Entitlement   = ' . ((empty($entitlement)) ?
-                        '<MISSING>' : $entitlement) . "\n" .
-                    'iTrustUIN     = ' . ((empty($itrustuin)) ?
-                        '<MISSING>' : $itrustuin) . "\n" .
-                    'Database UID  = ' . ((empty($i = static::getSessionVar('uid'))) ?
-                        '<MISSING>' : $i) . "\n" .
-                    'Status Code   = ' . ((empty(
-                        $i = array_search($status, DBService::$STATUS)
-                    )) ?  '<MISSSING>' : $i),
+                    'Remote_User   = ' . ((strlen($remoteuser) > 0) ?
+                        $remoteuser : '<MISSING>') . "\n" .
+                    'IdP ID        = ' . ((strlen($idp) > 0) ?
+                        $idp : '<MISSING>') . "\n" .
+                    'IdP Name      = ' . ((strlen($idpname) > 0) ?
+                        $idpname : '<MISSING>') . "\n" .
+                    'First Name    = ' . ((strlen($firstname) > 0) ?
+                        $firstname : '<MISSING>') . "\n" .
+                    'Last Name     = ' . ((strlen($lastname) > 0) ?
+                        $lastname : '<MISSING>') . "\n" .
+                    'Display Name  = ' . ((strlen($displayname) > 0) ?
+                        $displayname : '<MISSING>') . "\n" .
+                    'Email Address = ' . ((strlen($emailaddr) > 0) ?
+                        $emailaddr : '<MISSING>') . "\n" .
+                    'ePPN          = ' . ((strlen($ePPN) > 0) ?
+                        $ePPN : '<MISSING>') . "\n" .
+                    'ePTID         = ' . ((strlen($ePTID) > 0) ?
+                        $ePTID : '<MISSING>') . "\n" .
+                    'OpenID ID     = ' . ((strlen($openidID) > 0) ?
+                        $openidID : '<MISSING>') . "\n" .
+                    'OIDC ID       = ' . ((strlen($oidcID) > 0) ?
+                        $oidcID : '<MISSING>') . "\n" .
+                    'Affiliation   = ' . ((strlen($affiliation) > 0) ?
+                        $affiliation : '<MISSING>') . "\n" .
+                    'OU            = ' . ((strlen($ou) > 0) ?
+                        $ou : '<MISSING>') . "\n" .
+                    'MemberOf      = ' . ((strlen($memberof) > 0) ?
+                        $memberof : '<MISSING>') . "\n" .
+                    'ACR           = ' . ((strlen($acr) > 0) ?
+                        $acr : '<MISSING>') . "\n" .
+                    'Entitlement   = ' . ((strlen($entitlement) > 0) ?
+                        $entitlement : '<MISSING>') . "\n" .
+                    'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?
+                        $itrustuin : '<MISSING>') . "\n" .
+                    'Database UID  = ' . ((strlen(
+                        $i = static::getSessionVar('uid')
+                    ) > 0) ?  $i : '<MISSING>') . "\n" .
+                    'Status Code   = ' . ((strlen(
+                        $i = array_search(
+                            $status,
+                            DBService::$STATUS
+                        )
+                    ) > 0) ?  $i : '<MISSING>'),
                     $mailto
                 );
             }
@@ -1113,10 +1117,10 @@ Remote Address= ' . $remoteaddr . '
         $retval = false; // Assume not eduGAIN IdP and getcert
 
         // If $idp or $idpname not passed in, get from current session.
-        if (empty($idp)) {
+        if (strlen($idp) == 0) {
             $idp = static::getSessionVar('idp');
         }
-        if (empty($idpname)) {
+        if (strlen($idpname) == 0) {
             $idpname = static::getSessionVar('idpname');
         }
 
@@ -1140,8 +1144,8 @@ Remote Address= ' . $remoteaddr . '
         // First, make sure $idp was set and is not an OAuth2 IdP.
         $idplist = static::getIdpList();
         if (
-            ((!empty($idp)) &&
-            (!empty($idpname)) &&
+            ((strlen($idp) > 0) &&
+            (strlen($idpname) > 0) &&
             (!in_array($idpname, static::$oauth2idps))) &&
                 (
                 // Next, check for eduGAIN without REFEDS R&S and SIRTFI

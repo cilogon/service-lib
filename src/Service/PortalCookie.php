@@ -78,7 +78,7 @@ class PortalCookie
                 if ($b64 !== false) {
                     $iv = substr($b64, 0, 16); // IV prepended to encrypted data
                     $b64a = substr($b64, 16);  // IV is 16 bytes, rest is data
-                    if ((!empty($iv)) && (!empty($b64a))) {
+                    if ((strlen($iv) > 0) && (strlen($b64a) > 0)) {
                         $serial = openssl_decrypt(
                             $b64a,
                             'AES-128-CBC',
@@ -91,7 +91,7 @@ class PortalCookie
             }
 
             // Unserialize the cookie data back into the portalarray
-            if (!empty($serial)) {
+            if (strlen($serial) > 0) {
                 $unserial = unserialize($serial);
                 if ($unserial !== false) {
                     $this->portalarray = $unserial;
@@ -131,7 +131,7 @@ class PortalCookie
                         break;
                     }
                 }
-                if (!empty($smallportal)) {
+                if (strlen($smallportal) > 0) {
                     unset($this->portalarray[$smallportal]);
                 } else {
                     break; // Should never get here, but just in case
@@ -143,7 +143,7 @@ class PortalCookie
             // Attempt to encrypt and base64 the serialized portal array
             if (defined('OPENSSL_KEY') && (!empty(OPENSSL_KEY))) {
                 $iv = openssl_random_pseudo_bytes(16);  // IV is 16 bytes
-                if (!empty($iv)) {
+                if (strlen($iv) > 0) {
                     $data = openssl_encrypt(
                         $cookievar,
                         'AES-128-CBC',
@@ -151,7 +151,7 @@ class PortalCookie
                         OPENSSL_RAW_DATA,
                         $iv
                     );
-                    if (!empty($data)) {
+                    if (strlen($data) > 0) {
                         $b64 = base64_encode($iv . $data); // Prepend IV to data
                         if ($b64 !== false) {
                             $cookievar = $b64;
@@ -179,7 +179,7 @@ class PortalCookie
     {
         // Check the OAuth 1.0a 'delegate' 'callbackuri'
         $retval = Util::getSessionVar('callbackuri');
-        if (empty($retval)) {
+        if (strlen($retval) == 0) {
             // Next, check the OAuth 2.0 'authorize' $clientparams[]
             $clientparams = json_decode(
                 Util::getSessionVar('clientparams'),
@@ -235,7 +235,7 @@ class PortalCookie
         $retval = '';
         $name = $this->getPortalName();
         if (
-            (!empty($name)) &&
+            (strlen($name) > 0) &&
             (isset($this->portalarray[$name])) &&
             (isset($this->portalarray[$name][$param]))
         ) {
@@ -257,7 +257,7 @@ class PortalCookie
     public function set($param, $value)
     {
         $name = $this->getPortalName();
-        if (!empty($name)) {
+        if (strlen($name) > 0) {
             $this->portalarray[$name][$param] = $value;
         }
     }

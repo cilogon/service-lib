@@ -50,7 +50,7 @@ class OAuth2Provider
         $client_id     = constant(strtoupper($idp) . '_OAUTH2_CLIENT_ID');
         $client_secret = constant(strtoupper($idp) . '_OAUTH2_CLIENT_SECRET');
 
-        if ((!empty($client_id)) && (!empty($client_secret))) {
+        if ((strlen($client_id) > 0) && (strlen($client_secret) > 0)) {
             // Set options on a per-IdP basis
             if ($idp == 'google') {
                 $classname     = 'League\OAuth2\Client\Provider\Google';

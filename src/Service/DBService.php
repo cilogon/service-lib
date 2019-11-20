@@ -30,7 +30,7 @@ use CILogon\Service\Util;
  *
  *     // Later in the code, re-fetch the user using this uid
  *     // and print out the stored attributes.
- *     if (!empty($uid)) {
+ *     if (strlen($uid) > 0) {
  *         $dbservice->getUser($uid);
  *         echo 'Name = ' . $dbservice->first_name . ' ' .
  *                          $dbservice->last_name  . "\n";
@@ -458,7 +458,7 @@ class DBService
             $attr_arr = array();
             for ($i = 0; $i < $numargs; $i++) {
                 $arg = $args[$i];
-                if (!empty($arg)) {
+                if (strlen($arg) > 0) {
                     if ($i >= 13) {
                         // Put params after $ou into JSON object
                         $attr_arr[$params[$i]] = $arg;
@@ -712,8 +712,8 @@ class DBService
             '&user_uid=' . urlencode($uid) .
             '&auth_time=' . urlencode($authntime) .
             '&loa=' . urlencode($loa) .
-            ((empty($myproxyinfo)) ?
-                '' : ('&cilogon_info=' . urlencode($myproxyinfo)))
+            ((strlen($myproxyinfo) > 0) ?
+                ('&cilogon_info=' . urlencode($myproxyinfo)) : '')
         );
     }
 
@@ -855,7 +855,7 @@ class DBService
         }
 
         // Convert $attr_json into array and extract elements into class members
-        if (!empty($attr_json)) {
+        if (strlen($attr_json) > 0) {
             $attr_arr = json_decode($attr_json, true);
             if (!is_null($attr_arr)) {
                 if (isset($attr_arr['member_of'])) {

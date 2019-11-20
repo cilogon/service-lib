@@ -141,9 +141,9 @@ class Skin
         );
 
         foreach ($uristocheck as $value) {
-            if (!empty($value)) {
+            if (strlen($value) > 0) {
                 $skin = $this->getForceSkin($value);
-                if (!empty($skin)) {
+                if (strlen($skin) > 0) {
                     $skinvar = $skin;
                     break;
                 }
@@ -152,23 +152,23 @@ class Skin
 
         // If no force skin found, check GET and POST parameters, as well as
         // previously set cilogon_skin PHP session variable.
-        if (empty($skinvar)) {
+        if (strlen($skinvar) == 0) {
             // First, look for '?skin=...'
             $skinvar = Util::getGetVar('skin');
         }
-        if (empty($skinvar)) {
+        if (strlen($skinvar) == 0) {
             // Next, look for '?cilogon_skin=...'
             $skinvar = Util::getGetVar('cilogon_skin');
         }
-        if (empty($skinvar)) {
+        if (strlen($skinvar) == 0) {
             // Next, look for '?vo=...'
             $skinvar = Util::getGetVar('vo');
         }
-        if (empty($skinvar)) {
+        if (strlen($skinvar) == 0) {
             // Next, check 'cilogon_vo' form input variable
             $skinvar = Util::getPostVar('cilogon_vo');
         }
-        if (empty($skinvar)) {
+        if (strlen($skinvar) == 0) {
             // Finally, check 'cilogon_skin' PHP session variable
             $skinvar = Util::getSessionVar('cilogon_skin');
         }
@@ -177,7 +177,7 @@ class Skin
         // name exists.  Loop through all skin directories so we can do a
         // case-insenstive comparison. If we find a match, set skinname.
         $found = false;
-        if (!empty($skinvar)) {
+        if (strlen($skinvar) > 0) {
             $basedir = Util::getServerVar('DOCUMENT_ROOT') . '/skin';
             if ($handle = opendir($basedir)) {
                 while ((false !== ($file = readdir($handle))) && (!$found)) {
@@ -298,7 +298,7 @@ class Skin
     public function printSkinLink()
     {
         if (
-            (!empty($this->skinname)) &&
+            (strlen($this->skinname) > 0) &&
             (is_readable(Util::getServerVar('DOCUMENT_ROOT') . '/skin/' .
                          $this->skinname . '/skin.css'))
         ) {
@@ -451,27 +451,27 @@ class Skin
         $infostr = '';
 
         // Add the skinname if available
-        if (!empty($this->skinname)) {
+        if (strlen($this->skinname) > 0) {
             $infostr .= 'cilogon_skin=' . $this->skinname;
         }
 
         // Add the REMOTE_ADDR
         $remoteaddr = Util::getServerVar('REMOTE_ADDR');
-        if (!empty($remoteaddr)) {
-            $infostr .= (empty($infostr) ? '' : ',') .
+        if (strlen($remoteaddr) > 0) {
+            $infostr .= (strlen($infostr) > 0 ? ',' : '') .
                         "remote_addr=$remoteaddr";
         }
 
         // Add ePPN, ePTID, openidID, and oidcID if available
         foreach (array('ePPN','ePTID','openidID','oidcID') as $id) {
             $sessvar = Util::getSessionVar($id);
-            if (!empty($sessvar)) {
-                $infostr .= (empty($infostr) ? '' : ',') . "$id=$sessvar";
+            if (strlen($sessvar) > 0) {
+                $infostr .= (strlen($infostr) > 0 ? ',' : '') . "$id=$sessvar";
             }
         }
 
         // Finally, set the 'myproxyinfo' PHP session variable
-        if (!empty($infostr)) {
+        if (strlen($infostr) > 0) {
             Util::setSessionVar('myproxyinfo', 'info:' . $infostr);
         } else {
             Util::unsetSessionVar('myproxyinfo');

@@ -98,13 +98,13 @@ class Loggit
 
         $envstr = ' ';
         foreach ($envs as $value) {
-            if ((isset($_SERVER[$value])) && (!empty($_SERVER[$value]))) {
+            if ((isset($_SERVER[$value])) && (strlen($_SERVER[$value]) > 0)) {
                 $envstr .= $value . '="' . $_SERVER[$value] . '" ';
             }
         }
 
         foreach ($cookies as $value) {
-            if ((isset($_COOKIE[$value])) && (!empty($_COOKIE[$value]))) {
+            if ((isset($_COOKIE[$value])) && (strlen($_COOKIE[$value]) > 0)) {
                 $envstr .= $value . '="' . $_COOKIE[$value] . '" ';
             }
         }

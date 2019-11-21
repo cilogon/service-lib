@@ -838,7 +838,11 @@ EOT;
     public function getOrganizationName($entityID)
     {
         $retval = '';
-        if (isset($this->idparray[$entityID]['Organization_Name'])) {
+
+        if (
+            ($this->exists($entityID)) &&
+            (isset($this->idparray[$entityID]['Organization_Name']))
+        ) {
             $retval = $this->idparray[$entityID]['Organization_Name'];
         }
         return $retval;
@@ -857,7 +861,10 @@ EOT;
     public function getDisplayName($entityID)
     {
         $retval = '';
-        if (isset($this->idparray[$entityID]['Display_Name'])) {
+        if (
+            ($this->exists($entityID)) &&
+            (isset($this->idparray[$entityID]['Display_Name']))
+        ) {
             $retval = $this->idparray[$entityID]['Display_Name'];
         }
         return $retval;
@@ -875,7 +882,10 @@ EOT;
     public function getLogout($entityID)
     {
         $retval = '';
-        if (isset($this->idparray[$entityID]['Logout'])) {
+        if (
+            ($this->exists($entityID)) &&
+            (isset($this->idparray[$entityID]['Logout']))
+        ) {
             $retval = $this->idparray[$entityID]['Logout'];
         }
         return $retval;
@@ -920,8 +930,11 @@ EOT;
      */
     public function isAttributeSet($entityID, $attr)
     {
-        return (isset($this->idparray[$entityID][$attr]) &&
-                     ($this->idparray[$entityID][$attr] == 1));
+        return (
+            ($this->exists($entityID)) &&
+            (isset($this->idparray[$entityID][$attr])) &&
+            ($this->idparray[$entityID][$attr] == 1)
+        );
     }
 
     /**
@@ -1045,6 +1058,29 @@ EOT;
     }
 
     /**
+     * isOauth2
+     *
+     * This method returns true if the passed-in 'entitID' is one of the
+     * supported OAuth2 Identity Providers. Otherwise, false.
+     *
+     * @param string $entityID The enityID to search for
+     * @return bool True if the given entityID is an OAuth2 IdP.
+     *         False otherwise.
+     */
+    public function isOAuth2($entityID)
+    {
+        $retval = false;
+        if (
+            ($entityID == Util::getAuthzUrl('Google')) ||
+            ($entityID == Util::getAuthzUrl('GitHub')) ||
+            ($entityID == Util::getAuthzUrl('ORCID'))
+        ) {
+            $retval = true;
+        }
+        return $retval;
+    }
+
+    /**
      * getSAMLIdPs
      *
      * This method returns a two-dimensional array of SAML-based IdPs.
@@ -1083,8 +1119,18 @@ EOT;
             ) {
                 continue;
             }
-            $retarr[$key]['Organization_Name'] = $this->idparray[$key]['Organization_Name'];
-            $retarr[$key]['Display_Name'] = $this->idparray[$key]['Display_Name'];
+            if (
+                ($this->exists($key)) &&
+                (isset($this->idparray[$key]['Organization_Name']))
+            ) {
+                $retarr[$key]['Organization_Name'] = $this->idparray[$key]['Organization_Name'];
+            }
+            if (
+                ($this->exists($key)) &&
+                (isset($this->idparray[$key]['Display_Name']))
+            ) {
+                $retarr[$key]['Display_Name'] = $this->idparray[$key]['Display_Name'];
+            }
         }
 
         return $retarr;
@@ -1226,10 +1272,31 @@ EOT;
         );
 
         foreach ($attrarray as $attr) {
-            if (isset($this->idparray[$entityID][$attr])) {
+            if (
+                ($this->exists($entityID)) &&
+                (isset($this->idparray[$entityID][$attr]))
+            ) {
                 $shibarray[preg_replace('/_/', ' ', $attr)] =
                     $this->idparray[$entityID][$attr];
             }
+        }
+
+        // Special processing for OAuth 2.0 IdPs
+        if ($entityID == Util::getAuthzUrl('Google')) {
+            $shibarray['Organization Name'] = 'Google';
+            $shibarray['Home Page'] = 'https://myaccount.google.com';
+            $shibarray['Support Name'] = 'Google Help';
+            $shibarray['Support Address'] = 'help@google.com';
+        } elseif ($entityID == Util::getAuthzUrl('GitHub')) {
+            $shibarray['Organization Name'] = 'GitHub';
+            $shibarray['Home Page'] = 'https://github.com';
+            $shibarray['Support Name'] = 'GitHub Help';
+            $shibarray['Support Address'] = 'help@github.com';
+        } elseif ($entityID == Util::getAuthzUrl('ORCID')) {
+            $shibarray['Organization Name'] = 'ORCID';
+            $shibarray['Home Page'] = 'https://orcid.org';
+            $shibarray['Support Name'] = 'ORCID Help';
+            $shibarray['Support Address'] = 'help@orcid.org';
         }
 
         return $shibarray;

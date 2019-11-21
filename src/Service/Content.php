@@ -475,6 +475,470 @@ class Content
     }
 
     /**
+     * printCertInfo
+     *
+     * This function prints information related to the X.509 certificate
+     * such as DN (distinguished name) and LOA (level of assurance).
+     */
+    public static function printCertInfo()
+    {
+        $dn = Util::getSessionVar('dn');
+        // Strip off the email address from the pseudo-DN.
+        $dn = Content::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
+
+        echo '
+        <table class="certinfo">
+          <tr>
+            <th>Certificate&nbsp;Subject:</th>
+            <td>' , Util::htmlent($dn) , '</td>
+          </tr>
+          <tr>
+            <th>Identity&nbsp;Provider:</th>
+            <td>' , Util::getSessionVar('idpname') , '</td>
+          </tr>
+          <tr>
+            <th><a target="_blank"
+            href="http://ca.cilogon.org/loa">Level&nbsp;of&nbsp;Assurance:</a></th>
+            <td>
+        ';
+
+        $loa = Util::getSessionVar('loa');
+        if ($loa == 'openid') {
+            echo '<a href="http://ca.cilogon.org/policy/openid"
+                  target="_blank">OpenID</a>';
+        } elseif ($loa == 'http://incommonfederation.org/assurance/silver') {
+            echo '<a href="http://ca.cilogon.org/policy/silver"
+                  target="_blank">Silver</a>';
+        } else {
+            echo '<a href="http://ca.cilogon.org/policy/basic"
+                  target="_blank">Basic</a>';
+        }
+        echo '
+            </td>
+          </tr>
+        </table>
+        ';
+    }
+
+    /**
+     * printUserAttributes
+     *
+     * This function shows the user the attributes released by their
+     * selected IdP and saved in the PHP session.
+     */
+    public static function printUserAttributes()
+    {
+        $idplist = Util::getIdpList();
+        $idp = Util::getSessionVar('idp');
+        $gotattrs = Util::gotUserAttributes();
+        $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
+
+        echo '
+        <div class="summary">
+            <div id="userattrs1" style="display:' ,
+            ($gotattrs ? "inline" : "none") ,
+            '"><span class="expander"><a
+            href="javascript:showHideDiv(\'userattrs\',-1)"><img
+            src="/images/triright.gif" alt="&rArr;" width="14" height="14" />
+            User Attributes</a></span>';
+
+        // CIL-416 Show warning for missing ePPN
+        if (
+            ($samlidp) &&
+            (empty(Util::getSessionVar('ePPN'))) &&
+            (!empty(Util::getSessionVar('ePTID')))
+        ) {
+            Content::printIcon('warn', 'Some CILogon clients (e.g., Globus) require ePPN.');
+        }
+
+        echo '
+            </div>
+            <div id="userattrs2" style="display:' ,
+                ($gotattrs ? "none" : "inline") ,
+            '"><span class="expander"><a
+            href="javascript:showHideDiv(\'userattrs\',-1)"><img
+            src="/images/tridown.gif" alt="&dArr;" width="14" height="14" />
+            User Attributes</a></span>
+            </div>
+            <br class="clear" />
+            <div id="userattrs3" style="display:' ,
+                ($gotattrs ? "none" : "inline") ,
+            '">
+
+            <table cellpadding="5">
+              <tr class="odd">
+                <th>Identity Provider (entityID):</th>
+                <td>' , $idp , '</td>
+                <td>';
+
+        if (empty($idp)) {
+            Content::printIcon('error', 'Missing the entityID of the IdP.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr>
+                <th>ePTID:</th>
+                <td>' , Util::getSessionVar('ePTID') , '</td>
+                <td>';
+
+        if (
+            ($samlidp) &&
+            (empty(Util::getSessionVar('ePPN'))) &&
+            (empty(Util::getSessionVar('ePTID')))
+        ) {
+            Content::printIcon('error', 'Must have either ePPN -OR- ePTID.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr class="odd">
+                <th>ePPN:</th>
+                <td>' , Util::getSessionVar('ePPN') , '</td>
+                <td>';
+
+        if (($samlidp) && empty(Util::getSessionVar('ePPN'))) {
+            if (empty(Util::getSessionVar('ePTID'))) {
+                Content::printIcon('error', 'Must have either ePPN -OR- ePTID.');
+            } else {
+                Content::printIcon('warn', 'Some CILogon clients (e.g., Globus) require ePPN.');
+            }
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr>
+                <th>OpenID:</th>
+                <td>' , Util::getSessionVar('oidcID'), '</td>
+                <td>';
+
+        if (
+            (!empty($idp)) &&
+            (!$samlidp) &&
+            empty(Util::getSessionVar('oidcID'))
+        ) {
+            Content::printIcon('error', 'Missing the OpenID identifier.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr class="odd">
+                <th>First Name (givenName):</th>
+                <td>' ,Util::getSessionVar('firstname') , '</td>
+                <td>';
+
+        if (
+            (empty(Util::getSessionVar('firstname'))) &&
+            (empty(Util::getSessionVar('displayname')))
+        ) {
+            Content::printIcon('error', 'Must have either givenName + sn -OR- displayName.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr>
+                <th>Last Name (sn):</th>
+                <td>' , Util::getSessionVar('lastname') , '</td>
+                <td>';
+
+        if (
+            (empty(Util::getSessionVar('lastname'))) &&
+            (empty(Util::getSessionVar('displayname')))
+        ) {
+            Content::printIcon('error', 'Must have either givenName + sn -OR- displayName.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr class="odd">
+                <th>Display Name (displayName):</th>
+                <td>' , Util::getSessionVar('displayname') , '</td>
+                <td>';
+
+        if (
+            (empty(Util::getSessionVar('displayname'))) &&
+            ((empty(Util::getSessionVar('firstname'))) ||
+            (empty(Util::getSessionVar('lastname'))))
+        ) {
+            Content::printIcon('error', 'Must have either displayName -OR- givenName + sn.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr>
+                <th>Email Address (email):</th>
+                <td>' , Util::getSessionVar('emailaddr') , '</td>
+                <td>';
+
+        $emailvalid = filter_var(Util::getSessionVar('emailaddr'), FILTER_VALIDATE_EMAIL);
+        if ((empty(Util::getSessionVar('emailaddr'))) || (!$emailvalid)) {
+            Content::printIcon('error', 'Missing valid email address.');
+        }
+
+        echo '
+                </td>
+              </tr>
+
+              <tr class="odd">
+                <th>Level of Assurance (assurance):</th>
+                <td>' , Util::getSessionVar('loa') , '</td>
+                <td> </td>
+              </tr>
+
+              <tr>
+                <th>AuthnContextClassRef:</th>
+                <td>' , Util::getSessionVar('acr') , '</td>
+                <td> </td>
+              </tr>
+
+              <tr class="odd">
+                <th>Affiliation (affiliation):</th>
+                <td>' , Util::getSessionVar('affiliation') , '</td>
+                <td> </td>
+              </tr>
+
+              <tr>
+                <th>Entitlement (entitlement):</th>
+                <td>' , Util::getSessionVar('entitlement') , '</td>
+                <td> </td>
+              </tr>
+
+              <tr class="odd">
+                <th>Organizational Unit (ou):</th>
+                <td>' , Util::getSessionVar('ou') , '</td>
+                <td> </td>
+              </tr>
+
+              <tr>
+                <th>Member (member):</th>
+                <td>' , Util::getSessionVar('memberof') , '</td>
+                <td> </td>
+              </tr>
+
+              <tr class="odd">
+                <th>iTrustUIN (itrustuin):</th>
+                <td>' , Util::getSessionVar('itrustuin') , '</td>
+                <td> </td>
+              </tr>
+
+
+            </table>
+            </div> <!-- userattrs3 -->
+        </div> <!-- summary -->
+        ';
+    }
+
+    /**
+     * printIdPMetadata
+     *
+     * This function shows the metadata associated with the IdP saved to
+     * the PHP session.
+     */
+    public static function printIdPMetadata()
+    {
+        $idplist = Util::getIdpList();
+        $idp = Util::getSessionVar('idp');
+        $gotattrs = Util::gotUserAttributes();
+        $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
+        $shibarray = $idplist->getShibInfo($idp);
+
+        echo '
+        <div class="summary">
+            <div id="meta1" style="display:' ,
+                ($gotattrs ? "inline" : "none") ,
+            '"><span class="expander"><a
+            href="javascript:showHideDiv(\'meta\',-1)"><img
+            src="/images/triright.gif" alt="&rArr;" width="14" height="14" />
+            Identity Provider Attributes</a></span>';
+
+        // CIL-416 Check for eduGAIN IdPs without both REFEDS R&S and SIRTFI
+        // since these IdPs are not allowed to get certificates.
+        $eduGainWithoutRandSandSIRTFI = 0;
+        if (
+            ($samlidp) &&
+            (!$idplist->isRegisteredByInCommon($idp)) &&
+            ((!$idplist->isREFEDSRandS($idp)) ||
+             (!$idplist->isSIRTFI($idp)))
+        ) {
+            $eduGainWithoutRandSandSIRTFI = 1;
+        }
+
+        if ($eduGainWithoutRandSandSIRTFI) {
+            Content::printIcon('warn', 'This IdP does not support both ' .
+                'REFEDS R&amp;S and SIRTFI. CILogon functionality may be limited.');
+        }
+
+        echo '
+            </div>
+            <div id="meta2" style="display:' ,
+                ($gotattrs ? "none" : "inline") ,
+            '"><span class="expander"><a
+            href="javascript:showHideDiv(\'meta\',-1)"><img
+            src="/images/tridown.gif" alt="&dArr;" width="14" height="14" />
+            Identity Provider Attributes</a></span>
+            </div>
+            <br class="clear" />
+            <div id="meta3" style="display:' ,
+                ($gotattrs ? "none" : "inline") ,
+            '">
+
+            <table cellpadding="5">
+              <tr class="odd">
+                <th>Organization Name:</th>
+                <td>' , @$shibarray['Organization Name'] , '</td>
+                <td>';
+
+        if (empty(@$shibarray['Organization Name'])) {
+            Content::printIcon('error', 'Could not find ' .
+                '&lt;OrganizationDisplayName&gt; in metadata.');
+        }
+
+        echo '
+                </td>
+              </tr>
+              <tr>
+                <th>Home Page:</th>
+                <td><a target="_blank" href="' , @$shibarray['Home Page'] , '">' ,
+                @$shibarray['Home Page'] , '</a></td>
+                <td> </td>
+              </tr>
+
+              <tr class="odd">
+                <th>Support Contact:</th>
+        ';
+        if (
+            (!empty(@$shibarray['Support Name'])) ||
+            (!empty(@$shibarray['Support Address']))
+        ) {
+            echo '
+                <td>' , @$shibarray['Support Name'] , ' &lt;' ,
+                        preg_replace('/^mailto:/', '', @$shibarray['Support Address']) , '&gt;</td>
+                <td> </td>';
+        }
+        echo '
+              </tr>
+
+        ';
+
+        if ($samlidp) {
+            echo '
+                  <tr>
+                    <th>Technical Contact:</th>
+            ';
+            if (
+                (!empty(@$shibarray['Technical Name'])) ||
+                (!empty(@$shibarray['Technical Address']))
+            ) {
+                echo '
+                    <td>' , @$shibarray['Technical Name'] , ' &lt;' ,
+                            preg_replace('/^mailto:/', '', @$shibarray['Technical Address']) , '&gt;</td>
+                    <td> </td>';
+            }
+            echo '
+                  </tr>
+
+                  <tr class="odd">
+                    <th>Administrative Contact:</th>
+            ';
+            if (
+                (!empty(@$shibarray['Administrative Name'])) ||
+                (!empty(@$shibarray['Administrative Address']))
+            ) {
+                echo '
+                    <td>' , @$shibarray['Administrative Name'] , ' &lt;' ,
+                            preg_replace('/^mailto:/', '', @$shibarray['Administrative Address']) , '&gt;</td>
+                    <td> </td>';
+            }
+            echo '
+                  </tr>
+
+                  <tr>
+                    <th>Registered by InCommon:</th>
+                    <td>' , ($idplist->isRegisteredByInCommon($idp) ? 'Yes' : 'No') , '</td>
+                    <td> </td>
+                  </tr>
+
+                  <tr class="odd">
+                    <th><a style="text-decoration:underline" target="_blank"
+                    href="http://id.incommon.org/category/research-and-scholarship">InCommon R
+                    &amp; S</a>:</th>
+                    <td>' , ($idplist->isInCommonRandS($idp) ? 'Yes' : 'No') , '</td>
+                    <td> </td>
+                  </tr>
+
+                  <tr>
+                    <th><a style="text-decoration:underline" target="_blank"
+                    href="http://refeds.org/category/research-and-scholarship">REFEDS
+                    R &amp; S</a>:</th>
+                    <td>' , ($idplist->isREFEDSRandS($idp) ? 'Yes' : 'No') , '</td>
+                    <td>' ,
+                    (($eduGainWithoutRandSandSIRTFI &&
+                    !$idplist->isREFEDSRandS($idp)) ?
+                        Content::printIcon('warn', 'This IdP does not support both ' .
+                            'REFEDS R&amp;S and SIRTFI. CILogon functionality may be limited.') :
+                        '') ,
+                    '</td>
+                  </tr>
+
+                  <tr class="odd">
+                    <th><a style="text-decoration:underline" target="_blank"
+                           href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
+                    <td>' , ($idplist->isSIRTFI($idp) ? 'Yes' : 'No') , '</td>
+                    <td>',
+                    (($eduGainWithoutRandSandSIRTFI &&
+                    !$idplist->isSIRTFI($idp)) ?
+                        Content::printIcon('warn', 'This IdP does not support both ' .
+                            'REFEDS R&amp;S and SIRTFI. CILogon functionality may be limited.') :
+                        '') ,
+                    '</td>
+                  </tr>
+
+                  <tr>
+                    <th><a style="text-decoration:underline" target="_blank"
+                    href="http://id.incommon.org/assurance/bronze">InCommon Bronze</a>:</th>
+                    <td>' , ($idplist->isBronze($idp) ? 'Yes' : 'No') , '</td>
+                    <td> </td>
+                  </tr>
+
+                  <tr class="odd">
+                    <th><a style="text-decoration:underline" target="_blank"
+                    href="http://id.incommon.org/assurance/silver">InCommon Silver</a>:</th>
+                    <td>' , ($idplist->isSilver($idp) ? 'Yes' : 'No') , '</td>
+                    <td> </td>
+                  </tr>
+
+                  <tr>
+                    <th>Entity ID</th>
+                    <td><a style="text-decoration:underline" target="_blank"
+                    href="https://met.refeds.org/met/entity/',
+                    rawurlencode($idp),
+                    '">', $idp, '</td>
+                    <td> </td>
+                  </tr>
+                  ';
+        } // end if ($samlidp)
+        echo '
+              </table>
+            </div>  <!-- meta3 -->
+        </div>  <!-- summary -->
+        ';
+    }
+
+    /**
      * handleLogOnButtonClicked
      *
      * This function is called when the user clicks the 'Log On' button

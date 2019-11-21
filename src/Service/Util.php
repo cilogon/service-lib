@@ -728,6 +728,41 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
+     * gotUserAttributes
+     *
+     * This function returns true if the PHP session contains all of the
+     * necessary user/IdP attributes to fetch an X.509 certificate. This
+     * means that at least one of (remoteuser, ePPN, ePTID, openidID,
+     * oidcID) must be set, as well as idp (entityId), idpname, firstname,
+     * lastname, and emailaddr. Also, the emailaddr must conform to valid
+     * email formatting.
+     *
+     * @return bool True if all user/IdP attributes necessary to form the
+     *              distinguished name (DN) for X.509 certificates are
+     *              present in the PHP session. False otherwise.
+     */
+    public static function gotUserAttributes()
+    {
+        $retval = false;  // Assume we don't have all user attributes
+        if (
+            ((strlen(Util::getSessionVar('remoteuser')) > 0) ||
+                (strlen(Util::getSessionVar('ePPN')) > 0) ||
+                (strlen(Util::getSessionVar('ePTID')) > 0) ||
+                (strlen(Util::getSessionVar('openidID')) > 0) ||
+                (strlen(Util::getSessionVar('oidcID')) > 0)) &&
+            (strlen(Util::getSessionVar('idp')) > 0) &&
+            (strlen(Util::getSessionVar('idpname')) > 0)  &&
+            (strlen(Util::getSessionVar('firstname')) > 0) &&
+            (strlen(Util::getSessionVar('lastname')) > 0) &&
+            (strlen(Util::getSessionVar('emailaddr')) > 0) &&
+            (filter_var(Util::getSessionVar('emailaddr'), FILTER_VALIDATE_EMAIL))
+        ) {
+            $retval = true;
+        }
+        return $retval;
+    }
+
+    /**
      * saveUserToDataStore
      *
      * This function is called when a user logs on to save identity
@@ -790,19 +825,7 @@ Remote Address= ' . $remoteaddr . '
 
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
-        if (
-            ((strlen($remoteuser) > 0) ||
-               (strlen($ePPN) > 0) ||
-               (strlen($ePTID) > 0) ||
-               (strlen($openidID) > 0) ||
-               (strlen($oidcID) > 0)) &&
-            (strlen($idp) > 0) &&
-            (strlen($idpname) > 0)  &&
-            (strlen($firstname) > 0) &&
-            (strlen($lastname) > 0) &&
-            (strlen($emailaddr) > 0) &&
-            (filter_var($emailaddr, FILTER_VALIDATE_EMAIL))
-        ) {
+        if (static::gotUserAttributes()) {
             // For the new Google OAuth 2.0 endpoint, we want to keep the
             // old Google OpenID endpoint URL in the database (so user does
             // not get a new certificate subject DN). Change the idp

@@ -10,8 +10,8 @@ use CILogon\Service\SessionMgr;
 use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
-use \PEAR as PEAR;
-use \Config as Config;
+use PEAR;
+use Config;
 
 /**
  * Util

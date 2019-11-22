@@ -3,8 +3,8 @@
 namespace CILogon\Service;
 
 use CILogon\Service\Util;
-use \PEAR as PEAR;
-use \DB as DB;
+use PEAR;
+use DB;
 
 /**
  * DBProps

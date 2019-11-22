@@ -4,7 +4,7 @@ namespace CILogon\Service;
 
 use CILogon\Service\DBProps;
 use CILogon\Service\Util;
-use DB;
+use \DB as DB;
 
 /**
  * SessionMgr

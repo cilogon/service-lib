@@ -802,6 +802,7 @@ Remote Address= ' . $remoteaddr . '
         // (e.g., by the error handler in handleGotUser). Then get these
         // session variables into local vars for ease of use.
         static::setUserAttributeSessionVars(...$args);
+
         $remoteuser  = static::getSessionVar('remoteuser');
         $idp         = static::getSessionVar('idp');
         $idpname     = static::getSessionVar('idpname');
@@ -820,8 +821,6 @@ Remote Address= ' . $remoteaddr . '
         $acr         = static::getSessionVar('acr');
         $entitlement = static::getSessionVar('entitlement');
         $itrustuin   = static::getSessionVar('itrustuin');
-
-        static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
 
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
@@ -964,14 +963,7 @@ Remote Address= ' . $remoteaddr . '
                 );
             }
             static::unsetSessionVar('authntime');
-        } else { // status is okay, set authntime
-            static::setSessionVar('authntime', time());
         }
-
-        static::unsetSessionVar('responsesubmit');
-        static::unsetSessionVar('requestsilver');
-
-        static::getCsrf()->setCookieAndSession();
     }
 
     /**
@@ -1005,6 +997,13 @@ Remote Address= ' . $remoteaddr . '
         ) {
             static::setSessionVar('loa', 'http://incommonfederation.org/assurance/silver');
         }
+
+        static::setSessionVar('status', '0');
+        static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
+        static::setSessionVar('authntime', time());
+        static::unsetSessionVar('responsesubmit');
+        static::unsetSessionVar('requestsilver');
+        static::getCsrf()->setCookieAndSession();
     }
 
     /**

@@ -1336,7 +1336,6 @@ class Content
         $responseurl = null,
         $allowsilver = true
     ) {
-
         // If providerId not set, try the cookie value
         if (strlen($providerId) == 0) {
             $providerId = Util::getPortalOrNormalCookieVar('providerId');
@@ -1567,6 +1566,12 @@ class Content
         // Next, check for OAuth 1.0a
         if ((strlen($redirect) == 0) && (strlen($failureuri) > 0)) {
             $redirect = $failureuri . "?reason=missing_attributes";
+        }
+
+        if (!empty(Util::getSessionVar('storeattributes'))) {
+            Util::unsetSessionVar('storeattributes');
+            printMainPage();
+            exit;
         }
 
         // If empty 'uid' or 'status' or odd-numbered status code, error!

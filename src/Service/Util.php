@@ -66,7 +66,7 @@ class Util
      * $idplist to be used by other classes (since creating an IdPList
      * object is expensive).
      *
-     * @return IdPList The class instantiated IdPList object.
+     * @return IdPList|null The class instantiated IdPList object.
      **/
     public static function getIdpList()
     {
@@ -84,7 +84,7 @@ class Util
      * $csrf to be used by other classes (since we want the CSRV value
      * to be consistent for the current page load).
      *
-     * @return CSRF The class instantiated CSRF object.
+     * @return CSRF|null The class instantiated CSRF object.
      */
     public static function getCsrf()
     {
@@ -102,7 +102,7 @@ class Util
      * $skin to be used by other classes (since loading the skin is
      * potentially expensive).
      *
-     * @return The class instantiated Skin object.
+     * @return Skin|null The class instantiated Skin object.
      */
     public static function getSkin()
     {

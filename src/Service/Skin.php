@@ -246,7 +246,7 @@ class Skin
      * contents of the skin's config.xml file.  Note that you should
      * call readConfigFile to set the contents of $configxml.
      *
-     * @return SimpleXMLElement The SimpleXMLElement object corresponding to
+     * @return \SimpleXMLElement The SimpleXMLElement object corresponding to
      *         the parsed in XML config file.
      */
     public function getconfigxml()
@@ -269,7 +269,7 @@ class Skin
      *
      * @param mixed $args Variable number of parameters corresponding to XML
      *              blocks (and possible sub-blocks).
-     * @return SimpleXMLElement|null A SimpleXMLElement corresponding to the
+     * @return \SimpleXMLElement|null A SimpleXMLElement corresponding to the
      *         passed-in XML option, or 'null' if no such option exists.
      */
     public function getConfigOption(...$args)

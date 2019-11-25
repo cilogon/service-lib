@@ -1263,11 +1263,6 @@ class Content
     {
         $retval = false;
 
-        // Check for eduGAIN IdP and possible get cert context
-        if (Util::isEduGAINAndGetCert()) {
-            Util::unsetUserSessionVars();
-        }
-
         $idp       = Util::getSessionVar('idp');
         $idpname   = Util::getSessionVar('idpname');
         $uid       = Util::getSessionVar('uid');
@@ -1275,21 +1270,27 @@ class Content
         $dn        = Util::getSessionVar('dn');
         $authntime = Util::getSessionVar('authntime');
 
-
-        if (
+        // CIL-410 When using the /testidp/ flow, the 'storeattributes'
+        // session var is set. In this case, the only attribute that
+        // is needed is 'idp' (entityID).
+        if (Util::getSessionVar('storeattributes') == '1') {
+            if (strlen($idp) > 0) {
+                $retval = true;
+            }
+        } elseif (
             (strlen($uid) > 0) && (strlen($idp) > 0) &&
             (strlen($idpname) > 0) && (strlen($status) > 0) &&
             (strlen($dn) > 0) && (strlen($authntime) > 0) &&
-            (!($status & 1))
-        ) {  // All STATUS_OK codes are even
-            if ((strlen($providerId) == 0) || ($providerId == $idp)) {
+            (!($status & 1)) // All STATUS_OK codes are even
+        ) {
+            // Check for eduGAIN IdP and possible get cert context
+            if (Util::isEduGAINAndGetCert()) {
+                Util::unsetUserSessionVars();
+            } elseif ((strlen($providerId) == 0) || ($providerId == $idp)) {
+                // If $providerId passed in, make sure it matches the $idp
                 $retval = true;
+                Util::getSkin()->init(); // Does the IdP need a forced skin?
             }
-        }
-
-        // As a final check, see if the IdP requires a forced skin
-        if ($retval) {
-            Util::getSkin()->init();
         }
 
         return $retval;
@@ -1549,6 +1550,14 @@ class Content
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $failureuri   = Util::getSessionVar('failureuri');
 
+        // CIL-410 The /testidp/ flow is indicated by the presence of the
+        // 'storeattributes' PHP session var. In this case, simply show
+        // the main testidp page with user and IdP attributes.
+        if (!empty(Util::getSessionVar('storeattributes'))) {
+            printMainPage();
+            return;
+        }
+
         // Check for OIDC redirect_uri or OAuth 1.0a failureuri.
         // If found, set 'Proceed' button redirect appropriately.
         $redirect = '';
@@ -1563,15 +1572,10 @@ class Content
                     $clientparams['state'] . '" />';
             }
         }
+
         // Next, check for OAuth 1.0a
         if ((strlen($redirect) == 0) && (strlen($failureuri) > 0)) {
             $redirect = $failureuri . "?reason=missing_attributes";
-        }
-
-        if (!empty(Util::getSessionVar('storeattributes'))) {
-            Util::unsetSessionVar('storeattributes');
-            printMainPage();
-            exit;
         }
 
         // If empty 'uid' or 'status' or odd-numbered status code, error!

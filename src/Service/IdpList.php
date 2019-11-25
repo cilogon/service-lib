@@ -144,9 +144,10 @@ class IdpList
         $retval = false;  // Assume read failed
 
         $filename = $this->getFilename();
+        $doc = new DOMDocument();
         if (
             (is_readable($filename)) &&
-            (($dom = DOMDocument::load($filename, LIBXML_NOBLANKS)) !== false)
+            (($dom = $doc->load($filename, LIBXML_NOBLANKS)) !== false)
         ) {
             $this->idpdom = $dom;
             $this->idpdom->preserveWhiteSpace = false;
@@ -377,7 +378,8 @@ EOT;
                 );
 
                 // Create a DOMDocument to build up the list of IdPs.
-                $dom = DOMImplementation::createDocument(null, 'idps');
+                $domi = new DOMImplementation();
+                $dom = $domi->createDocument(null, 'idps');
                 $idps = $dom->documentElement; // Top level <idps> element
 
                 // Loop through the IdPs searching for desired attributes
@@ -696,11 +698,12 @@ EOT;
                 }
 
                 // Read in any test IdPs and add them to the list
+                $doc = new DOMDocument();
                 if (
                     (defined('TEST_IDP_XML')) &&
                     (!empty(TEST_IDP_XML)) &&
                     (is_readable(TEST_IDP_XML)) &&
-                    (($dom2 = DOMDocument::load(TEST_IDP_XML)) !== false)
+                    (($dom2 = $doc->load(TEST_IDP_XML)) !== false)
                 ) {
                     $idpnodes = $dom2->getElementsByTagName('idp');
                     foreach ($idpnodes as $idpnode) {
@@ -1309,8 +1312,8 @@ EOT;
      * idplist.xml and returns a 2D array where the keys are entityIDs
      * and the values are arrays of attributes for each IdP.
      *
-     * @param DOMDocument The DOM containing the list of IdPs to convert to
-     *        an array. Returns null on error.
+     * @param DOMDocument $dom The DOM containing the list of IdPs to convert
+     *        to an array. Returns null on error.
      * @return array An array corresponding to the DOM of the IdPs.
      */
     public function DOM2Array($dom)
@@ -1342,7 +1345,7 @@ EOT;
      * This function takes an array of IdPs (such as idparray) and
      * returns a corresponding DOM which can be written to XML.
      *
-     * @param array $arr An array corresponding to the idplist.
+     * @param array|null $arr An array corresponding to the idplist.
      * @return DOMDocument A DOM for the idplist which can be written to XML.
      */
     public function array2DOM($arr)
@@ -1350,7 +1353,8 @@ EOT;
         $retdom = null;
 
         if (!is_null($arr)) {
-            $dom = DOMImplementation::createDocument(null, 'idps');
+            $domi = new DOMImplementation();
+            $dom = $domi->createDocument(null, 'idps');
             $idps = $dom->documentElement; // Top level <idps> element
 
             foreach ($arr as $entityID => $attrs) {

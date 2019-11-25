@@ -77,7 +77,7 @@ class ShibError
     public function __construct()
     {
         $this->errorarray = array();
-        foreach (static::$errorparams as $param) {
+        foreach (self::$errorparams as $param) {
             if (isset($_GET[$param])) {
                 $this->errorarray[$param] = rtrim($_GET[$param]);
             }

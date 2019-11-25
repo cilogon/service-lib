@@ -60,7 +60,7 @@ class Skin
     protected $skinname;
 
     /**
-     * @var SimpleXMLElement $configxml A SimpleXMLElement object for the
+     * @var \SimpleXMLElement $configxml A SimpleXMLElement object for the
      *      config.xml file
      */
     protected $configxml;
@@ -255,11 +255,8 @@ class Skin
     }
 
     /**
-     * Function  : getConfigOption
-     * Parameters: One or more parameters corresponding to XML blocks
-     *             (and possible sub-blocks).
-     * Returns   : A SimpleXMLElement corresponding to the passed-in
-     *             XML option, or 'null' if no such option exists.
+     * getConfigOption
+     *
      * This method returns a SimpleXMLElement block corresponding to
      * the passed in arguments.  For example, to get the blacklist of
      * idps, call $idps = getConfigOption('idpblacklist') and then
@@ -269,16 +266,21 @@ class Skin
      * (int)getConfigOption('pkcs12','initiallifetime','number'). Note
      * that you should explicitly cast the values to int, string,
      * float, etc., when you use them.
+     *
+     * @param mixed $args Variable number of parameters corresponding to XML
+     *              blocks (and possible sub-blocks).
+     * @return SimpleXMLElement|null A SimpleXMLElement corresponding to the
+     *         passed-in XML option, or 'null' if no such option exists.
      */
-    public function getConfigOption()
+    public function getConfigOption(...$args)
     {
         $retval = null;
-        $numargs = func_num_args();
+        $numargs = count($args);
         if ($numargs > 0) {
             $retval = $this->configxml;
         }
         for ($i = 0; $i < $numargs; $i++) {
-            $argval = func_get_arg($i);
+            $argval = $args[$i];
             if (empty($retval->$argval)) {
                 $retval = null;
                 break;

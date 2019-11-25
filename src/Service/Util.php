@@ -1098,7 +1098,7 @@ Remote Address= ' . $remoteaddr . '
      * an array. The function returns true if the session is verified, so
      * that other functions may be called upon return.
      *
-     * @param function $func The function to call if the current session is
+     * @param callable $func The function to call if the current session is
      *        successfully verified.
      * @param array $params (Optional) An array of parameters to pass to the
      *        function. Defaults to empty array, meaning zero parameters.

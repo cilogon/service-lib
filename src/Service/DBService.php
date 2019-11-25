@@ -128,137 +128,137 @@ class DBService
     );
 
     /**
-     * @var int $status The returned status code from dbService calls
+     * @var int|null $status The returned status code from dbService calls
      */
     public $status;
 
     /**
-     * @var string $user_uid The CILogon UID
+     * @var string|null $user_uid The CILogon UID
      */
     public $user_uid;
 
     /**
-     * @var string $remote_user The HTTP session REMOTE_USER
+     * @var string|null $remote_user The HTTP session REMOTE_USER
      */
     public $remote_user;
 
     /**
-     * @var string $idp The Identity Provider's entityId
+     * @var string|null $idp The Identity Provider's entityId
      */
     public $idp;
 
     /**
-     * @var string $idp_display_name The Identity Provider's name
+     * @var string|null $idp_display_name The Identity Provider's name
      */
     public $idp_display_name;
 
     /**
-     * @var string $first_name User's given name
+     * @var string|null $first_name User's given name
      */
     public $first_name;
 
     /**
-     * @var string $last_name User's family name
+     * @var string|null $last_name User's family name
      */
     public $last_name;
 
     /**
-     * @var string $display_name User's full name
+     * @var string|null $display_name User's full name
      */
     public $display_name;
 
     /**
-     * @var string $email User's email address
+     * @var string|null $email User's email address
      */
     public $email;
 
     /**
-     * @var string $distinguished_name X.509 DN + email address
+     * @var string|null $distinguished_name X.509 DN + email address
      */
     public $distinguished_name;
 
     /**
-     * @var string $eppn eduPersonPrincipalName
+     * @var string|null $eppn eduPersonPrincipalName
      */
     public $eppn;
 
     /**
-     * @var string $eptid eduPersonTargetedID
+     * @var string|null $eptid eduPersonTargetedID
      */
     public $eptid;
 
     /**
-     * @var string $open_id Old Google OpenID 2.0 identifier
+     * @var string|null $open_id Old Google OpenID 2.0 identifier
      */
     public $open_id;
 
     /**
-     * @var string $oidc OpenID Connect identifier
+     * @var string|null $oidc OpenID Connect identifier
      */
     public $oidc;
 
     /**
-     * @var string $affiliation eduPersonScopedAffiliation
+     * @var string|null $affiliation eduPersonScopedAffiliation
      */
     public $affiliation;
 
     /**
-     * @var string $ou Organizational Unit
+     * @var string|null $ou Organizational Unit
      */
     public $ou;
 
     /**
-     * @var string $member_of isMemberOf group information
+     * @var string|null $member_of isMemberOf group information
      */
     public $member_of;
 
     /**
-     * @var string $acr Authentication Context Class Ref
+     * @var string|null $acr Authentication Context Class Ref
      */
     public $acr;
 
     /**
-     * @var string $entitlement eduPersonEntitlement
+     * @var string|null $entitlement eduPersonEntitlement
      */
     public $entitlement;
 
     /**
-     * @var string $itrustuin Person's univeristy ID number
+     * @var string|null $itrustuin Person's univeristy ID number
      */
     public $itrustuin;
 
     /**
-     * @var string $serial_string CILogon serial string (e.g., A34201)
+     * @var string|null $serial_string CILogon serial string (e.g., A34201)
      */
     public $serial_string;
 
     /**
-     * @var string $create_time Time user entry was created
+     * @var string|null $create_time Time user entry was created
      */
     public $create_time;
 
     /**
-     * @var string $oauth_token OAuth 2.0 token
+     * @var string|null $oauth_token OAuth 2.0 token
      */
     public $oauth_token;
 
     /**
-     * @var string $cilogon_callback OAuth 1.0a callback URL
+     * @var string|null $cilogon_callback OAuth 1.0a callback URL
      */
     public $cilogon_callback;
 
     /**
-     * @var string $cilogon_success OAuth 1.0a success URL
+     * @var string|null $cilogon_success OAuth 1.0a success URL
      */
     public $cilogon_success;
 
     /**
-     * @var string $cilogon_failure OAuth 1.0a failure URL
+     * @var string|null $cilogon_failure OAuth 1.0a failure URL
      */
     public $cilogon_failure;
 
     /**
-     * @var string $cilogon_portal_name OAuth client name
+     * @var string|null $cilogon_portal_name OAuth client name
      */
     public $cilogon_portal_name;
 
@@ -268,17 +268,17 @@ class DBService
     public $idp_uids;
 
     /**
-     * @var string $client_name OAuth 2.0 client name
+     * @var string|null $client_name OAuth 2.0 client name
      */
     public $client_name;
 
     /**
-     * @var string $client_id OAuth 2.0 client identifier
+     * @var string|null $client_id OAuth 2.0 client identifier
      */
     public $client_id;
 
     /**
-     * @var string $client_home_uri OAuth 2.0 client home URL
+     * @var string|null $client_home_uri OAuth 2.0 client home URL
      */
     public $client_home_uri;
 
@@ -288,7 +288,7 @@ class DBService
     public $client_callback_uris;
 
     /**
-     * @var string $dbservice URL The URL to use for the dbService
+     * @var string|null $dbservice URL The URL to use for the dbService
      */
     private $dbserviceurl;
 
@@ -370,7 +370,6 @@ class DBService
         $this->oidc = null;
         $this->serial_string = null;
         $this->create_time = null;
-        $this->two_factor = null;
         $this->affiliation = null;
         $this->ou = null;
         $this->member_of = null;
@@ -690,7 +689,7 @@ class DBService
      *
      * @param string $code The 'code' as returned by the OAuth 2.0 server.
      * @param string $uid The database user UID.
-     * @param int The Unix timestamp of the user authentication.
+     * @param int $authntime The Unix timestamp of the user authentication.
      * @param string $loa (Optional) The Level of Assurance: '' = basic,
      *        'openid' =  OpenID Connect (e.g., Google),
      *        'http://incommonfederation.org/assurance/silver' = silver
@@ -829,9 +828,6 @@ class DBService
                     if (preg_match('/cilogon_portal_name=([^\r\n]+)/', $output, $match)) {
                         $this->cilogon_portal_name = urldecode($match[1]);
                     }
-                    if (preg_match('/two_factor=([^\r\n]+)/', $output, $match)) {
-                        $this->two_factor = urldecode($match[1]);
-                    }
                     if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $match)) {
                         foreach ($match[1] as $value) {
                             $this->idp_uids[] = urldecode($value);
@@ -886,7 +882,7 @@ class DBService
     {
         if (!is_null($this->status)) {
             echo "status=$this->status (" .
-            array_search($this->status, static::$STATUS) . ")\n";
+            (string)(array_search($this->status, static::$STATUS)) . ")\n";
         }
         if (!is_null($this->user_uid)) {
             echo "user_uid=$this->user_uid\n";
@@ -965,9 +961,6 @@ class DBService
         }
         if (!is_null($this->cilogon_portal_name)) {
             echo "cilogon_portal_name=$this->cilogon_portal_name\n";
-        }
-        if (!is_null($this->two_factor)) {
-            echo "two_factor=$this->two_factor\n";
         }
         if (count($this->idp_uids) > 0) {
             uasort($this->idp_uids, 'strcasecmp');

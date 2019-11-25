@@ -258,6 +258,7 @@ class Content
         if (!empty($idphintlist)) {
             $useselectedidp = true;
             $providerId = $idphintlist[0];
+            $newidps = array();
             // Update the IdP selection list to show just the idphintlist.
             foreach ($idphintlist as $value) {
                 $newidps[$value] = $idps[$value];
@@ -885,26 +886,41 @@ class Content
                     href="http://refeds.org/category/research-and-scholarship">REFEDS
                     R &amp; S</a>:</th>
                     <td>' , ($idplist->isREFEDSRandS($idp) ? 'Yes' : 'No') , '</td>
-                    <td>' ,
-                    (($eduGainWithoutRandSandSIRTFI &&
-                    !$idplist->isREFEDSRandS($idp)) ?
-                        Content::printIcon('warn', 'This IdP does not support both ' .
-                            'REFEDS R&amp;S and SIRTFI. CILogon functionality may be limited.') :
-                        '') ,
-                    '</td>
+                    <td>';
+            if (
+                ($eduGainWithoutRandSandSIRTFI &&
+                !$idplist->isREFEDSRandS($idp))
+            ) {
+                Content::printIcon(
+                    'warn',
+                    'This IdP does not support both ' .
+                    'REFEDS R&amp;S and SIRTFI. ' .
+                    'CILogon functionality may be limited.'
+                );
+            }
+
+            echo '              </td>
                   </tr>
 
                   <tr class="odd">
                     <th><a style="text-decoration:underline" target="_blank"
                            href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
                     <td>' , ($idplist->isSIRTFI($idp) ? 'Yes' : 'No') , '</td>
-                    <td>',
-                    (($eduGainWithoutRandSandSIRTFI &&
-                    !$idplist->isSIRTFI($idp)) ?
-                        Content::printIcon('warn', 'This IdP does not support both ' .
-                            'REFEDS R&amp;S and SIRTFI. CILogon functionality may be limited.') :
-                        '') ,
-                    '</td>
+                    <td>';
+
+            if (
+                ($eduGainWithoutRandSandSIRTFI &&
+                !$idplist->isSIRTFI($idp))
+            ) {
+                Content::printIcon(
+                    'warn',
+                    'This IdP does not support both ' .
+                    'REFEDS R&amp;S and SIRTFI. ' .
+                    'CILogon functionality may be limited.'
+                );
+            }
+
+            echo '              </td>
                   </tr>
 
                   <tr>
@@ -1323,7 +1339,7 @@ class Content
      *       'submit' variable to be set upon return from the 'getuser'
      *        script.  This is utilized to control the flow of this script
      *        after 'getuser'. Defaults to 'gotuser'.
-     * @param string responseurl (Optional) A response url for redirection
+     * @param string $responseurl (Optional) A response url for redirection
      *        after successful processing at /secure/getuser/. Defaults to
      *        the current script directory.
      * @param bool $allowsilver Is it okay to request silver assurance in

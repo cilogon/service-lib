@@ -3,6 +3,7 @@
 namespace CILogon\Service;
 
 use CILogon\Service\Util;
+use League\OAuth2\Client\Provider;
 use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Google;
 use CILogon\OAuth2\Client\Provider\ORCID;
@@ -32,7 +33,8 @@ class OAuth2Provider
      * OAuth2 Client library provider object) and 'authzUrlOpts' (for use
      * with getAuthorizationUrl()).
      *
-     * @param string $idp The Identity Provider to use for OAuth2 connection.
+     * @param string|null $idp The Identity Provider to use for OAuth2
+     *        connection.
      */
     public function __construct($idp)
     {
@@ -41,8 +43,6 @@ class OAuth2Provider
         }
         $idp = strtolower($idp);
 
-        $client_id = '';
-        $client_secret = '';
         $classname = '';
         $extraparams = array();
 

@@ -52,12 +52,12 @@ use DB;
 class SessionMgr
 {
     /**
-     * @var DB $db A PEAR DB database connection object
+     * @var DB|null $db A PEAR DB database connection object
      */
     protected $db = null;
 
     /**
-     * @var string $crc Session data cache id
+     * @var string|null $crc Session data cache id
      */
     protected $crc = null;
 

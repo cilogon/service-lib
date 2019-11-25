@@ -122,8 +122,6 @@ class DBProps
      */
     public function getDBConnect()
     {
-        $retval = null;
-
         $db = new DB(); // So defined constants get read in
         $dsn = array(
             'phptype'  => $this->dbtype,

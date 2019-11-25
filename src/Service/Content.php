@@ -38,7 +38,6 @@ class Content
         $skin = Util::getSkin();
         $skinpoweredbyimg = (string)$skin->getConfigOption('poweredbyimg');
         if (
-            (!is_null($skinpoweredbyimg)) &&
             (strlen($skinpoweredbyimg) > 0) &&
             (is_readable('/var/www/html' . $skinpoweredbyimg))
         ) {
@@ -244,7 +243,7 @@ class Content
         // If no previous providerId, get from skin, or default to Google.
         if (strlen($providerId) == 0) {
             $initialidp = (string)$skin->getConfigOption('initialidp');
-            if ((!is_null($initialidp)) && (isset($idps[$initialidp]))) {
+            if ((strlen($initialidp) > 0) && (isset($idps[$initialidp]))) {
                 $providerId = $initialidp;
             } else {
                 $providerId = Util::getAuthzUrl('Google');
@@ -2123,7 +2122,7 @@ IdPs for the skin.'
     {
         $newdn = $dn;
         $dnformat = (string)Util::getSkin()->getConfigOption('dnformat');
-        if (!is_null($dnformat)) {
+        if (strlen($dnformat) > 0) {
             if (
                 ($dnformat == 'rfc2253') &&
                 (preg_match(

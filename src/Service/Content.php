@@ -348,11 +348,6 @@ class Content
         }
 
         echo '
-        <p class="silvercheckbox">
-        <label for="silveridp">Request Silver:</label>
-        <input type="checkbox" name="silveridp" id="silveridp"/>
-        </p>
-
         <p>
         ';
 
@@ -1341,16 +1336,11 @@ class Content
      * @param string $responseurl (Optional) A response url for redirection
      *        after successful processing at /secure/getuser/. Defaults to
      *        the current script directory.
-     * @param bool $allowsilver Is it okay to request silver assurance in
-     *        the authnContextClassRef? If not, then ignore the 'Request
-     *        Silver' checkbox and silver certification in metadata.
-     *        Defaults to true.
      */
     public static function redirectToGetShibUser(
         $providerId = '',
         $responsesubmit = 'gotuser',
-        $responseurl = null,
-        $allowsilver = true
+        $responseurl = null
     ) {
         // If providerId not set, try the cookie value
         if (strlen($providerId) == 0) {
@@ -1401,18 +1391,6 @@ class Content
                     $forceauthn = Util::getSkin()->getConfigOption('forceauthn');
                     if ((!is_null($forceauthn)) && ((int)$forceauthn == 1)) {
                         $redirect .= '&forceAuthn=true';
-                    }
-                }
-
-                // If Silver IdP or 'Request Silver' checked, send extra parameter
-                if ($allowsilver) {
-                    if (
-                        (Util::getIdpList()->isSilver($providerId)) ||
-                        (strlen(Util::getPostVar('silveridp')) > 0)
-                    ) {
-                        Util::setSessionVar('requestsilver', '1');
-                        $redirect .= '&authnContextClassRef=' .
-                            urlencode('http://id.incommon.org/assurance/silver');
                     }
                 }
             }

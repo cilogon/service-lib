@@ -1002,7 +1002,6 @@ Remote Address= ' . $remoteaddr . '
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
         static::setSessionVar('authntime', time());
         static::unsetSessionVar('responsesubmit');
-        static::unsetSessionVar('requestsilver');
         static::getCsrf()->setCookieAndSession();
     }
 

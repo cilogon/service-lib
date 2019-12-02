@@ -22,11 +22,8 @@ use CILogon\Service\Loggit;
  * create a new ShibError instance at the root index.php
  * file. The constructor looks for various 'GET'
  * parameters that get passed by the SP software. If there
- * is an error, it checks to see if the error was caused
- * by requesting silver assurance. If so, try the request
- * again WITHOUT requesting silver assurance. If not, put
- * put an error page with the info provided by the SP
- * software.
+ * is an error, show an error page with the info provided
+ * by the SP software.
  *
  * Example usage:
  *     require_once 'ShibError.php';
@@ -84,24 +81,9 @@ class ShibError
         }
 
         if ($this->isError()) {
-            // Check if we tried to get silver before. If so, don't print
-            // an error. Instead, try again without asking for silver.
-            if (Util::getSessionVar('requestsilver') == '1') {
-                $responseurl = null;
-                if (strlen(Util::getSessionVar('responseurl')) > 0) {
-                    $responseurl = Util::getSessionVar('responseurl');
-                }
-                $providerId = Util::getPortalOrNormalCookieVar('providerId');
-                Content::redirectToGetShibUser(
-                    $providerId,
-                    'gotuser',
-                    $responseurl,
-                    false
-                );
-                Util::unsetSessionVar('requestsilver');
             // CIL-410 Temporary fix for /secure/testidp Shibboleth error.
             // Check for error and redirect to /testidp .
-            } elseif (
+            if (
                 ($this->errorarray['errorType'] == 'shibsp::ConfigurationException') &&
                 ($this->errorarray['errorText'] ==
                     'None of the configured SessionInitiators handled the request.') &&

@@ -1172,6 +1172,12 @@ class Content
             // make sure that it matches the saved providerId. If not,
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
+                if (strlen($pn) > 0) {
+                    $pc->set('providerId', $providerId);
+                    $pc->write();
+                } else {
+                    Util::setCookieVar('providerId', $providerId);
+                }
                 $providerName = Util::getAuthzIdP($providerId);
                 if (in_array($providerName, Util::$oauth2idps)) {
                     // Log in with an OAuth2 IdP

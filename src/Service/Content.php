@@ -427,9 +427,6 @@ class Content
             echo $disabledmsg;
             echo '</div>';
         } else { // PKCS12 downloading is okay
-            $downloadcerttext = 'Clicking this button will generate a link ' .
-                'to a new certificate, which you can download to your local ' .
-                'computer. The certificate is valid for up to 13 months.';
             $p12linktext = "Left-click this link to import the certificate " .
                 "into your broswer / operating system. (Firefox users see " .
                 "the FAQ.) Right-click this link and select 'Save As...' to " .
@@ -722,7 +719,6 @@ class Content
     {
         $idplist = Util::getIdpList();
         $idp = Util::getSessionVar('idp');
-        $gotattrs = Util::gotUserAttributes();
         $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
 
         // Set various booleans for warning/error messages early so that we
@@ -987,14 +983,8 @@ class Content
     {
         $idplist = Util::getIdpList();
         $idp = Util::getSessionVar('idp');
-        $gotattrs = Util::gotUserAttributes();
         $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
         $shibarray = $idplist->getShibInfo($idp);
-
-        // Set various booleans for warning/error messages early so that we
-        // can display a "general" warning/error icon on the card title.
-        $warnings = array();
-        $errors = array();
 
         // CIL-416 Check for eduGAIN IdPs without both REFEDS R&S and SIRTFI
         // since these IdPs are not allowed to get certificates.
@@ -1789,7 +1779,6 @@ class Content
 
         // Set the cookie for keepidp if the checkbox was checked
         $pc = new PortalCookie();
-        $pn = $pc->getPortalName();
         Util::setPortalOrCookie(
             $pc,
             'keepidp',
@@ -2279,8 +2268,7 @@ class Content
         ) {
             $log->error(
                 'Failed to getuser' .
-                ($isEduGAINAndGetCert ? : ' due to eduGAIN IdP restriction') .
-                '.'
+                ($isEduGAINAndGetCert ? ' due to eduGAIN IdP restriction.' : '.')
             );
 
             // Is this a SAML IdP?

@@ -11,6 +11,7 @@ use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
 use PEAR;
+use DB;
 use Config;
 
 /**
@@ -1184,5 +1185,133 @@ Remote Address= ' . $remoteaddr . '
             $retval = true;
         }
         return $retval;
+    }
+
+    /**
+     * setPortalOrCookie
+     *
+     * This is a convenience function for a set of operations that is done
+     * a few times in Content.php. It first checks if the name of the portal
+     * in the PortalCookie is empty. If not, then it sets the PortalCookie
+     * key/value pair. Otherwise, it sets the 'normal' cookie key/value
+     * pair.
+     *
+     * @param PortalCookie $pc The PortalCookie to read/write. If the portal
+     *        name is empty, then use the 'normal' cookie instead.
+     * @param string $key The key of the PortalCookie or 'normal' cookie to
+     *        set.
+     * @param string $value The value to set for the $key.
+     * @param bool $save (optional) If set to true, attempt to write the
+     *        PortalCookie. Defaults to false.
+     */
+    public static function setPortalOrCookie($pc, $key, $value, $save = false)
+    {
+        $pn = $pc->getPortalName();
+        // If the portal name is valid, then set the PortalCookie key/value
+        if (strlen($pn) > 0) {
+            $pc->set($key, $value);
+            if ($save) {
+                $pc->write();
+            }
+        } else { // If portal name is not valid, then use the 'normal' cookie
+            if (strlen($value) > 0) {
+                Util::setCookieVar($key, $value);
+            } else { // If $value is empty, then UNset the 'normal' cookie
+                Util::unsetCookieVar($key);
+            }
+        }
+    }
+
+    /**
+     * getOIDCClientParams
+     *
+     * This function addresses CIL-618 and reads OIDC client information
+     * directly from the database. It is a replacement for
+     * $dbs->getClient($clientparams['client_id']) which calls
+     * '/dbService?action=getClient&client_id=...'. This gives the PHP
+     * '/authorize' endpoint access to additional OIDC client parameters
+     * without having to rewrite the '/dbService?action=getClient' endpoint.
+     *
+     * @param array $clientparams An array of client parameters which gets
+     *              stored in the PHP session. The keys of the array are
+     *              the column names of the 'client' table in the 'ciloa2'
+     *              database, prefixed by 'client_'.
+     */
+    public static function getOIDCClientParams(&$clientparams)
+    {
+        $retval = false;
+        if (strlen(@$clientparams['client_id']) > 0) {
+            $dsn = array(
+                'phptype'  => 'mysqli',
+                'username' => MYSQLI_USERNAME,
+                'password' => MYSQLI_PASSWORD,
+                'database' => 'ciloa2',
+                'hostspec' => 'localhost'
+            );
+
+            $opts = array(
+                'persistent'  => true,
+                'portability' => DB_PORTABILITY_ALL
+            );
+
+            $db = DB::connect($dsn, $opts);
+            if (!PEAR::isError($db)) {
+                $data = $db->getRow(
+                    'SELECT * from clients WHERE client_id = ?',
+                    array($clientparams['client_id']),
+                    DB_FETCHMODE_ASSOC
+                );
+                if (!DB::isError($data)) {
+                    if (!empty($data)) {
+                        foreach ($data as $key => $value) {
+                            $clientparams['client_' . $key] = $value;
+                        }
+                        $clientparams['clientstatus'] = DBService::$STATUS['STATUS_OK'];
+                        $retval = true;
+                    }
+                }
+                $db->disconnect();
+            }
+        }
+        return $retval;
+    }
+
+    /**
+     * getMinMaxLifetimes
+     *
+     * This function checks the skin's configuration to see if either or
+     * both of minlifetime and maxlifetime in the specified config.xml
+     * block have been set. If not, default to minlifetime of 1 (hour) and
+     * the specified defaultmaxlifetime.
+     *
+     * @param string $section The XML section block from which to read the
+     *        minlifetime and maxlifetime values. Can be one of the
+     *        following: 'pkcs12' or 'delegate'.
+     * @param int $defaultmaxlifetime Default maxlifetime (in hours) for the
+     *        credential.
+     * @return array An array consisting of two entries: the minimum and
+     *         maximum lifetimes (in hours) for a credential.
+     */
+    public static function getMinMaxLifetimes($section, $defaultmaxlifetime)
+    {
+        $minlifetime = 1;    // Default minimum lifetime is 1 hour
+        $maxlifetime = $defaultmaxlifetime;
+        $skin = Util::getSkin();
+        $skinminlifetime = $skin->getConfigOption($section, 'minlifetime');
+        // Read the skin's minlifetime value from the specified section
+        if ((!is_null($skinminlifetime)) && ((int)$skinminlifetime > 0)) {
+            $minlifetime = max($minlifetime, (int)$skinminlifetime);
+            // Make sure $minlifetime is less than $maxlifetime;
+            $minlifetime = min($minlifetime, $maxlifetime);
+        }
+        // Read the skin's maxlifetime value from the specified section
+        $skinmaxlifetime = $skin->getConfigOption($section, 'maxlifetime');
+        if ((!is_null($skinmaxlifetime)) && ((int)$skinmaxlifetime) > 0) {
+            $maxlifetime = min($maxlifetime, (int)$skinmaxlifetime);
+            // Make sure $maxlifetime is greater than $minlifetime
+            $maxlifetime = max($minlifetime, $maxlifetime);
+        }
+
+        return array($minlifetime, $maxlifetime);
     }
 }

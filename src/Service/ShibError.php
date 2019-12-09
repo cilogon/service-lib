@@ -163,53 +163,58 @@ class ShibError
         $log->error('Shibboleth error: ' . $errorstr1);
 
         Content::printHeader('Shiboleth Error');
+        Content::printCollapseBegin('shiberror', 'Shibboleth Error', false);
 
         echo '
-        <div class="boxed">
+            <div class="card-body px-5">
+              <div class="card-text my-2">
+                The CILogon Service has encountered a Shibboleth error.
+              </div> <!-- end card-text -->
         ';
 
-        $erroroutput = '
-        <p>
-        The CILogon Service has encountered a Shibboleth error.
-        </p>
-        <blockquote><pre>' . $errorstr2 . '</pre>
-        </blockquote>
-        <p>
-        System administrators have been
-        notified. This may be a temporary error. Please try again later, or
-        contact us at the email address at the bottom of the page.
-        </p>
+        Content::printErrorBox('<pre>' . $errorstr2 . '</pre>');
+
+        echo '
+              <div class="card-text my-2">
+                System administrators have been notified.
+                This may be a temporary error. Please try again later, or
+                contact us at the email address at the bottom of the page.
+              </div> <!-- end card-text -->
         ';
 
         $skin = Util::getSkin();
         $forceauthn = $skin->getConfigOption('forceauthn');
         if ((!is_null($forceauthn)) && ((int)$forceauthn == 1)) {
-            $erroroutput .= '
-            <p>
-            Note that this error may be due to your selected Identity
-            Provider (IdP) not fully supporting &quot;forced
-            reauthentication&quot;. This setting forces users to log in at
-            the IdP every time, thus bypassing Single Sign-On (SSO).
-            </p>
+            echo '
+              <div class="card-text my-2">
+                Note that this error may be due to your selected Identity
+                Provider (IdP) not fully supporting &quot;forced
+                reauthentication&quot;. This setting forces users to log 
+                in at the IdP every time, thus bypassing Single Sign-On 
+                (SSO).
+              </div> <!-- end card-text -->
             ';
         }
 
-        Content::printErrorBox($erroroutput);
-
-        echo '
-        <div>
-        ';
         Content::printFormHead();
-        echo '
-        <input type="submit" name="submit" class="submit" value="Proceed" />
-        </form>
-        </div>
-        ';
-
 
         echo '
-        </div>
-        ';
+              <div class="card-text my-2">
+                <div class="form-group">
+                  <div class="form-row align-items-center
+                  justify-content-center">
+                    <div class="col-auto">
+                      <input type="submit" name="submit"
+                      class="btn btn-primary submit form-control"
+                      value="Proceed" />
+                    </div>
+                  </div> <!-- end form-row align-items-center -->
+                </div> <!-- end form-group -->
+              </div> <!-- end card-text -->
+            </form>
+            </div> <!-- end card-body -->';
+
+        Content::printCollapseEnd();
         Content::printFooter();
 
         Util::sendErrorAlert('Shibboleth Error', $errorstr2);

@@ -23,10 +23,9 @@ class Content
      * Any style changes should go in the cilogon.css file.
      *
      * @param string $title The text in the window's titlebar
-     * @param string $extra Optional extra text to go in the <head> block
      * @param bool $csrfcookie Set the CSRF cookie. Defaults to true.
      */
-    public static function printHeader($title = '', $extra = '', $csrfcookie = true)
+    public static function printHeader($title = '', $csrfcookie = true)
     {
         if ($csrfcookie) {
             $csrf = Util::getCsrf();
@@ -44,63 +43,62 @@ class Content
             $poweredbyimg = $skinpoweredbyimg;
         }
 
-        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-        <head><title>' , $title , '</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="initial-scale=0.6" />
-        <link rel="stylesheet" type="text/css" href="/include/cilogon.css" />
+        echo '<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <title>', $title, '</title>
+
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+          crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous" />
+    <!-- Bootstrap-Select CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css" />
+    <!-- CILogon-specific CSS -->
+    <link rel="stylesheet" href="/include/cilogon.css" />
         ';
 
         $skin->printSkinLink();
 
         echo '
-        <script type="text/javascript" src="/include/cilogon.js"></script>
-        ' ;
+  </head>
 
-        echo '
-    <!--[if IE]>
-        <style type="text/css">
-          body { behavior: url(/include/csshover3.htc); }
-        </style>
-    <![endif]-->
-        ';
+  <body>
+    <div class="skincilogonlogo">
+      <a target="_blank" href="http://www.cilogon.org/faq/"><img
+      src="', $poweredbyimg , '" alt="CILogon" title="CILogon Service" /></a>
+    </div>
 
-        if (strlen($extra) > 0) {
-            echo $extra;
-        }
+    <div class="logoheader">
+       <h1><span>[CILogon Service]</span></h1>
+    </div>
 
-        echo '
-        </head>
+    <div class="mt-4 container-fluid"> <!-- Main Bootstrap Container -->
+    ';
 
-        <body>
-
-        <div class="skincilogonlogo">
-        <a target="_blank" href="http://www.cilogon.org/faq/"><img
-        src="' , $poweredbyimg , '" alt="CILogon"
-        title="CILogon Service" /></a>
-        </div>
-
-        <div class="logoheader">
-           <h1><span>[CILogon Service]</span></h1>
-        </div>
-        <div class="pagecontent">
-         ';
+        static::printNoScript();
 
         if ((defined('BANNER_TEXT')) && (!empty(BANNER_TEXT))) {
             echo '
-            <div class="noticebanner">' , BANNER_TEXT , '</div>
-            ';
-        }
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      ', BANNER_TEXT , '
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-        $providerId = Util::getSessionVar('idp');
-        if ($providerId == "urn:mace:incommon:idp.protectnetwork.org") {
-            echo '
-            <div class="noticebanner">Availability of the ProtectNetwork
-            Identity Provider (IdP) will end after December 2014. Please
-            consider using another IdP.</div>
-            ';
+';
         }
     }
 
@@ -120,45 +118,32 @@ class Content
         }
 
         echo '
-        <br class="clear" />
-        <div class="footer">
-        <a target="_blank" href="http://www.cilogon.org/faq"><img
-        src="/images/questionIcon.png" class="floatrightclear"
-        width="40" height="40" alt="CILogon FAQ" title="CILogon FAQ" /></a>
-        <p>For questions about this site, please see the <a target="_blank"
+    </div> <!-- Close Main Bootstrap Container -->
+    <footer class="footer">
+      <p>For questions about this site, please see the <a target="_blank"
         href="http://www.cilogon.org/faq">FAQs</a> or send email to <a
-        href="mailto:help@cilogon.org">help&nbsp;@&nbsp;cilogon.org</a>.</p>
-        <p>Know <a target="_blank"
+        href="mailto:help@cilogon.org">help@cilogon.org</a>.</p>
+      <p>Know <a target="_blank"
         href="http://ca.cilogon.org/responsibilities">your responsibilities</a>
         for using the CILogon Service.</p>
-        <p>See <a target="_blank"
+      <p>See <a target="_blank"
         href="http://ca.cilogon.org/acknowledgements">acknowledgements</a> of
         support for this site.</p>
-        </div> <!-- Close "footer" div -->
-        </div> <!-- Close "pagecontent" div -->
-        </body>
-        </html>
-        ';
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+            integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
+    <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
+    <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>
+    <script src="/include/cilogon.js"></script>
+  </body>
+</html>';
 
         session_write_close();
-    }
-
-    /**
-     * printPageHeader
-     *
-     * This function prints a fancy formatted box with a single line of
-     * text, suitable for a titlebox on each web page (to appear just below
-     * the page banner at the very top). It prints a gradent border around
-     * the four edges of the box and then outlines the inner box.
-     *
-     * @param string $text The text string to appear in the titlebox.
-     */
-    public static function printPageHeader($text)
-    {
-        echo '
-        <div class="titlebox">' , $text , '
-        </div>
-        ';
     }
 
     /**
@@ -175,10 +160,8 @@ class Content
      * @param string $method (Optional) The <form> 'method', one of 'get' or
      *        'post'. Defaults to 'post'.
      */
-    public static function printFormHead(
-        $action = '',
-        $method = 'post'
-    ) {
+    public static function printFormHead($action = '', $method = 'post')
+    {
         static $formnum = 0;
 
         if (strlen($action) == 0) {
@@ -186,8 +169,9 @@ class Content
         }
 
         echo '
-        <form action="' , $action , '" method="' , $method , '"
-         autocomplete="off" id="form' , sprintf("%02d", ++$formnum) , '">
+          <form action="', $action , '" method="', $method , '"
+          autocomplete="off" id="form', sprintf("%02d", ++$formnum), '"
+          class="needs-validation" novalidate="novalidate">
         ';
         $csrf = Util::getCsrf();
         echo $csrf->hiddenFormElement();
@@ -204,22 +188,53 @@ class Content
      *
      * @param bool $showremember (Optional) Show the 'Remember this
      *        selection' checkbox? Defaults to true.
-     * @param bool $samlidps (Optional) Show all SAML-based IdPs in
-     *        selection list? Defaults to false, which means show
-     *        only whitelisted IdPs.
      */
-    public static function printWAYF($showremember = true, $samlidps = false)
+    public static function printWAYF($showremember = true)
     {
-        $helptext = 'Check this box to bypass the welcome page on ' .
+        $idps = static::getCompositeIdPList();
+        $skin = Util::getSkin();
+
+        $rememberhelp = 'Check this box to bypass the welcome page on ' .
             'subsequent visits and proceed directly to the selected ' .
             'identity provider. You will need to clear your browser\'s ' .
             'cookies to return here.';
-        $searchtext = "Enter characters to search for in the list above.";
+        $selecthelp = '<p>
+            CILogon facilitates secure access to CyberInfrastructure (CI).
+            In order to use the CILogon Service, you must first select
+            an identity provider. An identity provider (IdP) is an
+            organization where you have an account and can log on
+            to gain access to online services.
+        </p>
+        <p>
+            If you are a faculty, staff, or student member of a university
+            or college, please select it for your identity provider.
+            If your school is not listed, please contact <a
+            href=\'mailto:help@cilogon.org\'>help@cilogon.org</a>, and we will
+            try to add your school in the future.
+        </p>
+        ';
 
-        // Get an array of IdPs
-        $idps = static::getCompositeIdPList($samlidps);
-
-        $skin = Util::getSkin();
+        $googleauthz = Util::getAuthzUrl('Google');
+        if (isset($idps[$googleauthz])) {
+            $selecthelp .= '<p>If you have a <a target=\'_blank\'
+            href=\'https://myaccount.google.com\'>Google</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
+        $githubauthz = Util::getAuthzUrl('GitHub');
+        if (isset($idps[$githubauthz])) {
+            $selecthelp .= '<p> If you have a <a target=\'_blank\'
+            href=\'https://github.com/settings/profile\'>GitHub</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
+        $orcidauthz = Util::getAuthzUrl('ORCID');
+        if (isset($idps[$orcidauthz])) {
+            $selecthelp .= '<p> If you have a <a target=\'_blank\'
+            href=\'https://orcid.org/my-orcid\'>ORCID</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
 
         // Check if the user had previously selected an IdP from the list.
         // First, check the portalcookie, then the 'normal' cookie.
@@ -273,200 +288,378 @@ class Content
         }
 
         echo '
-        <br />
-        <div class="actionbox"';
+      <div class="card text-center col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 mt-3">
+        <h4 class="card-header">',
+        ($useselectedidp ? 'Selected' : 'Select an'),
+        ' Identity Provider</h4>
+        <div class="card-body">
+          <form action="', Util::getScriptDir(), '" method="post">
+            <div class="form-group">
+            <select name="providerId" id="providerId"
+                autofocus="autofocus"
+                class="selectpicker mw-100"
+                data-size="20" data-width="fit"
+                data-live-search="true"
+                data-live-search-placeholder="Type to search"
+                data-live-search-normalize="true"
+                >';
 
-        if (Util::getSessionVar('showhelp') == 'on') {
-            echo ' style="width:92%;"';
-        }
 
-        echo '>
-        <table class="helptable">
-        <tr>
-        <td class="actioncell">
-
-          <form action="' , Util::getScriptDir() , '" method="post">
-          <fieldset>
-
-          <p>' , ($useselectedidp ? 'Selected' : 'Select An') ,
-          ' Identity Provider:</p>
-          ';
-
-        // See if the skin has set a size for the IdP <select> list
-        $selectsize = 4;
-        $ils = $skin->getConfigOption('idplistsize');
-        if ((!is_null($ils)) && ((int)$ils > 0)) {
-            $selectsize = (int)$ils;
-        }
-
-        // When selected_idp is used, list size may be smaller
-        if ($useselectedidp) {
-            $selectsize = min($selectsize, count($idps));
+        foreach ($idps as $entityId => $names) {
+            echo '
+                <option data-tokens="', $entityId , '" value="',
+                $entityId , '"',
+                (($entityId == $providerId) ? ' selected="selected"' : ''),
+            '>', Util::htmlent($names['Display_Name']), '</option>';
         }
 
         echo '
-          <p>
-          <select name="providerId" id="providerId" size="' , $selectsize , '"
-           onkeypress="enterKeySubmit(event)" ondblclick="doubleClickSubmit()"' ,
-           // Hide the drop-down arrow in Firefox and Chrome
-          ($useselectedidp ?
-              'style="-moz-appearance:none;-webkit-appearance:none"' : '') ,
-           '>
-        ';
-
-        foreach ($idps as $entityId => $names) {
-            echo '    <option value="' , $entityId , '"';
-            if ($entityId == $providerId) {
-                echo ' selected="selected"';
-            }
-            echo '>' , Util::htmlent($names['Display_Name']) , '</option>' , "\n    ";
-        }
-
-        echo '  </select>
-        </p>
-
-        <p id="listsearch" class="zeroheight">
-        <label for="searchlist" class="helpcursor" title="' ,
-        $searchtext , '">Search:</label>
-        <input type="text" name="searchlist" id="searchlist" value=""
-        size="30" onkeyup="searchOptions(this.value)"
-        title="' , $searchtext , '" />
-    <!--[if IE]><input type="text" style="display:none;" disabled="disabled" size="1"/><![endif]-->
-        </p>
-        ';
+            </select>
+            <a href="#" tabindex="0" data-trigger="hover click"
+            class="helpcursor"
+            data-toggle="popover" data-html="true"
+            title="Selecting an Identity Provider"
+            data-content="', $selecthelp, '"><i class="fa
+            fa-question-circle"></i></a>
+            </div> <!-- end div form-group -->
+            ';
 
         if ($showremember) {
             echo '
-            <p>
-            <label for="keepidp" title="' , $helptext ,
-            '" class="helpcursor">Remember this selection:</label>
-            <input type="checkbox" name="keepidp" id="keepidp" ' ,
-            ((strlen($keepidp) > 0) ? 'checked="checked" ' : '') ,
-            'title="' , $helptext , '" class="helpcursor" />
-            </p>
+            <div class="form-group">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                id="keepidp" name="keepidp" ',
+                ((strlen($keepidp) > 0) ? 'checked="checked" ' : ''), ' />
+                <label class="form-check-label"
+                for="keepidp">Remember this selection</label>
+                <a href="#" tabindex="0" data-trigger="hover click"
+                class="helpcursor"
+                data-toggle="popover" data-html="true"
+                data-content="', $rememberhelp, '"><i class="fa
+                fa-question-circle"></i></a>
+              </div> <!-- end div form-check -->
+            </div> <!-- end div form-group -->
+            ';
+        }
+
+        echo Util::getCsrf()->hiddenFormElement();
+        echo '<input type="hidden" name="previouspage" value="WAYF" />';
+        $lobtext = static::getLogOnButtonText();
+
+        echo '
+            <div class="form-group">
+              <div class="form-row align-items-center justify-content-center">
+                <div class="col-auto">
+                  <input type="submit" name="submit"
+                  class="btn btn-primary submit"
+                  value="', $lobtext , '" id="wayflogonbutton" />
+                </div> <!-- end col-auto -->
+        ';
+
+        $wayfcancelbutton = Util::getSkin()->getConfigOption('wayfcancelbutton');
+        if ((!is_null($wayfcancelbutton)) && ((int)$wayfcancelbutton == 1)) {
+            echo '
+                <div class="col-auto">
+                  <input type="submit" name="submit"
+                  class="btn btn-primary submit"
+                  title="Cancel authentication and navigate away from this site."
+                  value="Cancel" id="wayfcancelbutton" />
+                </div>
             ';
         }
 
         echo '
-        <p>
-        ';
-
-        echo Util::getCsrf()->hiddenFormElement();
-
-        $lobtext = static::getLogOnButtonText();
-
-        echo '
-        <input type="submit" name="submit" class="submit helpcursor"
-        title="Continue to the selected identity provider."
-        value="' , $lobtext , '" id="wayflogonbutton" />
-        <input type="hidden" name="previouspage" value="WAYF" />
-        <input type="submit" name="submit" class="submit helpcursor"
-        title="Cancel authentication and navigate away from this site."
-        value="Cancel" id="wayfcancelbutton" />
-        </p>
+              </div> <!-- end div form-row align-items-center -->
+            </div> <!-- end div form-group -->
         ';
 
         $logonerror = Util::getSessionVar('logonerror');
+        Util::unsetSessionVar('logonerror');
         if (strlen($logonerror) > 0) {
-            echo "<p class=\"logonerror\">$logonerror</p>";
-            Util::unsetSessionVar('logonerror');
+            echo '<div class="alert alert-danger" role="alert">', $logonerror, '</div>';
         }
 
         echo '
         <p class="privacypolicy">
-        By selecting "' , $lobtext , '", you agree to <a target="_blank"
+        By selecting "', $lobtext , '", you agree to <a target="_blank"
         href="http://ca.cilogon.org/policy/privacy">CILogon\'s privacy
         policy</a>.
         </p>
 
-        </fieldset>
+          </form>
 
-        </form>
-      </td>
-      ';
+        </div> <!-- End card-body -->
+      </div> <!-- End card -->
+        ';
+    }
 
-        if (Util::getSessionVar('showhelp') == 'on') {
-            echo '
-          <td class="helpcell">
-          <div>
-          ';
+    /**
+     * printGetCertificate
+     *
+     * This function prints the 'Get New Certificate' box on the main page.
+     * If the 'p12' PHP session variable is valid, it is read and a link for
+     * the usercred.p12 file is presented to the user.
+     */
+    public static function printGetCertificate()
+    {
+        // Check if PKCS12 downloading is disabled. If so, print out message.
+        $skin = Util::getSkin();
+        $pkcs12disabled = $skin->getConfigOption('pkcs12', 'disabled');
+        $disabledbyskin = ((!is_null($pkcs12disabled)) && ((int)$pkcs12disabled == 1));
+        $disabledbyconf = ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON)));
 
-            if ($samlidps) { // SAML-based IdPs only means running from /testidp/
-                echo '
-                <p>
-                CILogon facilitates secure access to CyberInfrastructure
-                (<acronym title="CyberInfrastructure">CI</acronym>). In
-                order to test your identity provider with the CILogon Service,
-                you must first Log On. If your preferred identity provider is
-                not listed, please contact <a
-                href="mailto:help@cilogon.org">help@cilogon.org</a>, and
-                we will try to add your identity provider in the future.
-                </p>
-                ';
-            } else { // If not InCommon only, print help text for OpenID providers.
-                echo '
-                <p>
-                CILogon facilitates secure access to CyberInfrastructure
-                (<acronym title="CyberInfrastructure">CI</acronym>).
-                In order to use the CILogon Service, you must first select
-                an identity provider. An identity provider (IdP) is an
-                organization where you have an account and can log on
-                to gain access to online services.
-                </p>
-                <p>
-                If you are a faculty, staff, or student member of a university
-                or college, please select it for your identity provider.
-                If your school is not listed, please contact <a
-                href="mailto:help@cilogon.org">help@cilogon.org</a>, and we will
-                try to add your school in the future.
-                </p>
-                ';
-
-                $googleauthz = Util::getAuthzUrl('Google');
-                if (isset($idps[$googleauthz])) {
-                    echo '
-                    <p>
-                    If you have a <a target="_blank"
-                    href="https://myaccount.google.com">Google</a>
-                    account, you can select it for
-                    authenticating to the CILogon Service.
-                    </p>
-                    ';
+        if ($disabledbyskin || $disabledbyconf) {
+            $disabledmsg = 'Downloading PKCS12 certificates is disabled.';
+            if ($disabledbyskin) {
+                $disabledmsg = $skin->getConfigOption('pkcs12', 'disabledmessage');
+                if (!is_null($disabledmsg)) {
+                    $disabledmsg = trim(html_entity_decode($disabledmsg));
                 }
-                $githubauthz = Util::getAuthzUrl('GitHub');
-                if (isset($idps[$githubauthz])) {
-                    echo '
-                    <p>
-                    If you have a <a target="_blank"
-                    href="https://github.com/settings/profile">GitHub</a>
-                    account, you can select it for
-                    authenticating to the CILogon Service.
-                    </p>
-                    ';
-                }
-                $orcidauthz = Util::getAuthzUrl('ORCID');
-                if (isset($idps[$orcidauthz])) {
-                    echo '
-                    <p>
-                    If you have a <a target="_blank"
-                    href="https://orcid.org/my-orcid">ORCID</a>
-                    account, you can select it for
-                    authenticating to the CILogon Service.
-                    </p>
-                    ';
+                if (strlen($disabledmsg) == 0) {
+                    $disabledmsg = 'Downloading PKCS12 certificates is ' .
+                        'restricted. Please try another method or log on ' .
+                        'with a different Identity Provider.';
                 }
             }
 
+            echo '<div class="alert alert-danger role="alert">';
+            echo $disabledmsg;
+            echo '</div>';
+        } else { // PKCS12 downloading is okay
+            $downloadcerttext = 'Clicking this button will generate a link ' .
+                'to a new certificate, which you can download to your local ' .
+                'computer. The certificate is valid for up to 13 months.';
+            $p12linktext = "Left-click this link to import the certificate " .
+                "into your broswer / operating system. (Firefox users see " .
+                "the FAQ.) Right-click this link and select 'Save As...' to " .
+                "save the certificate to your desktop.";
+            $passwordtext1 = 'Enter a password of at least 12 characters to protect your certificate.';
+            $passwordtext2 = 'Re-enter your password for verification.';
+
+            // Get the 'p12' session variable, which contains the time until
+            // the "Download Certificate" link expires concatenated with the
+            // download link (separated by a space). If either the time or
+            // the link is blank, or the time is 0:00, then do not show the
+            // link/time and unset the 'p12' session variable.
+            $p12expire = '';
+            $p12link = '';
+            $p12linkisactive = false;
+            $p12 = Util::getSessionVar('p12');
+            if (preg_match('/([^\s]*)\s(.*)/', $p12, $match)) {
+                $p12expire = $match[1];
+                $p12link = $match[2];
+            }
+
+            if (
+                (strlen($p12expire) > 0) &&
+                (strlen($p12link) > 0) &&
+                ($p12expire > 0) &&
+                ($p12expire >= time())
+            ) {
+                $p12linkisactive = true;
+                $expire = $p12expire - time();
+                $minutes = floor($expire % 3600 / 60);
+                $seconds = $expire % 60;
+                $p12expire = 'Link Expires: ' .
+                    sprintf("%02dm:%02ds", $minutes, $seconds);
+                $p12link = '<a class="btn btn-primary" title="' .
+                    $p12linktext . '" href="' . $p12link .
+                    '">Download Your Certificate</a>';
+            } else {
+                $p12expire = '';
+                $p12link = '';
+                Util::unsetSessionVar('p12');
+            }
+
+            $p12lifetime = Util::getSessionVar('p12lifetime');
+            if ((strlen($p12lifetime) == 0) || ($p12lifetime == 0)) {
+                $p12lifetime = Util::getCookieVar('p12lifetime');
+            }
+            $p12multiplier = Util::getSessionVar('p12multiplier');
+            if ((strlen($p12multiplier) == 0) || ($p12multiplier == 0)) {
+                $p12multiplier = Util::getCookieVar('p12multiplier');
+            }
+
+            // Try to read the skin's intiallifetime if not yet set
+            if ((strlen($p12lifetime) == 0) || ($p12lifetime <= 0)) {
+                // See if the skin specified an initial value
+                $skinlife = $skin->getConfigOption('pkcs12', 'initiallifetime', 'number');
+                $skinmult = $skin->getConfigOption('pkcs12', 'initiallifetime', 'multiplier');
+                if (
+                    (!is_null($skinlife)) && (!is_null($skinmult)) &&
+                    ((int)$skinlife > 0) && ((int)$skinmult > 0)
+                ) {
+                    $p12lifetime = (int)$skinlife;
+                    $p12multiplier = (int)$skinmult;
+                } else {
+                    $p12lifetime = 13;      // Default to 13 months
+                    $p12multiplier = 732;
+                }
+            }
+            if ((strlen($p12multiplier) == 0) || ($p12multiplier <= 0)) {
+                $p12multiplier = 732;   // Default to months
+                if ($p12lifetime > 13) {
+                    $p12lifetime = 13;
+                }
+            }
+
+            // Make sure lifetime is within [minlifetime,maxlifetime]
+            list($minlifetime, $maxlifetime) =
+                Util::getMinMaxLifetimes('pkcs12', 9516);
+            if (($p12lifetime * $p12multiplier) < $minlifetime) {
+                $p12lifetime = $minlifetime;
+                $p12multiplier = 1; // In hours
+            } elseif (($p12lifetime * $p12multiplier) > $maxlifetime) {
+                $p12lifetime = $maxlifetime;
+                $p12multiplier = 1; // In hours
+            }
+
+            $lifetimetext = "Certificate lifetime is between $minlifetime " .
+                "and $maxlifetime hours" .
+                (($maxlifetime > 732) ?
+                " ( = " . round(($maxlifetime / 732), 2) . " months)." : "."
+                );
+
+            $p12error = Util::getSessionVar('p12error');
+
+            static::printCollapseBegin(
+                'gencert',
+                'Create Password-Protected Certificate',
+                !($p12linkisactive || (strlen($p12error) > 0))
+            );
+
             echo '
-          </div>
-          </td>
-          ';
+          <div class="card-body col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1">';
+
+            static::printFormHead();
+
+            if (strlen($p12error) > 0) {
+                echo '<div class="alert alert-danger alert-dismissable fade show" role="alert">';
+                echo $p12error;
+                echo '
+                      <button type="button" class="close" data-dismiss="alert"
+                      aria-label="Close"><span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>';
+                Util::unsetSessionVar('p12error');
+            }
+
+            echo '
+            <div class="form-group">
+              <label for="password1">Enter Password</label>
+              <div class="form-row">
+                <div class="col-11">
+                  <input type="password" name="password1" id="password1"
+                  minlength="12" required="required"
+                  autocomplete="new-password"
+                  class="form-control" aria-describedby="password1help"
+                  onkeyup="checkPassword()"/>
+                  <div class="invalid-tooltip">
+                    Please enter a password of at least 12 characters.
+                  </div>
+                </div>
+                <div class="col">
+                  <i id="pw1icon" class="fa fa-fw"></i>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-11">
+                  <small id="password1help" class="form-text text-muted">',
+                  $passwordtext1, '
+                  </small>
+                </div>
+              </div>
+            </div> <!-- end form-group -->
+
+            <div class="form-group">
+              <label for="password2">Confirm Password</label>
+              <div class="form-row">
+                <div class="col-11">
+                  <input type="password" name="password2" id="password2"
+                  minlength="12" required="required"
+                  autocomplete="new-password"
+                  class="form-control" aria-describedby="password2help"
+                  onkeyup="checkPassword()"/>
+                  <div class="invalid-tooltip">
+                    Please ensure entered passwords match.
+                  </div>
+                </div>
+                <div class="col">
+                  <i id="pw2icon" class="fa fa-fw"></i>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-11">
+                  <small id="password2help" class="form-text text-muted">',
+                  $passwordtext2, '
+                  </small>
+                </div>
+              </div>
+            </div> <!-- end form-group -->
+
+            <div class="form-row p12certificatelifetime">
+              <div class="form-group col-8">
+              <label for="p12lifetime">Lifetime</label>
+                <input type="number" name="p12lifetime" id="p12lifetime" ',
+                'value="', $p12lifetime, '" min="', $minlifetime, '" max="',
+                $maxlifetime, '" class="form-control" required="required"
+                aria-describedby="lifetime1help" />
+                <div class="invalid-tooltip">
+                  Please enter a valid lifetime for the certificate.
+                </div>
+                <small id="lifetime1help" class="form-text text-muted">',
+                $lifetimetext, '
+                </small>
+              </div>
+              <div class="form-group col-4">
+                <label for="p12multiplier">&nbsp;</label>
+                <select id="p12multiplier" name="p12multiplier"
+                class="form-control">
+                  <option value="1"',
+                    (($p12multiplier == 1) ? ' selected="selected"' : ''),
+                    '>hours</option>
+                  <option value="24"',
+                    (($p12multiplier == 24) ? ' selected="selected"' : ''),
+                    '>days</option>
+                  <option value="732"',
+                    (($p12multiplier == 732) ? ' selected="selected"' : ''),
+                    '>months</option>
+                </select>
+              </div>
+            </div> <!-- end form-row -->
+
+            <div class="form-group">
+              <div class="form-row align-items-center">
+                <div class="col text-center">
+                  <input type="submit" name="submit"
+                  class="btn btn-primary submit"
+                  value="Get New Certificate" onclick="showHourglass(\'p12\')"/>
+                  <div class="spinner-border"
+                  style="width: 32px; height: 32px;"
+                  role="status" id="p12hourglass">
+                    <span class="sr-only">Generating...</span>
+                  </div> <!-- spinner-border -->
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-row align-items-center">
+                <div class="col text-center" id="p12value">
+                ', $p12link, '
+                </div>
+              </div>
+              <div class="form-row align-items-center">
+                <div class="col text-center" id="p12expire">
+                ', $p12expire, '
+                </div>
+              </div>
+            </div>
+            </form>
+          </div> <!-- end card-body -->';
+            static::printCollapseEnd();
         }
-        echo '
-      </tr>
-      </table>
-      </div>
-      ';
     }
 
     /**
@@ -479,23 +672,25 @@ class Content
     {
         $dn = Util::getSessionVar('dn');
         // Strip off the email address from the pseudo-DN.
-        $dn = Content::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
+        $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
 
+        static::printCollapseBegin('certinfo', 'Certificate Information');
         echo '
-        <table class="certinfo">
-          <tr>
-            <th>Certificate&nbsp;Subject:</th>
-            <td>' , Util::htmlent($dn) , '</td>
-          </tr>
-          <tr>
-            <th>Identity&nbsp;Provider:</th>
-            <td>' , Util::getSessionVar('idpname') , '</td>
-          </tr>
-          <tr>
-            <th><a target="_blank"
-            href="http://ca.cilogon.org/loa">Level&nbsp;of&nbsp;Assurance:</a></th>
-            <td>
-        ';
+          <div class="card-body">
+            <table class="table table-striped table-sm">
+            <tbody>
+              <tr>
+                <th>Certificate Subject:</th>
+                <td>', Util::htmlent($dn), '</td>
+              </tr>
+              <tr>
+                <th>Identity Provider:</th>
+                <td>', Util::getSessionVar('idpname'), '</td>
+              </tr>
+              <tr>
+                <th><a target="_blank"
+                  href="http://ca.cilogon.org/loa">Level of Assurance:</a></th>
+                  <td>';
 
         $loa = Util::getSessionVar('loa');
         if ($loa == 'openid') {
@@ -508,11 +703,13 @@ class Content
             echo '<a href="http://ca.cilogon.org/policy/basic"
                   target="_blank">Basic</a>';
         }
-        echo '
-            </td>
-          </tr>
-        </table>
-        ';
+
+        echo '</td>
+              </tr>
+              </tbody>
+            </table>
+          </div> <!-- end card-body -->';
+        static::printCollapseEnd();
     }
 
     /**
@@ -528,46 +725,80 @@ class Content
         $gotattrs = Util::gotUserAttributes();
         $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
 
-        echo '
-        <div class="summary">
-            <div id="userattrs1" style="display:' ,
-            ($gotattrs ? "inline" : "none") ,
-            '"><span class="expander"><a
-            href="javascript:showHideDiv(\'userattrs\',-1)"><img
-            src="/images/triright.gif" alt="&rArr;" width="14" height="14" />
-            User Attributes</a></span>';
+        // Set various booleans for warning/error messages early so that we
+        // can display a "general" warning/error icon on the card title.
+        $warnings = array();
+        $errors = array();
 
         // CIL-416 Show warning for missing ePPN
-        if (
-            ($samlidp) &&
-            (empty(Util::getSessionVar('ePPN'))) &&
-            (!empty(Util::getSessionVar('ePTID')))
-        ) {
-            Content::printIcon('warn', 'Some CILogon clients (e.g., Globus) require ePPN.');
+        if (($samlidp) && (empty(Util::getSessionVar('ePPN')))) {
+            if (empty(Util::getSessionVar('ePTID'))) {
+                $errors['no_eppn_or_eptid'] = true;
+            } else {
+                $warnings['no_eppn'] = true;
+            }
         }
 
-        echo '
-            </div>
-            <div id="userattrs2" style="display:' ,
-                ($gotattrs ? "none" : "inline") ,
-            '"><span class="expander"><a
-            href="javascript:showHideDiv(\'userattrs\',-1)"><img
-            src="/images/tridown.gif" alt="&dArr;" width="14" height="14" />
-            User Attributes</a></span>
-            </div>
-            <br class="clear" />
-            <div id="userattrs3" style="display:' ,
-                ($gotattrs ? "none" : "inline") ,
-            '">
+        if (empty($idp)) {
+            $errors['no_entityID'] = true;
+        } else {
+            if ((!$samlidp) && (empty(Util::getSessionVar('oidcID')))) {
+                $errors['no_oidcID'] = true;
+            }
+        }
 
-            <table cellpadding="5">
-              <tr class="odd">
+        if ((empty(Util::getSessionVar('firstname'))) && (empty(Util::getSessionVar('displayname')))) {
+            $errors['no_firstname'] = true;
+        }
+
+        if ((empty(Util::getSessionVar('lastname'))) && (empty(Util::getSessionVar('displayname')))) {
+            $errors['no_lastname'] = true;
+        }
+
+        if (
+            (empty(Util::getSessionVar('displayname'))) &&
+            ((empty(Util::getSessionVar('firstname'))) ||
+            (empty(Util::getSessionVar('lastname'))))
+        ) {
+            $errors['no_displayname'] = true;
+        }
+
+        $emailvalid = filter_var(Util::getSessionVar('emailaddr'), FILTER_VALIDATE_EMAIL);
+        if ((empty(Util::getSessionVar('emailaddr'))) || (!$emailvalid)) {
+            $errors['no_valid_email'] = true;
+        }
+
+        static::printCollapseBegin(
+            'userattrs',
+            'User Attributes ' .
+            (
+                (!empty($errors)) ? static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'One or more missing attributes.'
+                ) : ((@$warnings['no_eppn']) ?  static::getIcon(
+                    'fa-exclamation-triangle',
+                    'gold',
+                    'Some CILogon clients (e.g., Globus) require ePPN.'
+                ) : '')
+            )
+        );
+
+        echo '
+          <div class="card-body">
+            <table class="table table-striped table-sm">
+            <tbody>
+              <tr>
                 <th>Identity Provider (entityID):</th>
-                <td>' , $idp , '</td>
+                <td>', $idp , '</td>
                 <td>';
 
-        if (empty($idp)) {
-            Content::printIcon('error', 'Missing the entityID of the IdP.');
+        if (@$errors['no_entityID']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Missing the entityID of the IdP.'
+            );
         }
 
         echo '
@@ -576,32 +807,38 @@ class Content
 
               <tr>
                 <th>ePTID:</th>
-                <td>' , Util::getSessionVar('ePTID') , '</td>
+                <td>', Util::getSessionVar('ePTID'), '</td>
                 <td>';
 
-        if (
-            ($samlidp) &&
-            (empty(Util::getSessionVar('ePPN'))) &&
-            (empty(Util::getSessionVar('ePTID')))
-        ) {
-            Content::printIcon('error', 'Must have either ePPN -OR- ePTID.');
+        if (@$errors['no_eppn_or_eptid']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Must have either ePPN -OR- ePTID.'
+            );
         }
 
         echo '
                 </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>ePPN:</th>
-                <td>' , Util::getSessionVar('ePPN') , '</td>
+                <td>', Util::getSessionVar('ePPN'), '</td>
                 <td>';
 
-        if (($samlidp) && empty(Util::getSessionVar('ePPN'))) {
-            if (empty(Util::getSessionVar('ePTID'))) {
-                Content::printIcon('error', 'Must have either ePPN -OR- ePTID.');
-            } else {
-                Content::printIcon('warn', 'Some CILogon clients (e.g., Globus) require ePPN.');
-            }
+        if (@$errors['no_eppn_or_eptid']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Must have either ePPN -OR- ePTID.'
+            );
+        } elseif (@$warnings['no_eppn']) {
+            echo static::getIcon(
+                'fa-exclamation-triangle',
+                'gold',
+                'Some CILogon clients (e.g., Globus) require ePPN.'
+            );
         }
 
         echo '
@@ -610,31 +847,32 @@ class Content
 
               <tr>
                 <th>OpenID:</th>
-                <td>' , Util::getSessionVar('oidcID'), '</td>
+                <td>', Util::getSessionVar('oidcID'), '</td>
                 <td>';
 
-        if (
-            (!empty($idp)) &&
-            (!$samlidp) &&
-            empty(Util::getSessionVar('oidcID'))
-        ) {
-            Content::printIcon('error', 'Missing the OpenID identifier.');
+        if (@$errors['no_oidcID']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Missing the OpenID identifier.'
+            );
         }
 
         echo '
                 </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>First Name (givenName):</th>
-                <td>' ,Util::getSessionVar('firstname') , '</td>
+                <td>', Util::getSessionVar('firstname'), '</td>
                 <td>';
 
-        if (
-            (empty(Util::getSessionVar('firstname'))) &&
-            (empty(Util::getSessionVar('displayname')))
-        ) {
-            Content::printIcon('error', 'Must have either givenName + sn -OR- displayName.');
+        if (@$errors['no_firstname']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Must have either givenName + sn -OR- displayName.'
+            );
         }
 
         echo '
@@ -643,31 +881,32 @@ class Content
 
               <tr>
                 <th>Last Name (sn):</th>
-                <td>' , Util::getSessionVar('lastname') , '</td>
+                <td>', Util::getSessionVar('lastname'), '</td>
                 <td>';
 
-        if (
-            (empty(Util::getSessionVar('lastname'))) &&
-            (empty(Util::getSessionVar('displayname')))
-        ) {
-            Content::printIcon('error', 'Must have either givenName + sn -OR- displayName.');
+        if (@$errors['no_lastname']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Must have either givenName + sn -OR- displayName.'
+            );
         }
 
         echo '
                 </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>Display Name (displayName):</th>
-                <td>' , Util::getSessionVar('displayname') , '</td>
+                <td>', Util::getSessionVar('displayname'), '</td>
                 <td>';
 
-        if (
-            (empty(Util::getSessionVar('displayname'))) &&
-            ((empty(Util::getSessionVar('firstname'))) ||
-            (empty(Util::getSessionVar('lastname'))))
-        ) {
-            Content::printIcon('error', 'Must have either displayName -OR- givenName + sn.');
+        if (@$errors['no_displayname']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Must have either displayName -OR- givenName + sn.'
+            );
         }
 
         echo '
@@ -676,65 +915,66 @@ class Content
 
               <tr>
                 <th>Email Address (email):</th>
-                <td>' , Util::getSessionVar('emailaddr') , '</td>
+                <td>', Util::getSessionVar('emailaddr'), '</td>
                 <td>';
 
-        $emailvalid = filter_var(Util::getSessionVar('emailaddr'), FILTER_VALIDATE_EMAIL);
-        if ((empty(Util::getSessionVar('emailaddr'))) || (!$emailvalid)) {
-            Content::printIcon('error', 'Missing valid email address.');
+        if (@$errors['no_valid_email']) {
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Missing valid email address.'
+            );
         }
 
         echo '
                 </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>Level of Assurance (assurance):</th>
-                <td>' , Util::getSessionVar('loa') , '</td>
+                <td>', Util::getSessionVar('loa'), '</td>
                 <td> </td>
               </tr>
 
               <tr>
                 <th>AuthnContextClassRef:</th>
-                <td>' , Util::getSessionVar('acr') , '</td>
+                <td>', Util::getSessionVar('acr'), '</td>
                 <td> </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>Affiliation (affiliation):</th>
-                <td>' , Util::getSessionVar('affiliation') , '</td>
+                <td>', Util::getSessionVar('affiliation'), '</td>
                 <td> </td>
               </tr>
 
               <tr>
                 <th>Entitlement (entitlement):</th>
-                <td>' , Util::getSessionVar('entitlement') , '</td>
+                <td>', Util::getSessionVar('entitlement'), '</td>
                 <td> </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>Organizational Unit (ou):</th>
-                <td>' , Util::getSessionVar('ou') , '</td>
+                <td>', Util::getSessionVar('ou'), '</td>
                 <td> </td>
               </tr>
 
               <tr>
                 <th>Member (member):</th>
-                <td>' , Util::getSessionVar('memberof') , '</td>
+                <td>', Util::getSessionVar('memberof'), '</td>
                 <td> </td>
               </tr>
 
-              <tr class="odd">
+              <tr>
                 <th>iTrustUIN (itrustuin):</th>
-                <td>' , Util::getSessionVar('itrustuin') , '</td>
+                <td>', Util::getSessionVar('itrustuin'), '</td>
                 <td> </td>
               </tr>
-
-
+              </tbody>
             </table>
-            </div> <!-- userattrs3 -->
-        </div> <!-- summary -->
-        ';
+          </div> <!-- end card-body -->';
+        static::printCollapseEnd();
     }
 
     /**
@@ -751,14 +991,10 @@ class Content
         $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
         $shibarray = $idplist->getShibInfo($idp);
 
-        echo '
-        <div class="summary">
-            <div id="meta1" style="display:' ,
-                ($gotattrs ? "inline" : "none") ,
-            '"><span class="expander"><a
-            href="javascript:showHideDiv(\'meta\',-1)"><img
-            src="/images/triright.gif" alt="&rArr;" width="14" height="14" />
-            Identity Provider Attributes</a></span>';
+        // Set various booleans for warning/error messages early so that we
+        // can display a "general" warning/error icon on the card title.
+        $warnings = array();
+        $errors = array();
 
         // CIL-416 Check for eduGAIN IdPs without both REFEDS R&S and SIRTFI
         // since these IdPs are not allowed to get certificates.
@@ -772,34 +1008,38 @@ class Content
             $eduGainWithoutRandSandSIRTFI = 1;
         }
 
-        if ($eduGainWithoutRandSandSIRTFI) {
-            Content::printIcon('warn', 'This IdP does not support both ' .
-                'REFEDS R&amp;S and SIRTFI. CILogon functionality may be limited.');
-        }
+        static::printCollapseBegin(
+            'idpmeta',
+            'Identity Provider Attributes ' .
+            (
+                // CIL-416 Show warning for missing ePPN
+                ($eduGainWithoutRandSandSIRTFI) ?
+                static::getIcon(
+                    'fa-exclamation-triangle',
+                    'gold',
+                    'This IdP does not support both ' .
+                    'REFEDS R&amp;S and SIRTFI. CILogon ' .
+                    'functionality may be limited.'
+                ) : ''
+            )
+        );
 
-        echo '
-            </div>
-            <div id="meta2" style="display:' ,
-                ($gotattrs ? "none" : "inline") ,
-            '"><span class="expander"><a
-            href="javascript:showHideDiv(\'meta\',-1)"><img
-            src="/images/tridown.gif" alt="&dArr;" width="14" height="14" />
-            Identity Provider Attributes</a></span>
-            </div>
-            <br class="clear" />
-            <div id="meta3" style="display:' ,
-                ($gotattrs ? "none" : "inline") ,
-            '">
-
-            <table cellpadding="5">
-              <tr class="odd">
+        echo'
+          <div class="card-body">
+            <table class="table table-striped table-sm">
+            <tbody>
+              <tr>
                 <th>Organization Name:</th>
-                <td>' , @$shibarray['Organization Name'] , '</td>
+                <td>', @$shibarray['Organization Name'] , '</td>
                 <td>';
 
         if (empty(@$shibarray['Organization Name'])) {
-            Content::printIcon('error', 'Could not find ' .
-                '&lt;OrganizationDisplayName&gt; in metadata.');
+            echo static::getIcon(
+                'fa-exclamation-circle',
+                'red',
+                'Could not find ' .
+                '&lt;OrganizationDisplayName&gt; in metadata.'
+            );
         }
 
         echo '
@@ -807,21 +1047,20 @@ class Content
               </tr>
               <tr>
                 <th>Home Page:</th>
-                <td><a target="_blank" href="' , @$shibarray['Home Page'] , '">' ,
+                <td><a target="_blank" href="', @$shibarray['Home Page'] , '">',
                 @$shibarray['Home Page'] , '</a></td>
                 <td> </td>
               </tr>
 
-              <tr class="odd">
-                <th>Support Contact:</th>
-        ';
+              <tr>
+                <th>Support Contact:</th>';
         if (
             (!empty(@$shibarray['Support Name'])) ||
             (!empty(@$shibarray['Support Address']))
         ) {
             echo '
-                <td>' , @$shibarray['Support Name'] , ' &lt;' ,
-                        preg_replace('/^mailto:/', '', @$shibarray['Support Address']) , '&gt;</td>
+                <td>', @$shibarray['Support Name'] , ' &lt;',
+                        preg_replace('/^mailto:/', '', @$shibarray['Support Address']), '&gt;</td>
                 <td> </td>';
         }
         echo '
@@ -831,121 +1070,705 @@ class Content
 
         if ($samlidp) {
             echo '
-                  <tr>
-                    <th>Technical Contact:</th>
-            ';
+              <tr>
+                <th>Technical Contact:</th>';
             if (
                 (!empty(@$shibarray['Technical Name'])) ||
                 (!empty(@$shibarray['Technical Address']))
             ) {
                 echo '
-                    <td>' , @$shibarray['Technical Name'] , ' &lt;' ,
-                            preg_replace('/^mailto:/', '', @$shibarray['Technical Address']) , '&gt;</td>
-                    <td> </td>';
+                <td>', @$shibarray['Technical Name'] , ' &lt;',
+                        preg_replace('/^mailto:/', '', @$shibarray['Technical Address']), '&gt;</td>
+                <td> </td>';
             }
             echo '
-                  </tr>
+              </tr>
 
-                  <tr class="odd">
-                    <th>Administrative Contact:</th>
-            ';
+              <tr>
+                <th>Administrative Contact:</th>';
             if (
                 (!empty(@$shibarray['Administrative Name'])) ||
                 (!empty(@$shibarray['Administrative Address']))
             ) {
                 echo '
-                    <td>' , @$shibarray['Administrative Name'] , ' &lt;' ,
-                            preg_replace('/^mailto:/', '', @$shibarray['Administrative Address']) , '&gt;</td>
-                    <td> </td>';
+                <td>', @$shibarray['Administrative Name'] , ' &lt;',
+                        preg_replace('/^mailto:/', '', @$shibarray['Administrative Address']), '&gt;</td>
+                <td> </td>';
             }
             echo '
-                  </tr>
+              </tr>
 
-                  <tr>
-                    <th>Registered by InCommon:</th>
-                    <td>' , ($idplist->isRegisteredByInCommon($idp) ? 'Yes' : 'No') , '</td>
-                    <td> </td>
-                  </tr>
+              <tr>
+                <th>Registered by InCommon:</th>
+                <td>', ($idplist->isRegisteredByInCommon($idp) ? 'Yes' : 'No'), '</td>
+                <td> </td>
+              </tr>
 
-                  <tr class="odd">
-                    <th><a style="text-decoration:underline" target="_blank"
-                    href="http://id.incommon.org/category/research-and-scholarship">InCommon R
-                    &amp; S</a>:</th>
-                    <td>' , ($idplist->isInCommonRandS($idp) ? 'Yes' : 'No') , '</td>
-                    <td> </td>
-                  </tr>
+              <tr>
+                <th><a style="text-decoration:underline" target="_blank"
+                href="http://id.incommon.org/category/research-and-scholarship">InCommon R
+                &amp; S</a>:</th>
+                <td>', ($idplist->isInCommonRandS($idp) ? 'Yes' : 'No'), '</td>
+                <td> </td>
+              </tr>
 
-                  <tr>
-                    <th><a style="text-decoration:underline" target="_blank"
-                    href="http://refeds.org/category/research-and-scholarship">REFEDS
-                    R &amp; S</a>:</th>
-                    <td>' , ($idplist->isREFEDSRandS($idp) ? 'Yes' : 'No') , '</td>
-                    <td>';
+              <tr>
+                <th><a style="text-decoration:underline" target="_blank"
+                href="http://refeds.org/category/research-and-scholarship">REFEDS
+                R &amp; S</a>:</th>
+                <td>', ($idplist->isREFEDSRandS($idp) ? 'Yes' : 'No'), '</td>
+                <td>';
+
             if (
                 ($eduGainWithoutRandSandSIRTFI &&
                 !$idplist->isREFEDSRandS($idp))
             ) {
-                Content::printIcon(
-                    'warn',
+                echo static::getIcon(
+                    'fa-exclamation-triangle',
+                    'gold',
                     'This IdP does not support both ' .
                     'REFEDS R&amp;S and SIRTFI. ' .
                     'CILogon functionality may be limited.'
                 );
             }
 
-            echo '              </td>
-                  </tr>
+            echo '
+                </td>
+              </tr>
 
-                  <tr class="odd">
-                    <th><a style="text-decoration:underline" target="_blank"
-                           href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
-                    <td>' , ($idplist->isSIRTFI($idp) ? 'Yes' : 'No') , '</td>
-                    <td>';
+              <tr>
+                <th><a style="text-decoration:underline" target="_blank"
+                       href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
+                <td>', ($idplist->isSIRTFI($idp) ? 'Yes' : 'No'), '</td>
+                <td>';
 
             if (
                 ($eduGainWithoutRandSandSIRTFI &&
                 !$idplist->isSIRTFI($idp))
             ) {
-                Content::printIcon(
-                    'warn',
+                echo static::getIcon(
+                    'fa-exclamation-triangle',
+                    'gold',
                     'This IdP does not support both ' .
                     'REFEDS R&amp;S and SIRTFI. ' .
                     'CILogon functionality may be limited.'
                 );
             }
 
-            echo '              </td>
-                  </tr>
+            echo '
+                </td>
+              </tr>
 
-                  <tr>
-                    <th><a style="text-decoration:underline" target="_blank"
-                    href="http://id.incommon.org/assurance/bronze">InCommon Bronze</a>:</th>
-                    <td>' , ($idplist->isBronze($idp) ? 'Yes' : 'No') , '</td>
-                    <td> </td>
-                  </tr>
+              <tr>
+                <th><a style="text-decoration:underline" target="_blank"
+                href="http://id.incommon.org/assurance/bronze">InCommon Bronze</a>:</th>
+                <td>', ($idplist->isBronze($idp) ? 'Yes' : 'No'), '</td>
+                <td> </td>
+              </tr>
 
-                  <tr class="odd">
-                    <th><a style="text-decoration:underline" target="_blank"
-                    href="http://id.incommon.org/assurance/silver">InCommon Silver</a>:</th>
-                    <td>' , ($idplist->isSilver($idp) ? 'Yes' : 'No') , '</td>
-                    <td> </td>
-                  </tr>
+              <tr>
+                <th><a style="text-decoration:underline" target="_blank"
+                href="http://id.incommon.org/assurance/silver">InCommon Silver</a>:</th>
+                <td>', ($idplist->isSilver($idp) ? 'Yes' : 'No'), '</td>
+                <td> </td>
+              </tr>
 
-                  <tr>
-                    <th>Entity ID</th>
-                    <td><a style="text-decoration:underline" target="_blank"
-                    href="https://met.refeds.org/met/entity/',
-                    rawurlencode($idp),
-                    '">', $idp, '</td>
-                    <td> </td>
-                  </tr>
-                  ';
+              <tr>
+                <th>Entity ID</th>
+                <td><a style="text-decoration:underline" target="_blank"
+                href="https://met.refeds.org/met/entity/',
+                rawurlencode($idp),
+                '">', $idp, '</td>
+                <td> </td>
+              </tr>
+            ';
         } // end if ($samlidp)
+
+            echo '
+              </tbody>
+            </table>
+          </div> <!-- end card-body -->';
+        static::printCollapseEnd();
+    }
+
+    /**
+     * getIcon
+     *
+     * This function returns the HTML for the Font Awesome icons which can
+     * appear inline with other information.  This is accomplished via the
+     * use of wrapping the image in a <span> tag.
+     *
+     * @param string $icon The Font Awesome icon to be shown.
+     * @param string $color The HMTL color for the icon.
+     * @param string $help (Optionals) The popup 'title' help text to be
+     *        displayed when the mouse cursor hovers over the icon.
+     *        Defaults to empty string.
+     * @return string HTML for the icon block to output.
+     */
+    public static function getIcon($icon, $color, $help = '')
+    {
+        return '<span style="color: ' . $color . ';
+            -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: gray;">' .
+            ((strlen($help) > 0) ? '<span data-trigger="hover" ' .
+            'data-toggle="popover" data-html="true" ' .
+            'data-content="' . $help . '">' : '') .
+            '<i class="fa nocollapse ' . $icon . '"></i>' .
+            ((strlen($help) > 0) ? '</span>' : '') .
+            '</span>';
+    }
+
+    /**
+     * printCollapseBegin
+     *
+     * This function prints the preamble for a collapsible Bootstrap Card.
+     *
+     * @param string $name The name to give to the collapse elements which
+     *        should be unique among all collapse elements on the page.
+     * @param string $title The text for the card-header.
+     * @param bool $collapsed (optional) If true, then start with the card
+     *        collapsed. If false, start with the card opened.
+     */
+    public static function printCollapseBegin($name, $title, $collapsed = true)
+    {
         echo '
-              </table>
-            </div>  <!-- meta3 -->
-        </div>  <!-- summary -->
+      <div class="card col-sm-10 offset-sm-1">
+        <h5 class="card-header text-center">
+          <a class="d-block',
+            ($collapsed ? ' collapsed' : ''),
+            '" data-toggle="collapse"
+            href="#collapse-', $name, '" aria-expanded="',
+            ($collapsed ? 'false' : "true"),
+            '" aria-controls="collapse-', $name, '"
+            id="heading-', $name, '">
+            <i class="fa fa-chevron-down pull-right"></i>
+            ', $title, '
+          </a>
+        </h5>
+        <div id="collapse-',$name, '" class="collapse',
+        ($collapsed ? '' : ' show'),
+        '" aria-labelledby="heading-', $name , '">';
+    }
+
+    /**
+     * printCollapseEnd
+     *
+     * This function prints the closing block corresponding to the
+     * printCollapseBegin.
+     */
+    public static function printCollapseEnd()
+    {
+        echo '
+        </div> <!-- end collapse-... -->
+      </div> <!-- end card -->
         ';
+    }
+
+    /**
+     * printErrorBox
+     *
+     * This function prints out a bordered box with an error icon and any
+     * passed-in error HTML text.  The error icon and text are output to
+     * a <table> so as to keep the icon to the left of the error text.
+     *
+     * @param string $errortext HTML error text to be output
+     */
+    public static function printErrorBox($errortext)
+    {
+        echo '
+        <div class="alert alert-danger" role="alert">
+          <div class="row">
+            <div class="col-1 align-self-center text-center">
+            ', static::getIcon('fa-exclamation-circle fa-2x', 'red'),'
+            </div>
+            <div class="col">
+            ', $errortext , '
+            </div>
+          </div>
+        </div>
+        ';
+    }
+
+    /**
+     * printNoScript
+     *
+     * This function prints the <NoScript> block which is displayed if the
+     * user's browser does not have JavaScript enabled.
+     */
+    public static function printNoScript()
+    {
+        echo'
+      <noscript>
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <span><strong>Notice: </strong> JavaScript is not enabled.
+          The CILogon Service requires JavaScript for functionality.
+          <a target="_blank" href="https://enable-javascript.com/"
+          class="alert-link">Please Enable JavaScript</a>.</span>
+        </div>
+      </noscript>
+        ';
+    }
+
+    /**
+     * printLogOff
+     *
+     * This function prints the Log Of boxes at the bottom of the main page.
+     */
+    public static function printLogOff()
+    {
+        $logofftext = 'End your CILogon session and return to the ' .
+           'front page. Note that this will not log you out at ' .
+            Util::getSessionVar('idpname') . '.';
+
+        static::printFormHead();
+        echo '
+          <div class="form-group mt-3">
+            <div class="form-row align-items-center">
+              <div class="col text-center">
+              ';
+
+        $logofftextbox = Util::getSkin()->getConfigOption('logofftextbox');
+        if ((!is_null($logofftextbox)) && ((int)$logofftextbox == 1)) {
+            echo '  <div class="btn btn-primary">To log off,
+                please quit your browser.</div>';
+        } else {
+            echo '  <input type="submit" name="submit"
+                class="btn btn-primary submit"
+                title="', $logofftext , '" value="Log Off" />';
+        }
+
+        echo '
+              </div> <!-- end col-auto -->
+            </div> <!-- end form-row align-items-center -->
+          </div> <!-- end form-group -->
+        </form>
+        ';
+    }
+
+    /**
+     * printGeneralErrorPage
+     *
+     * This is a convenience method called by handleGotUser to print out
+     * a general error page to the user.
+     *
+     * @param string $redirect The url for the <form> element
+     * @param string $redirectform Additional hidden input fields for the
+     *        <form>.
+     */
+    public static function printGeneralErrorPage($redirect, $redirectform)
+    {
+        Util::unsetAllUserSessionVars();
+
+        static::printHeader('Error Logging On');
+        static::printCollapseBegin(
+            'attributeerror',
+            'General Error',
+            false
+        );
+
+        echo '
+              <div class="card-body px-5">';
+
+        static::printErrorBox('An error has occurred. System
+            administrators have been notified. This may be a temporary
+            error. Please try again later, or contact us at the the email
+            address at the bottom of the page.');
+
+        static::printFormHead($redirect, 'get');
+
+        echo '
+              <div class="card-text my-2">
+                <div class="form-group">
+                  <div class="form-row align-items-center
+                  justify-content-center">
+                    <div class="col-auto">
+                      ', $redirectform, '
+                      <input type="submit" name="submit"
+                      class="btn btn-primary submit form-control"
+                      value="Proceed" />
+                    </div>
+                  </div> <!-- end form-row align-items-center -->
+                </div> <!-- end form-group -->
+              </div> <!-- end card-text -->
+            </form>
+            </div> <!-- end card-body -->';
+
+        Content::printCollapseEnd();
+        Content::printFooter();
+    }
+
+    /**
+     * printSAMLAttributeReleaseErrorPage
+     *
+     * This is a convenience method called by handleGotUser to print out
+     * the attribute release error page for SAML IdPs. This can occur when
+     * not all attributes were released by the IdP, or when the IdP is an
+     * eduGAIN IdP without both R&S and SIRTFI, and the user was trying to
+     * get a certificate.
+     *
+     * @param string $ePPN
+     * @param string $ePTID
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $displayname
+     * @param string $emailaddr
+     * @param string $idp
+     * @param string $idpname
+     * @param string $affiliation
+     * @param string $ou
+     * @param string $memberof
+     * @param string $acr
+     * @param string $entitlement
+     * @param string $itrustuin
+     * @param string $clientparams
+     * @param string $redirect The url for the <form> element
+     * @param string $redirectform Additional hidden input fields for the
+     *        <form>.
+     * @param bool   $edugainandgetcert Is the IdP in eduGAIN without both
+     *        R&S and SIRTIF, and the user could get a certificate?
+     */
+    public static function printSAMLAttributeReleaseErrorPage(
+        $ePPN,
+        $ePTID,
+        $firstname,
+        $lastname,
+        $displayname,
+        $emailaddr,
+        $idp,
+        $idpname,
+        $affiliation,
+        $ou,
+        $memberof,
+        $acr,
+        $entitlement,
+        $itrustuin,
+        $clientparams,
+        $redirect,
+        $redirectform,
+        $edugainandgetcert
+    ) {
+        Util::unsetAllUserSessionVars();
+
+        static::printHeader('Error Logging On');
+        static::printCollapseBegin(
+            'attributeerror',
+            'Attribute Release Error',
+            false
+        );
+
+        echo '
+              <div class="card-body px-5">
+        ';
+
+        $errorboxstr = '
+                <div class="card-text my-2">
+                  There was a problem logging on. Your identity provider
+                  has not provided CILogon with required information.
+                </div> <!-- end card-text -->
+                <dl class="row">';
+
+        $missingattrs = '';
+        // Show user which attributes are missing
+        if ((strlen($ePPN) == 0) && (strlen($ePTID) == 0)) {
+            $errorboxstr .= '
+                <dt class="col-sm-3">ePTID:</dt>
+                <dd class="col-sm-9">MISSING</dd>
+                <dt class="col-sm-3">ePPN:</dt>
+                <dd class="col-sm-9">MISSING</dd>';
+            $missingattrs .= '%0D%0A    eduPersonPrincipalName' .
+                             '%0D%0A    eduPersonTargetedID ';
+        }
+        if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
+            $errorboxstr .= '
+                <dt class="col-sm-3">First Name:</dt>
+                <dd class="col-sm-9">MISSING</dd>';
+            $missingattrs .= '%0D%0A    givenName (first name)';
+        }
+        if ((strlen($lastname) == 0) && (strlen($displayname) == 0)) {
+            $errorboxstr .= '
+                <dt class="col-sm-3">Last Name:</dt>
+                <dd class="col-sm-9">MISSING</dd>';
+            $missingattrs .= '%0D%0A    sn (last name)';
+        }
+        if (
+            (strlen($displayname) == 0) &&
+            ((strlen($firstname) == 0) || (strlen($lastname) == 0))
+        ) {
+            $errorboxstr .= '
+                <dt class="col-sm-3">Display Name:</dt>
+                <dd class="col-sm-9">MISSING</dd>';
+            $missingattrs .= '%0D%0A    displayName';
+        }
+        $emailvalid = filter_var($emailaddr, FILTER_VALIDATE_EMAIL);
+        if ((strlen($emailaddr) == 0) || (!$emailvalid)) {
+            $errorboxstr .= '
+                <dt class="col-sm-3">Email Address:</dt>
+                <dd class="col-sm-9">' .
+            ((strlen($emailaddr) == 0) ? 'MISSING' : 'INVALID') . '</dd>';
+            $missingattrs .= '%0D%0A    mail (email address)';
+        }
+        // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
+        // print out missing R&S and SIRTFI values
+        $idplist = Util::getIdpList();
+        if ($edugainandgetcert) {
+            if (!$idplist->isREFEDSRandS($idp)) {
+                $errorboxstr .= '
+                    <dt class="col-sm-3"><a target="_blank"
+                    href="http://refeds.org/category/research-and-scholarship">Research
+                    and Scholarship</a>:</dt>
+                    <dd class="col-sm-9">MISSING</dd>';
+                $missingattrs .= '%0D%0A    http://refeds.org/category/research-and-scholarship';
+            }
+            if (!$idplist->isSIRTFI($idp)) {
+                $errorboxstr .= '
+                    <dt class="col-sm-3"><a target="_blank"
+                    href="https://refeds.org/sirtfi">SIRTFI</a>:</dt>
+                    <dd class="col-sm-9">MISSING</dd>';
+                $missingattrs .= '%0D%0A    http://refeds.org/sirtfi';
+            }
+        }
+        $student = false;
+        $errorboxstr .= '</dl>';
+
+        static::printErrorBox($errorboxstr);
+
+        if (
+            (strlen($emailaddr) == 0) &&
+            (preg_match('/student@/', $affiliation))
+        ) {
+            $student = true;
+            echo '
+                <div class="card-text my-2">
+                  <strong>If you are a student</strong>
+                  you may need to ask your identity provider
+                  to release your email address.
+                </div> <!-- end card-text -->
+            ';
+        }
+
+        // Get contacts from metadata for email addresses
+        $shibarray = $idplist->getShibInfo($idp);
+        $emailmsg = '?subject=Attribute Release Problem for CILogon' .
+        '&cc=help@cilogon.org' .
+        '&body=Hello, I am having trouble logging on to ' .
+        'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idpname .
+        ' Identity Provider (IdP) ' .
+        'due to the following missing attributes:%0D%0A' .
+        $missingattrs;
+        if ($student) {
+            $emailmsg .= '%0D%0A%0D%0ANote that my account is ' .
+            'marked "student" and thus my email address may need ' .
+            'to be released.';
+        }
+        $emailmsg .= '%0D%0A%0D%0APlease see ' .
+            'http://www.cilogon.org/service/addidp for more ' .
+            'details. Thank you for any help you can provide.';
+        echo '
+                <div class="card-text my-2">
+                  Contact your identity provider to let them know you are
+                  having having a problem logging on to CILogon.
+                </div> <!-- end card-text -->
+                <ul>
+            ';
+
+        $addrfound = false;
+        $name = @$shibarray['Support Name'];
+        $addr = @$shibarray['Support Address'];
+        $addr = preg_replace('/^mailto:/', '', $addr);
+
+        if (strlen($addr) > 0) {
+            $addrfound = true;
+            if (strlen($name) == 0) { // Use address if no name given
+                $name = $addr;
+            }
+            echo '
+                  <li> Support Contact: ' ,
+                  $name , ' <a class="btn btn-primary" href="mailto:' ,
+                  $addr , $emailmsg , '">' ,
+                  $addr , '</a>
+                  </li>';
+        }
+
+        if (!$addrfound) {
+            $name = @$shibarray['Technical Name'];
+            $addr = @$shibarray['Technical Address'];
+            $addr = preg_replace('/^mailto:/', '', $addr);
+            if (strlen($addr) > 0) {
+                $addrfound = true;
+                if (strlen($name) == 0) { // Use address if no name given
+                    $name = $addr;
+                }
+                echo '
+                      <li> Technical Contact: ' ,
+                      $name , ' <a class="btn btn-primary" href="mailto:' ,
+                      $addr , $emailmsg , '">' ,
+                      $addr , '</a>
+                      </li>';
+            }
+        }
+
+        if (!$addrfound) {
+            $name = @$shibarray['Administrative Name'];
+            $addr = @$shibarray['Administrative Address'];
+            $addr = preg_replace('/^mailto:/', '', $addr);
+            if (strlen($addr) > 0) {
+                if (strlen($name) == 0) { // Use address if no name given
+                    $name = $addr;
+                }
+                echo '
+                      <li>Administrative Contact: ' ,
+                      $name , ' <a class="btn btn-primary" href="mailto:' ,
+                      $addr , $emailmsg , '">' ,
+                      $addr , '</a>
+                      </li>';
+            }
+        }
+
+        echo '
+                </ul>
+                <div class="card-text my-2">
+                  Alternatively, you can contact us at the email address
+                  at the bottom of the page.
+                </div> <!-- end card-text -->
+            ';
+
+        static::printFormHead($redirect, 'get');
+
+        echo '
+              <div class="card-text my-2">
+                <div class="form-group">
+                  <div class="form-row align-items-center
+                  justify-content-center">
+                    <div class="col-auto">
+                      ', $redirectform, '
+                      <input type="submit" name="submit"
+                      class="btn btn-primary submit form-control"
+                      value="Proceed" />
+                    </div>
+                  </div> <!-- end form-row align-items-center -->
+                </div> <!-- end form-group -->
+              </div> <!-- end card-text -->
+            </form>
+            </div> <!-- end card-body -->';
+
+        Content::printCollapseEnd();
+        Content::printFooter();
+    }
+
+    /**
+     * printOAuth2AttributeReleaseErrorPage
+     *
+     * This function is called by handleGotUser when the IdP did not release
+     * all required attributes for the user. In the case of the OAuth2
+     * providers, this is typically due to one of first name, last name,
+     * and/or email address. Print out a special message for each OAuth2 IdP
+     * to let the user know how to fix the issue.
+     *
+     * @param string $idpname The name of the OAuth2 IdP.
+     * @param string $redirect The url for the <form> element
+     * @param string $redirectform Additional hidden input fields for the
+     *        <form>.
+     *
+     */
+    public static function printOAuth2AttributeReleaseErrorPage($idpname, $redirect, $redirectform)
+    {
+        Util::unsetAllUserSessionVars();
+        static::printHeader('Error Logging On');
+        static::printCollapseBegin(
+            'oauth2attrerror',
+            'Error Logging On',
+            false
+        );
+
+        echo '
+            <div class="card-body px-5">';
+
+        static::printErrorBox('There was a problem logging on.');
+
+        if ($idpname == 'Google') {
+            echo '
+              <div class="card-text my-2">
+                There was a problem logging on. It appears that you have
+                attempted to use Google as your identity provider, but your
+                name or email address was missing. To rectify this problem,
+                go to the <a target="_blank"
+                href="https://myaccount.google.com/privacy#personalinfo">Google
+                Account Personal Information page</a>, and enter your first
+                name, last name, and email address. (All other Google
+                account information is not required by the CILogon Service.)
+              </div>
+              <div class="card-text my-2">
+                After you have updated your Google account profile, click
+                the "Proceed" button below and attempt to log on
+                with your Google account again. If you have any questions,
+                please contact us at the email address at the bottom of the
+                page.
+              </div>';
+        } elseif ($idpname == 'GitHub') {
+            echo '
+              <div class="card-text my-2">
+                There was a problem logging on. It appears that you have
+                attempted to use GitHub as your identity provider, but your
+                name or email address was missing. To rectify this problem,
+                go to the <a target="_blank"
+                href="https://github.com/settings/profile">GitHub
+                Public Profile page</a>, and enter your name and email
+                address. (All other GitHub account information is not
+                required by the CILogon Service.)
+              </div>
+              <div class="card-text my-2">
+                After you have updated your GitHub account profile, click
+                the "Proceed" button below and attempt to log on
+                with your GitHub account again. If you have any questions,
+                please contact us at the email address at the bottom of the
+                page.
+              </div>';
+        } elseif ($idpname == 'ORCID') {
+            echo '
+              <div class="card-text my-2">
+                There was a problem logging on. It appears that you have
+                attempted to use ORCID as your identity provider, but your
+                name or email address was missing. To rectify this problem,
+                go to your <a target="_blank"
+                href="https://orcid.org/my-orcid">ORCID
+                Profile page</a>, enter your name and email address, and
+                make sure they can be viewed by Everyone.
+                (All other ORCID account information is not required by
+                the CILogon Service.)
+              </div>
+              <div class="card-text my-2">
+                After you have updated your ORCID account profile, click
+                the "Proceed" button below and attempt to log on
+                with your ORCID account again. If you have any questions,
+                please contact us at the email address at the bottom of the
+                page.
+              </div>';
+        }
+
+        static::printFormHead($redirect, 'get');
+
+        echo '
+              <div class="card-text my-2">
+                <div class="form-group">
+                  <div class="form-row align-items-center
+                  justify-content-center">
+                    <div class="col-auto">
+                      <input type="hidden" name="providerId"
+                      value="' ,
+                      Util::getAuthzUrl($idpname) , '" />
+                      ', $redirectform, '
+                      <input type="submit" name="submit"
+                      class="btn btn-primary submit form-control"
+                      value="Proceed" />
+                    </div>
+                  </div> <!-- end form-row align-items-center -->
+                </div> <!-- end form-group -->
+              </div> <!-- end card-text -->
+            </form>
+            </div> <!-- end card-body -->';
+
+        Content::printCollapseEnd();
+        Content::printFooter();
     }
 
     /**
@@ -967,31 +1790,25 @@ class Content
         // Set the cookie for keepidp if the checkbox was checked
         $pc = new PortalCookie();
         $pn = $pc->getPortalName();
-        if (strlen(Util::getPostVar('keepidp')) > 0) {
-            if (strlen($pn) > 0) {
-                $pc->set('keepidp', 'checked');
-            } else {
-                Util::setCookieVar('keepidp', 'checked');
-            }
-        } else {
-            if (strlen($pn) > 0) {
-                $pc->set('keepidp', '');
-            } else {
-                Util::unsetCookieVar('keepidp');
-            }
-        }
+        Util::setPortalOrCookie(
+            $pc,
+            'keepidp',
+            ((strlen(Util::getPostVar('keepidp')) > 0) ? 'checked' : '')
+        );
 
         // Get the user-chosen IdP from the posted form
         $providerId = Util::getPostVar('providerId');
+        $providerIdValid = ((strlen($providerId) > 0) &&
+                            (isset($idps[$providerId])));
 
         // Set the cookie for the last chosen IdP and redirect to it if in list
-        if ((strlen($providerId) > 0) && (isset($idps[$providerId]))) {
-            if (strlen($pn) > 0) {
-                $pc->set('providerId', $providerId);
-                $pc->write();
-            } else {
-                Util::setCookieVar('providerId', $providerId);
-            }
+        Util::setPortalOrCookie(
+            $pc,
+            'providerId',
+            ($providerIdValid ? $providerId : ''),
+            true
+        );
+        if ($providerIdValid) {
             $providerName = Util::getAuthzIdP($providerId);
             if (in_array($providerName, Util::$oauth2idps)) {
                 // Log in with an OAuth2 IdP
@@ -1000,41 +1817,7 @@ class Content
                 static::redirectToGetShibUser($providerId);
             }
         } else { // IdP not in list, or no IdP selected
-            if (strlen($pn) > 0) {
-                $pc->set('providerId', '');
-                $pc->write();
-            } else {
-                Util::unsetCookieVar('providerId');
-            }
             Util::setSessionVar('logonerror', 'Please select a valid IdP.');
-            printLogonPage();
-        }
-    }
-
-    /**
-     * handleHelpButtonClicked
-     *
-     * This function is called when the user clicks on the 'Show Help' /
-     * 'Hide Help' button in the upper right corner of the page. It toggles
-     * the 'showhelp' session variable and redisplays the appropriate page
-     * with help now shown or hidden.
-     */
-    public static function handleHelpButtonClicked()
-    {
-        if (Util::getSessionVar('showhelp') == 'on') {
-            Util::unsetSessionVar('showhelp');
-        } else {
-            Util::setSessionVar('showhelp', 'on');
-        }
-
-        $stage = Util::getSessionVar('stage');
-        if (static::verifyCurrentUserSession()) {
-            if ($stage == 'main') {
-                printMainPage();
-            } else {
-                printLogonPage();
-            }
-        } else {
             printLogonPage();
         }
     }
@@ -1172,12 +1955,7 @@ class Content
             // make sure that it matches the saved providerId. If not,
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
-                if (strlen($pn) > 0) {
-                    $pc->set('providerId', $providerId);
-                    $pc->write();
-                } else {
-                    Util::setCookieVar('providerId', $providerId);
-                }
+                Util::setPortalOrCookie($pc, 'providerId', $providerId, true);
                 $providerName = Util::getAuthzIdP($providerId);
                 if (in_array($providerName, Util::$oauth2idps)) {
                     // Log in with an OAuth2 IdP
@@ -1186,75 +1964,16 @@ class Content
                     // Log in with InCommon
                     static::redirectToGetShibUser($providerId);
                 } else { // $providerId not in whitelist
-                    if (strlen($pn) > 0) {
-                        $pc->set('providerId', '');
-                        $pc->write();
-                    } else {
-                        Util::unsetCookieVar('providerId');
-                    }
+                    Util::setPortalOrCookie($pc, 'providerId', '', true);
                     printLogonPage();
                 }
             } else { // selected_idp does not match saved providerId
-                if (strlen($pn) > 0) {
-                    $pc->set('keepidp', '');
-                    $pc->write();
-                } else {
-                    Util::unsetCookieVar('keepidp');
-                }
+                Util::setPortalOrCookie($pc, 'keepidp', '', true);
                 printLogonPage();
             }
         } else { // One of providerId or keepidp was not set
             printLogonPage();
         }
-    }
-
-    /**
-     * printIcon
-     *
-     * This function prints out the HTML for the little icons which can
-     * appear inline with other information.  This is accomplished via the
-     * use of wrapping the image in a <span> tag.
-     *
-     * @param string $icon The prefix of the '...Icon.png' image to be
-     *        shown. E.g., to show 'errorIcon.png', pass in 'error'.
-     * @param string $popuptext (Optionals) The popup 'title' text to be
-     *        displayed when the  mouse cursor hovers over the icon.
-     *        Defaults to empty string.
-     * @param string $class (Optionals) A CSS class for the icon. Will be
-     *        appended after the 'helpcursor' class. Defaults to empty
-     *        string.
-     */
-    public static function printIcon($icon, $popuptext = '', $class = '')
-    {
-        echo '<span';
-        if (strlen($popuptext) > 0) {
-            echo ' class="helpcursor ' , $class , '" title="' , $popuptext , '"';
-        }
-        echo '>&nbsp;<img src="/images/' , $icon , 'Icon.png"
-              alt="&laquo; ' , ucfirst($icon) , '"
-              width="14" height="14" /></span>';
-    }
-
-    /**
-     * printHelpButton
-     *
-     * This function prints the 'Show Help' / 'Hide Help' button in the
-     * upper-right corner of the main box area on the page.
-     */
-    public static function printHelpButton()
-    {
-        echo '
-        <div class="helpbutton">
-        ';
-
-        static::printFormHead();
-
-        echo '
-          <input type="submit" name="submit" class="helpbutton" value="' ,
-          (Util::getSessionVar('showhelp') == 'on' ? 'Hide' : 'Show') , '&#10; Help " />
-          </form>
-        </div>
-        ';
     }
 
     /**
@@ -1488,34 +2207,6 @@ class Content
     }
 
     /**
-     * printErrorBox
-     *
-     * This function prints out a bordered box with an error icon and any
-     * passed-in error HTML text.  The error icon and text are output to
-     * a <table> so as to keep the icon to the left of the error text.
-     *
-     * @param string $errortext HTML error text to be output
-     */
-    public static function printErrorBox($errortext)
-    {
-        echo '
-        <div class="errorbox">
-        <table cellpadding="5">
-        <tr>
-        <td valign="top">
-        ';
-        static::printIcon('error');
-        echo '&nbsp;
-        </td>
-        <td> ' , $errortext , '
-        </td>
-        </tr>
-        </table>
-        </div>
-        ';
-    }
-
-    /**
      * handleGotUser
      *
      * This function is called upon return from one of the getuser scripts
@@ -1577,210 +2268,64 @@ class Content
             $redirect = $failureuri . "?reason=missing_attributes";
         }
 
-        // If empty 'uid' or 'status' or odd-numbered status code, error!
-        if ((strlen($uid) == 0) || (strlen($status) == 0) || ($status & 1)) {
-            // Got all session vars by now, so okay to unset.
-            Util::unsetAllUserSessionVars();
+        $isEduGAINAndGetCert = Util::isEduGAINAndGetCert($idp, $idpname);
 
-            $log->error('Failed to getuser.');
-
-            static::printHeader('Error Logging On');
-
-            echo '
-            <div class="boxed">
-            ';
-
-            if ($status == DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) {
-                // Check if the problem IdP was an OAuth2 IdP;
-                // probably no first/last name
-                if ($idpname == 'Google') {
-                    static::printErrorBox('
-                    <p>
-                    There was a problem logging on. It appears that you have
-                    attempted to use Google as your identity provider, but your
-                    name or email address was missing. To rectify this problem,
-                    go to the <a target="_blank"
-                    href="https://myaccount.google.com/privacy#personalinfo">Google
-                    Account Personal Information page</a>, and enter your first
-                    name, last name, and email address. (All other Google
-                    account information is not required by the CILogon Service.)
-                    </p>
-                    <p>
-                    After you have updated your Google account profile, click
-                    the "Proceed" button below and attempt to log on
-                    with your Google account again. If you have any questions,
-                    please contact us at the email address at the bottom of the
-                    page.</p>
-                    ');
-
-                    echo '
-                    <div>
-                    ';
-                    static::printFormHead($redirect, 'get');
-                    echo '
-                    <p class="centered">
-                    <input type="hidden" name="providerId" value="' ,
-                    Util::getAuthzUrl('Google') , '" /> ' , $redirectform , '
-                    <input type="submit" name="submit" class="submit"
-                    value="Proceed" />
-                    </p>
-                    </form>
-                    </div>
-                    ';
-                } elseif ($idpname == 'GitHub') {
-                    static::printErrorBox('
-                    <p>
-                    There was a problem logging on. It appears that you have
-                    attempted to use GitHub as your identity provider, but your
-                    name or email address was missing. To rectify this problem,
-                    go to the <a target="_blank"
-                    href="https://github.com/settings/profile">GitHub
-                    Public Profile page</a>, and enter your name and email address.
-                    (All other GitHub account information is not required by
-                    the CILogon Service.)
-                    </p>
-                    <p>
-                    After you have updated your GitHub account profile, click
-                    the "Proceed" button below and attempt to log on
-                    with your GitHub account again. If you have any questions,
-                    please contact us at the email address at the bottom of the
-                    page.</p>
-                    ');
-
-                    echo '
-                    <div>
-                    ';
-                    static::printFormHead($redirect, 'get');
-                    echo '
-                    <p class="centered">
-                    <input type="hidden" name="providerId" value="' ,
-                    Util::getAuthzUrl('GitHub') , '" /> ' , $redirectform , '
-                    <input type="submit" name="submit" class="submit"
-                    value="Proceed" />
-                    </p>
-                    </form>
-                    </div>
-                    ';
-                } elseif ($idpname == 'ORCID') {
-                    static::printErrorBox('
-                    <p>
-                    There was a problem logging on. It appears that you have
-                    attempted to use ORCID as your identity provider, but your
-                    name or email address was missing. To rectify this problem,
-                    go to your <a target="_blank"
-                    href="https://orcid.org/my-orcid">ORCID
-                    Profile page</a>, enter your name and email address, and
-                    make sure they can be viewed by Everyone.
-                    (All other ORCID account information is not required by
-                    the CILogon Service.)
-                    </p>
-                    <p>
-                    After you have updated your ORCID account profile, click
-                    the "Proceed" button below and attempt to log on
-                    with your ORCID account again. If you have any questions,
-                    please contact us at the email address at the bottom of the
-                    page.</p>
-                    ');
-
-                    echo '
-                    <div>
-                    ';
-                    static::printFormHead($redirect, 'get');
-                    echo '
-                    <p class="centered">
-                    <input type="hidden" name="providerId" value="' ,
-                    Util::getAuthzUrl('ORCID') , '" /> ' , $redirectform , '
-                    <input type="submit" name="submit" class="submit"
-                    value="Proceed" />
-                    </p>
-                    </form>
-                    </div>
-                    ';
-                } else { // Problem was missing SAML attribute from Shib IdP
-                    static::printAttributeReleaseErrorMessage(
-                        $ePPN,
-                        $ePTID,
-                        $firstname,
-                        $lastname,
-                        $displayname,
-                        $emailaddr,
-                        $idp,
-                        $idpname,
-                        $affiliation,
-                        $ou,
-                        $memberof,
-                        $acr,
-                        $entitlement,
-                        $itrustuin,
-                        $clientparams,
-                        $redirect,
-                        $redirectform,
-                        Util::isEduGAINAndGetCert($idp, $idpname)
-                    );
-                }
-            } else {
-                static::printErrorBox('An internal error has occurred. System
-                    administrators have been notified. This may be a temporary
-                    error. Please try again later, or contact us at the the email
-                    address at the bottom of the page.');
-
-                echo '
-                <div>
-                ';
-                static::printFormHead($redirect, 'get');
-                echo $redirectform , '
-                <input type="submit" name="submit" class="submit" value="Proceed" />
-                </form>
-                </div>
-                ';
-            }
-
-            echo '
-            </div>
-            ';
-            static::printFooter();
-        } elseif (Util::isEduGAINAndGetCert($idp, $idpname)) {
-            // If eduGAIN IdP and session can get a cert, then error!
-            // Got all session vars by now, so okay to unset.
-            Util::unsetAllUserSessionVars();
-
-            $log->error('Failed to getuser due to eduGAIN IdP restriction.');
-
-            static::printHeader('Error Logging On');
-
-            echo '
-            <div class="boxed">
-            ';
-            static::printAttributeReleaseErrorMessage(
-                $ePPN,
-                $ePTID,
-                $firstname,
-                $lastname,
-                $displayname,
-                $emailaddr,
-                $idp,
-                $idpname,
-                $affiliation,
-                $ou,
-                $memberof,
-                $acr,
-                $entitlement,
-                $itrustuin,
-                $clientparams,
-                $redirect,
-                $redirectform,
-                true
+        // Check for various error conditions and print out appropriate page
+        if (
+            (strlen($uid) == 0) ||    // Empty uid
+            (strlen($status) == 0) || // Empty status
+            ($status & 1) ||          // Odd-numbered status = error
+            ($isEduGAINAndGetCert)    // Not allowed
+        ) {
+            $log->error(
+                'Failed to getuser' .
+                ($isEduGAINAndGetCert ? : ' due to eduGAIN IdP restriction') .
+                '.'
             );
 
-            echo '
-            </div>
-            ';
-            static::printFooter();
-        } else { // Got one of the STATUS_OK status codes
-            // Extra security check: Once the user has successfully authenticated
-            // with an IdP, verify that the chosen IdP was actually whitelisted.
-            // If not, then set error message and show Select an Identity Provider
-            // page again.
+            // Is this a SAML IdP?
+            $idplist = Util::getIdpList();
+            $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
+
+            // Was there a misssing parameter?
+            $missingparam = ($status ==
+                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']);
+
+            if (($isEduGAINAndGetCert) || ($missingparam && $samlidp)) {
+                static::printSAMLAttributeReleaseErrorPage(
+                    $ePPN,
+                    $ePTID,
+                    $firstname,
+                    $lastname,
+                    $displayname,
+                    $emailaddr,
+                    $idp,
+                    $idpname,
+                    $affiliation,
+                    $ou,
+                    $memberof,
+                    $acr,
+                    $entitlement,
+                    $itrustuin,
+                    $clientparams,
+                    $redirect,
+                    $redirectform,
+                    $isEduGAINAndGetCert
+                );
+            } elseif ($missingparam && (!$samlidp)) { // OAuth2 IdP
+                static::printOAuth2AttributeReleaseErrorPage(
+                    $idpname,
+                    $redirect,
+                    $redirectform
+                );
+            } else { // General error
+                static::printGeneralErrorPage($redirect, $redirectform);
+            }
+        } else { // EVERYTHING IS OKAY SO FAR
+            // Extra security check: Once the user has successfully
+            // authenticated with an IdP, verify that the chosen IdP was
+            // actually whitelisted. If not, then set error message and show
+            // Select an Identity Provider page again.
             Util::getSkin()->init();  // Check for forced skin
             $idps = static::getCompositeIdPList();
             $providerId = Util::getSessionVar('idp');
@@ -1791,11 +2336,12 @@ class Content
                 );
                 Util::sendErrorAlert(
                     'Authentication attempt using non-whitelisted IdP',
-                    'A user successfully authenticated with an IdP, however, the
-selected IdP was not in the list of whitelisted IdPs as determined
-by the current skin. This might indicate the user attempted to
-circumvent the security check in "handleGotUser()" for valid
-IdPs for the skin.'
+                    'A user successfully authenticated with an IdP,
+                    however, the selected IdP was not in the list of
+                    whitelisted IdPs as determined by the current skin. This
+                    might indicate the user attempted to circumvent the
+                    security check in "handleGotUser()" for valid IdPs for
+                    the skin.'
                 );
                 Util::unsetCookieVar('providerId');
                 Util::unsetAllUserSessionVars();
@@ -1871,7 +2417,7 @@ IdPs for the skin.'
 
         // Get the entered p12lifetime and p12multiplier and set the cookies
         list($minlifetime, $maxlifetime) =
-            static::getMinMaxLifetimes('pkcs12', 9516);
+            Util::getMinMaxLifetimes('pkcs12', 9516);
         $p12lifetime   = Util::getPostVar('p12lifetime');
         $p12multiplier = Util::getPostVar('p12multiplier');
         if (strlen($p12multiplier) == 0) {
@@ -2124,45 +2670,6 @@ IdPs for the skin.'
     }
 
     /**
-     * getMinMaxLifetimes
-     *
-     * This function checks the skin's configuration to see if either or
-     * both of minlifetime and maxlifetime in the specified config.xml
-     * block have been set. If not, default to minlifetime of 1 (hour) and
-     * the specified defaultmaxlifetime.
-     *
-     * @param string $section The XML section block from which to read the
-     *        minlifetime and maxlifetime values. Can be one of the
-     *        following: 'pkcs12' or 'delegate'.
-     * @param int $defaultmaxlifetime Default maxlifetime (in hours) for the
-     *        credential.
-     * @return array An array consisting of two entries: the minimum and
-     *         maximum lifetimes (in hours) for a credential.
-     */
-    public static function getMinMaxLifetimes($section, $defaultmaxlifetime)
-    {
-        $minlifetime = 1;    // Default minimum lifetime is 1 hour
-        $maxlifetime = $defaultmaxlifetime;
-        $skin = Util::getSkin();
-        $skinminlifetime = $skin->getConfigOption($section, 'minlifetime');
-        // Read the skin's minlifetime value from the specified section
-        if ((!is_null($skinminlifetime)) && ((int)$skinminlifetime > 0)) {
-            $minlifetime = max($minlifetime, (int)$skinminlifetime);
-            // Make sure $minlifetime is less than $maxlifetime;
-            $minlifetime = min($minlifetime, $maxlifetime);
-        }
-        // Read the skin's maxlifetime value from the specified section
-        $skinmaxlifetime = $skin->getConfigOption($section, 'maxlifetime');
-        if ((!is_null($skinmaxlifetime)) && ((int)$skinmaxlifetime) > 0) {
-            $maxlifetime = min($maxlifetime, (int)$skinmaxlifetime);
-            // Make sure $maxlifetime is greater than $minlifetime
-            $maxlifetime = max($minlifetime, $maxlifetime);
-        }
-
-        return array($minlifetime, $maxlifetime);
-    }
-
-    /**
      * getMachineHostname
      *
      * This function is utilized in the formation of the URL for the
@@ -2205,68 +2712,61 @@ IdPs for the skin.'
      * IdPs based on the skin's whitelist/blacklist and the global
      * blacklist file. For the TestIdP page, the list is all InCommon IdPs.
      *
-     * @param bool $samlidps (Optional) Show all SAML-based IdPs in
-     *        selection list? Defaults to false, which means show only
-     *        whitelisted IdPs.
      * @return array A two-dimensional array where the primary key is the
      *         entityID and the secondary key is either 'Display_Name'
      *         or 'Organization_Name'.
      */
-    public static function getCompositeIdPList($samlidps = false)
+    public static function getCompositeIdPList()
     {
         $retarray = array();
 
         $idplist = Util::getIdpList();
-        if ($samlidps) { // Get all SAML-based IdPs only
-            $retarray = $idplist->getSAMLIdPs();
-        } else { // Get the selected InCommon IdPs, plus maybe OAuth2 IdPs
-            $skin = Util::getSkin();
+        $skin = Util::getSkin();
 
-            // Check if the skin's config.xml has set the
-            // 'registeredbyincommonidps' option, which restricts the SAML-
-            // based IdPs to those with the <Registered_By_InCommon> tag.
-            // Otherwise, just get the SAML-based IdPs that have the
-            // <Whitelisted> tag. Note that the skin's <idpwhitelist>
-            // is still consulted in either case (below).
-            $registeredbyincommonidps = $skin->getConfigOption('registeredbyincommonidps');
-            if (
-                (!is_null($registeredbyincommonidps)) &&
-                ((int)$registeredbyincommonidps == 1)
-            ) {
-                $retarray = $idplist->getRegisteredByInCommonIdPs();
-            } else {
-                $retarray = $idplist->getWhitelistedIdPs();
+        // Check if the skin's config.xml has set the
+        // 'registeredbyincommonidps' option, which restricts the SAML-
+        // based IdPs to those with the <Registered_By_InCommon> tag.
+        // Otherwise, just get the SAML-based IdPs that have the
+        // <Whitelisted> tag. Note that the skin's <idpwhitelist>
+        // is still consulted in either case (below).
+        $registeredbyincommonidps = $skin->getConfigOption('registeredbyincommonidps');
+        if (
+            (!is_null($registeredbyincommonidps)) &&
+            ((int)$registeredbyincommonidps == 1)
+        ) {
+            $retarray = $idplist->getRegisteredByInCommonIdPs();
+        } else {
+            $retarray = $idplist->getWhitelistedIdPs();
+        }
+
+        // Add all OAuth2 IdPs to the list
+        foreach (Util::$oauth2idps as $value) {
+            // CIL-617 Show OAuth2 IdPs only if client_id is configured
+            $client_id = constant(strtoupper($value) . '_OAUTH2_CLIENT_ID');
+            if (!empty($client_id)) {
+                $retarray[Util::getAuthzUrl($value)]['Organization_Name'] =
+                    $value;
+                $retarray[Util::getAuthzUrl($value)]['Display_Name'] =
+                    $value;
             }
+        }
 
-            // Add all OAuth2 IdPs to the list
-            foreach (Util::$oauth2idps as $value) {
-                // CIL-617 Show OAuth2 IdPs only if client_id is configured
-                $client_id = constant(strtoupper($value) . '_OAUTH2_CLIENT_ID');
-                if (!empty($client_id)) {
-                    $retarray[Util::getAuthzUrl($value)]['Organization_Name'] =
-                        $value;
-                    $retarray[Util::getAuthzUrl($value)]['Display_Name'] =
-                        $value;
+        // Check to see if the skin's config.xml has a whitelist of IDPs.
+        // If so, go thru master IdP list and keep only those IdPs in the
+        // config.xml's whitelist.
+        if ($skin->hasIdpWhitelist()) {
+            foreach ($retarray as $entityId => $names) {
+                if (!$skin->idpWhitelisted($entityId)) {
+                    unset($retarray[$entityId]);
                 }
             }
-
-            // Check to see if the skin's config.xml has a whitelist of IDPs.
-            // If so, go thru master IdP list and keep only those IdPs in the
-            // config.xml's whitelist.
-            if ($skin->hasIdpWhitelist()) {
-                foreach ($retarray as $entityId => $names) {
-                    if (!$skin->idpWhitelisted($entityId)) {
-                        unset($retarray[$entityId]);
-                    }
-                }
-            }
-            // Next, check to see if the skin's config.xml has a blacklist of
-            // IdPs. If so, cull down the master IdP list removing 'bad' IdPs.
-            if ($skin->hasIdpBlacklist()) {
-                $idpblacklist = $skin->getConfigOption('idpblacklist');
-                foreach ($idpblacklist->idp as $blackidp) {
-                    unset($retarray[(string)$blackidp]);
-                }
+        }
+        // Next, check to see if the skin's config.xml has a blacklist of
+        // IdPs. If so, cull down the master IdP list removing 'bad' IdPs.
+        if ($skin->hasIdpBlacklist()) {
+            $idpblacklist = $skin->getConfigOption('idpblacklist');
+            foreach ($idpblacklist->idp as $blackidp) {
+                unset($retarray[(string)$blackidp]);
             }
         }
 
@@ -2293,210 +2793,6 @@ IdPs for the skin.'
         });
 
         return $retarray;
-    }
-
-    /**
-     * printAttributeReleaseErrorMessage
-     *
-     * This is a convenience method called by handleGotUser to print out
-     * the attribute release error page to the user.
-     *
-     * @param string $ePPN
-     * @param string $ePTID
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $displayname
-     * @param string $emailaddr
-     * @param string $idp
-     * @param string $idpname
-     * @param string $affiliation
-     * @param string $ou
-     * @param string $memberof
-     * @param string $acr
-     * @param string $entitlement
-     * @param string $itrustuin
-     * @param string $clientparams
-     * @param string $redirect
-     * @param string $redirectform
-     * @param bool   $edugainandgetcert
-     */
-    public static function printAttributeReleaseErrorMessage(
-        $ePPN,
-        $ePTID,
-        $firstname,
-        $lastname,
-        $displayname,
-        $emailaddr,
-        $idp,
-        $idpname,
-        $affiliation,
-        $ou,
-        $memberof,
-        $acr,
-        $entitlement,
-        $itrustuin,
-        $clientparams,
-        $redirect,
-        $redirectform,
-        $edugainandgetcert
-    ) {
-        $errorboxstr =
-        '<p>There was a problem logging on. Your identity
-        provider has not provided CILogon with required information.</p>
-        <blockquote><table cellpadding="5">';
-
-        $missingattrs = '';
-        // Show user which attributes are missing
-        if ((strlen($ePPN) == 0) && (strlen($ePTID) == 0)) {
-            $errorboxstr .=
-            '<tr><th>ePTID:</th><td>MISSING</td></tr>
-            <tr><th>ePPN:</th><td>MISSING</td></tr>';
-            $missingattrs .= '%0D%0A    eduPersonPrincipalName' .
-                             '%0D%0A    eduPersonTargetedID ';
-        }
-        if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
-            $errorboxstr .=
-            '<tr><th>First Name:</th><td>MISSING</td></tr>';
-            $missingattrs .= '%0D%0A    givenName (first name)';
-        }
-        if ((strlen($lastname) == 0) && (strlen($displayname) == 0)) {
-            $errorboxstr .=
-            '<tr><th>Last Name:</th><td>MISSING</td></tr>';
-            $missingattrs .= '%0D%0A    sn (last name)';
-        }
-        if (
-            (strlen($displayname) == 0) &&
-            ((strlen($firstname) == 0) || (strlen($lastname) == 0))
-        ) {
-            $errorboxstr .=
-            '<tr><th>Display Name:</th><td>MISSING</td></tr>';
-            $missingattrs .= '%0D%0A    displayName';
-        }
-        $emailvalid = filter_var($emailaddr, FILTER_VALIDATE_EMAIL);
-        if ((strlen($emailaddr) == 0) || (!$emailvalid)) {
-            $errorboxstr .=
-            '<tr><th>Email Address:</th><td>' .
-            ((strlen($emailaddr) == 0) ? 'MISSING' : 'INVALID') .
-            '</td></tr>';
-            $missingattrs .= '%0D%0A    mail (email address)';
-        }
-        // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
-        // print out missing R&S and SIRTFI values
-        $idplist = Util::getIdpList();
-        if ($edugainandgetcert) {
-            if (!$idplist->isREFEDSRandS($idp)) {
-                $errorboxstr .=
-                '<tr><th><a target="_blank"
-                href="http://refeds.org/category/research-and-scholarship">Research
-                and Scholarship</a>:</th><td>MISSING</td></tr>';
-                $missingattrs .= '%0D%0A    http://refeds.org/category/research-and-scholarship';
-            }
-            if (!$idplist->isSIRTFI($idp)) {
-                $errorboxstr .=
-                '<tr><th><a target="_blank"
-                href="https://refeds.org/sirtfi">SIRTFI</a>:</th><td>MISSING</td></tr>';
-                $missingattrs .= '%0D%0A    http://refeds.org/sirtfi';
-            }
-        }
-        $student = false;
-        $errorboxstr .= '</table></blockquote>';
-        if (
-            (strlen($emailaddr) == 0) &&
-            (preg_match('/student@/', $affiliation))
-        ) {
-            $student = true;
-            $errorboxstr .= '<p><b>If you are a student</b>, ' .
-            'you may need to ask your identity provider ' .
-            'to release your email address.</p>';
-        }
-
-        // Get contacts from metadata for email addresses
-        $shibarray = $idplist->getShibInfo($idp);
-        $emailmsg = '?subject=Attribute Release Problem for CILogon' .
-        '&cc=help@cilogon.org' .
-        '&body=Hello, I am having trouble logging on to ' .
-        'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idpname .
-        ' Identity Provider (IdP) ' .
-        'due to the following missing attributes:%0D%0A' .
-        $missingattrs;
-        if ($student) {
-            $emailmsg .= '%0D%0A%0D%0ANote that my account is ' .
-            'marked "student" and thus my email address may need ' .
-            'to be released.';
-        }
-        $emailmsg .= '%0D%0A%0D%0APlease see ' .
-            'http://www.cilogon.org/service/addidp for more ' .
-            'details. Thank you for any help you can provide.';
-        $errorboxstr .= '<p>Contact your identity provider to ' .
-        'let them know you are having having a problem logging on ' .
-        'to CILogon.</p><blockquote><ul>';
-
-        $addrfound = false;
-        $name = @$shibarray['Support Name'];
-        $addr = @$shibarray['Support Address'];
-        $addr = preg_replace('/^mailto:/', '', $addr);
-
-        if (strlen($addr) > 0) {
-            $addrfound = true;
-            if (strlen($name) == 0) { // Use address if no name given
-                $name = $addr;
-            }
-            $errorboxstr .= '<li> Support Contact: ' .
-                $name . ' &lt;<a href="mailto:' .
-                $addr . $emailmsg . '">' .
-                $addr . '</a>&gt;</li>';
-        }
-
-        if (!$addrfound) {
-            $name = @$shibarray['Technical Name'];
-            $addr = @$shibarray['Technical Address'];
-            $addr = preg_replace('/^mailto:/', '', $addr);
-            if (strlen($addr) > 0) {
-                $addrfound = true;
-                if (strlen($name) == 0) { // Use address if no name given
-                    $name = $addr;
-                }
-                $errorboxstr .= '<li> Technical Contact: ' .
-                    $name . ' &lt;<a href="mailto:' .
-                    $addr . $emailmsg . '">' .
-                    $addr . '</a>&gt;</li>';
-            }
-        }
-
-        if (!$addrfound) {
-            $name = @$shibarray['Administrative Name'];
-            $addr = @$shibarray['Administrative Address'];
-            $addr = preg_replace('/^mailto:/', '', $addr);
-            if (strlen($addr) > 0) {
-                if (strlen($name) == 0) { // Use address if no name given
-                    $name = $addr;
-                }
-                $errorboxstr .= '<li>Administrative Contact: ' .
-                    $name . ' &lt;<a href="mailto:' .
-                    $addr . $emailmsg . '">' .
-                    $addr . '</a>&gt</li>';
-            }
-        }
-
-        $errorboxstr .= '</ul></blockquote>
-
-        <p> Alternatively, you can contact us at the email address
-        at the bottom of the page.</p>
-        ';
-
-        static::printErrorBox($errorboxstr);
-
-        echo '
-        <div>
-        ';
-
-        static::printFormHead($redirect, 'get');
-        echo $redirectform , '
-        <input type="submit" name="submit" class="submit"
-        value="Proceed" />
-        </form>
-        </div>
-        ';
     }
 
     /**

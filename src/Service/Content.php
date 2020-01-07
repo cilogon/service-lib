@@ -519,11 +519,12 @@ class Content
                 );
 
             $p12error = Util::getSessionVar('p12error');
+            $expandcreatecert = (int)$skin->getConfigOption('expandcreatecert');
 
             static::printCollapseBegin(
                 'gencert',
                 'Create Password-Protected Certificate',
-                !($p12linkisactive || (strlen($p12error) > 0))
+                !($p12linkisactive || (strlen($p12error) > 0) || $expandcreatecert)
             );
 
             echo '

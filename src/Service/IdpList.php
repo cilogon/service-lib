@@ -703,9 +703,9 @@ EOT;
                     (defined('TEST_IDP_XML')) &&
                     (!empty(TEST_IDP_XML)) &&
                     (is_readable(TEST_IDP_XML)) &&
-                    (($dom2 = $doc->load(TEST_IDP_XML)) !== false)
+                    (($doc->load(TEST_IDP_XML)) !== false)
                 ) {
-                    $idpnodes = $dom2->getElementsByTagName('idp');
+                    $idpnodes = $doc->getElementsByTagName('idp');
                     foreach ($idpnodes as $idpnode) {
                         // Check if the entityID already exists. If so,
                         // delete it from both the idps DOM and the idparray

@@ -228,6 +228,16 @@ class DBService
     public $itrustuin;
 
     /**
+     * @var string|null $subject_id Person's univeristy subject identifier
+     */
+    public $subject_id;
+
+    /**
+     * @var string|null $pairwise_id Person's univeristy pairwise identifier
+     */
+    public $pairwise_id;
+
+    /**
      * @var string|null $serial_string CILogon serial string (e.g., A34201)
      */
     public $serial_string;
@@ -376,6 +386,8 @@ class DBService
         $this->acr = null;
         $this->entitlement = null;
         $this->itrustuin = null;
+        $this->subject_id = null;
+        $this->pairwise_id = null;
     }
 
     /**
@@ -435,6 +447,7 @@ class DBService
      *            $first_name, $last_name, $display_name, $email,
      *            $eppn, $eptid, $openid, $oidc, $affiliation,
      *            $ou, $member_of, $acr, $entitlement, $itrustuin
+     *            $subject_id, $pairwise_id
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -452,7 +465,7 @@ class DBService
                             'first_name', 'last_name', 'display_name', 'email',
                             'eppn', 'eptid', 'open_id', 'oidc', 'affiliation',
                             'ou', 'member_of', 'acr', 'entitlement',
-                            'itrustuin');
+                            'itrustuin', 'subject_id', 'pairwise_id');
             $cmd = 'action=getUser';
             $attr_arr = array();
             for ($i = 0; $i < $numargs; $i++) {
@@ -866,6 +879,12 @@ class DBService
                 if (isset($attr_arr['itrustuin'])) {
                     $this->itrustuin = $attr_arr['itrustuin'];
                 }
+                if (isset($attr_arr['subject_id'])) {
+                    $this->subject_id = $attr_arr['subject_id'];
+                }
+                if (isset($attr_arr['pairwise_id'])) {
+                    $this->pairwise_id = $attr_arr['pairwise_id'];
+                }
             }
         }
 
@@ -940,6 +959,12 @@ class DBService
         }
         if (!is_null($this->itrustuin)) {
             echo "itrustuin=$this->itrustuin\n";
+        }
+        if (!is_null($this->subject_id)) {
+            echo "subject_id=$this->subject_id\n";
+        }
+        if (!is_null($this->pairwise_id)) {
+            echo "pairwise_id=$this->pairwise_id\n";
         }
         if (!is_null($this->serial_string)) {
             echo "serial_string=$this->serial_string\n";

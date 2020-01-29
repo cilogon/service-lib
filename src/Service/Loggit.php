@@ -121,7 +121,7 @@ class Loggit
             $uservars = array('ePPN', 'ePTID', 'openidID', 'oidcID',
                 'firstname', 'lastname', 'displayname', 'emailaddr',
                 'affiliation', 'ou', 'memberof', 'acr', 'entitlement',
-                'itrustuin');
+                'itrustuin', 'subjectID', 'pairwiseID');
             foreach ($uservars as $uv) {
                 if (!isset($_SESSION[$uv])) {
                     $envstr .= $uv . '="MISSING" ';

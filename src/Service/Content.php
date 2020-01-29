@@ -968,6 +968,18 @@ class Content
                 <td>', Util::getSessionVar('itrustuin'), '</td>
                 <td> </td>
               </tr>
+
+              <tr>
+                <th>Subject ID (subject-id):</th>
+                <td>', Util::getSessionVar('subjectID'), '</td>
+                <td> </td>
+              </tr>
+
+              <tr>
+                <th>Pairwise ID (pairwise-id):</th>
+                <td>', Util::getSessionVar('pairwiseID'), '</td>
+                <td> </td>
+              </tr>
               </tbody>
             </table>
           </div> <!-- end card-body -->';
@@ -1411,6 +1423,8 @@ class Content
      * @param string $acr
      * @param string $entitlement
      * @param string $itrustuin
+     * @param string $subjectID
+     * @param string $pairwiseID
      * @param string $clientparams
      * @param string $redirect The url for the <form> element
      * @param string $redirectform Additional hidden input fields for the
@@ -1433,6 +1447,8 @@ class Content
         $acr,
         $entitlement,
         $itrustuin,
+        $subjectID,
+        $pairwiseID,
         $clientparams,
         $redirect,
         $redirectform,
@@ -2227,6 +2243,8 @@ class Content
         $acr          = Util::getSessionVar('acr');
         $entitlement  = Util::getSessionVar('entitlement');
         $itrustuin    = Util::getSessionVar('itrustuin');
+        $subjectID    = Util::getSessionVar('subjectID');
+        $pairwiseID   = Util::getSessionVar('pairwiseID');
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $failureuri   = Util::getSessionVar('failureuri');
 
@@ -2296,6 +2314,8 @@ class Content
                     $acr,
                     $entitlement,
                     $itrustuin,
+                    $subjectID,
+                    $pairwiseID,
                     $clientparams,
                     $redirect,
                     $redirectform,

@@ -564,6 +564,8 @@ class Util
             'acr'          => 'AuthnContextClassRef',
             'entitlement'  => 'Entitlement',
             'itrustuin'    => 'iTrustUIN',
+            'subjectID'    => 'Subject ID',
+            'pairwiseID'   => 'Pairwise ID',
             'cilogon_skin' => 'Skin Name',
             'authntime'    => 'Authn Time'
         );
@@ -794,6 +796,8 @@ Remote Address= ' . $remoteaddr . '
      *     acr - Authentication Context Class Ref
      *     entitlement - User's entitlement
      *     itrustuin - User's univerity ID number
+     *     subjectID - User's university subject identifier
+     *     pairwiseID - User's university pairwise identifier
      */
     public static function saveUserToDataStore(...$args)
     {
@@ -822,6 +826,8 @@ Remote Address= ' . $remoteaddr . '
         $acr         = static::getSessionVar('acr');
         $entitlement = static::getSessionVar('entitlement');
         $itrustuin   = static::getSessionVar('itrustuin');
+        $subjectID   = static::getSessionVar('subjectID');
+        $pairwiseID  = static::getSessionVar('pairwiseID');
 
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
@@ -861,7 +867,9 @@ Remote Address= ' . $remoteaddr . '
                 $memberof,
                 $acr,
                 $entitlement,
-                $itrustuin
+                $itrustuin,
+                $subjectID,
+                $pairwiseID
             );
             static::setSessionVar('uid', $dbs->user_uid);
             static::setSessionVar('dn', $dbs->distinguished_name);
@@ -951,6 +959,10 @@ Remote Address= ' . $remoteaddr . '
                         $entitlement : '<MISSING>') . "\n" .
                     'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?
                         $itrustuin : '<MISSING>') . "\n" .
+                    'Subject ID    = ' . ((strlen($subjectID) > 0) ?
+                        $subjectID : '<MISSING>') . "\n" .
+                    'Pairwise ID   = ' . ((strlen($pairwiseID) > 0) ?
+                        $pairwiseID : '<MISSING>') . "\n" .
                     'Database UID  = ' . ((strlen(
                         $i = static::getSessionVar('uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .
@@ -982,7 +994,8 @@ Remote Address= ' . $remoteaddr . '
                        'lastname', 'displayname', 'emailaddr',
                        'loa', 'ePPN', 'ePTID', 'openidID', 'oidcID',
                        'affiliation', 'ou', 'memberof', 'acr',
-                       'entitlement', 'itrustuin');
+                       'entitlement', 'itrustuin', 'subjectID',
+                       'pairwiseID');
         $numargs = count($args);
         for ($i = 0; $i < $numargs; $i++) {
             static::setSessionVar($attrs[$i], $args[$i]);
@@ -1067,6 +1080,8 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('acr');
         static::unsetSessionVar('entitlement');
         static::unsetSessionVar('itrustuin');
+        static::unsetSessionVar('subjectID');
+        static::unsetSessionVar('pairwiseID');
 
         // Current skin
         static::unsetSessionVar('cilogon_skin');

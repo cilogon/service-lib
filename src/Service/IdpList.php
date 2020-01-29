@@ -1250,6 +1250,8 @@ EOT;
         $shibarray['Authn Context'] = Util::getServerVar('HTTP_SHIB_AUTHNCONTEXT_CLASS');
         $shibarray['Entitlement'] = Util::getServerVar('HTTP_ENTITLEMENT');
         $shibarray['iTrustUIN'] = Util::getServerVar('HTTP_ITRUSTUIN');
+        $shibarray['Subject ID'] = Util::getServerVar('HTTP_SUBJECT_ID');
+        $shibarray['Pairwise ID'] = Util::getServerVar('HTTP_PAIRWISE_ID');
 
         // Make sure to use only the first of multiple values.
         $attrs = array('ePPN','ePTID','First Name','Last Name',

@@ -147,9 +147,9 @@ class IdpList
         $doc = new DOMDocument();
         if (
             (is_readable($filename)) &&
-            (($dom = $doc->load($filename, LIBXML_NOBLANKS)) !== false)
+            (($doc->load($filename, LIBXML_NOBLANKS)) !== false)
         ) {
-            $this->idpdom = $dom;
+            $this->idpdom = $doc;
             $this->idpdom->preserveWhiteSpace = false;
             $this->idpdom->formatOutput = true;
             // Convert the read-in DOM to idparray for later use

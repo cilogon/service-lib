@@ -1001,17 +1001,6 @@ Remote Address= ' . $remoteaddr . '
             static::setSessionVar($attrs[$i], $args[$i]);
         }
 
-        // CACC-238 - Set loa to "silver" if the following are true:
-        // (1) loa contains  https://refeds.org/assurance/profile/cappuccino
-        // (2) acr is either https://refeds.org/profile/sfa or
-        //                   https://refeds.org/profile/mfa
-        if (
-            (preg_match('%https://refeds.org/assurance/profile/cappuccino%', static::getSessionVar('loa'))) &&
-            (preg_match('%https://refeds.org/profile/[ms]fa%', static::getSessionVar('acr')))
-        ) {
-            static::setSessionVar('loa', 'http://incommonfederation.org/assurance/silver');
-        }
-
         static::setSessionVar('status', '0');
         static::setSessionVar('submit', static::getSessionVar('responsesubmit'));
         static::setSessionVar('authntime', time());
@@ -1328,5 +1317,83 @@ Remote Address= ' . $remoteaddr . '
         }
 
         return array($minlifetime, $maxlifetime);
+    }
+
+    /**
+     * isLOASilver
+     *
+     * This function returns true if the 'loa' (level of assurance)
+     * should be http://incommonfederation.org/assurance/silver .
+     * As specified in CACC-238, this is when both of the following are true:
+     * (1) loa contains  https://refeds.org/assurance/profile/cappuccino
+     * (2) acr is either https://refeds.org/profile/sfa or
+     *                   https://refeds.org/profile/mfa
+     *
+     * @return bool True if level of assurance is 'silver'.
+     */
+    public static function isLOASilver()
+    {
+        $retval = false;
+        if (
+            (preg_match('%https://refeds.org/assurance/profile/cappuccino%', static::getSessionVar('loa'))) &&
+            (preg_match('%https://refeds.org/profile/[ms]fa%', static::getSessionVar('acr')))
+        ) {
+            $retval = true;
+        }
+        return $retval;
+    }
+
+    /**
+     * getLOA
+     *
+     * This function is a bit of a hack. Once upon a time, the level of
+     * assurance (loa) was one of empty string (which implied 'basic
+     * CA'), 'openid' (which implied 'openid CA'), or
+     * 'http://incommonfederation.org/assurance/silver' (which implied
+     * 'silver CA'). Then things got more complex when the silver
+     * assurance was replaced by cappuccino (see CACC-238). But parts of the
+     * PHP code still depeneded on the InCommon silver string.
+     *
+     * This function transforms the assurance attribute asserted by an IdP
+     * (which is stored in the 'loa' session variable) into one of
+     * empty string (for 'basic CA'), 'openid', or
+     * 'http://incommonfederation.org/assurance/silver' for use by those
+     * PHP functions which expect the 'loa' in this format.
+     *
+     * @return string One of empty string, 'openid', or
+     *         'http://incommonfederation.org/assurance/silver'
+     */
+    public static function getLOA()
+    {
+        $retval = '';
+        if (static::isLOASilver()) {
+            $retval = 'http://incommonfederation.org/assurance/silver';
+        } else {
+            $retval = static::getSessionVar('loa');
+        }
+        return $retval;
+    }
+
+    /**
+     * getLOAPort
+     *
+     * This function returns the port to be used for MyProxy based on the
+     * level of assurance.
+     *     Basic  CA = 7512
+     *     Silver CA = 7514
+     *     OpenID CA = 7516
+     *
+     * @return int The MyProxy port number to be used based on the 'level
+     *         of assurance' (basic, silver, openid).
+     */
+    public static function getLOAPort()
+    {
+        $port = 7512; // Basic
+        if (Util::isLOASilver()) {
+            $port = 7514;
+        } elseif (Util::getSessionVar('loa') == 'openid') {
+            $port = 7516;
+        }
+        return $port;
     }
 }

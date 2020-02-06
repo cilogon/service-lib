@@ -690,11 +690,10 @@ class Content
                   href="http://ca.cilogon.org/loa">Level of Assurance:</a></th>
                   <td>';
 
-        $loa = Util::getSessionVar('loa');
-        if ($loa == 'openid') {
+        if (Util::getSessionVar('loa') == 'openid') {
             echo '<a href="http://ca.cilogon.org/policy/openid"
                   target="_blank">OpenID</a>';
-        } elseif ($loa == 'http://incommonfederation.org/assurance/silver') {
+        } elseif (Util::isLOASilver()) {
             echo '<a href="http://ca.cilogon.org/policy/silver"
                   target="_blank">Silver</a>';
         } else {
@@ -2474,13 +2473,7 @@ class Content
         }
 
         // Set the port based on the Level of Assurance
-        $port = 7512;
-        $loa = Util::getSessionVar('loa');
-        if ($loa == 'http://incommonfederation.org/assurance/silver') {
-            $port = 7514;
-        } elseif ($loa == 'openid') {
-            $port = 7516;
-        }
+        $port = Util::getLOAPort();
 
         $dn = Util::getSessionVar('dn');
         if (strlen($dn) > 0) {

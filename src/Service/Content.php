@@ -2472,9 +2472,6 @@ class Content
             return; // MISMATCHED PASSWORDS - NO FURTHER PROCESSING NEEDED!
         }
 
-        // Set the port based on the Level of Assurance
-        $port = Util::getLOAPort();
-
         $dn = Util::getSessionVar('dn');
         if (strlen($dn) > 0) {
             // Append extra info, such as 'skin', to be processed by MyProxy
@@ -2487,7 +2484,7 @@ class Content
                 $dn,
                 '',
                 MYPROXY_HOST,
-                $port,
+                Util::getLOAPort(),
                 $lifetime,
                 '/var/www/config/hostcred.pem',
                 ''

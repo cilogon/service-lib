@@ -404,14 +404,17 @@ class Content
     public static function printGetCertificate()
     {
         // Check if PKCS12 downloading is disabled. If so, print out message.
+        $disabledmsg = '';
+        $disabledbyconf = ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON)));
         $skin = Util::getSkin();
         $pkcs12disabled = $skin->getConfigOption('pkcs12', 'disabled');
         $disabledbyskin = ((!is_null($pkcs12disabled)) && ((int)$pkcs12disabled == 1));
-        $disabledbyconf = ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON)));
+        $dn = Util::getSessionVar('dn'); // Did we get user attributes for certs?
 
-        if ($disabledbyskin || $disabledbyconf) {
-            $disabledmsg = 'Downloading PKCS12 certificates is disabled.';
-            if ($disabledbyskin) {
+        if ($disabledbyconf || $disabledbyskin || (strlen($dn) == 0)) {
+            if ($disabledbyconf) {
+                $disabledmsg = 'Downloading PKCS12 certificates is disabled.';
+            } elseif ($disabledbyskin) {
                 $disabledmsg = $skin->getConfigOption('pkcs12', 'disabledmessage');
                 if (!is_null($disabledmsg)) {
                     $disabledmsg = trim(html_entity_decode($disabledmsg));
@@ -421,6 +424,10 @@ class Content
                         'restricted. Please try another method or log on ' .
                         'with a different Identity Provider.';
                 }
+            } elseif (strlen($dn) == 0) {
+                $disabledmsg = 'Unable to generate a certificate. ' .
+                    'Your identity provider has not provided CILogon ' .
+                    'with all required information.';
             }
 
             echo '<div class="alert alert-danger role="alert">';
@@ -669,42 +676,56 @@ class Content
     public static function printCertInfo()
     {
         $dn = Util::getSessionVar('dn');
-        // Strip off the email address from the pseudo-DN.
-        $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
-
         static::printCollapseBegin('certinfo', 'Certificate Information');
-        echo '
-          <div class="card-body">
-            <table class="table table-striped table-sm">
-            <tbody>
-              <tr>
-                <th>Certificate Subject:</th>
-                <td>', Util::htmlent($dn), '</td>
-              </tr>
-              <tr>
-                <th>Identity Provider:</th>
-                <td>', Util::getSessionVar('idpname'), '</td>
-              </tr>
-              <tr>
-                <th><a target="_blank"
-                  href="http://ca.cilogon.org/loa">Level of Assurance:</a></th>
-                  <td>';
+        if (strlen($dn) > 0) {
+            // Strip off the email address from the pseudo-DN.
+            $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
+            echo '
+              <div class="card-body">
+                <table class="table table-striped table-sm">
+                <tbody>
+                  <tr>
+                    <th>Certificate Subject:</th>
+                    <td>', Util::htmlent($dn), '</td>
+                  </tr>
+                  <tr>
+                    <th>Identity Provider:</th>
+                    <td>', Util::getSessionVar('idpname'), '</td>
+                  </tr>
+                  <tr>
+                    <th><a target="_blank"
+                      href="http://ca.cilogon.org/loa">Level of Assurance:</a></th>
+                      <td>
+            ';
 
-        if (Util::getSessionVar('loa') == 'openid') {
-            echo '<a href="http://ca.cilogon.org/policy/openid"
-                  target="_blank">OpenID</a>';
-        } elseif (Util::isLOASilver()) {
-            echo '<a href="http://ca.cilogon.org/policy/silver"
-                  target="_blank">Silver</a>';
+            if (Util::getSessionVar('loa') == 'openid') {
+                echo '<a href="http://ca.cilogon.org/policy/openid"
+                      target="_blank">OpenID</a>';
+            } elseif (Util::isLOASilver()) {
+                echo '<a href="http://ca.cilogon.org/policy/silver"
+                      target="_blank">Silver</a>';
+            } else {
+                echo '<a href="http://ca.cilogon.org/policy/basic"
+                      target="_blank">Basic</a>';
+            }
+
+            echo '</td>
+                  </tr>
+                  </tbody>
+                </table>';
         } else {
-            echo '<a href="http://ca.cilogon.org/policy/basic"
-                  target="_blank">Basic</a>';
+            echo '
+              <div class="card-body px-5">
+            ';
+            static::printErrorBox(
+                '
+                <div class="card-text my-2">
+                  Unable to generate a certificate. Your identity provider
+                  has not provided CILogon with all required information.
+                </div> <!-- end card-text -->'
+            );
         }
-
-        echo '</td>
-              </tr>
-              </tbody>
-            </table>
+        echo '
           </div> <!-- end card-body -->';
         static::printCollapseEnd();
     }
@@ -2007,7 +2028,6 @@ class Content
         $idpname   = Util::getSessionVar('idpname');
         $uid       = Util::getSessionVar('uid');
         $status    = Util::getSessionVar('status');
-        $dn        = Util::getSessionVar('dn');
         $authntime = Util::getSessionVar('authntime');
 
         // CIL-410 When using the /testidp/ flow, the 'storeattributes'
@@ -2020,7 +2040,7 @@ class Content
         } elseif (
             (strlen($uid) > 0) && (strlen($idp) > 0) &&
             (strlen($idpname) > 0) && (strlen($status) > 0) &&
-            (strlen($dn) > 0) && (strlen($authntime) > 0) &&
+            (strlen($authntime) > 0) &&
             (!($status & 1)) // All STATUS_OK codes are even
         ) {
             // Check for eduGAIN IdP and possible get cert context
@@ -2556,10 +2576,10 @@ class Content
                 );
                 $log->info('Error creating certificate - myproxy-logon failed');
             }
-        } else { // Couldn't find the 'dn' PHP session value - shouldn't happen!
+        } else { // Couldn't find the 'dn' PHP session value
             Util::setSessionVar(
                 'p12error',
-                'Missing username. Please enable cookies.'
+                'Cannot create certificate due to missing attributes.'
             );
             $log->info('Error creating certificate - missing dn session variable');
         }

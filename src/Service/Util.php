@@ -599,56 +599,6 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
-     * getFirstAndLastName
-     *
-     * This function attempts to get the first and last name of a user
-     * extracted from the 'full name' (displayName) of the user.
-     * Simply pass in all name info (full, first, and last) and the
-     * function first tries to break up the full name into first/last.
-     * If this is not sufficient, the function checks first and last
-     * name. Finally, if either first or last is blank, the function
-     * duplicates first <=> last so both names have the same value.
-     * Note that even with all this, you still need to check if the
-     * returned (first,last) names are blank.
-     *
-     * @param string $full The 'full name' of the user
-     * @param string $first (Optional) The 'first name' of the user
-     * @param string $last (Optional) The 'last name' of the user
-     * @return array An array 'list(firstname,lastname)'
-     */
-    public static function getFirstAndLastName($full, $first = '', $last = '')
-    {
-        $firstname = '';
-        $lastname = '';
-
-        # Try to split the incoming $full name into first and last names
-        if (strlen($full) > 0) {
-            $names = preg_split('/\s+/', $full, 2);
-            $firstname = @$names[0];
-            $lastname =  @$names[1];
-        }
-
-        # If either first or last name blank, then use incoming $first and $last
-        if (strlen($firstname) == 0) {
-            $firstname = $first;
-        }
-        if (strlen($lastname) == 0) {
-            $lastname = $last;
-        }
-
-        # Finally, if only a single name, copy first name <=> last name
-        if (strlen($lastname) == 0) {
-            $lastname = $firstname;
-        }
-        if (strlen($firstname) == 0) {
-            $firstname = $lastname;
-        }
-
-        # Return both names as an array (i.e., use list($first,last)=...)
-        return array($firstname,$lastname);
-    }
-
-    /**
      * getHN
      *
      * This function calculates and returns the 'hostname' for the

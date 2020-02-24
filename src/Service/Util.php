@@ -681,41 +681,6 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
-     * gotUserAttributes
-     *
-     * This function returns true if the PHP session contains all of the
-     * necessary user/IdP attributes to fetch an X.509 certificate. This
-     * means that at least one of (remoteuser, ePPN, ePTID, openidID,
-     * oidcID) must be set, as well as idp (entityId), idpname, firstname,
-     * lastname, and emailaddr. Also, the emailaddr must conform to valid
-     * email formatting.
-     *
-     * @return bool True if all user/IdP attributes necessary to form the
-     *              distinguished name (DN) for X.509 certificates are
-     *              present in the PHP session. False otherwise.
-     */
-    public static function gotUserAttributes()
-    {
-        $retval = false;  // Assume we don't have all user attributes
-        if (
-            ((strlen(Util::getSessionVar('remoteuser')) > 0) ||
-                (strlen(Util::getSessionVar('ePPN')) > 0) ||
-                (strlen(Util::getSessionVar('ePTID')) > 0) ||
-                (strlen(Util::getSessionVar('openidID')) > 0) ||
-                (strlen(Util::getSessionVar('oidcID')) > 0)) &&
-            (strlen(Util::getSessionVar('idp')) > 0) &&
-            (strlen(Util::getSessionVar('idpname')) > 0)  &&
-            (strlen(Util::getSessionVar('firstname')) > 0) &&
-            (strlen(Util::getSessionVar('lastname')) > 0) &&
-            (strlen(Util::getSessionVar('emailaddr')) > 0) &&
-            (filter_var(Util::getSessionVar('emailaddr'), FILTER_VALIDATE_EMAIL))
-        ) {
-            $retval = true;
-        }
-        return $retval;
-    }
-
-    /**
      * saveUserToDataStore
      *
      * This function is called when a user logs on to save identity
@@ -779,62 +744,54 @@ Remote Address= ' . $remoteaddr . '
         $subjectID   = static::getSessionVar('subjectID');
         $pairwiseID  = static::getSessionVar('pairwiseID');
 
-        // Make sure parameters are not empty strings, and email is valid
-        // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
-        if (static::gotUserAttributes()) {
-            // For the new Google OAuth 2.0 endpoint, we want to keep the
-            // old Google OpenID endpoint URL in the database (so user does
-            // not get a new certificate subject DN). Change the idp
-            // and idpname to the old Google OpenID values.
-            if (
-                ($idpname == 'Google+') ||
-                ($idp == static::getAuthzUrl('Google'))
-            ) {
-                $idpname = 'Google';
-                $idp = 'https://www.google.com/accounts/o8/id';
-            }
+        // For the new Google OAuth 2.0 endpoint, we want to keep the
+        // old Google OpenID endpoint URL in the database (so user does
+        // not get a new certificate subject DN). Change the idp
+        // and idpname to the old Google OpenID values.
+        if (
+            ($idpname == 'Google+') ||
+            ($idp == static::getAuthzUrl('Google'))
+        ) {
+            $idpname = 'Google';
+            $idp = 'https://www.google.com/accounts/o8/id';
+        }
 
-            // In the database, keep a consistent ProviderId format: only
-            // allow 'http' (not 'https') and remove any 'www.' prefix.
-            if ($loa == 'openid') {
-                $idp = preg_replace('%^https://(www\.)?%', 'http://', $idp);
-            }
+        // In the database, keep a consistent ProviderId format: only
+        // allow 'http' (not 'https') and remove any 'www.' prefix.
+        if ($loa == 'openid') {
+            $idp = preg_replace('%^https://(www\.)?%', 'http://', $idp);
+        }
 
-            $result = $dbs->getUser(
-                $remoteuser,
-                $idp,
-                $idpname,
-                $firstname,
-                $lastname,
-                $displayname,
-                $emailaddr,
-                $ePPN,
-                $ePTID,
-                $openidID,
-                $oidcID,
-                $affiliation,
-                $ou,
-                $memberof,
-                $acr,
-                $entitlement,
-                $itrustuin,
-                $subjectID,
-                $pairwiseID
-            );
-            static::setSessionVar('uid', $dbs->user_uid);
-            static::setSessionVar('dn', $dbs->distinguished_name);
-            static::setSessionVar('status', $dbs->status);
-            if (!$result) {
-                static::sendErrorAlert(
-                    'dbService Error',
-                    'Error calling dbservice action "getUser" in ' .
-                    'saveUserToDatastore() method.'
-                );
-            }
-        } else { // Missing one or more required attributes
-            static::setSessionVar(
-                'status',
-                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']
+        // Call the dbService to get the user using IdP attributes.
+        $result = $dbs->getUser(
+            $remoteuser,
+            $idp,
+            $idpname,
+            $firstname,
+            $lastname,
+            $displayname,
+            $emailaddr,
+            $ePPN,
+            $ePTID,
+            $openidID,
+            $oidcID,
+            $affiliation,
+            $ou,
+            $memberof,
+            $acr,
+            $entitlement,
+            $itrustuin,
+            $subjectID,
+            $pairwiseID
+        );
+        static::setSessionVar('uid', $dbs->user_uid);
+        static::setSessionVar('dn', $dbs->distinguished_name);
+        static::setSessionVar('status', $dbs->status);
+        if (!$result) {
+            static::sendErrorAlert(
+                'dbService Error',
+                'Error calling dbservice action "getUser" in ' .
+                'saveUserToDatastore() method.'
             );
         }
 

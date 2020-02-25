@@ -2266,6 +2266,7 @@ class Content
         $pairwiseID   = Util::getSessionVar('pairwiseID');
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $failureuri   = Util::getSessionVar('failureuri');
+        $dn           = Util::getSessionVar('dn');
 
         // CIL-410 The /testidp/ flow is indicated by the presence of the
         // 'storeattributes' PHP session var. In this case, simply show
@@ -2297,12 +2298,17 @@ class Content
 
         $isEduGAINAndGetCert = Util::isEduGAINAndGetCert($idp, $idpname);
 
+        // Was this an OAuth 1.0a transaction but the distinguished_name
+        // could not be calculated? Set $missingparam below.
+        $oauth1withoutdn = ((strlen($failureuri) > 0) && (strlen($dn) == 0));
+
         // Check for various error conditions and print out appropriate page
         if (
             (strlen($uid) == 0) ||    // Empty uid
             (strlen($status) == 0) || // Empty status
             ($status & 1) ||          // Odd-numbered status = error
-            ($isEduGAINAndGetCert)    // Not allowed
+            ($isEduGAINAndGetCert) || // Not allowed
+            ($oauth1withoutdn)        // OAuth1.0a needs DN for cert
         ) {
             $log->error(
                 'Failed to getuser' .
@@ -2314,8 +2320,9 @@ class Content
             $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
 
             // Was there a misssing parameter?
-            $missingparam = ($status ==
-                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']);
+            $missingparam = (($status ==
+                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) ||
+                    $oauth1withoutdn);
 
             if (($isEduGAINAndGetCert) || ($missingparam && $samlidp)) {
                 static::printSAMLAttributeReleaseErrorPage(

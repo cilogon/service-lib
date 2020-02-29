@@ -430,7 +430,7 @@ class Content
                     'with all required information.';
             }
 
-            echo '<div class="alert alert-danger role="alert">';
+            echo '<div class="alert alert-danger" role="alert">';
             echo $disabledmsg;
             echo '</div>';
         } else { // PKCS12 downloading is okay
@@ -713,9 +713,9 @@ class Content
                   </tr>
                   </tbody>
                 </table>';
-        } else {
+        } else { // No DN? Show missing name(s) or email address.
             echo '
-              <div class="card-body px-5">
+              <div class="card-body">
             ';
             static::printErrorBox(
                 '
@@ -724,9 +724,73 @@ class Content
                   has not provided CILogon with all required information.
                 </div> <!-- end card-text -->'
             );
+            $firstname   = Util::getSessionVar('firstname');
+            $lastname    = Util::getSessionVar('lastname');
+            $displayname = Util::getSessionVar('displayname');
+            $emailaddr   = Util::getSessionVar('emailaddr');
+            echo '
+                <table class="table table-striped table-sm">
+                <tbody>';
+            if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
+                echo '
+                  <tr>
+                    <th class="w-50">First Name:</th>
+                    <td>MISSING</td>
+                  </tr>';
+            }
+            if ((strlen($lastname) == 0) && (strlen($displayname) == 0)) {
+                echo '
+                  <tr>
+                    <th class="w-50">Last Name:</th>
+                    <td>MISSING</td>
+                  </tr>';
+            }
+            if (
+                (strlen($displayname) == 0) &&
+                ((strlen($firstname) == 0) || (strlen($lastname) == 0))
+            ) {
+                echo '
+                  <tr>
+                    <th class="w-50">Display Name:</th>
+                    <td>MISSING</td>
+                  </tr>';
+            }
+            $emailvalid = filter_var($emailaddr, FILTER_VALIDATE_EMAIL);
+            if ((strlen($emailaddr) == 0) || (!$emailvalid)) {
+                echo '
+                  <tr>
+                    <th class="w-50">Email Address:</th>
+                    <td>' , ((strlen($emailaddr) == 0) ? 'MISSING' : 'INVALID') , '</td>
+                  </tr>';
+            }
+            $idp     = Util::getSessionVar('idp');
+            $idpname = Util::getSessionVar('idpname');
+            if (Util::isEduGAINAndGetCert($idp, $idpname)) {
+                $idplist = Util::getIdpList();
+                if (!$idplist->isREFEDSRandS($idp)) {
+                    echo '
+                      <tr>
+                        <th class="w-50"><a target="_blank"
+                        href="http://refeds.org/category/research-and-scholarship">Research
+                        and Scholarship</a>:</th>
+                        <td>MISSING</td>
+                      </tr>';
+                }
+                if (!$idplist->isSIRTFI($idp)) {
+                    echo '
+                      <tr>
+                        <th class="w-50"><a target="_blank"
+                        href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
+                        <td>MISSING</td>
+                      </tr>';
+                }
+            }
+            echo '
+                  </tbody>
+                </table>';
         }
         echo '
-          </div> <!-- end card-body -->';
+              </div> <!-- end card-body -->';
         static::printCollapseEnd();
     }
 
@@ -1201,7 +1265,7 @@ class Content
                 <td><a style="text-decoration:underline" target="_blank"
                 href="https://met.refeds.org/met/entity/',
                 rawurlencode($idp),
-                '">', $idp, '</td>
+                '">', $idp, '</a></td>
                 <td> </td>
               </tr>
             ';

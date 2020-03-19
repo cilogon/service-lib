@@ -557,6 +557,8 @@ class Util
             'ePTID'        => 'ePTID',
             'openID'       => 'OpenID ID',
             'oidcID'       => 'OIDC ID',
+            'subjectID'    => 'Subject ID',
+            'pairwiseID'   => 'Pairwise ID',
             'loa'          => 'LOA',
             'affiliation'  => 'Affiliation',
             'ou'           => 'OU',
@@ -564,8 +566,6 @@ class Util
             'acr'          => 'AuthnContextClassRef',
             'entitlement'  => 'Entitlement',
             'itrustuin'    => 'iTrustUIN',
-            'subjectID'    => 'Subject ID',
-            'pairwiseID'   => 'Pairwise ID',
             'cilogon_skin' => 'Skin Name',
             'authntime'    => 'Authn Time'
         );
@@ -790,14 +790,14 @@ Remote Address= ' . $remoteaddr . '
      *     ePTID - User's ePTID (for SAML IdPs)
      *     openidID - User's OpenID 2.0 Identifier (Google deprecated)
      *     oidcID - User's OpenID Connect Identifier
+     *     subjectID - User's university subject identifier
+     *     pairwiseID - User's university pairwise identifier
      *     affiliation - User's affiliation
      *     ou - User's organizational unit (OU)
      *     memberof - User's isMemberOf group info
      *     acr - Authentication Context Class Ref
      *     entitlement - User's entitlement
      *     itrustuin - User's univerity ID number
-     *     subjectID - User's university subject identifier
-     *     pairwiseID - User's university pairwise identifier
      */
     public static function saveUserToDataStore(...$args)
     {
@@ -820,14 +820,14 @@ Remote Address= ' . $remoteaddr . '
         $ePTID       = static::getSessionVar('ePTID');
         $openidID    = static::getSessionVar('openidID');
         $oidcID      = static::getSessionVar('oidcID');
+        $subjectID   = static::getSessionVar('subjectID');
+        $pairwiseID  = static::getSessionVar('pairwiseID');
         $affiliation = static::getSessionVar('affiliation');
         $ou          = static::getSessionVar('ou');
         $memberof    = static::getSessionVar('memberof');
         $acr         = static::getSessionVar('acr');
         $entitlement = static::getSessionVar('entitlement');
         $itrustuin   = static::getSessionVar('itrustuin');
-        $subjectID   = static::getSessionVar('subjectID');
-        $pairwiseID  = static::getSessionVar('pairwiseID');
 
         // Make sure parameters are not empty strings, and email is valid
         // Must have at least one of remoteuser/ePPN/ePTID/openidID/oidcID
@@ -862,14 +862,14 @@ Remote Address= ' . $remoteaddr . '
                 $ePTID,
                 $openidID,
                 $oidcID,
+                $subjectID,
+                $pairwiseID,
                 $affiliation,
                 $ou,
                 $memberof,
                 $acr,
                 $entitlement,
-                $itrustuin,
-                $subjectID,
-                $pairwiseID
+                $itrustuin
             );
             static::setSessionVar('uid', $dbs->user_uid);
             static::setSessionVar('dn', $dbs->distinguished_name);
@@ -947,6 +947,10 @@ Remote Address= ' . $remoteaddr . '
                         $openidID : '<MISSING>') . "\n" .
                     'OIDC ID       = ' . ((strlen($oidcID) > 0) ?
                         $oidcID : '<MISSING>') . "\n" .
+                    'Subject ID    = ' . ((strlen($subjectID) > 0) ?
+                        $subjectID : '<MISSING>') . "\n" .
+                    'Pairwise ID   = ' . ((strlen($pairwiseID) > 0) ?
+                        $pairwiseID : '<MISSING>') . "\n" .
                     'Affiliation   = ' . ((strlen($affiliation) > 0) ?
                         $affiliation : '<MISSING>') . "\n" .
                     'OU            = ' . ((strlen($ou) > 0) ?
@@ -959,10 +963,6 @@ Remote Address= ' . $remoteaddr . '
                         $entitlement : '<MISSING>') . "\n" .
                     'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?
                         $itrustuin : '<MISSING>') . "\n" .
-                    'Subject ID    = ' . ((strlen($subjectID) > 0) ?
-                        $subjectID : '<MISSING>') . "\n" .
-                    'Pairwise ID   = ' . ((strlen($pairwiseID) > 0) ?
-                        $pairwiseID : '<MISSING>') . "\n" .
                     'Database UID  = ' . ((strlen(
                         $i = static::getSessionVar('uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .
@@ -993,9 +993,9 @@ Remote Address= ' . $remoteaddr . '
         $attrs = array('remoteuser', 'idp', 'idpname', 'firstname',
                        'lastname', 'displayname', 'emailaddr',
                        'loa', 'ePPN', 'ePTID', 'openidID', 'oidcID',
+                       'subjectID', 'pairwiseID',
                        'affiliation', 'ou', 'memberof', 'acr',
-                       'entitlement', 'itrustuin', 'subjectID',
-                       'pairwiseID');
+                       'entitlement', 'itrustuin');
         $numargs = count($args);
         for ($i = 0; $i < $numargs; $i++) {
             static::setSessionVar($attrs[$i], $args[$i]);
@@ -1063,14 +1063,14 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('ePTID');
         static::unsetSessionVar('openidID');
         static::unsetSessionVar('oidcID');
+        static::unsetSessionVar('subjectID');
+        static::unsetSessionVar('pairwiseID');
         static::unsetSessionVar('affiliation');
         static::unsetSessionVar('ou');
         static::unsetSessionVar('memberof');
         static::unsetSessionVar('acr');
         static::unsetSessionVar('entitlement');
         static::unsetSessionVar('itrustuin');
-        static::unsetSessionVar('subjectID');
-        static::unsetSessionVar('pairwiseID');
 
         // Current skin
         static::unsetSessionVar('cilogon_skin');

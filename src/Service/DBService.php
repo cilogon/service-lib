@@ -445,9 +445,9 @@ class DBService
      *        For more than 1 parameter, parameters can include:
      *            $remote_user, $idp, $idp_display_name,
      *            $first_name, $last_name, $display_name, $email,
-     *            $eppn, $eptid, $openid, $oidc, $affiliation,
+     *            $eppn, $eptid, $openid, $oidc,
+     *            $subject_id, $pairwise_id, $affiliation,
      *            $ou, $member_of, $acr, $entitlement, $itrustuin
-     *            $subject_id, $pairwise_id
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -463,15 +463,16 @@ class DBService
         } elseif ($numargs > 1) {
             $params = array('remote_user', 'idp', 'idp_display_name',
                             'first_name', 'last_name', 'display_name', 'email',
-                            'eppn', 'eptid', 'open_id', 'oidc', 'affiliation',
-                            'ou', 'member_of', 'acr', 'entitlement',
-                            'itrustuin', 'subject_id', 'pairwise_id');
+                            'eppn', 'eptid', 'open_id', 'oidc',
+                            'subject_id', 'pairwise_id',
+                            'affiliation', 'ou', 'member_of', 'acr',
+                            'entitlement', 'itrustuin');
             $cmd = 'action=getUser';
             $attr_arr = array();
             for ($i = 0; $i < $numargs; $i++) {
                 $arg = $args[$i];
                 if (strlen($arg) > 0) {
-                    if ($i >= 13) {
+                    if ($i >= 15) {
                         // Put params after $ou into JSON object
                         $attr_arr[$params[$i]] = $arg;
                     } else {
@@ -810,6 +811,12 @@ class DBService
                     if (preg_match('/oidc=([^\r\n]+)/', $output, $match)) {
                         $this->oidc = urldecode($match[1]);
                     }
+                    if (preg_match('/subject_id=([^\r\n]+)/', $output, $match)) {
+                        $this->subject_id = urldecode($match[1]);
+                    }
+                    if (preg_match('/pairwise_id=([^\r\n]+)/', $output, $match)) {
+                        $this->pairwise_id = urldecode($match[1]);
+                    }
                     if (preg_match('/affiliation=([^\r\n]+)/', $output, $match)) {
                         $this->affiliation = urldecode($match[1]);
                     }
@@ -878,12 +885,6 @@ class DBService
                 }
                 if (isset($attr_arr['itrustuin'])) {
                     $this->itrustuin = $attr_arr['itrustuin'];
-                }
-                if (isset($attr_arr['subject_id'])) {
-                    $this->subject_id = $attr_arr['subject_id'];
-                }
-                if (isset($attr_arr['pairwise_id'])) {
-                    $this->pairwise_id = $attr_arr['pairwise_id'];
                 }
             }
         }

@@ -122,7 +122,7 @@ class Content
     <footer class="footer">
       <p>For questions about this site, please see the <a target="_blank"
         href="http://www.cilogon.org/faq">FAQs</a> or send email to <a
-        href="mailto:help@cilogon.org">help@cilogon.org</a>.</p>
+        href="mailto:', EMAIL_HELP, '">', EMAIL_HELP, '</a>.</p>
       <p>Know <a target="_blank"
         href="http://ca.cilogon.org/responsibilities">your responsibilities</a>
         for using the CILogon Service.</p>
@@ -209,8 +209,8 @@ class Content
             If you are a faculty, staff, or student member of a university
             or college, please select it for your identity provider.
             If your school is not listed, please contact <a
-            href=\'mailto:help@cilogon.org\'>help@cilogon.org</a>, and we will
-            try to add your school in the future.
+            href=\'mailto:' . EMAIL_HELP . '\'>' . EMAIL_HELP . '</a>,
+            and we will try to add your school in the future.
         </p>
         ';
 
@@ -1640,7 +1640,7 @@ class Content
         // Get contacts from metadata for email addresses
         $shibarray = $idplist->getShibInfo($idp);
         $emailmsg = '?subject=Attribute Release Problem for CILogon' .
-        '&cc=help@cilogon.org' .
+        '&cc=' . EMAIL_HELP .
         '&body=Hello, I am having trouble logging on to ' .
         'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idpname .
         ' Identity Provider (IdP) ' .

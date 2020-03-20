@@ -538,12 +538,13 @@ class Util
      * @param string $detail A detailed description of the error (in the
      *        email body)
      * @param string $mailto (Optional) The destination email address.
-     *        Defaults to 'alerts@cilogon.org'.
+     *        Defaults to EMAIL_ALERTS (defined in the top-level
+     *        config.php file as 'alerts@' . DEFAULT_HOSTNAME).
      */
     public static function sendErrorAlert(
         $summary,
         $detail,
-        $mailto = 'alerts@cilogon.org'
+        $mailto = EMAIL_ALERTS
     ) {
         $sessionvars = array(
             'idp'          => 'IdP ID',
@@ -572,7 +573,7 @@ class Util
 
         $remoteaddr = static::getServerVar('REMOTE_ADDR');
         $remotehost = gethostbyaddr($remoteaddr);
-        $mailfrom = 'From: alerts@cilogon.org' . "\r\n" .
+        $mailfrom = 'From: ' . EMAIL_ALERTS . "\r\n" .
                     'X-Mailer: PHP/' . phpversion();
         $mailsubj = 'CILogon Service on ' . php_uname('n') .
                     ' - ' . $summary;
@@ -814,12 +815,12 @@ Remote Address= ' . $remoteaddr . '
                     DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) ||
                 (preg_match('/ligo\.org/', $idp))
             ) {
-                $mailto = 'alerts@cilogon.org';
+                $mailto = EMAIL_ALERTS;
 
                 // CIL-205 - Notify LIGO about IdP login errors.
                 // Set DISABLE_LIGO_ALERTS to true in the top-level
                 // config.php file to stop LIGO failures
-                // from being sent to 'alerts@cilogon.org', but still
+                // from being sent to EMAIL_ALERTS, but still
                 // sent to 'cilogon-alerts@ligo.org'.
                 if (preg_match('/ligo\.org/', $idp)) {
                     if (DISABLE_LIGO_ALERTS) {

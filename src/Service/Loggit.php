@@ -26,7 +26,7 @@ class Loggit
      * You can log either to the system syslog, or send a 'log' message
      * to an email address.  Default is 'syslog' if you don't specify
      * the first parameter.  If first parameter is 'mail', the default
-     * for the second parameter is help@cilogon.org.  If running in a
+     * for the second parameter is EMAIL_HELP.  If running in a
      * browser session, the SERVER_NAME and REQUEST_URI are included
      * in all log events.
      *
@@ -41,9 +41,10 @@ class Loggit
      * @param string $logtype (Optional) The log type, can be 'syslog' or
      *        'mail'. Defaults to 'syslog'.
      * @param string $email (Optional) The destination email address if
-     *        $logtype is 'mail'. Defaults to 'help@cilogon.org'.
+     *        $logtype is 'mail'. Defaults to EMAIL_HELP (defined in the
+     *        top-level config.php file as 'help@' . DEFAULT_HOSTNAME).
      */
-    public function __construct($logtype = 'syslog', $email = 'help@cilogon.org')
+    public function __construct($logtype = 'syslog', $email = EMAIL_HELP)
     {
         $ident = Util::getServerVar('SERVER_NAME') .
                  Util::getServerVar('REQUEST_URI');

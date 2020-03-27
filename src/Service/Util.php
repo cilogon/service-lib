@@ -547,28 +547,28 @@ class Util
         $mailto = EMAIL_ALERTS
     ) {
         $sessionvars = array(
-            'idp'          => 'IdP ID',
-            'idpname'      => 'IdP Name',
-            'uid'          => 'Database UID',
-            'dn'           => 'Cert DN',
-            'firstname'    => 'First Name',
-            'lastname'     => 'Last Name',
-            'displayname'  => 'Display Name',
-            'ePPN'         => 'ePPN',
-            'ePTID'        => 'ePTID',
-            'openID'       => 'OpenID ID',
-            'oidcID'       => 'OIDC ID',
-            'subjectID'    => 'Subject ID',
-            'pairwiseID'   => 'Pairwise ID',
-            'loa'          => 'LOA',
-            'affiliation'  => 'Affiliation',
-            'ou'           => 'OU',
-            'memberof'     => 'MemberOf',
-            'acr'          => 'AuthnContextClassRef',
-            'entitlement'  => 'Entitlement',
-            'itrustuin'    => 'iTrustUIN',
-            'cilogon_skin' => 'Skin Name',
-            'authntime'    => 'Authn Time'
+            'idp'                => 'IdP ID',
+            'idp_display_name'   => 'IdP Name',
+            'user_uid'           => 'User UID',
+            'distinguished_name' => 'Cert DN',
+            'first_name'         => 'First Name',
+            'last_name'          => 'Last Name',
+            'display_name'       => 'Display Name',
+            'eppn'               => 'ePPN',
+            'eptid'              => 'ePTID',
+            'open_id'            => 'OpenID ID',
+            'oidc'               => 'OIDC ID',
+            'subject_id'         => 'Subject ID',
+            'pairwise_id'        => 'Pairwise ID',
+            'loa'                => 'LOA',
+            'affiliation'        => 'Affiliation',
+            'ou'                 => 'OU',
+            'member_of'          => 'MemberOf',
+            'acr'                => 'AuthnContextClassRef',
+            'entitlement'        => 'Entitlement',
+            'itrustuin'          => 'iTrustUIN',
+            'cilogon_skin'       => 'Skin Name',
+            'authntime'          => 'Authn Time'
         );
 
         $remoteaddr = static::getServerVar('REMOTE_ADDR');
@@ -693,27 +693,8 @@ Remote Address= ' . $remoteaddr . '
      * for use by the program later on. In case of error, an email
      * alert is sent showing the missing parameters.
      *
-     * @param mixed $args Variable number of paramters ordered as follows:
-     *     remoteuser -The REMOTE_USER from HTTP headers
-     *     idp - The provider IdP Identifier / URL endpoint
-     *     idpname - The pretty print provider IdP name
-     *     firstname - The user's first name
-     *     lastname - The user's last name
-     *     displayname - The user's display name
-     *     emailaddr-  The user's email address
-     *     loa - The level of assurance (e.g., openid/basic/silver)
-     *     ePPN - User's ePPN (for SAML IdPs)
-     *     ePTID - User's ePTID (for SAML IdPs)
-     *     openidID - User's OpenID 2.0 Identifier (Google deprecated)
-     *     oidcID - User's OpenID Connect Identifier
-     *     subjectID - User's university subject identifier
-     *     pairwiseID - User's university pairwise identifier
-     *     affiliation - User's affiliation
-     *     ou - User's organizational unit (OU)
-     *     memberof - User's isMemberOf group info
-     *     acr - Authentication Context Class Ref
-     *     entitlement - User's entitlement
-     *     itrustuin - User's univerity ID number
+     * @param mixed $args Variable number of parameters, the same as those
+     *        in DBService::$user_attrs
      */
     public static function saveUserToDataStore(...$args)
     {
@@ -724,36 +705,20 @@ Remote Address= ' . $remoteaddr . '
         // session variables into local vars for ease of use.
         static::setUserAttributeSessionVars(...$args);
 
-        $remoteuser  = static::getSessionVar('remoteuser');
-        $idp         = static::getSessionVar('idp');
-        $idpname     = static::getSessionVar('idpname');
-        $firstname   = static::getSessionVar('firstname');
-        $lastname    = static::getSessionVar('lastname');
-        $displayname = static::getSessionVar('displayname');
-        $emailaddr   = static::getSessionvar('emailaddr');
-        $loa         = static::getSessionVar('loa');
-        $ePPN        = static::getSessionVar('ePPN');
-        $ePTID       = static::getSessionVar('ePTID');
-        $openidID    = static::getSessionVar('openidID');
-        $oidcID      = static::getSessionVar('oidcID');
-        $subjectID   = static::getSessionVar('subjectID');
-        $pairwiseID  = static::getSessionVar('pairwiseID');
-        $affiliation = static::getSessionVar('affiliation');
-        $ou          = static::getSessionVar('ou');
-        $memberof    = static::getSessionVar('memberof');
-        $acr         = static::getSessionVar('acr');
-        $entitlement = static::getSessionVar('entitlement');
-        $itrustuin   = static::getSessionVar('itrustuin');
+        // Set local variables from the PHP session that was just populated
+        foreach (DBService::$user_attrs as $value) {
+            $$value = static::getSessionVar($value);
+        }
 
         // For the new Google OAuth 2.0 endpoint, we want to keep the
         // old Google OpenID endpoint URL in the database (so user does
         // not get a new certificate subject DN). Change the idp
-        // and idpname to the old Google OpenID values.
+        // and idp_display_name to the old Google OpenID values.
         if (
-            ($idpname == 'Google+') ||
+            ($idp_display_name == 'Google+') ||
             ($idp == static::getAuthzUrl('Google'))
         ) {
-            $idpname = 'Google';
+            $idp_display_name = 'Google';
             $idp = 'https://www.google.com/accounts/o8/id';
         }
 
@@ -765,28 +730,29 @@ Remote Address= ' . $remoteaddr . '
 
         // Call the dbService to get the user using IdP attributes.
         $result = $dbs->getUser(
-            $remoteuser,
+            $remote_user,
             $idp,
-            $idpname,
-            $firstname,
-            $lastname,
-            $displayname,
-            $emailaddr,
-            $ePPN,
-            $ePTID,
-            $openidID,
-            $oidcID,
-            $subjectID,
-            $pairwiseID,
+            $idp_display_name,
+            $first_name,
+            $last_name,
+            $display_name,
+            $email,
+            $loa,
+            $eppn,
+            $eptid,
+            $open_id,
+            $oidc,
+            $subject_id,
+            $pairwise_id,
             $affiliation,
             $ou,
-            $memberof,
+            $member_of,
             $acr,
             $entitlement,
             $itrustuin
         );
-        static::setSessionVar('uid', $dbs->user_uid);
-        static::setSessionVar('dn', $dbs->distinguished_name);
+        static::setSessionVar('user_uid', $dbs->user_uid);
+        static::setSessionVar('distinguished_name', $dbs->distinguished_name);
         static::setSessionVar('status', $dbs->status);
         if (!$result) {
             static::sendErrorAlert(
@@ -833,46 +799,48 @@ Remote Address= ' . $remoteaddr . '
                 static::sendErrorAlert(
                     'Failure in ' .
                         (($loa == 'openid') ? '' : '/secure') . '/getuser/',
-                    'Remote_User   = ' . ((strlen($remoteuser) > 0) ?
-                        $remoteuser : '<MISSING>') . "\n" .
+                    'Remote_User   = ' . ((strlen($remote_user) > 0) ?
+                        $remote_user : '<MISSING>') . "\n" .
                     'IdP ID        = ' . ((strlen($idp) > 0) ?
                         $idp : '<MISSING>') . "\n" .
-                    'IdP Name      = ' . ((strlen($idpname) > 0) ?
-                        $idpname : '<MISSING>') . "\n" .
-                    'First Name    = ' . ((strlen($firstname) > 0) ?
-                        $firstname : '<MISSING>') . "\n" .
-                    'Last Name     = ' . ((strlen($lastname) > 0) ?
-                        $lastname : '<MISSING>') . "\n" .
-                    'Display Name  = ' . ((strlen($displayname) > 0) ?
-                        $displayname : '<MISSING>') . "\n" .
-                    'Email Address = ' . ((strlen($emailaddr) > 0) ?
-                        $emailaddr : '<MISSING>') . "\n" .
-                    'ePPN          = ' . ((strlen($ePPN) > 0) ?
-                        $ePPN : '<MISSING>') . "\n" .
-                    'ePTID         = ' . ((strlen($ePTID) > 0) ?
-                        $ePTID : '<MISSING>') . "\n" .
-                    'OpenID ID     = ' . ((strlen($openidID) > 0) ?
-                        $openidID : '<MISSING>') . "\n" .
-                    'OIDC ID       = ' . ((strlen($oidcID) > 0) ?
-                        $oidcID : '<MISSING>') . "\n" .
-                    'Subject ID    = ' . ((strlen($subjectID) > 0) ?
-                        $subjectID : '<MISSING>') . "\n" .
-                    'Pairwise ID   = ' . ((strlen($pairwiseID) > 0) ?
-                        $pairwiseID : '<MISSING>') . "\n" .
+                    'IdP Name      = ' . ((strlen($idp_display_name) > 0) ?
+                        $idp_display_name : '<MISSING>') . "\n" .
+                    'First Name    = ' . ((strlen($first_name) > 0) ?
+                        $first_name : '<MISSING>') . "\n" .
+                    'Last Name     = ' . ((strlen($last_name) > 0) ?
+                        $last_name : '<MISSING>') . "\n" .
+                    'Display Name  = ' . ((strlen($display_name) > 0) ?
+                        $display_name : '<MISSING>') . "\n" .
+                    'Email Address = ' . ((strlen($email) > 0) ?
+                        $email : '<MISSING>') . "\n" .
+                    'LOA           = ' . ((strlen($loa) > 0) ?
+                        $loa : '<MISSING>') . "\n" .
+                    'ePPN          = ' . ((strlen($eppn) > 0) ?
+                        $eppn : '<MISSING>') . "\n" .
+                    'ePTID         = ' . ((strlen($eptid) > 0) ?
+                        $eptid : '<MISSING>') . "\n" .
+                    'OpenID ID     = ' . ((strlen($open_id) > 0) ?
+                        $open_id : '<MISSING>') . "\n" .
+                    'OIDC ID       = ' . ((strlen($oidc) > 0) ?
+                        $oidc : '<MISSING>') . "\n" .
+                    'Subject ID    = ' . ((strlen($subject_id) > 0) ?
+                        $subject_id : '<MISSING>') . "\n" .
+                    'Pairwise ID   = ' . ((strlen($pairwise_id) > 0) ?
+                        $pairwise_id : '<MISSING>') . "\n" .
                     'Affiliation   = ' . ((strlen($affiliation) > 0) ?
                         $affiliation : '<MISSING>') . "\n" .
                     'OU            = ' . ((strlen($ou) > 0) ?
                         $ou : '<MISSING>') . "\n" .
-                    'MemberOf      = ' . ((strlen($memberof) > 0) ?
-                        $memberof : '<MISSING>') . "\n" .
+                    'MemberOf      = ' . ((strlen($member_of) > 0) ?
+                        $member_of : '<MISSING>') . "\n" .
                     'ACR           = ' . ((strlen($acr) > 0) ?
                         $acr : '<MISSING>') . "\n" .
                     'Entitlement   = ' . ((strlen($entitlement) > 0) ?
                         $entitlement : '<MISSING>') . "\n" .
                     'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?
                         $itrustuin : '<MISSING>') . "\n" .
-                    'Database UID  = ' . ((strlen(
-                        $i = static::getSessionVar('uid')
+                    'User UID      = ' . ((strlen(
+                        $i = static::getSessionVar('user_uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .
                     'Status Code   = ' . ((strlen(
                         $i = array_search(
@@ -884,6 +852,13 @@ Remote Address= ' . $remoteaddr . '
                 );
             }
             static::unsetSessionVar('authntime');
+        } else {
+            // Success! We need to overwrite current session vars with values
+            // returned by the DBService, e.g., in case attributes were read
+            // from LDAP.
+            foreach (DBService::$user_attrs as $value) {
+                static::setSessionVar($value, $dbs->$value);
+            }
         }
     }
 
@@ -894,19 +869,13 @@ Remote Address= ' . $remoteaddr . '
      * variables into the PHP session for later use.
      *
      * @param mixed $args Variable number of user attribute paramters
-     *        ordered as shown in the $attrs array below.
+     *        ordered as shown in the DBService::$user_attrs array.
      */
     public static function setUserAttributeSessionVars(...$args)
     {
-        $attrs = array('remoteuser', 'idp', 'idpname', 'firstname',
-                       'lastname', 'displayname', 'emailaddr',
-                       'loa', 'ePPN', 'ePTID', 'openidID', 'oidcID',
-                       'subjectID', 'pairwiseID',
-                       'affiliation', 'ou', 'memberof', 'acr',
-                       'entitlement', 'itrustuin');
         $numargs = count($args);
         for ($i = 0; $i < $numargs; $i++) {
-            static::setSessionVar($attrs[$i], $args[$i]);
+            static::setSessionVar(DBService::$user_attrs[$i], $args[$i]);
         }
 
         static::setSessionVar('status', '0');
@@ -953,34 +922,13 @@ Remote Address= ' . $remoteaddr . '
      */
     public static function unsetUserSessionVars()
     {
-        // Needed for verifyCurrentUserSession
-        static::unsetSessionVar('idp');
-        static::unsetSessionVar('idpname');
+        foreach (DBService::$user_attrs as $value) {
+            static::unsetSessionVar($value);
+        }
         static::unsetSessionVar('status');
-        static::unsetSessionVar('uid');
-        static::unsetSessionVar('dn');
+        static::unsetSessionVar('user_uid');
+        static::unsetSessionVar('distinguished_name');
         static::unsetSessionVar('authntime');
-
-        // Variables set by getuser
-        static::unsetSessionVar('firstname');
-        static::unsetSessionVar('lastname');
-        static::unsetSessionVar('displayname');
-        static::unsetSessionVar('emailaddr');
-        static::unsetSessionVar('loa');
-        static::unsetSessionVar('ePPN');
-        static::unsetSessionVar('ePTID');
-        static::unsetSessionVar('openidID');
-        static::unsetSessionVar('oidcID');
-        static::unsetSessionVar('subjectID');
-        static::unsetSessionVar('pairwiseID');
-        static::unsetSessionVar('affiliation');
-        static::unsetSessionVar('ou');
-        static::unsetSessionVar('memberof');
-        static::unsetSessionVar('acr');
-        static::unsetSessionVar('entitlement');
-        static::unsetSessionVar('itrustuin');
-
-        // Current skin
         static::unsetSessionVar('cilogon_skin');
     }
 
@@ -1040,22 +988,22 @@ Remote Address= ' . $remoteaddr . '
      *
      * @param string $idp (optional) The IdP entityID. If empty, read value
      *        from PHP session.
-     * @param string $idpname (optional) The IdP display name. If empty,
+     * @param string $idp_display_name (optional) The IdP display name. If empty,
      *        read value from PHP session.
      * @return bool True if the current IdP is an eduGAIN IdP without
      *         both REFEDS R&S and SIRTFI, AND the session could be
      *         used to get a certificate.
      */
-    public static function isEduGAINAndGetCert($idp = '', $idpname = '')
+    public static function isEduGAINAndGetCert($idp = '', $idp_display_name = '')
     {
         $retval = false; // Assume not eduGAIN IdP and getcert
 
-        // If $idp or $idpname not passed in, get from current session.
+        // If $idp or $idp_display_name not passed in, get from current session.
         if (strlen($idp) == 0) {
             $idp = static::getSessionVar('idp');
         }
-        if (strlen($idpname) == 0) {
-            $idpname = static::getSessionVar('idpname');
+        if (strlen($idp_display_name) == 0) {
+            $idp_display_name = static::getSessionVar('idp_display_name');
         }
 
         // Check if this was an OIDC transaction, and if the
@@ -1079,8 +1027,8 @@ Remote Address= ' . $remoteaddr . '
         $idplist = static::getIdpList();
         if (
             ((strlen($idp) > 0) &&
-            (strlen($idpname) > 0) &&
-            (!in_array($idpname, static::$oauth2idps))) &&
+            (strlen($idp_display_name) > 0) &&
+            (!in_array($idp_display_name, static::$oauth2idps))) &&
                 (
                 // Next, check for eduGAIN without REFEDS R&S and SIRTFI
                 ((!$idplist->isRegisteredByInCommon($idp)) &&

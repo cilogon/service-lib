@@ -88,6 +88,8 @@ class DBService
         'STATUS_CLIENT_NOT_FOUND'          => 0xFFFFF, // 1048575
         'STATUS_TRANSACTION_NOT_FOUND'     => 0x10001, //   65537
         'STATUS_EPTID_MISMATCH'            => 0x100001,// 1048577
+        'STATUS_PAIRWISE_ID_MISMATCH'      => 0x100003,// 1048579
+        'STATUS_SUBJECT_ID_MISMATCH'       => 0x100005,// 1048581
         'STATUS_EXPIRED_TOKEN'             => 0x10003, //   65539
         'STATUS_CREATE_TRANSACTION_FAILED' => 0x10005, //   65541
         'STATUS_UNKNOWN_CALLBACK'          => 0x10007, //   65543
@@ -118,6 +120,8 @@ class DBService
         'STATUS_CLIENT_NOT_FOUND'          => 'Missing client.',
         'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
         'STATUS_EPTID_MISMATCH'            => 'EPTID mismatch.',
+        'STATUS_PAIRWISE_ID_MISMATCH'      => 'Pairwise ID mismatch.',
+        'STATUS_SUBJECT_ID_MISMATCH'       => 'Subject ID mismatch.',
         'STATUS_EXPIRED_TOKEN'             => 'Expired token.',
         'STATUS_CREATE_TRANSACTION_FAILED' => 'Failed to initialize OIDC flow.',
         'STATUS_UNKNOWN_CALLBACK'          => 'The redirect_uri does not match a registered callback URI.',
@@ -126,6 +130,35 @@ class DBService
         'STATUS_UNKNOWN_CLIENT'            => 'Unknown client_id.',
         'STATUS_UNAPPROVED_CLIENT'         => 'Client has not been approved.'
     );
+
+    /**
+     * @var array $user_attrs An array of all the user attributes that
+     *      get passed to the getUser function. This is available to other
+     *      function since these user attributes are set frequently
+     *      throughout the code.
+     */
+    public static $user_attrs = [
+        'remote_user',
+        'idp',
+        'idp_display_name',
+        'first_name',
+        'last_name',
+        'display_name',
+        'email',
+        'loa',
+        'eppn',
+        'eptid',
+        'open_id',
+        'oidc',
+        'subject_id',
+        'pairwise_id',
+        'affiliation',
+        'ou',
+        'member_of',
+        'acr',
+        'entitlement',
+        'itrustuin',
+    ];
 
     /**
      * @var int|null $status The returned status code from dbService calls
@@ -171,6 +204,11 @@ class DBService
      * @var string|null $email User's email address
      */
     public $email;
+
+    /**
+     * @var string|null $loa Level of Assurance (Note: not saved in database)
+     */
+    public $loa;
 
     /**
      * @var string|null $distinguished_name X.509 DN + email address
@@ -364,30 +402,14 @@ class DBService
      */
     public function clearUser()
     {
+        foreach (static::$user_attrs as $value) {
+            $this->$value = null;
+        }
         $this->status = null;
         $this->user_uid = null;
-        $this->remote_user = null;
-        $this->idp = null;
-        $this->idp_display_name = null;
-        $this->first_name = null;
-        $this->last_name = null;
-        $this->display_name = null;
-        $this->email = null;
         $this->distinguished_name = null;
-        $this->eppn = null;
-        $this->eptid = null;
-        $this->open_id = null;
-        $this->oidc = null;
         $this->serial_string = null;
         $this->create_time = null;
-        $this->affiliation = null;
-        $this->ou = null;
-        $this->member_of = null;
-        $this->acr = null;
-        $this->entitlement = null;
-        $this->itrustuin = null;
-        $this->subject_id = null;
-        $this->pairwise_id = null;
     }
 
     /**
@@ -461,22 +483,17 @@ class DBService
             $retval = $this->call('action=getUser&user_uid=' .
                 urlencode($args[0]));
         } elseif ($numargs > 1) {
-            $params = array('remote_user', 'idp', 'idp_display_name',
-                            'first_name', 'last_name', 'display_name', 'email',
-                            'eppn', 'eptid', 'open_id', 'oidc',
-                            'subject_id', 'pairwise_id',
-                            'affiliation', 'ou', 'member_of', 'acr',
-                            'entitlement', 'itrustuin');
             $cmd = 'action=getUser';
             $attr_arr = array();
+            $ou_pos = array_search('ou', static::$user_attrs);
             for ($i = 0; $i < $numargs; $i++) {
                 $arg = $args[$i];
                 if (strlen($arg) > 0) {
-                    if ($i >= 15) {
+                    if ($i > $ou_pos) {
                         // Put params after $ou into JSON object
-                        $attr_arr[$params[$i]] = $arg;
+                        $attr_arr[static::$user_attrs[$i]] = $arg;
                     } else {
-                        $cmd .= '&' . $params[$i] . '=' . urlencode($arg);
+                        $cmd .= '&' . static::$user_attrs[$i] . '=' . urlencode($arg);
                     }
                 }
             }
@@ -504,25 +521,6 @@ class DBService
             $retval = $this->call($cmd);
         }
         return $retval;
-    }
-
-    /**
-     * getLastArchivedUser
-     *
-     * This method calls the 'getLastArchivedUser' action of the
-     * servlet and sets the class member variables associated with user
-     * info appropriately.  If the servlet returns correctly (i.e. an
-     * HTTP status code of 200), this method returns true.
-     *
-     * @param string $uid The database user identifier
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function getLastArchivedUser($uid)
-    {
-        $this->clearUser();
-        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
-        return $this->call('action=getLastArchivedUser&user_uid=' .
-            urlencode($uid));
     }
 
     /**

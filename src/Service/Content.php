@@ -409,7 +409,7 @@ class Content
         $skin = Util::getSkin();
         $pkcs12disabled = $skin->getConfigOption('pkcs12', 'disabled');
         $disabledbyskin = ((!is_null($pkcs12disabled)) && ((int)$pkcs12disabled == 1));
-        $dn = Util::getSessionVar('dn'); // Did we get user attributes for certs?
+        $dn = Util::getSessionVar('distinguished_name'); // Did we get user attributes for certs?
 
         if ($disabledbyconf || $disabledbyskin || (strlen($dn) == 0)) {
             if ($disabledbyconf) {
@@ -675,7 +675,7 @@ class Content
      */
     public static function printCertInfo()
     {
-        $dn = Util::getSessionVar('dn');
+        $dn = Util::getSessionVar('distinguished_name');
         static::printCollapseBegin('certinfo', 'Certificate Information');
         if (strlen($dn) > 0) {
             // Strip off the email address from the pseudo-DN.
@@ -690,7 +690,7 @@ class Content
                   </tr>
                   <tr>
                     <th>Identity Provider:</th>
-                    <td>', Util::getSessionVar('idpname'), '</td>
+                    <td>', Util::getSessionVar('idp_display_name'), '</td>
                   </tr>
                   <tr>
                     <th><a target="_blank"
@@ -724,21 +724,21 @@ class Content
                   has not provided CILogon with all required information.
                 </div> <!-- end card-text -->'
             );
-            $firstname   = Util::getSessionVar('firstname');
-            $lastname    = Util::getSessionVar('lastname');
-            $displayname = Util::getSessionVar('displayname');
-            $emailaddr   = Util::getSessionVar('emailaddr');
+            $first_name   = Util::getSessionVar('first_name');
+            $last_name    = Util::getSessionVar('last_name');
+            $display_name = Util::getSessionVar('display_name');
+            $email        = Util::getSessionVar('email');
             echo '
                 <table class="table table-striped table-sm">
                 <tbody>';
-            if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
+            if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
                   <tr>
                     <th class="w-50">First Name:</th>
                     <td>MISSING</td>
                   </tr>';
             }
-            if ((strlen($lastname) == 0) && (strlen($displayname) == 0)) {
+            if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
                   <tr>
                     <th class="w-50">Last Name:</th>
@@ -746,8 +746,8 @@ class Content
                   </tr>';
             }
             if (
-                (strlen($displayname) == 0) &&
-                ((strlen($firstname) == 0) || (strlen($lastname) == 0))
+                (strlen($display_name) == 0) &&
+                ((strlen($first_name) == 0) || (strlen($last_name) == 0))
             ) {
                 echo '
                   <tr>
@@ -755,17 +755,17 @@ class Content
                     <td>MISSING</td>
                   </tr>';
             }
-            $emailvalid = filter_var($emailaddr, FILTER_VALIDATE_EMAIL);
-            if ((strlen($emailaddr) == 0) || (!$emailvalid)) {
+            $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
+            if ((strlen($email) == 0) || (!$emailvalid)) {
                 echo '
                   <tr>
                     <th class="w-50">Email Address:</th>
-                    <td>' , ((strlen($emailaddr) == 0) ? 'MISSING' : 'INVALID') , '</td>
+                    <td>' , ((strlen($email) == 0) ? 'MISSING' : 'INVALID') , '</td>
                   </tr>';
             }
             $idp     = Util::getSessionVar('idp');
-            $idpname = Util::getSessionVar('idpname');
-            if (Util::isEduGAINAndGetCert($idp, $idpname)) {
+            $idp_display_name = Util::getSessionVar('idp_display_name');
+            if (Util::isEduGAINAndGetCert($idp, $idp_display_name)) {
                 $idplist = Util::getIdpList();
                 if (!$idplist->isREFEDSRandS($idp)) {
                     echo '
@@ -812,8 +812,8 @@ class Content
         $errors = array();
 
         // CIL-416 Show warning for missing ePPN
-        if (($samlidp) && (empty(Util::getSessionVar('ePPN')))) {
-            if (empty(Util::getSessionVar('ePTID'))) {
+        if (($samlidp) && (empty(Util::getSessionVar('eppn')))) {
+            if (empty(Util::getSessionVar('eptid'))) {
                 $errors['no_eppn_or_eptid'] = true;
             } else {
                 $warnings['no_eppn'] = true;
@@ -823,29 +823,29 @@ class Content
         if (empty($idp)) {
             $errors['no_entityID'] = true;
         } else {
-            if ((!$samlidp) && (empty(Util::getSessionVar('oidcID')))) {
-                $errors['no_oidcID'] = true;
+            if ((!$samlidp) && (empty(Util::getSessionVar('oidc')))) {
+                $errors['no_oidc'] = true;
             }
         }
 
-        if ((empty(Util::getSessionVar('firstname'))) && (empty(Util::getSessionVar('displayname')))) {
-            $errors['no_firstname'] = true;
+        if ((empty(Util::getSessionVar('first_name'))) && (empty(Util::getSessionVar('display_name')))) {
+            $errors['no_first_name'] = true;
         }
 
-        if ((empty(Util::getSessionVar('lastname'))) && (empty(Util::getSessionVar('displayname')))) {
-            $errors['no_lastname'] = true;
+        if ((empty(Util::getSessionVar('last_name'))) && (empty(Util::getSessionVar('display_name')))) {
+            $errors['no_last_name'] = true;
         }
 
         if (
-            (empty(Util::getSessionVar('displayname'))) &&
-            ((empty(Util::getSessionVar('firstname'))) ||
-            (empty(Util::getSessionVar('lastname'))))
+            (empty(Util::getSessionVar('display_name'))) &&
+            ((empty(Util::getSessionVar('first_name'))) ||
+            (empty(Util::getSessionVar('last_name'))))
         ) {
-            $errors['no_displayname'] = true;
+            $errors['no_display_name'] = true;
         }
 
-        $emailvalid = filter_var(Util::getSessionVar('emailaddr'), FILTER_VALIDATE_EMAIL);
-        if ((empty(Util::getSessionVar('emailaddr'))) || (!$emailvalid)) {
+        $emailvalid = filter_var(Util::getSessionVar('email'), FILTER_VALIDATE_EMAIL);
+        if ((empty(Util::getSessionVar('email'))) || (!$emailvalid)) {
             $errors['no_valid_email'] = true;
         }
 
@@ -888,7 +888,7 @@ class Content
 
               <tr>
                 <th>ePTID:</th>
-                <td>', Util::getSessionVar('ePTID'), '</td>
+                <td>', Util::getSessionVar('eptid'), '</td>
                 <td>';
 
         if (@$errors['no_eppn_or_eptid']) {
@@ -905,7 +905,7 @@ class Content
 
               <tr>
                 <th>ePPN:</th>
-                <td>', Util::getSessionVar('ePPN'), '</td>
+                <td>', Util::getSessionVar('eppn'), '</td>
                 <td>';
 
         if (@$errors['no_eppn_or_eptid']) {
@@ -928,10 +928,10 @@ class Content
 
               <tr>
                 <th>OpenID:</th>
-                <td>', Util::getSessionVar('oidcID'), '</td>
+                <td>', Util::getSessionVar('oidc'), '</td>
                 <td>';
 
-        if (@$errors['no_oidcID']) {
+        if (@$errors['no_oidc']) {
             echo static::getIcon(
                 'fa-exclamation-circle',
                 'red',
@@ -945,10 +945,10 @@ class Content
 
               <tr>
                 <th>First Name (givenName):</th>
-                <td>', Util::getSessionVar('firstname'), '</td>
+                <td>', Util::getSessionVar('first_name'), '</td>
                 <td>';
 
-        if (@$errors['no_firstname']) {
+        if (@$errors['no_first_name']) {
             echo static::getIcon(
                 'fa-exclamation-circle',
                 'red',
@@ -962,10 +962,10 @@ class Content
 
               <tr>
                 <th>Last Name (sn):</th>
-                <td>', Util::getSessionVar('lastname'), '</td>
+                <td>', Util::getSessionVar('last_name'), '</td>
                 <td>';
 
-        if (@$errors['no_lastname']) {
+        if (@$errors['no_last_name']) {
             echo static::getIcon(
                 'fa-exclamation-circle',
                 'red',
@@ -979,10 +979,10 @@ class Content
 
               <tr>
                 <th>Display Name (displayName):</th>
-                <td>', Util::getSessionVar('displayname'), '</td>
+                <td>', Util::getSessionVar('display_name'), '</td>
                 <td>';
 
-        if (@$errors['no_displayname']) {
+        if (@$errors['no_display_name']) {
             echo static::getIcon(
                 'fa-exclamation-circle',
                 'red',
@@ -996,7 +996,7 @@ class Content
 
               <tr>
                 <th>Email Address (email):</th>
-                <td>', Util::getSessionVar('emailaddr'), '</td>
+                <td>', Util::getSessionVar('email'), '</td>
                 <td>';
 
         if (@$errors['no_valid_email']) {
@@ -1043,7 +1043,7 @@ class Content
 
               <tr>
                 <th>Member (member):</th>
-                <td>', Util::getSessionVar('memberof'), '</td>
+                <td>', Util::getSessionVar('member_of'), '</td>
                 <td> </td>
               </tr>
 
@@ -1055,13 +1055,13 @@ class Content
 
               <tr>
                 <th>Subject ID (subject-id):</th>
-                <td>', Util::getSessionVar('subjectID'), '</td>
+                <td>', Util::getSessionVar('subject_id'), '</td>
                 <td> </td>
               </tr>
 
               <tr>
                 <th>Pairwise ID (pairwise-id):</th>
-                <td>', Util::getSessionVar('pairwiseID'), '</td>
+                <td>', Util::getSessionVar('pairwise_id'), '</td>
                 <td> </td>
               </tr>
               </tbody>
@@ -1405,7 +1405,7 @@ class Content
     {
         $logofftext = 'End your CILogon session and return to the ' .
            'front page. Note that this will not log you out at ' .
-            Util::getSessionVar('idpname') . '.';
+            Util::getSessionVar('idp_display_name') . '.';
 
         static::printFormHead();
         echo '
@@ -1493,22 +1493,22 @@ class Content
      * eduGAIN IdP without both R&S and SIRTFI, and the user was trying to
      * get a certificate.
      *
-     * @param string $ePPN
-     * @param string $ePTID
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $displayname
-     * @param string $emailaddr
+     * @param string $eppn
+     * @param string $eptid
+     * @param string $first_name
+     * @param string $last_name
+     * @param string $display_name
+     * @param string $email
      * @param string $idp
-     * @param string $idpname
+     * @param string $idp_display_name
      * @param string $affiliation
      * @param string $ou
-     * @param string $memberof
+     * @param string $member_of
      * @param string $acr
      * @param string $entitlement
      * @param string $itrustuin
-     * @param string $subjectID
-     * @param string $pairwiseID
+     * @param string $subject_id
+     * @param string $pairwise_id
      * @param string $clientparams
      * @param string $redirect The url for the <form> element
      * @param string $redirectform Additional hidden input fields for the
@@ -1517,22 +1517,22 @@ class Content
      *        R&S and SIRTIF, and the user could get a certificate?
      */
     public static function printSAMLAttributeReleaseErrorPage(
-        $ePPN,
-        $ePTID,
-        $firstname,
-        $lastname,
-        $displayname,
-        $emailaddr,
+        $eppn,
+        $eptid,
+        $first_name,
+        $last_name,
+        $display_name,
+        $email,
         $idp,
-        $idpname,
+        $idp_display_name,
         $affiliation,
         $ou,
-        $memberof,
+        $member_of,
         $acr,
         $entitlement,
         $itrustuin,
-        $subjectID,
-        $pairwiseID,
+        $subject_id,
+        $pairwise_id,
         $clientparams,
         $redirect,
         $redirectform,
@@ -1560,7 +1560,7 @@ class Content
 
         $missingattrs = '';
         // Show user which attributes are missing
-        if ((strlen($ePPN) == 0) && (strlen($ePTID) == 0)) {
+        if ((strlen($eppn) == 0) && (strlen($eptid) == 0)) {
             $errorboxstr .= '
                 <dt class="col-sm-3">ePTID:</dt>
                 <dd class="col-sm-9">MISSING</dd>
@@ -1569,33 +1569,33 @@ class Content
             $missingattrs .= '%0D%0A    eduPersonPrincipalName' .
                              '%0D%0A    eduPersonTargetedID ';
         }
-        if ((strlen($firstname) == 0) && (strlen($displayname) == 0)) {
+        if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
                 <dt class="col-sm-3">First Name:</dt>
                 <dd class="col-sm-9">MISSING</dd>';
             $missingattrs .= '%0D%0A    givenName (first name)';
         }
-        if ((strlen($lastname) == 0) && (strlen($displayname) == 0)) {
+        if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
                 <dt class="col-sm-3">Last Name:</dt>
                 <dd class="col-sm-9">MISSING</dd>';
             $missingattrs .= '%0D%0A    sn (last name)';
         }
         if (
-            (strlen($displayname) == 0) &&
-            ((strlen($firstname) == 0) || (strlen($lastname) == 0))
+            (strlen($display_name) == 0) &&
+            ((strlen($first_name) == 0) || (strlen($last_name) == 0))
         ) {
             $errorboxstr .= '
                 <dt class="col-sm-3">Display Name:</dt>
                 <dd class="col-sm-9">MISSING</dd>';
             $missingattrs .= '%0D%0A    displayName';
         }
-        $emailvalid = filter_var($emailaddr, FILTER_VALIDATE_EMAIL);
-        if ((strlen($emailaddr) == 0) || (!$emailvalid)) {
+        $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
+        if ((strlen($email) == 0) || (!$emailvalid)) {
             $errorboxstr .= '
                 <dt class="col-sm-3">Email Address:</dt>
                 <dd class="col-sm-9">' .
-            ((strlen($emailaddr) == 0) ? 'MISSING' : 'INVALID') . '</dd>';
+            ((strlen($email) == 0) ? 'MISSING' : 'INVALID') . '</dd>';
             $missingattrs .= '%0D%0A    mail (email address)';
         }
         // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
@@ -1624,7 +1624,7 @@ class Content
         static::printErrorBox($errorboxstr);
 
         if (
-            (strlen($emailaddr) == 0) &&
+            (strlen($email) == 0) &&
             (preg_match('/student@/', $affiliation))
         ) {
             $student = true;
@@ -1642,7 +1642,7 @@ class Content
         $emailmsg = '?subject=Attribute Release Problem for CILogon' .
         '&cc=' . EMAIL_HELP .
         '&body=Hello, I am having trouble logging on to ' .
-        'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idpname .
+        'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idp_display_name .
         ' Identity Provider (IdP) ' .
         'due to the following missing attributes:%0D%0A' .
         $missingattrs;
@@ -1755,13 +1755,13 @@ class Content
      * and/or email address. Print out a special message for each OAuth2 IdP
      * to let the user know how to fix the issue.
      *
-     * @param string $idpname The name of the OAuth2 IdP.
+     * @param string $idp_display_name The name of the OAuth2 IdP.
      * @param string $redirect The url for the <form> element
      * @param string $redirectform Additional hidden input fields for the
      *        <form>.
      *
      */
-    public static function printOAuth2AttributeReleaseErrorPage($idpname, $redirect, $redirectform)
+    public static function printOAuth2AttributeReleaseErrorPage($idp_display_name, $redirect, $redirectform)
     {
         Util::unsetAllUserSessionVars();
         static::printHeader('Error Logging On');
@@ -1776,7 +1776,7 @@ class Content
 
         static::printErrorBox('There was a problem logging on.');
 
-        if ($idpname == 'Google') {
+        if ($idp_display_name == 'Google') {
             echo '
               <div class="card-text my-2">
                 There was a problem logging on. It appears that you have
@@ -1795,7 +1795,7 @@ class Content
                 please contact us at the email address at the bottom of the
                 page.
               </div>';
-        } elseif ($idpname == 'GitHub') {
+        } elseif ($idp_display_name == 'GitHub') {
             echo '
               <div class="card-text my-2">
                 There was a problem logging on. It appears that you have
@@ -1814,7 +1814,7 @@ class Content
                 please contact us at the email address at the bottom of the
                 page.
               </div>';
-        } elseif ($idpname == 'ORCID') {
+        } elseif ($idp_display_name == 'ORCID') {
             echo '
               <div class="card-text my-2">
                 There was a problem logging on. It appears that you have
@@ -1846,7 +1846,7 @@ class Content
                     <div class="col-auto">
                       <input type="hidden" name="providerId"
                       value="' ,
-                      Util::getAuthzUrl($idpname) , '" />
+                      Util::getAuthzUrl($idp_display_name) , '" />
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
@@ -2071,9 +2071,9 @@ class Content
      *
      * This function verifies the contents of the PHP session.  It checks
      * the following:
-     * (1) The persistent store 'uid', the Identity Provider 'idp', the
-     *     IdP Display Name 'idpname', and the 'status' (of getUser()) are
-     *     all non-empty strings.
+     * (1) The persistent store 'user_uid', the Identity Provider 'idp',
+     *     the IdP Display Name 'idp_display_name', and the 'status'
+     *     (of getUser()) are all non-empty strings.
      * (2) The 'status' (of getUser()) is even (i.e. STATUS_OK).
      * (3) If $providerId is passed-in, it must match 'idp'.
      * If all checks are good, then this function returns true.
@@ -2089,8 +2089,8 @@ class Content
         $retval = false;
 
         $idp       = Util::getSessionVar('idp');
-        $idpname   = Util::getSessionVar('idpname');
-        $uid       = Util::getSessionVar('uid');
+        $idp_display_name   = Util::getSessionVar('idp_display_name');
+        $user_uid  = Util::getSessionVar('user_uid');
         $status    = Util::getSessionVar('status');
         $authntime = Util::getSessionVar('authntime');
 
@@ -2102,8 +2102,8 @@ class Content
                 $retval = true;
             }
         } elseif (
-            (strlen($uid) > 0) && (strlen($idp) > 0) &&
-            (strlen($idpname) > 0) && (strlen($status) > 0) &&
+            (strlen($user_uid) > 0) && (strlen($idp) > 0) &&
+            (strlen($idp_display_name) > 0) && (strlen($status) > 0) &&
             (strlen($authntime) > 0) &&
             (!($status & 1)) // All STATUS_OK codes are even
         ) {
@@ -2161,7 +2161,7 @@ class Content
             $providerId = Util::getPortalOrNormalCookieVar('providerId');
         }
 
-        // If the user has a valid 'uid' in the PHP session, and the
+        // If the user has a valid 'user_uid' in the PHP session, and the
         // providerId matches the 'idp' in the PHP session, then
         // simply go to the main page.
         if (static::verifyCurrentUserSession($providerId)) {
@@ -2244,7 +2244,7 @@ class Content
             $providerId = Util::getPortalOrNormalCookieVar('providerId');
         }
 
-        // If the user has a valid 'uid' in the PHP session, and the
+        // If the user has a valid 'user_uid' in the PHP session, and the
         // providerId matches the 'idp' in the PHP session, then
         // simply go to the 'Download Certificate' button page.
         if (static::verifyCurrentUserSession($providerId)) {
@@ -2299,38 +2299,25 @@ class Content
      * handleGotUser
      *
      * This function is called upon return from one of the getuser scripts
-     * which should have set the 'uid' and 'status' PHP session variables.
+     * which should have set the 'user_uid' and 'status' PHP session variables.
      * It verifies that the status return is one of STATUS_OK (even
      * values).  If not, we print an error message to the user.
      */
     public static function handleGotUser()
     {
         $log = new Loggit();
-        $uid = Util::getSessionVar('uid');
+        $user_uid = Util::getSessionVar('user_uid');
         $status = Util::getSessionVar('status');
 
         // We must get and unset session vars BEFORE any HTML output since
         // a redirect may go to another site, meaning we need to update
         // the session cookie before we leave the cilogon.org domain.
-        $ePPN         = Util::getSessionVar('ePPN');
-        $ePTID        = Util::getSessionVar('ePTID');
-        $firstname    = Util::getSessionVar('firstname');
-        $lastname     = Util::getSessionVar('lastname');
-        $displayname  = Util::getSessionVar('displayname');
-        $emailaddr    = Util::getSessionVar('emailaddr');
-        $idp          = Util::getSessionVar('idp');
-        $idpname      = Util::getSessionVar('idpname');
-        $affiliation  = Util::getSessionVar('affiliation');
-        $ou           = Util::getSessionVar('ou');
-        $memberof     = Util::getSessionVar('memberof');
-        $acr          = Util::getSessionVar('acr');
-        $entitlement  = Util::getSessionVar('entitlement');
-        $itrustuin    = Util::getSessionVar('itrustuin');
-        $subjectID    = Util::getSessionVar('subjectID');
-        $pairwiseID   = Util::getSessionVar('pairwiseID');
+        foreach (DBService::$user_attrs as $value) {
+            $$value = Util::getSessionVar($value);
+        }
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $failureuri   = Util::getSessionVar('failureuri');
-        $dn           = Util::getSessionVar('dn');
+        $dn           = Util::getSessionVar('distinguished_name');
 
         // CIL-410 The /testidp/ flow is indicated by the presence of the
         // 'storeattributes' PHP session var. In this case, simply show
@@ -2360,7 +2347,7 @@ class Content
             $redirect = $failureuri . "?reason=missing_attributes";
         }
 
-        $isEduGAINAndGetCert = Util::isEduGAINAndGetCert($idp, $idpname);
+        $isEduGAINAndGetCert = Util::isEduGAINAndGetCert($idp, $idp_display_name);
 
         // Was this an OAuth 1.0a transaction but the distinguished_name
         // could not be calculated? Set $missingparam below.
@@ -2368,11 +2355,11 @@ class Content
 
         // Check for various error conditions and print out appropriate page
         if (
-            (strlen($uid) == 0) ||    // Empty uid
-            (strlen($status) == 0) || // Empty status
-            ($status & 1) ||          // Odd-numbered status = error
-            ($isEduGAINAndGetCert) || // Not allowed
-            ($oauth1withoutdn)        // OAuth1.0a needs DN for cert
+            (strlen($user_uid) == 0) || // Empty user_uid
+            (strlen($status) == 0) ||   // Empty status
+            ($status & 1) ||            // Odd-numbered status = error
+            ($isEduGAINAndGetCert) ||   // Not allowed
+            ($oauth1withoutdn)          // OAuth1.0a needs DN for cert
         ) {
             $log->error(
                 'Failed to getuser' .
@@ -2390,22 +2377,22 @@ class Content
 
             if (($isEduGAINAndGetCert) || ($missingparam && $samlidp)) {
                 static::printSAMLAttributeReleaseErrorPage(
-                    $ePPN,
-                    $ePTID,
-                    $firstname,
-                    $lastname,
-                    $displayname,
-                    $emailaddr,
+                    $eppn,
+                    $eptid,
+                    $first_name,
+                    $last_name,
+                    $display_name,
+                    $email,
                     $idp,
-                    $idpname,
+                    $idp_display_name,
                     $affiliation,
                     $ou,
-                    $memberof,
+                    $member_of,
                     $acr,
                     $entitlement,
                     $itrustuin,
-                    $subjectID,
-                    $pairwiseID,
+                    $subject_id,
+                    $pairwise_id,
                     $clientparams,
                     $redirect,
                     $redirectform,
@@ -2413,7 +2400,7 @@ class Content
                 );
             } elseif ($missingparam && (!$samlidp)) { // OAuth2 IdP
                 static::printOAuth2AttributeReleaseErrorPage(
-                    $idpname,
+                    $idp_display_name,
                     $redirect,
                     $redirectform
                 );
@@ -2477,7 +2464,7 @@ class Content
         ) {
             // Extra check for new users: see if any HTML entities
             // are in the user name. If so, send an email alert.
-            $dn = Util::getSessionVar('dn');
+            $dn = Util::getSessionVar('distinguished_name');
             $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
             $htmldn = Util::htmlent($dn);
             if (strcmp($dn, $htmldn) != 0) {
@@ -2563,7 +2550,7 @@ class Content
             return; // MISMATCHED PASSWORDS - NO FURTHER PROCESSING NEEDED!
         }
 
-        $dn = Util::getSessionVar('dn');
+        $dn = Util::getSessionVar('distinguished_name');
         if (strlen($dn) > 0) {
             // Append extra info, such as 'skin', to be processed by MyProxy
             $myproxyinfo = Util::getSessionVar('myproxyinfo');
@@ -2631,7 +2618,7 @@ class Content
                     $log->info('Generated New User Certificate="' . $p12link . '"');
                     //CIL-507 Special Log Message For XSEDE
                     $log->info('USAGE email="' .
-                        Util::getSessionVar('emailaddr') . '" client="PKCS12"');
+                        Util::getSessionVar('email') . '" client="PKCS12"');
                 } else { // Empty or missing usercred.p12 file - shouldn't happen!
                     Util::setSessionVar(
                         'p12error',
@@ -2647,7 +2634,7 @@ class Content
                 );
                 $log->info('Error creating certificate - myproxy-logon failed');
             }
-        } else { // Couldn't find the 'dn' PHP session value
+        } else { // Couldn't find the 'distinguished_name' PHP session value
             Util::setSessionVar(
                 'p12error',
                 'Cannot create certificate due to missing attributes.'
@@ -2674,57 +2661,6 @@ class Content
             $retval = (string)$lobt;
         }
         return $retval;
-    }
-
-    /**
-     * getSerialStringFromDN
-     *
-     * This function takes in a CILogon subject DN and returns just the
-     * serial string part (e.g., A325). This function is needed since the
-     * serial_string is not stored in the PHP session as a separate
-     * variable since it is always available in the 'dn' session variable.
-     *
-     * @param string $dn The certificate subject DN (typically found in the
-     *        session 'dn' variable)
-     * @return string The serial string extracted from the subject DN, or
-     *         empty string if DN is empty or wrong format.
-     */
-    public static function getSerialStringFromDN($dn)
-    {
-        $serial = ''; // Return empty string upon error
-
-        // Strip off the email address, if present
-        $dn = preg_replace('/\s+email=.+$/', '', $dn);
-        // Find the 'CN=' entry
-        if (preg_match('%/DC=org/DC=cilogon/C=US/O=.*/CN=(.*)%', $dn, $match)) {
-            $cn = $match[1];
-            if (preg_match('/\s+([^\s]+)$/', $cn, $match)) {
-                $serial = $match[1];
-            }
-        }
-        return $serial;
-    }
-
-    /**
-     * getEmailFromDN
-     *
-     * This function takes in a CILogon subject DN and returns just the
-     * email address part. This function is needed since the email address
-     * is not stored in the PHP session as a separate variable since it is
-     * always available in the 'dn' session variable.
-     *
-     * @param string $dn The certificate subject DN (typically found in the
-     *        session 'dn' variable)
-     * @return string The email address extracted from the subject DN, or
-     *         empty string if DN is empty or wrong format.
-     */
-    public static function getEmailFromDN($dn)
-    {
-        $email = ''; // Return empty string upon error
-        if (preg_match('/\s+email=(.+)$/', $dn, $match)) {
-            $email = $match[1];
-        }
-        return $email;
     }
 
     /**

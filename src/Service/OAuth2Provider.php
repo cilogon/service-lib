@@ -29,37 +29,37 @@ class OAuth2Provider
      * __construct
      *
      * Class constructor. Initializes the class variables using the passed-in
-     * Identity Provider ($idp). Sets the class variables 'provider' (the
-     * OAuth2 Client library provider object) and 'authzUrlOpts' (for use
-     * with getAuthorizationUrl()).
+     * Identity Provider Display Name ($idpdn). Sets the class variables
+     * 'provider' (the OAuth2 Client library provider object) and
+     * 'authzUrlOpts' (for use with getAuthorizationUrl()).
      *
-     * @param string|null $idp The Identity Provider to use for OAuth2
-     *        connection.
+     * @param string|null $idpdn The Display Name of the Identity Provider
+     *        use for OAuth2 connection.
      */
-    public function __construct($idp)
+    public function __construct($idpdn)
     {
-        if (is_null($idp)) {
-            $idp = Util::getSessionVar('idpname');
+        if (is_null($idpdn)) {
+            $idpdn = Util::getSessionVar('idp_display_name');
         }
-        $idp = strtolower($idp);
+        $idpdn = strtolower($idpdn);
 
         $classname = '';
         $extraparams = array();
 
-        // Set the client id and secret for the $idp
-        $client_id     = constant(strtoupper($idp) . '_OAUTH2_CLIENT_ID');
-        $client_secret = constant(strtoupper($idp) . '_OAUTH2_CLIENT_SECRET');
+        // Set the client id and secret for the $idpdn
+        $client_id     = constant(strtoupper($idpdn) . '_OAUTH2_CLIENT_ID');
+        $client_secret = constant(strtoupper($idpdn) . '_OAUTH2_CLIENT_SECRET');
 
         if ((strlen($client_id) > 0) && (strlen($client_secret) > 0)) {
             // Set options on a per-IdP basis
-            if ($idp == 'google') {
+            if ($idpdn == 'google') {
                 $classname     = 'League\OAuth2\Client\Provider\Google';
                 $this->authzUrlOpts = ['scope' => ['openid','email','profile']];
                 $extraparams = array('accessType' => 'offline');
-            } elseif ($idp == 'github') {
+            } elseif ($idpdn == 'github') {
                 $classname     = 'League\OAuth2\Client\Provider\Github';
                 $this->authzUrlOpts = ['scope' => ['user:email']];
-            } elseif ($idp == 'orcid') {
+            } elseif ($idpdn == 'orcid') {
                 $classname     = 'CILogon\OAuth2\Client\Provider\ORCID';
             }
 

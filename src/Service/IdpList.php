@@ -269,7 +269,10 @@ class IdpList
         if (!is_null($this->idparray)) {
             $filename = $this->getFilename();
             $tmpfname = tempnam('/tmp', 'JSON');
-            $json = json_encode($this->idparray, JSON_FORCE_OBJECT);
+            $json = json_encode(
+                $this->idparray,
+                JSON_FORCE_OBJECT | JSON_UNESCAPED_SLASHES
+            );
             if (
                 ((file_put_contents($tmpfname, $json)) !== false) &&
                 (@rename($tmpfname, $filename))

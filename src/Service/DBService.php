@@ -500,8 +500,11 @@ class DBService
             // If any elements in $attr_arr, append converted JSON object
             if (count($attr_arr) > 0) {
                 if (
-                    ($attr_json = json_encode($attr_arr, JSON_FORCE_OBJECT))
-                    !== false
+                    ($attr_json = json_encode(
+                        $attr_arr,
+                        JSON_FORCE_OBJECT | JSON_UNESCAPED_SLASHES
+                    )
+                    ) !== false
                 ) {
                     $cmd .= '&attr_json=' . urlencode($attr_json);
                 }

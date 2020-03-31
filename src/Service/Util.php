@@ -256,7 +256,7 @@ class Util
     }
 
     /**
-     * getPortalOrNormalCookieVar
+     * getPortalOrlCookieVar
      *
      * This is a convenience function which first checks if there is a
      * OAuth 1.0a ('delegate') or OIDC ('authorize') session active.
@@ -273,7 +273,7 @@ class Util
      *         'normal' cookie. Return empty string if no matching
      *         cookie in either place.
      */
-    public static function getPortalOrNormalCookieVar($cookie)
+    public static function getPortalOrlCookieVar($cookie)
     {
         $retval = '';
         $pc = new PortalCookie();
@@ -1041,7 +1041,7 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
-     * setPortalOrCookie
+     * setPortalOrCookieVar
      *
      * This is a convenience function for a set of operations that is done
      * a few times in Content.php. It first checks if the name of the portal
@@ -1057,7 +1057,7 @@ Remote Address= ' . $remoteaddr . '
      * @param bool $save (optional) If set to true, attempt to write the
      *        PortalCookie. Defaults to false.
      */
-    public static function setPortalOrCookie($pc, $key, $value, $save = false)
+    public static function setPortalOrCookieVar($pc, $key, $value, $save = false)
     {
         $pn = $pc->getPortalName();
         // If the portal name is valid, then set the PortalCookie key/value

@@ -1880,7 +1880,7 @@ class Content
 
         // Set the cookie for keepidp if the checkbox was checked
         $pc = new PortalCookie();
-        Util::setPortalOrCookie(
+        Util::setPortalOrCookieVar(
             $pc,
             'keepidp',
             ((strlen(Util::getPostVar('keepidp')) > 0) ? 'checked' : '')
@@ -1892,7 +1892,7 @@ class Content
                             (isset($idps[$providerId])));
 
         // Set the cookie for the last chosen IdP and redirect to it if in list
-        Util::setPortalOrCookie(
+        Util::setPortalOrCookieVar(
             $pc,
             'providerId',
             ($providerIdValid ? $providerId : ''),
@@ -2045,7 +2045,7 @@ class Content
             // make sure that it matches the saved providerId. If not,
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
-                Util::setPortalOrCookie($pc, 'providerId', $providerId, true);
+                Util::setPortalOrCookieVar($pc, 'providerId', $providerId, true);
                 $providerName = Util::getAuthzIdP($providerId);
                 if (in_array($providerName, Util::$oauth2idps)) {
                     // Log in with an OAuth2 IdP
@@ -2054,11 +2054,11 @@ class Content
                     // Log in with InCommon
                     static::redirectToGetShibUser($providerId);
                 } else { // $providerId not in whitelist
-                    Util::setPortalOrCookie($pc, 'providerId', '', true);
+                    Util::setPortalOrCookieVar($pc, 'providerId', '', true);
                     printLogonPage();
                 }
             } else { // selected_idp does not match saved providerId
-                Util::setPortalOrCookie($pc, 'keepidp', '', true);
+                Util::setPortalOrCookieVar($pc, 'keepidp', '', true);
                 printLogonPage();
             }
         } else { // One of providerId or keepidp was not set
@@ -2158,7 +2158,7 @@ class Content
     ) {
         // If providerId not set, try the cookie value
         if (strlen($providerId) == 0) {
-            $providerId = Util::getPortalOrNormalCookieVar('providerId');
+            $providerId = Util::getPortalOrCookieVar('providerId');
         }
 
         // If the user has a valid 'user_uid' in the PHP session, and the
@@ -2241,7 +2241,7 @@ class Content
     ) {
         // If providerId not set, try the cookie value
         if (strlen($providerId) == 0) {
-            $providerId = Util::getPortalOrNormalCookieVar('providerId');
+            $providerId = Util::getPortalOrCookieVar('providerId');
         }
 
         // If the user has a valid 'user_uid' in the PHP session, and the

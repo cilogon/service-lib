@@ -2422,15 +2422,14 @@ class Content
                 );
                 Util::sendErrorAlert(
                     'Authentication attempt using non-whitelisted IdP',
-                    'A user successfully authenticated with an IdP,
-                    however, the selected IdP was not in the list of
-                    whitelisted IdPs as determined by the current skin. This
-                    might indicate the user attempted to circumvent the
-                    security check in "handleGotUser()" for valid IdPs for
-                    the skin.'
+                    '
+A user successfully authenticated with an IdP, however, the selected IdP
+was not in the list of whitelisted IdPs as determined by the current skin.
+This might indicate the user attempted to circumvent the security check
+in "handleGotUser()" for valid IdPs for the skin.'
                 );
                 Util::unsetCookieVar('providerId');
-                Util::unsetAllUserSessionVars();
+                Util::unsetUserSessionVars();
                 printLogonPage();
             } else { // Got user successfully
                 static::gotUserSuccess();

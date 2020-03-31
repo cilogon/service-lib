@@ -852,13 +852,6 @@ Remote Address= ' . $remoteaddr . '
                 );
             }
             static::unsetSessionVar('authntime');
-        } else {
-            // Success! We need to overwrite current session vars with values
-            // returned by the DBService, e.g., in case attributes were read
-            // from LDAP.
-            foreach (DBService::$user_attrs as $value) {
-                static::setSessionVar($value, $dbs->$value);
-            }
         }
     }
 

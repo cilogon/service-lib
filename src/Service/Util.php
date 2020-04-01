@@ -751,15 +751,19 @@ Remote Address= ' . $remoteaddr . '
             $entitlement,
             $itrustuin
         );
-        static::setSessionVar('user_uid', $dbs->user_uid);
-        static::setSessionVar('distinguished_name', $dbs->distinguished_name);
-        static::setSessionVar('status', $dbs->status);
-        if (!$result) {
+        if ($result) {
+            static::setSessionVar('user_uid', $dbs->user_uid);
+            static::setSessionVar('distinguished_name', $dbs->distinguished_name);
+            static::setSessionVar('status', $dbs->status);
+        } else {
             static::sendErrorAlert(
                 'dbService Error',
                 'Error calling dbservice action "getUser" in ' .
                 'saveUserToDatastore() method.'
             );
+            static::unsetSessionVar('user_uid');
+            static::unsetSessionVar('distinguished_name');
+            static::setSessionVar('status', DBService::$STATUS['STATUS_INTERNAL_ERROR']);
         }
 
         // If 'status' is not STATUS_OK*, then send an error email
@@ -852,6 +856,15 @@ Remote Address= ' . $remoteaddr . '
                 );
             }
             static::unsetSessionVar('authntime');
+        } else {
+            // Success! We need to overwrite current session vars with values
+            // returned by the DBService, e.g., in case attributes were set
+            // previously but not this time. Skip 'idp' since the PHP code
+            // transforms 'https://' to 'http://' for database consistency.
+            foreach (DBService::$user_attrs as $value) {
+                if ($value != 'idp') {
+                    static::setSessionVar($value, $dbs->$value);
+                }
         }
     }
 

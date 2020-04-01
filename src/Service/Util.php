@@ -865,6 +865,7 @@ Remote Address= ' . $remoteaddr . '
                 if ($value != 'idp') {
                     static::setSessionVar($value, $dbs->$value);
                 }
+            }
         }
     }
 

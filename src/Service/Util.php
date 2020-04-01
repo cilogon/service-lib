@@ -861,8 +861,9 @@ Remote Address= ' . $remoteaddr . '
             // returned by the DBService, e.g., in case attributes were set
             // previously but not this time. Skip 'idp' since the PHP code
             // transforms 'https://' to 'http://' for database consistency.
+            // Also skip 'loa' since that is not saved in the database.
             foreach (DBService::$user_attrs as $value) {
-                if ($value != 'idp') {
+                if (($value != 'idp') && ($value != 'loa')) {
                     static::setSessionVar($value, $dbs->$value);
                 }
             }

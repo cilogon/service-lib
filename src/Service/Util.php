@@ -256,7 +256,7 @@ class Util
     }
 
     /**
-     * getPortalOrlCookieVar
+     * getPortalOrCookieVar
      *
      * This is a convenience function which first checks if there is a
      * OAuth 1.0a ('delegate') or OIDC ('authorize') session active.
@@ -273,7 +273,7 @@ class Util
      *         'normal' cookie. Return empty string if no matching
      *         cookie in either place.
      */
-    public static function getPortalOrlCookieVar($cookie)
+    public static function getPortalOrCookieVar($cookie)
     {
         $retval = '';
         $pc = new PortalCookie();

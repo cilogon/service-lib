@@ -465,10 +465,21 @@ class Skin
         }
 
         // Add eppn, eptid, open_id, and oidc if available
+        // Note that these values are lowercase after an update to make
+        // them the same as those used by the dbService. BUT, MyProxy
+        // expects the old versions. So this array maps the new lowercase
+        // versions back into the old ones.
+        $mpid = array(
+            'eppn' => 'ePPN',
+            'eptid' => 'ePTID',
+            'open_id' => 'openidID',
+            'oidc' => 'oidcID'
+        );
         foreach (array('eppn','eptid','open_id','oidc') as $id) {
             $sessvar = Util::getSessionVar($id);
             if (strlen($sessvar) > 0) {
-                $infostr .= (strlen($infostr) > 0 ? ',' : '') . "$id=$sessvar";
+                $infostr .= (strlen($infostr) > 0 ? ',' : '') .
+                    $mpid[$id] . "=" . $sessvar;
             }
         }
 

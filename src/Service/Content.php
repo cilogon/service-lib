@@ -2312,6 +2312,9 @@ class Content
         // We must get and unset session vars BEFORE any HTML output since
         // a redirect may go to another site, meaning we need to update
         // the session cookie before we leave the cilogon.org domain.
+        //
+        // This bit of trickery sets local variables from the PHP session
+        // that was just populated, using the names in the $user_attrs array.
         foreach (DBService::$user_attrs as $value) {
             $$value = Util::getSessionVar($value);
         }

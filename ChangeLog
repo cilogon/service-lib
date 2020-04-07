@@ -1,3 +1,97 @@
+e49003e 2020-04-07 Add log message for new users without a distinguished_name value.
+8e14a82 2020-04-07 Relax checking of eduGAIN and getcert check for basic download of X509 certs to allow users to log in.
+b9f3f70 2020-04-06 Add comments to explain the 'for' loop with '$$value'.
+d5face5 2020-04-03 Bug: After renaming the PHP session variables to better match those used by the dbService, MyProxy certs no longer contained the correct extensions for ePPN and ePTID because of a case change.
+e2eac2e 2020-04-02 Fix typo.
+11342d7 2020-04-01 Don't overwrite session 'loa' from non-existent database entry.
+ca767a5 2020-04-01 Add missing closing brace.
+e839ef7 2020-04-01 CIL-540 Save results of dbService?action=getUser back to PHP session in case database contains more user attributes than current authentication.
+0ca022b 2020-03-31 Rename a couple of functions to make get/set pair.
+68ed93e 2020-03-31 CIL-540 Don't set session from database since 'idp' is transformed to 'http' for writing to database. Also, in case of idp not in skin, don't unset client session vars.
+7014117 2020-03-30 CIL-540 Don't escape backslashes in JSON to save some characters.
+3b7317d 2020-03-27 CIL-540 Rename PHP session variables for user attributes to match those used by the dbService?action=getUser webapp. Also (re)set these session attributes after calling the dbService so the PHP session matches what is in the database.
+e2f802f 2020-03-20 CIL-672 Define help@/alerts@cilogon.org in top-level config.php file.
+5b4d639 2020-03-19 CIL-649 Make subject_id and pairwise_id distinct parameters to the dbService rather than part of attr_json.
+0d68785 2020-02-29 CIL-540 Show missing name/email attribues in Certificate Information box.
+24c0599 2020-02-29 For STATUS_ hex values, comments show decimal equivalent values.
+b76fff9 2020-02-25 CIL-540 For OAuth 1.0a, make the PHP code verify that distinguished_name is available for creation of delegated certificate.
+2f06197 2020-02-24 CIL-540 Let the dbService check for missing attributes.
+74a3838 2020-02-07 CIL-540 No longer check for 'dn' when validating user session.
+58b43e6 2020-02-06 CIL-655 - Remove unnecessary LOA port variable assignment.
+360e342 2020-02-06 CIL-655 Display actual LOA (assurance) instead of InCommon "silver".
+e9d2939 2020-02-05 Fix bug in IdPList JSON generation.
+24db12e 2020-02-04 Check if array key is set before accessing.
+8bd0f31 2020-01-29 CIL-649 Add support for subject-id and pairwise-id SAML attributes.
+70d62c3 2020-01-13 getElementsByTagName should be called on the DOMDocument object.
+ced8a63 2020-01-07 Add skin option to always expand the "Create Password-Protected Certificate" collapsible card.
+bcf872b 2019-12-09 Scrutinizer CI - Remove dead code and fix bugs.
+8e53e6e 2019-12-09 CIL-175, CIL-615, CIL-616, CIL-620 - Bootstrap CSS redesign (MAJOR UPDATE). Use bootstrap-select for "Select an Identity Provider" dropdown. Show cert DN, user attributes, IdP attributes on X509 page.  Remove "Show Help" button.
+3bea6df 2019-12-02 CIL-610 When allowing bypass via idphint, must set providerId in the portalcookie so OAuth2 providers work as expected (bug fix).
+4d95f70 2019-12-02 CIL-629 Remove "Request Silver" checkbox on "Select an IdP" page.
+b2c8b64 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+4f0147e 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+fba0029 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+71e9720 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+4762a98 2019-11-25 CIL-410 For /testidp/ use 'standard' flow when getting user attributes.
+8c20a7a 2019-11-22 Move set/unset of a few session vars from saveUserToDataStore() to setUserAttributeSessionVars().
+29fe4ac 2019-11-22 Move unset 'storeattributes' to a different function. (Note that this is still not the right place.)
+bee94cf 2019-11-22 Revert "Fix PHP Warning:  The use statement with non-compound name '...' has no effect."
+7c1fa83 2019-11-22 Fix PHP Warning:  The use statement with non-compound name '...' has no effect.
+a423d2f 2019-11-21 CIL-410 Refactor /testidp/ to use standard 'getuser' flow for both SAML and OAuth2 IdPs.
+4efdfb0 2019-11-20 Revert "Change strlen() to empty() where appropriate."
+fc45d12 2019-11-20 Move $disableligoalerts config to DISABLE_LIGO_ALERTS in top-level config.php.
+be9044b 2019-11-20 Change strlen() to empty() where appropriate.
+9456f23 2019-11-20 CIL-617 Show OAuth2 IdPs (Google, GitHub, Orcid) only if client_id is configured.
+d57941d 2019-11-20 CIL-613 Replace 'allowbypass' skin with ALLOW_BYPASS_ARRAY in config.php.
+a728d09 2019-11-20 CIL-623 If OPENSSL_KEY is not configured, then don't encrypt the Portal Array Cookie.
+f4e9957 2019-11-20 CIL-625 Move hostname mapping to config.php .
+39084b0 2019-11-19 Add another missing closing paren.
+84d5806 2019-11-19 Add missing closing paren.
+ec0aca5 2019-11-19 CIL-611 and CIL-622 - Move various config options/files to 'define()' statements in top-level config.php and config.secrets.php.
+d820065 2019-11-19 CIL-577 GridShib-CA is gone, so no need for deployJava.js.
+3c2b3e5 2019-11-19 Change deprecated 'each' statement to 'foreach'.
+64a5209 2019-11-19 Accidentally deleted a critical 'else' block.
+fe518b2 2019-11-19 CIL-614 Remove CILogon 2FA capability (i.e., local Google Authenticator / Duo).
+f952145 2019-11-19 Update comments regarding New Users.
+4dffb96 2019-11-18 Remove more unused code.
+91df4b6 2019-11-18 Remove unnecessary code which attempted to bypass the New User page (since the New User page is no longer shown).
+b0f9dd3 2019-11-18 CIL-542 and CIL-619 Retire the "Your DN has changed" and "New User" pages. Simply log the action instead.
+b7905f1 2019-11-18 Remove phpcs from Travis CI since it's old and doesn't support PSR-12.
+7be3d2d 2019-11-18 Make PHP code PSR12 compliant (https://www.php-fig.org/psr/psr-12/).
+27303a7 2019-11-18 CIL-577 Retire CILogon GridShibCA. Remove no-longer-needed PHP code pertaining to GridShib CA.
+2cf605c 2019-11-13 CIL-606 Fix problem with saving ePTID due to typo.
+7e3e9e4 2019-09-30 Fix typo in comment block.
+a0a2c22 2019-09-17 CIL-598 Add skin config option for IdPs registered by InCommon.
+f87cc18 2019-09-17 Make code compliant with PSR-12 (https://www.php-fig.org/psr/psr-12/).
+b6ea7ca 2019-08-20 Move isEduGAINAndGetCert() from Content.php to Util.php.
+8355af8 2019-07-02 CIL-575 Better handling of OAuth2 createTransaction errors.
+dea66a8 2019-07-02 CIL-548 Add support for AARC-G049 "IdP Hinting".
+9868680 2019-05-22 CIL-568 Add iTrustUIN claim for Rokwire client.
+ef66da2 2019-04-26 Update to new PHP analysis engine for Scrutinizer.
+a1987d0 2019-04-26 Calculate $numargs instead of using count($args) in for loop.
+f71f094 2019-04-23 Create new method setUserAttributeSessionVars which takes user attributes passed to saveUserToDataStore and puts them in the PHP session.
+b146998 2019-04-10 CIL-558 Scan metadata for <SingleLogoutService> tags and add <Logout> tag to idplist.xml file.
+ed4cb51 2019-03-22 CIL-555 Add utility function getGetOrPostVar() to look for a variable in a query parameter or form submit.
+656de54 2019-03-19 PHP supported versions are 7.1, 7.2, and 7.3.
+07d20bd 2019-03-19 For travis, test with PHP 7.1, 7.2, and 7.3.
+1eee37a 2019-03-19 Update LICENSE to 2019.
+9f11abd 2019-02-27 Add date/time to error email.
+5c11465 2019-02-27 Stop sending email when DNs change.
+28f7944 2019-02-27 CIL-497 - PHP sends UTF-8 characters to dbService (i.e., remove PHP iconv() UTF-7 encoding).
+08b6fdd 2019-02-25 CACC-241 We decided to have local database instances (instead of a separate central database like dodo-dev). So no need to connect to database with SSL anymore.
+6e01ccb 2019-02-19 CIL-539 Print missing R&S and SIRTFI for eduGAIN IdPs getting a cert.
+ec0305e 2019-02-19 CIL-539 For edugainandgetcert, default value should be false rather than empty string (although ultimately the behavior is the same).
+6ccb07d 2019-02-19 CIL-539 Print error message for missing R&S and/or SIRTFI attributes only when IdP is eduGAIN and user could get a certificate.
+dbc57ac 2019-02-18 Remove end-of-line spaces.
+327d2a7 2019-02-18 For upcoming oauth2.war v4.1.2 deployment, temporarily send email alerts for DN changes. Email alert can be removed after PHP code has been updated to send UTF-8 strings to dbService.
+36fb850 2019-02-13 CIL-537 Allow client_id to force skin or bypass IdP selection screen.
+a18fe3a 2019-02-13 Forgot to decode 'entitlement' from attr_json.
+83d022e 2019-02-08 Special log message when a user's Subject DN changes.
+c0caad1 2019-02-06 Bug fix: Pattern match display_name and idp_display_name separately.
+ac72a50 2019-02-06 Forgot to clear out a few class member variables.
+f2674e6 2019-01-10 CIL-532 Add eduPersonEntitlement.
+09925fe 2019-01-07 CACC-238 Issue CILogon Silver certificates when AuthnContextClassRef is REFEDS 'sfa' or 'mfa', and eduPersonAssurance is cappuccino.
+262b91d 2018-12-03 Add ChangeLog.
 45a9dde 2018-12-03 Update License date to 2018 and replace template name with CILogon.
 54f202e 2018-10-15 CIL-331 Starting with OA4MP 4.1.0, use /oauth2/dbService endpoint as default.
 47e35be 2018-09-17 CIL-507 Output special log messages for XSEDE log analysis.

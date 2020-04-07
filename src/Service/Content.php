@@ -410,8 +410,9 @@ class Content
         $pkcs12disabled = $skin->getConfigOption('pkcs12', 'disabled');
         $disabledbyskin = ((!is_null($pkcs12disabled)) && ((int)$pkcs12disabled == 1));
         $dn = Util::getSessionVar('distinguished_name'); // Did we get user attributes for certs?
+        $isEduGAINAndGetCert = Util::isEduGAINAndGetCert();
 
-        if ($disabledbyconf || $disabledbyskin || (strlen($dn) == 0)) {
+        if ($disabledbyconf || $disabledbyskin || (strlen($dn) == 0) || $isEduGAINAndGetCert) {
             if ($disabledbyconf) {
                 $disabledmsg = 'Downloading PKCS12 certificates is disabled.';
             } elseif ($disabledbyskin) {
@@ -428,6 +429,10 @@ class Content
                 $disabledmsg = 'Unable to generate a certificate. ' .
                     'Your identity provider has not provided CILogon ' .
                     'with all required information.';
+            } elseif ($isEduGAINAndGetCert) {
+                $disabledmsg = 'Unable to generate a certificate. ' .
+                    'Your identity provider has not asserted support ' .
+                    'for "Research and Scholarship" and "SIRTFI".';
             }
 
             echo '<div class="alert alert-danger" role="alert">';
@@ -765,7 +770,7 @@ class Content
             }
             $idp     = Util::getSessionVar('idp');
             $idp_display_name = Util::getSessionVar('idp_display_name');
-            if (Util::isEduGAINAndGetCert($idp, $idp_display_name)) {
+            if (Util::isEduGAINAndGetCert()) {
                 $idplist = Util::getIdpList();
                 if (!$idplist->isREFEDSRandS($idp)) {
                     echo '
@@ -2107,11 +2112,8 @@ class Content
             (strlen($authntime) > 0) &&
             (!($status & 1)) // All STATUS_OK codes are even
         ) {
-            // Check for eduGAIN IdP and possible get cert context
-            if (Util::isEduGAINAndGetCert()) {
-                Util::unsetUserSessionVars();
-            } elseif ((strlen($providerId) == 0) || ($providerId == $idp)) {
-                // If $providerId passed in, make sure it matches the $idp
+            // If $providerId is passed in, make sure it matches the $idp
+            if ((strlen($providerId) == 0) || ($providerId == $idp)) {
                 $retval = true;
                 Util::getSkin()->init(); // Does the IdP need a forced skin?
             }
@@ -2350,7 +2352,18 @@ class Content
             $redirect = $failureuri . "?reason=missing_attributes";
         }
 
-        $isEduGAINAndGetCert = Util::isEduGAINAndGetCert($idp, $idp_display_name);
+        // For the 'Create Password-Protected Certificate' flow, we now
+        // allow users to log in even if not all attributes are given. So
+        // the check for isEduGAINandGetCert happens later for X509 certs.
+        // Here we just check for OAuth1/OAuth2/OIDC flow and
+        // eduGAIN getcert restriction.
+        $isEduGAINAndGetCert = false;
+        if (
+            (strlen($failureuri) > 0) ||                      // OAuth 1.0a
+            (strlen(Util::getSessionVar('clientparams')) > 0) // OIDC
+        ) {
+            $isEduGAINAndGetCert = Util::isEduGAINAndGetCert();
+        }
 
         // Was this an OAuth 1.0a transaction but the distinguished_name
         // could not be calculated? Set $missingparam below.

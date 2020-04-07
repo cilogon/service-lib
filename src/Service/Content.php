@@ -769,7 +769,6 @@ class Content
                   </tr>';
             }
             $idp     = Util::getSessionVar('idp');
-            $idp_display_name = Util::getSessionVar('idp_display_name');
             if (Util::isEduGAINAndGetCert()) {
                 $idplist = Util::getIdpList();
                 if (!$idplist->isREFEDSRandS($idp)) {
@@ -2472,28 +2471,25 @@ in "handleGotUser()" for valid IdPs for the skin.'
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $callbackuri = Util::getSessionVar('callbackuri');
 
-        if (
-            ($status == DBService::$STATUS['STATUS_NEW_USER']) &&
-            ((strlen($callbackuri) > 0) ||
-             (isset($clientparams['code'])))
-        ) {
-            // Extra check for new users: see if any HTML entities
-            // are in the user name. If so, send an email alert.
-            $dn = Util::getSessionVar('distinguished_name');
-            $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
-            $htmldn = Util::htmlent($dn);
-            if (strcmp($dn, $htmldn) != 0) {
-                Util::sendErrorAlert(
-                    'New user DN contains HTML entities',
-                    "htmlentites(DN) = $htmldn\n"
-                );
-            }
-        }
-
-        // For a new user, or if the user got new attributes, just log it.
-        // Then proceed to the Main Page.
+        // Log new users with possibly empty distinguished_name values
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
-            $log->info('New User.');
+            $dn = Util::getSessionVar('distinguished_name');
+            $log->info('New User' . ((strlen($dn) == 0) ? ' without a distinguished_name.' : '.'));
+            // If HTML entities are in the distinguished_name, send an alert.
+            if (
+                (strlen($dn) > 0) &&
+                ((strlen($callbackuri) > 0) ||
+                 (isset($clientparams['code'])))
+            ) {
+                $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
+                $htmldn = Util::htmlent($dn);
+                if (strcmp($dn, $htmldn) != 0) {
+                    Util::sendErrorAlert(
+                        'New user DN contains HTML entities',
+                        "htmlentites(DN) = $htmldn\n"
+                    );
+                }
+            }
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {
             $log->info('User IdP attributes changed.');
         }

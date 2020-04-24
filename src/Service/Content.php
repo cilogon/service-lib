@@ -67,9 +67,9 @@ class Content
           href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css" />
     <!-- CILogon-specific CSS -->
     <link rel="stylesheet" href="/include/cilogon.css" />
-        ';
+    ';
 
-        $skin->printSkinLink();
+        $skin->printSkinCSS();
 
         echo '
   </head>

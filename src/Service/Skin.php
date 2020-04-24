@@ -3,6 +3,7 @@
 namespace CILogon\Service;
 
 use CILogon\Service\Util;
+use tubalmartin\CssMin\Minifier as CSSmin;
 
 /**
  * Skin
@@ -36,7 +37,7 @@ use CILogon\Service\Util;
  *   require_once 'Skin.php';
  *   $skin = new Skin();
  *   // While outputting the <head> HTML block...
- *   $skin->printSkinLink();
+ *   $skin->printSkinCSS();
  *   // Get the value of a configuration option
  *   $idpwhitelist = $skin->getConfigOption('idpwhitelist');
  *   // Now, process entries in the $idpwhitelist
@@ -292,22 +293,25 @@ class Skin
     }
 
     /**
-     * printSkinLink
+     * printSkinCSS
      *
      * Call this function in the HTML <head> block to print out the
-     * <link> tag pointing to the skin.css file.
+     * <style> tag for the internal CSS of the skin. The CSS is minified
+     * to remove whitespace.
      */
-    public function printSkinLink()
+    public function printSkinCSS()
     {
-        if (
-            (strlen($this->skinname) > 0) &&
-            (is_readable(Util::getServerVar('DOCUMENT_ROOT') . '/skin/' .
-                         $this->skinname . '/skin.css'))
-        ) {
-            echo '
-            <link rel="stylesheet" type="text/css"
-             href="/skin/' , $this->skinname , '/skin.css" />
-            ';
+        if (strlen($this->skinname) > 0) {
+            $skinfile = Util::getServerVar('DOCUMENT_ROOT') . '/skin/' .
+                $this->skinname . '/skin.css';
+            if (is_readable($skinfile)) {
+                $inputcss = file_get_contents($skinfile);
+                $cssmin = new CSSmin();
+                $cssmin->removeImportantComments();
+                $cssmin->setLineBreakPosition(255);
+                $outputcss = $cssmin->run($inputcss);
+                echo "<style>$outputcss</style>";
+            }
         }
     }
 

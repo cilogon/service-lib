@@ -4,23 +4,27 @@ namespace CILogon\Service;
 
 use CILogon\Service\Util;
 use tubalmartin\CssMin\Minifier as CSSmin;
+use PEAR;
+use DB;
+use Config;
 
 /**
  * Skin
  *
  * This class reads in CSS and configuration options
- * for a 'skin'.  The skin is a named subdirectory under
- * /var/www/html/skin/ and is set by passing the
- * '?skin=...' (or '?cilogon_skin=...') URL parameter.
- * If found, this class verifies the existence of such
- * a named directory and reads the skin.css and config.xml
- * files.  It also sets a PHP session variable so that
- * the skin name is remembered across page loads.
+ * for a 'skin'. The skin is set by passing the
+ * '?skin=...' (or '?cilogon_skin=...') query parameter.
+ * If found, the assoicated config XML and CSS are read
+ * in from either the filesystem (under the /skin/NAME
+ * directory) or the database. It also sets a PHP
+ * session variable so that the skin name is remembered
+ * across page loads. If no skin name is found, then the
+ * default /skin/config.xml file is read in.
  *
  * Note that this class uses the SimpleXML class to parse
- * the config.xml file.  This stores the XML in a special
- * SimpleXMLElement object, which is NOT an array.  But
- * you can iterate over elements in the structure.  See
+ * the config XML. This stores the XML in a special
+ * SimpleXMLElement object, which is NOT an array. But
+ * you can iterate over elements in the structure. See
  * the PHP SimpleXML online manual 'Basic Usage' for
  * more information.
  *
@@ -56,7 +60,7 @@ use tubalmartin\CssMin\Minifier as CSSmin;
 class Skin
 {
     /**
-     * @var string $skinname The directory name of the skin
+     * @var string $skinname The name of the skin
      */
     protected $skinname;
 
@@ -65,6 +69,11 @@ class Skin
      *      config.xml file
      */
     protected $configxml;
+
+    /**
+     * @var string $css The un-minified CSS for the skin
+     */
+    protected $css;
 
     /**
      * @var array $forcearray An array of (URI,skinname) pairs for forcing
@@ -89,12 +98,12 @@ class Skin
      *
      * This function does the work of (re)initializing the skin object.
      * It finds the name of the skin (if any) and reads in the skin's
-     * config.xml file (if present). Call this function to reset the
+     * config XML file (if found). Call this function to reset the
      * skin in case of possible forced skin due to IdP or portal
      * callbackURL.
      *
-     * @param bool $reset True to reset the 'cilogon_skin' PHP session var to
-     *        blank so that findSkinName doesn't check for it.
+     * @param bool $reset True to reset the 'cilogon_skin' PHP session var
+     *        to blank so that readSkinConfig doesn't check for it.
      *        Defaults to 'false'.
      */
     public function init($reset = false)
@@ -103,32 +112,34 @@ class Skin
             Util::unsetSessionVar('cilogon_skin');
         }
 
+        $this->skinname = '';
+        $this->configxml = null;
+        $this->css = '';
         $this->forcearray = FORCE_SKIN_ARRAY;
-        $this->findSkinName();
-        $this->readConfigFile();
+        $this->readSkinConfig();
         $this->setMyProxyInfo();
     }
 
     /**
-     * findSkinName
+     * readSkinConfig
      *
-     * Get the name of the skin and store it in the class variable
-     * $skinname.  This function checks for the name of the skin in
-     * several places: (1) The FORCE_SKIN_ARRAY for a matching IdP
-     * entityID or portal callbackURL, (2) in a URL parameter (can be
-     * '?skin=', '?cilogon_skin=', '?vo='), (3) cilogon_vo form input
-     * variable (POST for ECP case), or (4) 'cilogon_skin' PHP session
+     * This function checks for the name of the skin in several places:
+     * (1) The FORCE_SKIN_ARRAY for a matching IdP entityID or portal
+     * callbackURL, (2) in a URL parameter (can be '?skin=',
+     * '?cilogon_skin=', '?vo='), (3) cilogon_vo form input variable
+     * (POST for ECP case), or (4) 'cilogon_skin' PHP session
      * variable.  If it finds the skin name in any of these, it then
-     * checks to see if such a named 'skin/...' directory exists on the
-     * server. If so, it sets the class variable $skinname AND the
+     * checks to see if such a named skin exists, either on the filesystem
+     * or in the database. If found, the class variable $skinname AND the
      * 'cilogon_skin' PHP session variable (for use on future page
-     * loads by the user).
+     * loads by the user) are set. It then reads in the config XML and the
+     * CSS and stores them in the class variables $configxml and $css.
+     * If no skin name is found, read in the default /skin/config.xml file.
      *
      * Side Effect: Sets the 'cilogon_skin' session variable if needed.
      */
-    public function findSkinName()
+    protected function readSkinConfig()
     {
-        $this->skinname = '';
         $skinvar = '';
 
         // Check for matching IdP, callbackURI (OAuth1),
@@ -174,85 +185,154 @@ class Skin
             $skinvar = Util::getSessionVar('cilogon_skin');
         }
 
-        // If we found $skinvar, check to see if a skin directory with that
-        // name exists.  Loop through all skin directories so we can do a
-        // case-insenstive comparison. If we find a match, set skinname.
-        $found = false;
+        // If we found $skinvar, attempt to read the skin config/css from
+        // either the filesystem or the database, or failing that, read the
+        // default /skin/config.xml file.
         if (strlen($skinvar) > 0) {
-            $basedir = Util::getServerVar('DOCUMENT_ROOT') . '/skin';
-            if ($handle = opendir($basedir)) {
-                while ((false !== ($file = readdir($handle))) && (!$found)) {
-                    if (
-                        ($file != '.') && ($file != '..') &&
-                        (is_dir($basedir . '/' . $file)) &&
-                        (strcasecmp($skinvar, $file) == 0)
-                    ) {
-                        $this->skinname = $file;
-                        Util::setSessionVar('cilogon_skin', $file);
-                        $found = true;
-                    }
+            $skinvar = strtolower($skinvar); // All skin dirs are lowercase
+            $this->readSkinFromFile($skinvar) ||
+                $this->readSkinFromDatabase($skinvar) ||
+                $this->readDefaultSkin();
+        }
+    }
+
+    /**
+     * readSkinFromFile
+     *
+     * This function reads in the skin config XML and CSS from the
+     * filesystem into the class variables $configxml and $css.
+     *
+     * @param string $skinvar The name of the skin as found by
+     *        readSkinConfig().
+     * @return bool True if at least one of config.xml or skin.css could
+     *         be found (and read in) for the skin (i.e., the skin
+     *         directory exists and isn't empty). False otherwise.
+     */
+    protected function readSkinFromFile($skinvar)
+    {
+        $readin = false; // Make sure we read in either XML or CSS (or both)
+
+        $skindir = Util::getServerVar('DOCUMENT_ROOT') . "/skin/$skinvar";
+        if (is_dir($skindir)) {
+            // Read in the config XML
+            $skinconf = $skindir . '/config.xml';
+            if (is_readable($skinconf)) {
+                if (($xml = @simplexml_load_file($skinconf)) !== false) {
+                    $this->configxml = $xml;
+                    $readin = true;
                 }
-                closedir($handle);
+            }
+            //Read in the CSS
+            $skincss = $skindir . '/skin.css';
+            if (is_readable($skincss)) {
+                if (($css = file_get_contents($skincss)) !== false) {
+                    $this->css = $css;
+                    $readin = true;
+                }
             }
         }
-        if (!$found) {
+
+        if ($readin) {
+            $this->skinname = $skinvar;
+            Util::setSessionVar('cilogon_skin', $skinvar);
+        } else {
             Util::unsetSessionVar('cilogon_skin');
         }
+
+        return $readin;
     }
 
     /**
-     * getSkinName
+     * readSkinFromDatabase
      *
-     * This function returns the name of the skin.  Note that you must
-     * call findSkinName to set the name of the skin.
+     * This function reads in the skin config XML and CSS from the
+     * database into the class variables $configxml and $css.
      *
-     * @return string The name of the skin stored in the protected class
-     *         variable $skinname.
+     * @param string $skinvar The name of the skin as found by
+     *        readSkinConfig().
+     * @return bool True if at least one of config XML or CSS could
+     *         be read from the database for the skin. False otherwise.
      */
-    public function getSkinName()
+    protected function readSkinFromDatabase($skinvar)
     {
-        return $this->skinname;
-    }
+        $readin = false; // Make sure we read in either XML or CSS (or both)
 
-    /**
-     * readConfigFile
-     *
-     * This function looks for a file 'config.xml' in the skin
-     * directory. If there is no skin specified, then it looks for the
-     * 'default' config.xml file located at the top of the skin
-     * directory. If either file is found, it reads it in and parses it
-     * into the class variable $configxml. It uses SimpleXML to read in
-     * the file which strips off the top-level <config> from the XML.
-     */
-    public function readConfigFile()
-    {
-        $this->configxml = null;
+        if (strlen($skinvar) > 0) {
+            $dsn = array(
+                'phptype'  => 'mysqli',
+                'username' => MYSQLI_USERNAME,
+                'password' => MYSQLI_PASSWORD,
+                'database' => 'ciloa2',
+                'hostspec' => 'localhost'
+            );
 
-        /* Note that if $this->skinname is blank, then we are simply
-         * reading the config.xml file at the top-level skin directory. */
-        $skinconf = Util::getServerVar('DOCUMENT_ROOT') . '/skin/' .
-            $this->skinname . '/config.xml';
-        if (is_readable($skinconf)) {
-            $xml = @simplexml_load_file($skinconf);
-            if ($xml !== false) {
-                $this->configxml = $xml;
+            $opts = array(
+                'persistent'  => true,
+                'portability' => DB_PORTABILITY_ALL
+            );
+
+            $db = DB::connect($dsn, $opts);
+            if (!PEAR::isError($db)) {
+                $data = $db->getRow(
+                    'SELECT * from skins WHERE name = ?',
+                    array($skinvar),
+                    DB_FETCHMODE_ASSOC
+                );
+                if ((!DB::isError($data)) && (!empty($data))) {
+                    // Read in the config XML
+                    if (
+                        (strlen(@$data['config']) > 0) &&
+                        (($xml = @simple_xml_load_string($data['config'])) !== false)
+                    ) {
+                        $this->configxml = $xml;
+                        $readin = true;
+                    }
+                    //Read in the CSS
+                    if (strlen(@$data['css']) > 0) {
+                        $this->css = $data['css'];
+                        $readin = true;
+                    }
+                }
+                $db->disconnect();
             }
         }
+
+        if ($readin) {
+            $this->skinname = $skinvar;
+            Util::setSessionVar('cilogon_skin', $skinvar);
+        } else {
+            Util::unsetSessionVar('cilogon_skin');
+        }
+
+        return $readin;
     }
 
     /**
-     * getconfigxml
+     * readDefaultSkin
      *
-     * This function returns a SimpleXMLElement corresponding to the
-     * contents of the skin's config.xml file.  Note that you should
-     * call readConfigFile to set the contents of $configxml.
+     * If we don't read a skin from the filesystem or the database, then
+     * read in the default "/skin/config.xml" file.
      *
-     * @return \SimpleXMLElement The SimpleXMLElement object corresponding to
-     *         the parsed in XML config file.
+     * @return bool True if the default config.xml file was read in.
+     *         False otherwise.
      */
-    public function getconfigxml()
+    protected function readDefaultSkin()
     {
-        return $this->configxml;
+        $readin = false;
+
+        $this->skinname = '';
+        $this->css = '';
+        Util::unsetSessionVar('cilogon_skin');
+
+        $skinconf = Util::getServerVar('DOCUMENT_ROOT') . '/skin/config.xml';
+        if (is_readable($skinconf)) {
+            if (($xml = @simplexml_load_file($skinconf)) !== false) {
+                $this->configxml = $xml;
+                $readin = true;
+            }
+        }
+
+        return $readin;
     }
 
     /**
@@ -297,21 +377,17 @@ class Skin
      *
      * Call this function in the HTML <head> block to print out the
      * <style> tag for the internal CSS of the skin. The CSS is minified
-     * to remove whitespace.
+     * to remove whitespace. Note that you should call readSkinConfig
+     * to set the contents of $css.
      */
     public function printSkinCSS()
     {
-        if (strlen($this->skinname) > 0) {
-            $skinfile = Util::getServerVar('DOCUMENT_ROOT') . '/skin/' .
-                $this->skinname . '/skin.css';
-            if (is_readable($skinfile)) {
-                $inputcss = file_get_contents($skinfile);
-                $cssmin = new CSSmin();
-                $cssmin->removeImportantComments();
-                $cssmin->setLineBreakPosition(255);
-                $outputcss = $cssmin->run($inputcss);
-                echo "<style>$outputcss</style>";
-            }
+        if (strlen($this->css) > 0) {
+            $cssmin = new CSSmin();
+            $cssmin->removeImportantComments();
+            $cssmin->setLineBreakPosition(255);
+            $outputcss = $cssmin->run($this->css);
+            echo "<style>$outputcss</style>";
         }
     }
 
@@ -558,7 +634,7 @@ class Skin
      * @return string The skin name for the URI, or empty string if not
      *         found.
      */
-    public function getForceSkin($uri)
+    protected function getForceSkin($uri)
     {
         $retval = '';  // Assume uri is not in FORCE_SKIN_ARRAY
 

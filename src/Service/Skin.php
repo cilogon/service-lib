@@ -282,7 +282,7 @@ class Skin
                     // Read in the config XML
                     if (
                         (strlen(@$data['config']) > 0) &&
-                        (($xml = @simple_xml_load_string($data['config'])) !== false)
+                        (($xml = @simplexml_load_string($data['config'])) !== false)
                     ) {
                         $this->configxml = $xml;
                         $readin = true;

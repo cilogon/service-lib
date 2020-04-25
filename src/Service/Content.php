@@ -403,6 +403,12 @@ class Content
      */
     public static function printGetCertificate()
     {
+        // CIL-624 If DISABLE_X509 is true, then don't even print out the
+        // Get New Certificate box.
+        if ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) {
+            return;
+        }
+
         // Check if PKCS12 downloading is disabled. If so, print out message.
         $disabledmsg = '';
         $disabledbyconf = ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON)));
@@ -680,6 +686,12 @@ class Content
      */
     public static function printCertInfo()
     {
+        // CIL-624 If DISABLE_X509 is true, then don't even print out the
+        // Certificate Information box.
+        if ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) {
+            return;
+        }
+
         $dn = Util::getSessionVar('distinguished_name');
         static::printCollapseBegin('certinfo', 'Certificate Information');
         if (strlen($dn) > 0) {

@@ -1126,7 +1126,7 @@ Remote Address= ' . $remoteaddr . '
             $db = DB::connect($dsn, $opts);
             if (!PEAR::isError($db)) {
                 $data = $db->getRow(
-                    'SELECT * from clients WHERE client_id = ?',
+                    'SELECT name,home_url,callback_uri from clients WHERE client_id = ?',
                     array($clientparams['client_id']),
                     DB_FETCHMODE_ASSOC
                 );

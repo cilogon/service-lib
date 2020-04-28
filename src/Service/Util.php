@@ -1024,7 +1024,7 @@ Remote Address= ' . $remoteaddr . '
             $oidctrans = true;
             if (
                 preg_match(
-                    '/edu\.uiuc\.ncsa\.myproxy\.getcert/',
+                    '/edu.uiuc.ncsa.myproxy.getcert/',
                     $clientparams['scope']
                 )
             ) {

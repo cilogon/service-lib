@@ -882,9 +882,15 @@ Remote Address= ' . $remoteaddr . '
      */
     public static function setUserAttributeSessionVars(...$args)
     {
+        // Loop through the list of user_attrs. First, unset any previous
+        // value for the attribute, then set the passed-in attribute value.
+        $numattrs = count(DBService::$user_attrs);
         $numargs = count($args);
-        for ($i = 0; $i < $numargs; $i++) {
-            static::setSessionVar(DBService::$user_attrs[$i], $args[$i]);
+        for ($i = 0; $i < $numattrs; $i++) {
+            static::unsetSessionVar(DBService::$user_attrs[$i]);
+            if ($i < $numargs) {
+                static::setSessionVar(DBService::$user_attrs[$i], $args[$i]);
+            }
         }
 
         static::setSessionVar('status', '0');

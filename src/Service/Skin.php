@@ -6,7 +6,6 @@ use CILogon\Service\Util;
 use tubalmartin\CssMin\Minifier as CSSmin;
 use PEAR;
 use DB;
-use Config;
 
 /**
  * Skin
@@ -14,7 +13,7 @@ use Config;
  * This class reads in CSS and configuration options
  * for a 'skin'. The skin is set by passing the
  * '?skin=...' (or '?cilogon_skin=...') query parameter.
- * If found, the assoicated config XML and CSS are read
+ * If found, the associated config XML and CSS are read
  * in from either the filesystem (under the /skin/NAME
  * directory) or the database. It also sets a PHP
  * session variable so that the skin name is remembered

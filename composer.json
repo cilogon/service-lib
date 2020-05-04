@@ -28,7 +28,6 @@
         "cilogon/oauth2-orcid": "^1.0",
         "pear/net_ldap2": "^2.2",
         "pear/log": "^1.13",
-        "pear/config": "dev-trunk",
         "pear/db": "dev-trunk",
         "tubalmartin/cssmin": "^4.0"
     },

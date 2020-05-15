@@ -187,12 +187,10 @@ class Skin
         // If we found $skinvar, attempt to read the skin config/css from
         // either the filesystem or the database, or failing that, read the
         // default /skin/config.xml file.
-        if (strlen($skinvar) > 0) {
-            $skinvar = strtolower($skinvar); // All skin dirs are lowercase
-            $this->readSkinFromFile($skinvar) ||
-                $this->readSkinFromDatabase($skinvar) ||
-                $this->readDefaultSkin();
-        }
+        $skinvar = strtolower($skinvar); // All skin dirs are lowercase
+        $this->readSkinFromFile($skinvar) ||
+            $this->readSkinFromDatabase($skinvar) ||
+            $this->readDefaultSkin();
     }
 
     /**
@@ -211,22 +209,24 @@ class Skin
     {
         $readin = false; // Make sure we read in either XML or CSS (or both)
 
-        $skindir = Util::getServerVar('DOCUMENT_ROOT') . "/skin/$skinvar";
-        if (is_dir($skindir)) {
-            // Read in the config XML
-            $skinconf = $skindir . '/config.xml';
-            if (is_readable($skinconf)) {
-                if (($xml = @simplexml_load_file($skinconf)) !== false) {
-                    $this->configxml = $xml;
-                    $readin = true;
+        if (strlen($skinvar) > 0) {
+            $skindir = Util::getServerVar('DOCUMENT_ROOT') . "/skin/$skinvar";
+            if (is_dir($skindir)) {
+                // Read in the config XML
+                $skinconf = $skindir . '/config.xml';
+                if (is_readable($skinconf)) {
+                    if (($xml = @simplexml_load_file($skinconf)) !== false) {
+                        $this->configxml = $xml;
+                        $readin = true;
+                    }
                 }
-            }
-            //Read in the CSS
-            $skincss = $skindir . '/skin.css';
-            if (is_readable($skincss)) {
-                if (($css = file_get_contents($skincss)) !== false) {
-                    $this->css = $css;
-                    $readin = true;
+                //Read in the CSS
+                $skincss = $skindir . '/skin.css';
+                if (is_readable($skincss)) {
+                    if (($css = file_get_contents($skincss)) !== false) {
+                        $this->css = $css;
+                        $readin = true;
+                    }
                 }
             }
         }

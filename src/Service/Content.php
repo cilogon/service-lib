@@ -89,6 +89,19 @@ class Content
 
         static::printNoScript();
 
+        // CIL-712 Add skin config option to display a info banner.
+        $skinbanner = (string)$skin->getConfigOption('banner');
+        if (strlen($skinbanner) > 0) {
+            echo '
+      <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+      ', $skinbanner , '
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+';
+        }
+
         if ((defined('BANNER_TEXT')) && (!empty(BANNER_TEXT))) {
             echo '
       <div class="alert alert-warning alert-dismissible fade show" role="alert">

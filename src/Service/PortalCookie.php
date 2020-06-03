@@ -234,12 +234,31 @@ class PortalCookie
     {
         $retval = '';
         $name = $this->getPortalName();
-        if (
-            (strlen($name) > 0) &&
-            (isset($this->portalarray[$name])) &&
-            (isset($this->portalarray[$name][$param]))
-        ) {
-            $retval = $this->portalarray[$name][$param];
+        if (strlen($name) > 0) {
+            if (
+                (isset($this->portalarray[$name])) &&
+                (isset($this->portalarray[$name][$param]))
+            ) {
+                $retval = $this->portalarray[$name][$param];
+            } else {
+                // CIL-719 If there is no portal cookie set for this
+                // particular 'portal name', then attempt to read values
+                // from the most recently set portal cookie.
+                $pa = $this->portalarray; // Make a copy of the portalarary
+                // Ascending sort the array by 'ut'
+                uasort($pa, function ($a, $b) {
+                    return ($a['ut'] < $b['ut']) ? -1 : (($a['ut'] > $b['ut']) ? 1 : 0);
+                });
+                // Get the last (most recent) element of the array
+                $name = @array_key_last($pa);
+                if (
+                    (strlen($name) > 0) &&
+                    (isset($pa[$name])) &&
+                    (isset($pa[$name][$param]))
+                ) {
+                    $retval = $pa[$name][$param];
+                }
+            }
         }
         return $retval;
     }

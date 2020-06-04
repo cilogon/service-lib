@@ -240,10 +240,10 @@ class PortalCookie
                 (isset($this->portalarray[$name][$param]))
             ) {
                 $retval = $this->portalarray[$name][$param];
-            } else {
+            } elseif ($param == 'providerId') {
                 // CIL-719 If there is no portal cookie set for this
-                // particular 'portal name', then attempt to read values
-                // from the most recently set portal cookie.
+                // particular 'portal name', then attempt to read the
+                // 'providerId' value from the most recent portal cookie.
                 $pa = $this->portalarray; // Make a copy of the portalarary
                 // Ascending sort the array by 'ut'
                 uasort($pa, function ($a, $b) {

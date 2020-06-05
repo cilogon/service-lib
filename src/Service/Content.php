@@ -1223,14 +1223,6 @@ class Content
 
               <tr>
                 <th><a style="text-decoration:underline" target="_blank"
-                href="http://id.incommon.org/category/research-and-scholarship">InCommon R
-                &amp; S</a>:</th>
-                <td>', ($idplist->isInCommonRandS($idp) ? 'Yes' : 'No'), '</td>
-                <td> </td>
-              </tr>
-
-              <tr>
-                <th><a style="text-decoration:underline" target="_blank"
                 href="http://refeds.org/category/research-and-scholarship">REFEDS
                 R &amp; S</a>:</th>
                 <td>', ($idplist->isREFEDSRandS($idp) ? 'Yes' : 'No'), '</td>
@@ -1274,20 +1266,6 @@ class Content
 
             echo '
                 </td>
-              </tr>
-
-              <tr>
-                <th><a style="text-decoration:underline" target="_blank"
-                href="http://id.incommon.org/assurance/bronze">InCommon Bronze</a>:</th>
-                <td>', ($idplist->isBronze($idp) ? 'Yes' : 'No'), '</td>
-                <td> </td>
-              </tr>
-
-              <tr>
-                <th><a style="text-decoration:underline" target="_blank"
-                href="http://id.incommon.org/assurance/silver">InCommon Silver</a>:</th>
-                <td>', ($idplist->isSilver($idp) ? 'Yes' : 'No'), '</td>
-                <td> </td>
               </tr>
 
               <tr>

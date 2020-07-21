@@ -264,8 +264,20 @@ class Content
             $providerId = Util::getCookieVar('providerId');
         }
 
+        // CIL-763 If there was no previously saved cookie for the initially
+        // selected IdP, check for 'initialidp=...' query parameter. Note
+        // that this value will be overridden by the 'idphint=...' query
+        // parameter (if also present).
+        if (
+            (strlen($providerId) == 0) &&
+            (!empty(Util::getGetVar('initialidp')))
+        ) {
+            $providerId = static::normalizeOAuth2IdP(Util::getGetVar('initialidp'));
+        }
+
         // Make sure previously selected IdP is in list of available IdPs.
         if ((strlen($providerId) > 0) && (!isset($idps[$providerId]))) {
+            $keepidp = '';
             $providerId = '';
         }
 
@@ -2889,15 +2901,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 if (preg_match('%([^\?]*)\?%', $value, $matches)) {
                     $value = $matches[1];
                 }
-                // Also, check for OIDC issuers and transform them into
-                // CILogon-specific values used in the 'Select an IdP' list.
-                if (preg_match('%https://accounts.google.com%', $value)) {
-                    $value = 'https://accounts.google.com/o/oauth2/auth';
-                } elseif (preg_match('%https://github.com%', $value)) {
-                    $value = 'https://github.com/login/oauth/authorize';
-                } elseif (preg_match('%https://orcid.org%', $value)) {
-                    $value = 'https://orcid.org/oauth/authorize';
-                }
+                $value = static::normalizeOAuth2IdP($value);
             }
             unset($value); // Break the reference with the last element.
 
@@ -2914,5 +2918,31 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
         }
         return $hintarray;
+    }
+
+    /**
+     * normalizeOAuth2IdP
+     *
+     * This function takes in a URL for one of the CILogon-supported OAuth2 
+     * issuers (i.e., Google, GitHub, ORCID) and transforms it into a URL 
+     * used by CILogon as shown in the 'Select an Identity Provider' list.
+     *
+     * @param string An OAuth2 issuer string (i.e., 'iss') for one of the
+     *        OAuth2 IdPs supported by CILogon.
+     * @return string The input string transformed to a URL to be used in
+     *         the 'Select an Identity Provider' list. If the incoming
+     *         string does not match one of the OAuth2 issuers, the string
+     *         is returned unmodified.
+     */
+    public static function normalizeOAuth2IdP($idp)
+    {
+        if (preg_match('%^https?://accounts.google.com%', $idp)) {
+            $idp = 'https://accounts.google.com/o/oauth2/auth';
+        } elseif (preg_match('%^https?://github.com%', $idp)) {
+            $idp = 'https://github.com/login/oauth/authorize';
+        } elseif (preg_match('%^https?://orcid.org%', $idp)) {
+            $idp = 'https://orcid.org/oauth/authorize';
+        }
+        return $idp;
     }
 }

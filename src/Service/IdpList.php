@@ -436,6 +436,11 @@ EOT;
                         continue;
                     }
 
+                    // CIL-741 Omit IdPs in the global BLACKLIST_IDP_ARRAY
+                    if (in_array($entityID, BLACKLIST_IDP_ARRAY)) {
+                        continue;
+                    }
+
                     // Create an <idp> element to hold sub elements
                     $idp = $dom->createElement('idp');
                     $idp->setAttribute('entityID', $entityID);
@@ -691,12 +696,6 @@ EOT;
                             $Logout = $matches[1] . '/profile/Logout';
                         }
                         $this->addNode($dom, $idp, 'Logout', $Logout);
-                    }
-
-                    // Add a <Whitelisted> block for all IdPs
-                    // not in the BLACKLIST_IDP_ARRAY.
-                    if (!in_array($entityID, BLACKLIST_IDP_ARRAY)) {
-                        $this->addNode($dom, $idp, 'Whitelisted', '1');
                     }
                 }
 

@@ -126,7 +126,7 @@ class Content
         $footertext = '
       <p>For questions about this site, please see the <a target="_blank"
         href="http://www.cilogon.org/faq">FAQs</a> or send email to <a
-        href="mailto:', EMAIL_HELP, '">', EMAIL_HELP, '</a>.</p>
+        href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
       <p>Know <a target="_blank"
         href="http://ca.cilogon.org/responsibilities">your responsibilities</a>
         for using the CILogon Service.</p>
@@ -135,6 +135,7 @@ class Content
         support for this site.</p>';
 
         // CIL-767 Allow skin to set footer text
+        $skin = Util::getSkin();
         $skinfootertext = (string)$skin->getConfigOption('footertext');
         if (strlen($skinfootertext) > 0) {
             $footertext = $skinfootertext;

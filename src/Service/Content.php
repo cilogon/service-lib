@@ -2062,7 +2062,7 @@ class Content
         }
 
         // If both 'keepidp' and 'providerId' were set (and the
-        // providerId is a whitelisted IdP or valid OpenID provider),
+        // providerId is a greenlit IdP or valid OpenID provider),
         // then skip the Logon page and proceed to the appropriate
         // getuser script.
         if ((strlen($providerId) > 0) && (strlen($keepidp) > 0)) {
@@ -2078,7 +2078,7 @@ class Content
                 } elseif (Util::getIdpList()->exists($providerId)) {
                     // Log in with InCommon
                     static::redirectToGetShibUser($providerId);
-                } else { // $providerId not in whitelist
+                } else { // $providerId not greenlit
                     Util::setPortalOrCookieVar($pc, 'providerId', '', true);
                     printLogonPage();
                 }
@@ -2146,7 +2146,7 @@ class Content
      * redirectToGetShibUser
      *
      * This method redirects control flow to the getuser script for
-     * If the first parameter (a whitelisted entityId) is not specified,
+     * If the first parameter (a greenlit entityId) is not specified,
      * we check to see if either the providerId PHP session variable or the
      * providerId cookie is set (in that order) and use one if available.
      * The function then checks to see if there is a valid PHP session
@@ -2446,7 +2446,7 @@ class Content
         } else { // EVERYTHING IS OKAY SO FAR
             // Extra security check: Once the user has successfully
             // authenticated with an IdP, verify that the chosen IdP was
-            // actually whitelisted. If not, then set error message and show
+            // actually greenlit. If not, then set error message and show
             // Select an Identity Provider page again.
             Util::getSkin()->init();  // Check for forced skin
             $idps = static::getCompositeIdPList();
@@ -2457,10 +2457,10 @@ class Content
                     'Invalid IdP selected. Please try again.'
                 );
                 Util::sendErrorAlert(
-                    'Authentication attempt using non-whitelisted IdP',
+                    'Authentication attempt using non-greenlit IdP',
                     '
 A user successfully authenticated with an IdP, however, the selected IdP
-was not in the list of whitelisted IdPs as determined by the current skin.
+was not in the list of greenlit IdPs as determined by the current skin.
 This might indicate the user attempted to circumvent the security check
 in "handleGotUser()" for valid IdPs for the skin.'
                 );
@@ -2767,8 +2767,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
      * This function generates a list of IdPs to display in the 'Select
      * An Identity Provider' box on the main CILogon page or on the
      * TestIdP page. For the main CILogon page, this is a filtered list of
-     * IdPs based on the skin's whitelist/blacklist and the global
-     * blacklist file. For the TestIdP page, the list is all InCommon IdPs.
+     * IdPs based on the skin's greenlit/redlit list and the global
+     * redlit list. For the TestIdP page, the list is all InCommon IdPs.
      *
      * @return array A two-dimensional array where the primary key is the
      *         entityID and the secondary key is either 'Display_Name'
@@ -2784,9 +2784,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
         // Check if the skin's config.xml has set the
         // 'registeredbyincommonidps' option, which restricts the SAML-
         // based IdPs to those with the <Registered_By_InCommon> tag.
-        // Otherwise, just get the SAML-based IdPs that have the
-        // <Whitelisted> tag. Note that the skin's <idpwhitelist>
-        // is still consulted in either case (below).
+        // Otherwise, just get all SAML-based IdPs that have not been
+        // restricted based on the global 'redlit' list.
         $registeredbyincommonidps = $skin->getConfigOption('registeredbyincommonidps');
         if (
             (!is_null($registeredbyincommonidps)) &&
@@ -2794,7 +2793,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         ) {
             $retarray = $idplist->getRegisteredByInCommonIdPs();
         } else {
-            $retarray = $idplist->getWhitelistedIdPs();
+            $retarray = $idplist->getSAMLIdPs();
         }
 
         // Add all OAuth2 IdPs to the list
@@ -2809,22 +2808,26 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
         }
 
-        // Check to see if the skin's config.xml has a whitelist of IDPs.
-        // If so, go thru master IdP list and keep only those IdPs in the
-        // config.xml's whitelist.
-        if ($skin->hasIdpWhitelist()) {
+        // Check to see if the skin's config.xml has a greenlit list of IDPs.
+        // If so, go thru master IdP list and keep only those IdPs.
+        if ($skin->hasGreenlitIdps()) {
             foreach ($retarray as $entityId => $names) {
-                if (!$skin->idpWhitelisted($entityId)) {
+                if (!$skin->idpGreenlit($entityId)) {
                     unset($retarray[$entityId]);
                 }
             }
         }
-        // Next, check to see if the skin's config.xml has a blacklist of
+        // Next, check to see if the skin's config.xml has a redlit list of
         // IdPs. If so, cull down the master IdP list removing 'bad' IdPs.
-        if ($skin->hasIdpBlacklist()) {
-            $idpblacklist = $skin->getConfigOption('idpblacklist');
-            foreach ($idpblacklist->idp as $blackidp) {
-                unset($retarray[(string)$blackidp]);
+        if ($skin->hasRedlitIdps()) {
+            $idpredlit = $skin->getConfigOption('idpredlit');
+            // REMOVE AFTER DATABASE UPDATE!!!
+            // For now, also check for older 'idpblacklist' option
+            if ((is_null($idpredlit)) || (empty($idpredlit->idp))) {
+                $idpredlit = $skin->getConfigOption('idpblacklist');
+            }
+            foreach ($idpredlit->idp as $redidp) {
+                unset($retarray[(string)$redidp]);
             }
         }
 
@@ -2868,7 +2871,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
      * an IdP' list are removed. The resulting processed list of
      * entityIds is returned, which may be an empty array.
      *
-     * @param array $idps (Optional) A list of valid (i.e., whitelisted) IdPs.
+     * @param array $idps (Optional) A list of valid (i.e., greenlit) IdPs.
      *        If this list is empty, then use the current skin's IdP list.
      * @return array A list of entityIds / OIDC provider URLs extracted from
      *         a passed-in parameter 'selected_idp' or 'idphint'. This array
@@ -2910,7 +2913,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
             unset($value); // Break the reference with the last element.
 
-            // Remove any non-whitelisted IdPs from the hintarray.
+            // Remove any non-greenlit IdPs from the hintarray.
             if (empty($idps)) {
                 $idps = static::getCompositeIdPList();
             }

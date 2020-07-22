@@ -42,10 +42,10 @@ use DB;
  *   // While outputting the <head> HTML block...
  *   $skin->printSkinCSS();
  *   // Get the value of a configuration option
- *   $idpwhitelist = $skin->getConfigOption('idpwhitelist');
- *   // Now, process entries in the $idpwhitelist
- *   if ((!is_null($idpwhitelist)) && (!empty($idpwhitelist->idp))) {
- *       foreach ($idpwhitelist->idp as $entityID) {
+ *   $idpgreenlit = $skin->getConfigOption('idpgreenlit');!!
+ *   // Now, process entries in the $idpgreenlit list
+ *   if ((!is_null($idpgreenlit)) && (!empty($idpgreenlit->idp))) {
+ *       foreach ($idpgreenlit->idp as $entityID) {
  *           echo '<p>' , (string)$entityID , "<\p>\n";
  *       }
  *   }
@@ -338,8 +338,8 @@ class Skin
      * getConfigOption
      *
      * This method returns a SimpleXMLElement block corresponding to
-     * the passed in arguments.  For example, to get the blacklist of
-     * idps, call $idps = getConfigOption('idpblacklist') and then
+     * the passed in arguments.  For example, to get the redlit list of
+     * idps, call $idps = getConfigOption('idpredlit') and then
      * iterate over $idps with foreach($idps as $idp) { ... }.  To get
      * a single subblock value such as the initial lifetime number for
      * the PKCS12 download option, call $life =
@@ -391,67 +391,88 @@ class Skin
     }
 
     /**
-     * hasIdpWhitelist
+     * hasGreenlitIdps
      *
-     * This function checks for the presence of a <idpwhitelist> block
+     * This function checks for the presence of a <idpgreenlit> block
      * in the skin's config file.  There must be at least one <idp>
-     * in the <idpwhitelist>.
+     * in the <idpgreenlit>.
      *
-     * @return bool True if skin has a non-empty <idpwhitelist>.
+     * @return bool True if skin has a non-empty <idpgreenlit>.
      */
-    public function hasIdpWhitelist()
+    public function hasGreenlitIdps()
     {
-        $retval = false;  // Assume no <idpwhitelist> configured
-        $idpwhitelist = $this->getConfigOption('idpwhitelist');
-        if ((!is_null($idpwhitelist)) && (!empty($idpwhitelist->idp))) {
+        $retval = false;  // Assume no <idpgreenlit> configured
+        $idpgreenlit = $this->getConfigOption('idpgreenlit');
+        if ((!is_null($idpgreenlit)) && (!empty($idpgreenlit->idp))) {
             $retval = true;
+        }
+        // REMOVE AFTER DATABASE UPDATE!!! 
+        // For now, also check for older 'idpwhitelist' option
+        if (!$retval) {
+             $idpwhitelist = $this->getConfigOption('idpwhitelist');
+             if ((!is_null($idpwhitelist)) && (!empty($idpwhitelist->idp))) {
+                 $retval = true;
+             }
         }
         return $retval;
     }
 
     /**
-     * hasIdpBlacklist
+     * hasRedlitIdps
      *
-     * This function checks for the presence of a <idpblacklist> block
+     * This function checks for the presence of a <idpredlit> block
      * in the skin's config file.  There must be at least one <idp>
-     * in the <idpblacklist>.
+     * in the <idpredlit>.
      *
-     * @return bool True if skin has a non-empty <idpblacklist>.
+     * @return bool True if skin has a non-empty <idpredlit>.
      */
-    public function hasIdpBlacklist()
+    public function hasRedlitIdps()
     {
-        $retval = false;  // Assume no <idpblacklist> configured
-        $idpblacklist = $this->getConfigOption('idpblacklist');
-        if ((!is_null($idpblacklist)) && (!empty($idpblacklist->idp))) {
+        $retval = false;  // Assume no <idpredlit> configured
+        $idpredlit = $this->getConfigOption('idpredlit');
+        if ((!is_null($idpredlit)) && (!empty($idpredlit->idp))) {
             $retval = true;
+        }
+        // REMOVE AFTER DATABASE UPDATE!!! 
+        // For now, also check for older 'idpblacklist' option
+        if (!$retval) {
+            $idpblacklist = $this->getConfigOption('idpblacklist');
+            if ((!is_null($idpblacklist)) && (!empty($idpblacklist->idp))) {
+                $retval = true;
+            }
+
         }
         return $retval;
     }
 
     /**
-     * idpWhitelisted
+     * idpGreenlit
      *
      * This method checks to see if a given entityId of an IdP
-     * is whitelisted. 'Whitelisted' in this case means either (a) the
-     * entityId is in the skin's <idpwhitelist> list or (b) the skin
-     * doesn't have a <idpwhitelist> at all.  In the second case, all
-     * IdPs are by default 'whitelisted'.  If you want to find if an
+     * is greenlit. 'Greenlit' in this case means either (a) the
+     * entityId is in the skin's <idpgreenlit> list or (b) the skin
+     * doesn't have a <idpgreenlit> at all.  In the second case, all
+     * IdPs are by default 'greenlit'.  If you want to find if an
      * IdP should be listed in the WAYF, use 'idpAvailable' which
-     * checks the whitelist AND the blacklist.
+     * checks the greenlit AND the redlit lists.
      *
-     * @param string $entityId The entityId of an IdP to check for
-     *        whitelisting.
+     * @param string $entityId The entityId of an IdP to check for greenlit.
      * @return bool True if the given IdP entityId is in the skin's
-     *         whitelist (or if the skin doesn't have a whitelist).
+     *         greenlit list (or if the skin doesn't have a greenlit list).
      */
-    public function idpWhitelisted($entityId)
+    public function idpGreenlit($entityId)
     {
-        $retval = true;  // Assume the entityId is 'whitelisted'
-        if ($this->hasIdpWhitelist()) {
-            $idpwhitelist = $this->getConfigOption('idpwhitelist');
+        $retval = true;  // Assume the entityId is 'greenlit'
+        if ($this->hasGreenlitIdps()) {
+            $idpgreenlit = $this->getConfigOption('idpgreenlit');
+            // REMOVE AFTER DATABASE UPDATE!!!
+            // For now, also check for older 'idpwhitelist' option
+            if ((is_null($idpgreenlit)) || (empty($idpgreenlit->idp))) {
+                $idpgreenlit = $this->getConfigOption('idpwhitelist');
+            }
             $found = false;
-            foreach ($idpwhitelist->idp as $whiteidp) {
-                if ($entityId == ((string)$whiteidp)) {
+            foreach ($idpgreenlit->idp as $greenidp) {
+                if ($entityId == ((string)$greenidp)) {
                     $found = true;
                     break;
                 }
@@ -464,23 +485,28 @@ class Skin
     }
 
     /**
-     * idpBlacklisted
+     * idpRedlit
      *
      * This method checks to see if a given entityId of an IdP
-     * appears in the skin's <idpblacklist>.
+     * appears in the skin's <idpredlit>.
      *
      * @param string $entityId The entityId of an IdP to check for
-     *        blacklisting.
+     *        redlit status.
      * @return bool True if the given IdP entityId is in the skin's
-     *         blacklist.
+     *         redlit list.
      */
-    public function idpBlacklisted($entityId)
+    public function idpRedlit($entityId)
     {
-        $retval = false;  // Assume entityId is NOT in the idpblacklist
-        if ($this->hasIdpBlacklist()) {
-            $idpblacklist = $this->getConfigOption('idpblacklist');
-            foreach ($idpblacklist->idp as $blackidp) {
-                if ($entityId == ((string)$blackidp)) {
+        $retval = false;  // Assume entityId is NOT in the idpredlit
+        if ($this->hasRedlitIdps()) {
+            $idpredlit = $this->getConfigOption('idpredlit');
+            // REMOVE AFTER DATABASE UPDATE!
+            // For now, also check for older 'idpwhitelist' option
+            if ((is_null($idpredlit)) || (empty($idpredlit->idp))) {
+                $idpredlit = $this->getConfigOption('idpblacklist');
+            }
+            foreach ($idpredlit->idp as $redidp) {
+                if ($entityId == ((string)$redidp)) {
                     $retval = true;
                     break;
                 }
@@ -492,11 +518,11 @@ class Skin
     /**
      * idpAvailable
      *
-     * This method combines idpWhitelisted and idpBlacklisted to return
+     * This method combines idpGreenlit and idpRedlit to return
      * a 'yes/no' for if a given IdP should be made available for
      * selection in the WAYF.  It first checks to see if the IdP is
-     * whitelisted.  If not, it returns false. Otherwise, it then
-     * checks if the IdP is blacklisted.  If not, it returns true.
+     * greenlit.  If not, it returns false. Otherwise, it then
+     * checks if the IdP is redlit.  If not, it returns true.
      *
      * @param string $entityId The entityId of an IdP to check to see if it
      *        should be available in the WAYF.
@@ -507,8 +533,8 @@ class Skin
     {
         $retval = false;   // Assume IdP is not available in the WAYF
         if (
-            ($this->idpWhitelisted($entityId)) &&
-            (!$this->idpBlacklisted($entityId))
+            ($this->idpGreenlit($entityId)) &&
+            (!$this->idpRedlit($entityId))
         ) {
             $retval = true;
         }

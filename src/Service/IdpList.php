@@ -30,8 +30,8 @@ use SimpleXMLElement;
  * to file).
  *
  * Note that this class previously defaulted to writing the idplist
- * as an XMl file and then reading that XML file back in. When all
- * InCommon and eduGAIN IdPs were 'whitelisted', the xpath queries
+ * as an XML file and then reading that XML file back in. When all
+ * InCommon and eduGAIN IdPs were allowed, the xpath queries
  * used on the read-in XML file were painfully slow. So now the default
  * is to read/write a JSON file and use a protected $idparray which is
  * an order of magnitude faster than xpath queries. You can still
@@ -436,8 +436,8 @@ EOT;
                         continue;
                     }
 
-                    // CIL-741 Omit IdPs in the global BLACKLIST_IDP_ARRAY
-                    if (in_array($entityID, BLACKLIST_IDP_ARRAY)) {
+                    // CIL-741 Omit IdPs in the global REDLIT_IDP_ARRAY
+                    if (in_array($entityID, REDLIT_IDP_ARRAY)) {
                         continue;
                     }
 
@@ -943,21 +943,6 @@ EOT;
     }
 
     /**
-     * isWhitelisted
-     *
-     * This method searches for the given entityID and checks if the
-     *'Whitelisted' entry has been set to '1'.
-     *
-     * @param string $entityID The enityID to search for
-     * @return bool True if the given entityID is marked 'Whitelisted'.
-     *         False otherwise.
-     */
-    public function isWhitelisted($entityID)
-    {
-        return $this->isAttributeSet($entityID, 'Whitelisted');
-    }
-
-    /**
      * isSilver
      *
      * This method searches for the given entityID and checks if the
@@ -1093,17 +1078,15 @@ EOT;
      * either 'Organization_Name' (corresponds to OrganizationDisplayName)
      * or 'Display_Name' (corresponds to mdui:DisplayName).
      * If a non-null parameter is passed in it returns a subset of the
-     * InCommon IdPs. 0 means list only non-whitelisted IdPs, 1 means list
-     * only whitelisted IdPs, 2 means list only R&S IdPs.
+     * InCommon IdPs. 2 means list only R&S IdPs, 3 means list only IdPs 
+     * marked as Registered By InCommon.
      *
      * @param int $filter
      *        null => all SAML-based IdPs
-     *        0    => non-whitelisted SAML-based IdPs
-     *        1    => whitelisted SAML-based IdPs
      *        2    => R&S SAML-based IdPs
-     *        3    => whitelisted "Registered By InCommon" IdPs
+     *        3    => "Registered By InCommon" IdPs
      * $return array An array of SAML-based IdP Organization Names and Display
-     *         Names, possibly filtered by whitelisted / non-whitelisted / R&S.
+     *         Names, possibly filtered R&S / Registered By InCommon.
      */
     public function getSAMLIdPs($filter = null)
     {
@@ -1112,15 +1095,10 @@ EOT;
         foreach ($this->idparray as $key => $value) {
             if (
                 (!is_null($filter)) &&
-                (($filter === 0) &&
-                 ($this->isWhitelisted($key))) ||
-                (($filter === 1) &&
-                 (!$this->isWhitelisted($key))) ||
                 (($filter === 2) &&
                  (!$this->isRandS($key))) ||
                 (($filter === 3) &&
-                 (!$this->isRegisteredByInCommon($key)) ||
-                 (!$this->isWhitelisted($key)))
+                 (!$this->isRegisteredByInCommon($key)))
             ) {
                 continue;
             }
@@ -1139,36 +1117,6 @@ EOT;
         }
 
         return $retarr;
-    }
-
-    /**
-     * getNonWhitelistedIdPs
-     *
-     * This method returns an array of non-whitelisted IdPs where the
-     * keys of the array are the entityIDs and the values are the
-     * pretty print Organization Names. Note that this essentially
-     * returns the IdPs in the BLACKLIST_IDP_ARRAY.
-     *
-     * @return array An array of non-whitelisted IdPs.
-     */
-    public function getNonWhitelistedIdPs()
-    {
-        return $this->getSAMLIdPs(0);
-    }
-
-    /**
-     * getWhitelistedIdPs
-     *
-     * This method returns an array of whitelisted IdPs where the keys
-     * of the array are the entityIDs and the values are the
-     * pretty print Organization Names. Note that this returns all of the
-     * IdPs not in the BLACKLIST_IDP_ARRAY.
-     *
-     * @return array An array of whitelisted IdPs.
-     */
-    public function getWhitelistedIdPs()
-    {
-        return $this->getSAMLIdPs(1);
     }
 
     /**

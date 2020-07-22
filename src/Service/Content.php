@@ -120,19 +120,10 @@ class Content
      *
      * This function should be called to print out the closing HTML block
      * for each web page.
-     *
-     * @param string $footer Optional extra text to be output before the
-     * closing footer div.
      */
-    public static function printFooter($footer = '')
+    public static function printFooter()
     {
-        if (strlen($footer) > 0) {
-            echo $footer;
-        }
-
-        echo '
-    </div> <!-- Close Main Bootstrap Container -->
-    <footer class="footer">
+        $footertext = '
       <p>For questions about this site, please see the <a target="_blank"
         href="http://www.cilogon.org/faq">FAQs</a> or send email to <a
         href="mailto:', EMAIL_HELP, '">', EMAIL_HELP, '</a>.</p>
@@ -141,7 +132,21 @@ class Content
         for using the CILogon Service.</p>
       <p>See <a target="_blank"
         href="http://ca.cilogon.org/acknowledgements">acknowledgements</a> of
-        support for this site.</p>
+        support for this site.</p>';
+
+        // CIL-767 Allow skin to set footer text
+        $skinfootertext = (string)$skin->getConfigOption('footertext');
+        if (strlen($skinfootertext) > 0) {
+            $footertext = $skinfootertext;
+        }
+
+        echo '
+    </div> <!-- Close Main Bootstrap Container -->
+    <footer class="footer">';
+
+        echo $footertext;
+
+        echo '
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"

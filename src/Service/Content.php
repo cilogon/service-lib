@@ -2822,11 +2822,6 @@ in "handleGotUser()" for valid IdPs for the skin.'
         // IdPs. If so, cull down the master IdP list removing 'bad' IdPs.
         if ($skin->hasRedlitIdps()) {
             $idpredlit = $skin->getConfigOption('idpredlit');
-            // REMOVE AFTER DATABASE UPDATE!!!
-            // For now, also check for older 'idpblacklist' option
-            if ((is_null($idpredlit)) || (empty($idpredlit->idp))) {
-                $idpredlit = $skin->getConfigOption('idpblacklist');
-            }
             foreach ($idpredlit->idp as $redidp) {
                 unset($retarray[(string)$redidp]);
             }

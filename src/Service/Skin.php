@@ -406,14 +406,6 @@ class Skin
         if ((!is_null($idpgreenlit)) && (!empty($idpgreenlit->idp))) {
             $retval = true;
         }
-        // REMOVE AFTER DATABASE UPDATE!!! 
-        // For now, also check for older 'idpwhitelist' option
-        if (!$retval) {
-             $idpwhitelist = $this->getConfigOption('idpwhitelist');
-             if ((!is_null($idpwhitelist)) && (!empty($idpwhitelist->idp))) {
-                 $retval = true;
-             }
-        }
         return $retval;
     }
 
@@ -432,15 +424,6 @@ class Skin
         $idpredlit = $this->getConfigOption('idpredlit');
         if ((!is_null($idpredlit)) && (!empty($idpredlit->idp))) {
             $retval = true;
-        }
-        // REMOVE AFTER DATABASE UPDATE!!! 
-        // For now, also check for older 'idpblacklist' option
-        if (!$retval) {
-            $idpblacklist = $this->getConfigOption('idpblacklist');
-            if ((!is_null($idpblacklist)) && (!empty($idpblacklist->idp))) {
-                $retval = true;
-            }
-
         }
         return $retval;
     }
@@ -465,11 +448,6 @@ class Skin
         $retval = true;  // Assume the entityId is 'greenlit'
         if ($this->hasGreenlitIdps()) {
             $idpgreenlit = $this->getConfigOption('idpgreenlit');
-            // REMOVE AFTER DATABASE UPDATE!!!
-            // For now, also check for older 'idpwhitelist' option
-            if ((is_null($idpgreenlit)) || (empty($idpgreenlit->idp))) {
-                $idpgreenlit = $this->getConfigOption('idpwhitelist');
-            }
             $found = false;
             foreach ($idpgreenlit->idp as $greenidp) {
                 if ($entityId == ((string)$greenidp)) {
@@ -500,11 +478,6 @@ class Skin
         $retval = false;  // Assume entityId is NOT in the idpredlit
         if ($this->hasRedlitIdps()) {
             $idpredlit = $this->getConfigOption('idpredlit');
-            // REMOVE AFTER DATABASE UPDATE!
-            // For now, also check for older 'idpwhitelist' option
-            if ((is_null($idpredlit)) || (empty($idpredlit->idp))) {
-                $idpredlit = $this->getConfigOption('idpblacklist');
-            }
             foreach ($idpredlit->idp as $redidp) {
                 if ($entityId == ((string)$redidp)) {
                     $retval = true;

@@ -415,7 +415,7 @@ class Content
         echo '
         <p class="privacypolicy">
         By selecting "', $lobtext , '", you agree to <a target="_blank"
-        href="http://ca.cilogon.org/policy/privacy">CILogon\'s privacy
+        href="https://www.cilogon.org/privacy">CILogon\'s privacy
         policy</a>.
         </p>
 

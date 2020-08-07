@@ -316,26 +316,6 @@ class DBService
     public $idp_uids;
 
     /**
-     * @var string|null $client_name OAuth 2.0 client name
-     */
-    public $client_name;
-
-    /**
-     * @var string|null $client_id OAuth 2.0 client identifier
-     */
-    public $client_id;
-
-    /**
-     * @var string|null $client_home_uri OAuth 2.0 client home URL
-     */
-    public $client_home_uri;
-
-    /**
-     * @var array $client_callback_uris An array of OAuth 2.0 callback URLs
-     */
-    public $client_callback_uris;
-
-    /**
      * @var string|null $dbservice URL The URL to use for the dbService
      */
     private $dbserviceurl;
@@ -391,7 +371,6 @@ class DBService
         $this->clearUser();
         $this->clearPortal();
         $this->clearIdps();
-        $this->clearClient();
     }
 
     /**
@@ -437,21 +416,6 @@ class DBService
     {
         $this->status = null;
         $this->idp_uids = array();
-    }
-
-    /**
-     * clearClient
-     *
-     * Set all of the class member variables associated with
-     * getClient() to 'null'.
-     */
-    public function clearClient()
-    {
-        $this->status = null;
-        $this->client_name = null;
-        $this->client_id = null;
-        $this->client_home_uri = null;
-        $this->client_callback_uris = array();
     }
 
     /**
@@ -672,25 +636,6 @@ class DBService
     }
 
     /**
-     * getClient
-     *
-     * This method calls the 'getClient' action of the Oauth 2.0
-     * servlet and sets the class member variables associated with
-     * client info appropriately.  If the servlet returns correctly
-     * (i.e. an HTTP status code of 200), this method returns true.
-     *
-     * @param string $cid The Oauth 2.0 Client ID (client_id).
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function getClient($cid)
-    {
-        $this->clearClient();
-        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
-        return $this->call('action=getClient&client_id=' .
-            urlencode($cid));
-    }
-
-    /**
      * setTransactionState
      *
      * This method calls the 'setTransactionState' action of the Oauth
@@ -854,18 +799,6 @@ class DBService
                             $this->idp_uids[] = urldecode($value);
                         }
                     }
-                    if (preg_match('/client_name=([^\r\n]+)/', $output, $match)) {
-                        $this->client_name = urldecode($match[1]);
-                    }
-                    if (preg_match('/client_id=([^\r\n]+)/', $output, $match)) {
-                        $this->client_id = urldecode($match[1]);
-                    }
-                    if (preg_match('/client_home_uri=([^\r\n]+)/', $output, $match)) {
-                        $this->client_home_uri = urldecode($match[1]);
-                    }
-                    if (preg_match('/client_callback_uris=([^\r\n]+)/', $output, $match)) {
-                        $this->client_callback_uris = explode(urldecode($match[1]), ',');
-                    }
                 }
             }
             curl_close($ch);
@@ -993,23 +926,6 @@ class DBService
             uasort($this->idp_uids, 'strcasecmp');
             echo "idp_uids={\n";
             foreach ($this->idp_uids as $value) {
-                echo "    $value\n";
-            }
-            echo "}\n";
-        }
-        if (!is_null($this->client_name)) {
-            echo "client_name=$this->client_name\n";
-        }
-        if (!is_null($this->client_id)) {
-            echo "client_id=$this->client_id\n";
-        }
-        if (!is_null($this->client_home_uri)) {
-            echo "client_home_uri=$this->client_home_uri\n";
-        }
-        if (count($this->client_callback_uris) > 0) {
-            uasort($this->client_callback_uris, 'strcasecmp');
-            echo "client_callback_uris={\n";
-            foreach ($this->client_callback_uris as $value) {
                 echo "    $value\n";
             }
             echo "}\n";

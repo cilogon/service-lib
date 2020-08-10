@@ -916,7 +916,20 @@ class Content
         echo '
           <div class="card-body">
             <table class="table table-striped table-sm">
-            <tbody>
+            <tbody>';
+
+        // CIL-781 Show CILogon User Identifier (user_uid) when logged in
+        $user_uid = Util::getSessionVar('user_uid');
+        if (strlen($user_uid) > 0) {
+            echo '
+              <tr>
+                <th>CILogon User Identifier:</th>
+                <td>', $user_uid, '</td>
+                <td> </td>
+              </tr>';
+        }
+
+        echo '
               <tr>
                 <th>Identity Provider (entityID):</th>
                 <td>', $idp , '</td>
@@ -2927,8 +2940,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
     /**
      * normalizeOAuth2IdP
      *
-     * This function takes in a URL for one of the CILogon-supported OAuth2 
-     * issuers (i.e., Google, GitHub, ORCID) and transforms it into a URL 
+     * This function takes in a URL for one of the CILogon-supported OAuth2
+     * issuers (i.e., Google, GitHub, ORCID) and transforms it into a URL
      * used by CILogon as shown in the 'Select an Identity Provider' list.
      *
      * @param string An OAuth2 issuer string (i.e., 'iss') for one of the

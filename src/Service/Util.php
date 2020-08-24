@@ -1292,9 +1292,15 @@ Remote Address= ' . $remoteaddr . '
 
         # Try to split the incoming $full name into first and last names
         if (strlen($full) > 0) {
-            $names = preg_split('/\s+/', $full, 2);
-            $firstname = @$names[0];
-            $lastname =  @$names[1];
+            if (preg_match('/,/', $full)) { // Split on comma if present
+                $names = preg_split('/,/', $full, 2);
+                $lastname =  trim(@$names[0]);
+                $firstname = trim(@$names[1]);
+            } else {
+                $names = preg_split('/\s+/', $full, 2);
+                $firstname = trim(@$names[0]);
+                $lastname =  trim(@$names[1]);
+            }
         }
 
         # If either first or last name blank, then use incoming $first and $last

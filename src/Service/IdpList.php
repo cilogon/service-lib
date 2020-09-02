@@ -1078,7 +1078,7 @@ EOT;
      * either 'Organization_Name' (corresponds to OrganizationDisplayName)
      * or 'Display_Name' (corresponds to mdui:DisplayName).
      * If a non-null parameter is passed in it returns a subset of the
-     * InCommon IdPs. 2 means list only R&S IdPs, 3 means list only IdPs 
+     * InCommon IdPs. 2 means list only R&S IdPs, 3 means list only IdPs
      * marked as Registered By InCommon.
      *
      * @param int $filter

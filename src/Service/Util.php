@@ -564,6 +564,7 @@ class Util
             'ou'                 => 'OU',
             'member_of'          => 'MemberOf',
             'acr'                => 'AuthnContextClassRef',
+            'amr'                => 'AuthnMethodRef',
             'entitlement'        => 'Entitlement',
             'itrustuin'          => 'iTrustUIN',
             'cilogon_skin'       => 'Skin Name',
@@ -748,6 +749,7 @@ Remote Address= ' . $remoteaddr . '
             $ou,
             $member_of,
             $acr,
+            $amr,
             $entitlement,
             $itrustuin
         );
@@ -839,6 +841,8 @@ Remote Address= ' . $remoteaddr . '
                         $member_of : '<MISSING>') . "\n" .
                     'ACR           = ' . ((strlen($acr) > 0) ?
                         $acr : '<MISSING>') . "\n" .
+                    'AMR           = ' . ((strlen($amr) > 0) ?
+                        $amr : '<MISSING>') . "\n" .
                     'Entitlement   = ' . ((strlen($entitlement) > 0) ?
                         $entitlement : '<MISSING>') . "\n" .
                     'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?

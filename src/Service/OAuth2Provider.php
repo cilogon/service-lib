@@ -61,6 +61,9 @@ class OAuth2Provider
                 $this->authzUrlOpts = ['scope' => ['user:email']];
             } elseif ($idpdn == 'orcid') {
                 $classname     = 'CILogon\OAuth2\Client\Provider\ORCID';
+                // CIL-799 Use Member API and fetch id_token in order to get 'amr' claim
+                $this->authzUrlOpts = ['scope' => ['openid']];
+                $extraparams = array('member' => 'true');
             }
 
             $this->provider = new $classname(array_merge(array(

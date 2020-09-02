@@ -1085,6 +1085,12 @@ class Content
               </tr>
 
               <tr>
+                <th>AuthnMethodRef:</th>
+                <td>', Util::getSessionVar('amr'), '</td>
+                <td> </td>
+              </tr>
+
+              <tr>
                 <th>Affiliation (affiliation):</th>
                 <td>', Util::getSessionVar('affiliation'), '</td>
                 <td> </td>
@@ -1544,6 +1550,7 @@ class Content
      * @param string $ou
      * @param string $member_of
      * @param string $acr
+     * @param string $amr
      * @param string $entitlement
      * @param string $itrustuin
      * @param string $subject_id
@@ -1568,6 +1575,7 @@ class Content
         $ou,
         $member_of,
         $acr,
+        $amr,
         $entitlement,
         $itrustuin,
         $subject_id,
@@ -2439,6 +2447,7 @@ class Content
                     $ou,
                     $member_of,
                     $acr,
+                    $amr,
                     $entitlement,
                     $itrustuin,
                     $subject_id,

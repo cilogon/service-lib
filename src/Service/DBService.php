@@ -156,6 +156,7 @@ class DBService
         'ou',
         'member_of',
         'acr',
+        'amr',
         'entitlement',
         'itrustuin',
     ];
@@ -254,6 +255,11 @@ class DBService
      * @var string|null $acr Authentication Context Class Ref
      */
     public $acr;
+
+    /**
+     * @var string|null $amr Authentication Method Reference from ORCID
+     */
+    public $amr;
 
     /**
      * @var string|null $entitlement eduPersonEntitlement
@@ -433,7 +439,8 @@ class DBService
      *            $first_name, $last_name, $display_name, $email,
      *            $eppn, $eptid, $openid, $oidc,
      *            $subject_id, $pairwise_id, $affiliation,
-     *            $ou, $member_of, $acr, $entitlement, $itrustuin
+     *            $ou, $member_of, $acr, $amr, $entitlement,
+     *            $itrustuin
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -814,6 +821,9 @@ class DBService
                 if (isset($attr_arr['acr'])) {
                     $this->acr = $attr_arr['acr'];
                 }
+                if (isset($attr_arr['amr'])) {
+                    $this->amr = $attr_arr['amr'];
+                }
                 if (isset($attr_arr['entitlement'])) {
                     $this->entitlement = $attr_arr['entitlement'];
                 }
@@ -888,6 +898,9 @@ class DBService
         }
         if (!is_null($this->acr)) {
             echo "acr=$this->acr\n";
+        }
+        if (!is_null($this->amr)) {
+            echo "amr=$this->amr\n";
         }
         if (!is_null($this->entitlement)) {
             echo "entitlement=$this->entitlement\n";

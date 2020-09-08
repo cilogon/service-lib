@@ -1684,6 +1684,12 @@ class Content
             ';
         }
 
+        // Attempt to get the OAuth1/OIDC client name
+        $portalname = Util::getSessionVar('portalname');
+        if (strlen($portalname) == 0) {
+            $portalname = @$clientparams['client_name'];
+        }
+
         // Get contacts from metadata for email addresses
         $shibarray = $idplist->getShibInfo($idp);
         $emailmsg = '?subject=Attribute Release Problem for CILogon' .
@@ -1691,6 +1697,7 @@ class Content
         '&body=Hello, I am having trouble logging on to ' .
         'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idp_display_name .
         ' Identity Provider (IdP) ' .
+        ((strlen($portalname) > 0) ? 'with "' . htmlspecialchars($portalname) . '" ' : '') .
         'due to the following missing attributes:%0D%0A' .
         $missingattrs;
         if ($student) {

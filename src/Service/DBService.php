@@ -61,7 +61,10 @@ class DBService
 {
     /**
      * @var array $STATUS The various STATUS_* constants, originally from
-     *      Store.pm. The keys of the array are strings corresponding to the
+     *      Store.pm. See cilogon2-server-loader-oauth2/src/main/java/org/cilogon/oauth2/servlet/impl/DBService2.java
+     *      in the https://github.com/cilogon/cilogon-java/ repo for the
+     *      definitive list of oauth2 return status codes.
+     *      The keys of the array are strings corresponding to the
      *      constant names. The values of the array are the integer (hex)
      *      values. For example, DBService::$STATUS['STATUS_OK'] = 0;
      *      Use 'array_search($this->status,DBService::$STATUS)' to look
@@ -96,7 +99,9 @@ class DBService
         'STATUS_MISSING_CLIENT_ID'         => 0x10009, //   65545
         'STATUS_NO_REGISTERED_CALLBACKS'   => 0x1000B, //   65547
         'STATUS_UNKNOWN_CLIENT'            => 0x1000D, //   65549
-        'STATUS_UNAPPROVED_CLIENT'         => 0x1000F  //   65551
+        'STATUS_UNAPPROVED_CLIENT'         => 0x1000F, //   65551
+        'STATUS_NO_SCOPES'                 => 0x10011, //   65553
+        'STATUS_MALFORMED_SCOPE'           => 0x10013, //   65555
     );
 
     public static $STATUS_TEXT = array(
@@ -128,7 +133,9 @@ class DBService
         'STATUS_MISSING_CLIENT_ID'         => 'Missing client_id parameter.',
         'STATUS_NO_REGISTERED_CALLBACKS'   => 'No registered callback URIs.',
         'STATUS_UNKNOWN_CLIENT'            => 'Unknown client_id.',
-        'STATUS_UNAPPROVED_CLIENT'         => 'Client has not been approved.'
+        'STATUS_UNAPPROVED_CLIENT'         => 'Client has not been approved.',
+        'STATUS_NO_SCOPES'                 => 'Missing or empty scope parameter.',
+        'STATUS_MALFORMED_SCOPE'           => 'Malformed scope parameter.',
     );
 
     /**

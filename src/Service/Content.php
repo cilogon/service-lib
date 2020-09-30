@@ -2017,6 +2017,8 @@ class Content
                     (preg_match($key, $client_id))
                 ) {
                     $bypassidp = $value;
+                    // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
+                    $skin->init(true);
                     break;
                 }
             }

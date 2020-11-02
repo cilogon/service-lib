@@ -2695,8 +2695,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
                         if (($f != '.') && ($f != '..')) {
                             $tempdir = $tdirparent . $f;
                             if ((filetype($tempdir) == 'dir') && ($f != 'CVS')) {
-                                if (time() > (300+filemtime($tempdir))) {
-                                    Util::deleteDir($tempdir,true);
+                                if (time() > (300 + filemtime($tempdir))) {
+                                    Util::deleteDir($tempdir, true);
                                 }
                             }
                         }

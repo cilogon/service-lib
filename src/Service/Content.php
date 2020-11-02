@@ -2654,12 +2654,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
 
             if (strlen($cert2) > 0) { // Successfully got a certificate!
                 // Create a temporary directory in /var/www/html/pkcs12/
-                $tdirparent = '/var/www/html/pkcs12/';
-                $polonum = '3';   // Prepend the polo? number to directory
-                if (preg_match('/(\d+)\./', php_uname('n'), $polomatch)) {
-                    $polonum = $polomatch[1];
-                }
-                $tdir = Util::tempDir($tdirparent, $polonum, 0770);
+                $tdirparent = DEFAULT_PKCS12_DIR;
+                $tdir = Util::tempDir($tdirparent, '', 0770);
                 $p12dir = str_replace($tdirparent, '', $tdir);
                 $p12file = $tdir . '/usercred.p12';
 
@@ -2690,6 +2686,21 @@ in "handleGotUser()" for valid IdPs for the skin.'
                     );
                     Util::deleteDir($tdir); // Remove the temporary directory
                     $log->info('Error creating certificate - missing usercred.p12');
+                }
+
+                // CIL-865 Clean up PKCS12 directory when generating new PKCS12 cert
+                if (is_dir($tdirparent)) {
+                    $files = scandir($tdirparent);
+                    foreach ($files as $f) {
+                        if (($f != '.') && ($f != '..')) {
+                            $tempdir = $tdirparent . $f;
+                            if ((filetype($tempdir) == 'dir') && ($f != 'CVS')) {
+                                if (time() > (300+filemtime($tempdir))) {
+                                    Util::deleteDir($tempdir,true);
+                                }
+                            }
+                        }
+                    }
                 }
             } else { // The myproxy-logon command failed - shouldn't happen!
                 Util::setSessionVar(

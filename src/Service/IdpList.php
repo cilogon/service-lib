@@ -62,7 +62,7 @@ class IdpList
      * @var mixed $idparray An array version of $idpdom. It is used
      * primarily since searching an array is faster than xpath query.
      */
-    protected $idparray = null;
+    public $idparray = null;
 
     /**
      * @var string $idpfilename The name of the IdP list in JSON format.

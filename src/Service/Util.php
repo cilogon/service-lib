@@ -1326,4 +1326,30 @@ Remote Address= ' . $remoteaddr . '
         # Return both names as an array (i.e., use list($first,last)=...)
         return array($firstname,$lastname);
     }
+
+    /**
+     * cleanupPKCS12
+     *
+     * This function scans the DEFAULT_PKCS12_DIR and removes any
+     * directories (and contained files) that are older than 10 minutes.
+     * This function is used by the /cleancerts/ endpoint which can
+     * be called by a cronjob.
+     */
+    public static function cleanupPKCS12()
+    {
+        $pkcs12dir = DEFAULT_PKCS12_DIR;
+        if (is_dir($pkcs12dir)) {
+            $files = scandir($pkcs12dir);
+            foreach ($files as $f) {
+                if (($f != '.') && ($f != '..')) {
+                    $tempdir = $pkcs12dir . $f;
+                    if ((filetype($tempdir) == 'dir') && ($f != '.git')) {
+                        if (time() > (600 + filemtime($tempdir))) {
+                            static::deleteDir($tempdir, true);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

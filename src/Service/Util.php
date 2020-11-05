@@ -1334,9 +1334,13 @@ Remote Address= ' . $remoteaddr . '
      * directories (and contained files) that are older than 10 minutes.
      * This function is used by the /cleancerts/ endpoint which can
      * be called by a cronjob.
+     *
+     * @return int The number of PKCS12 dirs/files removed.
      */
     public static function cleanupPKCS12()
     {
+        $numdel = 0;
+
         $pkcs12dir = DEFAULT_PKCS12_DIR;
         if (is_dir($pkcs12dir)) {
             $files = scandir($pkcs12dir);
@@ -1346,10 +1350,12 @@ Remote Address= ' . $remoteaddr . '
                     if ((filetype($tempdir) == 'dir') && ($f != '.git')) {
                         if (time() > (600 + filemtime($tempdir))) {
                             static::deleteDir($tempdir, true);
+                            $numdel++;
                         }
                     }
                 }
             }
         }
+        return $numdel;
     }
 }

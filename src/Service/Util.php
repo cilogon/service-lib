@@ -392,6 +392,18 @@ class Util
 
         if (preg_match('/^mysql/', $storetype)) {
             $sessionmgr = new SessionMgr();
+        } elseif ($storetype == 'file') {
+            // If storing PHP sessions to file, check if an optional directory
+            // for storage has been set. If so, create it if necessary.
+            if ((defined('STORAGE_PHPSESSIONS_DIR')) && (!empty(STORAGE_PHPSESSIONS_DIR))) {
+                if (!is_dir(STORAGE_PHPSESSIONS_DIR)) {
+                    mkdir(STORAGE_PHPSESSIONS_DIR, 0770, true);
+                }
+
+                if (is_dir(STORAGE_PHPSESSIONS_DIR)) {
+                    ini_set('session.save_path', STORAGE_PHPSESSIONS_DIR);
+                }
+            }
         }
 
         ini_set('session.cookie_secure', true);

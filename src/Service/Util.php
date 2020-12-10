@@ -387,10 +387,12 @@ class Util
     public static function startPHPSession($storetype = null)
     {
         // No parameter given? Use the value read in from cilogon.ini file.
-        // If STORAGE_PHPSESSIONS == 'mysqli', create a sessionmgr().
-        $storetype = STORAGE_PHPSESSIONS;
+        if (is_null($storetype)) {
+            $storetype = STORAGE_PHPSESSIONS;
+        }
 
         if (preg_match('/^mysql/', $storetype)) {
+            // If STORAGE_PHPSESSIONS == 'mysqli', create a sessionmgr().
             $sessionmgr = new SessionMgr();
         } elseif ($storetype == 'file') {
             // If storing PHP sessions to file, check if an optional directory

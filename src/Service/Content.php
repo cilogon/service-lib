@@ -1697,7 +1697,7 @@ class Content
         '&body=Hello, I am having trouble logging on to ' .
         'https://' . DEFAULT_HOSTNAME . '/ using the ' . $idp_display_name .
         ' Identity Provider (IdP) ' .
-        ((strlen($portalname) > 0) ? 'with "' . htmlspecialchars($portalname) . '" ' : '') .
+        ((strlen($portalname) > 0) ? 'with ' . strip_tags($portalname) . ' ' : '') .
         'due to the following missing attributes:%0D%0A' .
         $missingattrs;
         if ($student) {

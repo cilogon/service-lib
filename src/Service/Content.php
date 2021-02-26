@@ -2628,7 +2628,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 MYPROXY_HOST,
                 Util::getLOAPort(),
                 $lifetime,
-                '/var/www/config/hostcred.pem',
+                MYPROXY_CLIENT_CRED,
                 ''
             );
 

@@ -617,15 +617,17 @@ Remote Address= ' . $remoteaddr . '
      * getHN
      *
      * This function calculates and returns the 'hostname' for the
-     * server. It first checks HTTP_HOST. If not set, it returns
-     * DEFAULT_HOSTNAME. This is needed by command line scripts.
+     * server. It first checks HTTP_HOST. If not set OR if not a
+     * FQDN (with at least one '.'), it returns DEFAULT_HOSTNAME.
+     * This is needed by command line scripts.
      *
      * @return string The 'Hostname' for the web server.
      */
     public static function getHN()
     {
         $thehostname = static::getServerVar('HTTP_HOST');
-        if (strlen($thehostname) == 0) {
+        if ((strlen($thehostname) == 0) ||
+            (strpos($thehostname, '.') === false)) {
             $thehostname = DEFAULT_HOSTNAME;
         }
         return $thehostname;

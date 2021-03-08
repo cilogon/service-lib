@@ -208,8 +208,12 @@ class Content
      *
      * @param bool $showremember (Optional) Show the 'Remember this
      *        selection' checkbox? Defaults to true.
+     * @param bool $showcancel (Optional) Force the display of the 'Cancel'
+     *        button next to the logon button. Defaults to false, which
+     *        means the Cancel button is shown based on the skin
+     *        configuration.
      */
-    public static function printWAYF($showremember = true)
+    public static function printWAYF($showremember = true, $showcancel = false)
     {
         $idps = static::getCompositeIdPList();
         $skin = Util::getSkin();
@@ -390,12 +394,15 @@ class Content
         ';
 
         $wayfcancelbutton = Util::getSkin()->getConfigOption('wayfcancelbutton');
-        if ((!is_null($wayfcancelbutton)) && ((int)$wayfcancelbutton == 1)) {
+        if (
+            ($showcancel) ||
+            ((!is_null($wayfcancelbutton)) && ((int)$wayfcancelbutton == 1))
+        ) {
             echo '
                 <div class="col-auto">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
-                  title="Cancel authentication and navigate away from this site."
+                  title="Cancel authentication."
                   value="Cancel" id="wayfcancelbutton" />
                 </div>
             ';
@@ -1525,8 +1532,8 @@ class Content
             </form>
             </div> <!-- end card-body -->';
 
-        Content::printCollapseEnd();
-        Content::printFooter();
+        static::printCollapseEnd();
+        static::printFooter();
     }
 
     /**
@@ -1796,8 +1803,8 @@ class Content
             </form>
             </div> <!-- end card-body -->';
 
-        Content::printCollapseEnd();
-        Content::printFooter();
+        static::printCollapseEnd();
+        static::printFooter();
     }
 
     /**
@@ -1912,8 +1919,8 @@ class Content
             </form>
             </div> <!-- end card-body -->';
 
-        Content::printCollapseEnd();
-        Content::printFooter();
+        static::printCollapseEnd();
+        static::printFooter();
     }
 
     /**
@@ -2974,5 +2981,88 @@ in "handleGotUser()" for valid IdPs for the skin.'
             $idp = 'https://orcid.org/oauth/authorize';
         }
         return $idp;
+    }
+
+    /**
+     * printOIDCConsent
+     *
+     * This function prints out the block showing the scopes requested by the
+     * OIDC client. If 'user_code' is present in the $clientparams array,
+     * the Device Code is also printed so the user can verify that the code
+     * matches the one on the device.
+     */
+    public static function printOIDCConsent()
+    {
+        // Look in the 'scope' OIDC parameter to see which attributes are
+        // being requested. The values we care about are 'email', 'profile'
+        // (for first/last name), and 'edu.uiuc.ncsa.myproxy.getcert'
+        // (which gives a certificate containing first/last name AND email).
+        // Anything else should just be output as-is.
+        $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
+        $scopes = preg_split("/[\s\+]+/", $clientparams['scope']);
+        $scopes = array_unique($scopes); // Remove any duplicates
+
+        // CIL-779 Show only those scopes which have been registered, i.e.,
+        // compute the set intersection of requested and registered scopes.
+        $client_scopes = json_decode($clientparams['client_scopes'], true);
+        if (!is_null($client_scopes)) {
+            $scopes = array_intersect($scopes, $client_scopes);
+        }
+
+        static::printCollapseBegin('oidcconsent', 'Consent to Attribute Release', false);
+
+        echo '
+            <div class="card-body px-5">
+              <div class="card-text my-2">
+                <a target="_blank" href="' ,
+                htmlspecialchars($clientparams['client_home_url']) , '">',
+                htmlspecialchars($clientparams['client_name']) , '</a>' ,
+                ' requests access to the following information.
+                If you do not approve this request, do not proceed.
+              </div> <!-- end row -->
+              <ul>
+        ';
+
+        if (in_array('user_code', $clientparams)) {
+            echo '<li>User Code: <tt>' . $clientparams['user_code'] .
+                '</tt></li>';
+        }
+        if (in_array('openid', $scopes)) {
+            echo '<li>Your CILogon user identifier</li>';
+            $scopes = array_diff($scopes, ['openid']);
+        }
+        if (
+            (in_array('profile', $scopes)) ||
+            (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes))
+        ) {
+            echo '<li>Your name</li>';
+            $scopes = array_diff($scopes, ['profile']);
+        }
+        if (
+            (in_array('email', $scopes)) ||
+            (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes))
+        ) {
+            echo '<li>Your email address</li>';
+            $scopes = array_diff($scopes, ['email']);
+        }
+        if (in_array('org.cilogon.userinfo', $scopes)) {
+            echo '<li>Your username and affiliation from your identity provider</li>';
+            $scopes = array_diff($scopes, ['org.cilogon.userinfo']);
+        }
+        if (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes)) {
+            echo '<li>A certificate that allows "' ,
+            htmlspecialchars($clientparams['client_name']) ,
+            '" to act on your behalf</li>';
+            $scopes = array_diff($scopes, ['edu.uiuc.ncsa.myproxy.getcert']);
+        }
+        // Output any remaining scopes as-is
+        foreach ($scopes as $value) {
+            echo '<li>', $value , '</li>';
+        }
+        echo '</ul>
+            </div> <!-- end card-body -->
+        ';
+
+        static::printCollapseEnd();
     }
 }

@@ -626,8 +626,10 @@ Remote Address= ' . $remoteaddr . '
     public static function getHN()
     {
         $thehostname = static::getServerVar('HTTP_HOST');
-        if ((strlen($thehostname) == 0) ||
-            (strpos($thehostname, '.') === false)) {
+        if (
+            (strlen($thehostname) == 0) ||
+            (strpos($thehostname, '.') === false)
+        ) {
             $thehostname = DEFAULT_HOSTNAME;
         }
         return $thehostname;
@@ -1130,6 +1132,7 @@ Remote Address= ' . $remoteaddr . '
      *              stored in the PHP session. The keys of the array are
      *              the column names of the 'client' table in the 'ciloa2'
      *              database, prefixed by 'client_'.
+     * @return bool True if database query was successful. False otherwise.
      */
     public static function getOIDCClientParams(&$clientparams)
     {

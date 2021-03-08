@@ -324,6 +324,16 @@ class DBService
     public $cilogon_portal_name;
 
     /**
+     * @var string|null $client_id OAuth 2.0 client_id
+     */
+    public $client_id;
+
+    /**
+     * @var string|null $user_code OAuth 2.0 Device Authz Grant flow user_code
+     */
+    public $user_code;
+
+    /**
      * @var array $idp_uids IdPs stored in the 'values' of the array
      */
     public $idp_uids;
@@ -383,6 +393,7 @@ class DBService
     {
         $this->clearUser();
         $this->clearPortal();
+        $this->clearUserCode();
         $this->clearIdps();
     }
 
@@ -418,6 +429,19 @@ class DBService
         $this->cilogon_success = null;
         $this->cilogon_failure = null;
         $this->cilogon_portal_name = null;
+    }
+
+    /**
+     * clearUserCode
+     *
+     * Set the class member variables associated with
+     * checkUserCode() to 'null'
+     */
+    public function clearUserCode()
+    {
+        $this->status = null;
+        $this->user_code = null;
+        $this->client_id = null;
     }
 
     /**
@@ -652,12 +676,12 @@ class DBService
     /**
      * setTransactionState
      *
-     * This method calls the 'setTransactionState' action of the Oauth
-     * 2.0 servlet to associate the Oauth 2.0 'code' with the database
-     * user UID. This is necessary for the Oauth 2.0 server to be able
+     * This method calls the 'setTransactionState' action of the OAuth
+     * 2.0 servlet to associate the OAuth 2.0 'code' with the database
+     * user UID. This is necessary for the OAuth 2.0 server to be able
      * to return information about the user (name, email address) as
      * well as return a certificate for the user. If the servlet
-     * returns correctly (i.e. an HTTP status code of 200), this method
+     * returns correctly (i.e., an HTTP status code of 200), this method
      * returns true. Check the 'status' return value to verify that
      * the transaction state was set successfully.
      *
@@ -688,6 +712,71 @@ class DBService
             ((strlen($myproxyinfo) > 0) ?
                 ('&cilogon_info=' . urlencode($myproxyinfo)) : '')
         );
+    }
+
+    /**
+     * checkUserCode
+     *
+     * This method calls the 'checkUserCode' action of the OAuth 2.0 servlet
+     * to fetch a client_id associated with a user_code entered by the end
+     * user as part of an OAuth2 Device Authorization Grant flow. If the
+     * servlet returns correctly (i.e., an HTTP status code of 200), this
+     * method returns true. Check the 'status' return value to verify that
+     * the user_code is correct. The client_id and 'original' user_code
+     * will be available if the input user_code was valid.
+     *
+     * @param string $user_code The OAuth 2.0 Device Authorization Grant
+     *        flow code entered by the user.
+     * @return bool True if the servlet returned correctly. client_id and
+     *         originally generated user_code will be available.
+     *        Return false if user_code was expired or not found.
+     */
+    public function checkUserCode($user_code)
+    {
+        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
+        /*
+        return $this->call(
+            'action=userCodeApproved' .
+            '&user_code=' . urlencode($user_code)
+        );
+        */
+        // DEBUG PLACEHOLDER - return some dummy values
+        $this->status = 0;
+        $this->user_code = 'ABCD-JKLM';
+        $this->client_id = 'cilogon:/client_id/100c74e105fb9652d80817d4106b5696';
+        return true;
+    }
+
+    /**
+     * userCodeApproved
+     *
+     * This method calls the 'userCodeApproved' action of the OAuth 2.0
+     * servlet to let the OA4MP code know that a user has approved a
+     * user_code associated with a Device Authorization Grant transaction.
+     * If the servlet returns correctly (i.e.,  an HTTP status code of 200),
+     * this method returns true. Check the 'status' return value to verify
+     * that the user_code is correct and is not expired.
+     *
+     * @param string $user_code The OAuth 2.0 Device Authorization Grant
+     *        flow code entered by the user.
+     * @param int $approved (Optional) =1 if the user_code has been approved
+     *        by the user (default). =0 if the user clicks 'Cancel' to
+     *        deny the user_code approval.
+     * @return bool True if the servlet returned correctly. Else false.
+     */
+    public function userCodeApproved($user_code, $approved = 1)
+    {
+        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
+        /*
+        return $this->call(
+            'action=userCodeApproved' .
+            '&user_code=' . urlencode($user_code) .
+            '&approved=' . $approved
+        );
+        */
+        // DEBUG PLACEHOLDER - return some dummy values
+        $this->status = 0;
+        return true;
     }
 
     /**
@@ -807,6 +896,12 @@ class DBService
                     }
                     if (preg_match('/cilogon_portal_name=([^\r\n]+)/', $output, $match)) {
                         $this->cilogon_portal_name = urldecode($match[1]);
+                    }
+                    if (preg_match('/user_code=([^\r\n]+)/', $output, $match)) {
+                        $this->user_code = urldecode($match[1]);
+                    }
+                    if (preg_match('/client_id=([^\r\n]+)/', $output, $match)) {
+                        $this->client_id = urldecode($match[1]);
                     }
                     if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $match)) {
                         foreach ($match[1] as $value) {
@@ -941,6 +1036,12 @@ class DBService
         }
         if (!is_null($this->cilogon_portal_name)) {
             echo "cilogon_portal_name=$this->cilogon_portal_name\n";
+        }
+        if (!is_null($this->user_code)) {
+            echo "user_code=$this->user_code\n";
+        }
+        if (!is_null($this->client_id)) {
+            echo "client_id=$this->client_id\n";
         }
         if (count($this->idp_uids) > 0) {
             uasort($this->idp_uids, 'strcasecmp');

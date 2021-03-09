@@ -11,6 +11,7 @@ use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
 use PEAR;
+require_once 'DB.php';
 use DB;
 
 /**

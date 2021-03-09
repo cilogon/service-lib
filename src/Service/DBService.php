@@ -334,6 +334,12 @@ class DBService
     public $user_code;
 
     /**
+     * @var string|null $scope Space-separated list of OAuth 2.0 scopes 
+     *      associated with the user_code 
+     */
+    public $scope;
+
+    /**
      * @var array $idp_uids IdPs stored in the 'values' of the array
      */
     public $idp_uids;
@@ -442,6 +448,7 @@ class DBService
         $this->status = null;
         $this->user_code = null;
         $this->client_id = null;
+        $this->scope = null;
     }
 
     /**
@@ -744,6 +751,7 @@ class DBService
         $this->status = 0;
         $this->user_code = 'ABCD-JKLM';
         $this->client_id = 'cilogon:/client_id/100c74e105fb9652d80817d4106b5696';
+        $this->scope = 'openid profile email';
         return true;
     }
 
@@ -903,6 +911,9 @@ class DBService
                     if (preg_match('/client_id=([^\r\n]+)/', $output, $match)) {
                         $this->client_id = urldecode($match[1]);
                     }
+                    if (preg_match('/scope=([^\r\n]+)/', $output, $match)) {
+                        $this->scope = urldecode($match[1]);
+                    }
                     if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $match)) {
                         foreach ($match[1] as $value) {
                             $this->idp_uids[] = urldecode($value);
@@ -1042,6 +1053,9 @@ class DBService
         }
         if (!is_null($this->client_id)) {
             echo "client_id=$this->client_id\n";
+        }
+        if (!is_null($this->scope)) {
+            echo "scope=$this->scope\n";
         }
         if (count($this->idp_uids) > 0) {
             uasort($this->idp_uids, 'strcasecmp');

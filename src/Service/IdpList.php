@@ -705,7 +705,7 @@ EOT;
                     (defined('TEST_IDP_XML')) &&
                     (!empty(TEST_IDP_XML)) &&
                     (is_readable(TEST_IDP_XML)) &&
-                    (($doc->load(TEST_IDP_XML)) !== false)
+                    ((@$doc->load(TEST_IDP_XML)) !== false)
                 ) {
                     $idpnodes = $doc->getElementsByTagName('idp');
                     foreach ($idpnodes as $idpnode) {

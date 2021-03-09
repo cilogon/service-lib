@@ -3023,7 +3023,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <ul>
         ';
 
-        if (in_array('user_code', $clientparams)) {
+        if (array_key_exists('user_code', $clientparams)) {
             echo '<li>User Code: <tt>' . $clientparams['user_code'] .
                 '</tt></li>';
         }

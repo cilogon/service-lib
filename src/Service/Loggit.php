@@ -44,7 +44,7 @@ class Loggit
         if (($logtype == 'syslog') && (strlen($logname) == 0)) {
             $logname = 'LOG_SYSLOG';
         }
-        $this->logger = &Log::singleton($logtype, $logname, $ident);
+        $this->logger = Log::singleton($logtype, $logname, $ident);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace CILogon\Service;
 
+require_once 'DB.php';
+
 use CILogon\Service\CSRF;
 use CILogon\Service\Loggit;
 use CILogon\Service\IdpList;
@@ -11,7 +13,6 @@ use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
 use PEAR;
-require_once 'DB.php';
 use DB;
 
 /**
@@ -1377,5 +1378,78 @@ Remote Address= ' . $remoteaddr . '
             }
         }
         return $numdel;
+    }
+
+    /**
+     * logXSEDEUsage
+     *
+     * This function writes the XSEDE USAGE message to a CSV file. See
+     * CIL-938 and CIL-507 for background. This function first checks if the
+     * XSEDE_USAGE_DIR config value is not empty and that the referenced
+     * directory exists on the filesystem. If so, a CSV file is created/
+     * appended using today's date. If the CSV file is new, a header
+     * line is written. Then the actual USAGE line is output in the
+     * following format:
+     *
+     *     cilogon,GMT_date,client_name,email_address
+     *
+     * @param string $client The name of the client. One of 'ECP', 'PKCS12',
+     *        or the name of the OAuth1/OAuth2/OIDC client/portal.
+     * @param string $email The email address of the user.
+     */
+    public static function logXSEDEUsage($client, $email)
+    {
+        if (
+            (defined('XSEDE_USAGE_DIR')) &&
+            (!empty(XSEDE_USAGE_DIR)) &&
+            (is_writable(XSEDE_USAGE_DIR))
+        ) {
+            $error = ''; // Was there an error to be reported?
+
+            // Get the date strings for filename and CSV line output.
+            // Filename uses local time zone; log lines use GMT.
+            // Save the current default timezone and restore it later.
+            $deftz = date_default_timezone_get();
+            $now = time();
+            $datestr = gmdate('Y-m-d\TH:i:s\Z', $now);
+            date_default_timezone_set(LOCAL_TIMEZONE);
+            $filename = date('Ymd', $now) . '.upload.csv';
+
+            // Open and lock the file
+            $fp = fopen(XSEDE_USAGE_DIR . DIRECTORY_SEPARATOR . $filename, 'c');
+            if ($fp !== false) {
+                if (flock($fp, LOCK_EX)) {
+                    // Move file pointer to the end of the file.
+                    if (fseek($fp, 0, SEEK_END) == 0) { // Note 0 = success
+                        $endpos = ftell($fp);
+                        // If the position is at the beginning of the file (0),
+                        // then the file is new, so output the HEADER line.
+                        if (($endpos !== false) && ($endpos == 0)) {
+                            fwrite($fp, "USED_COMPONENT,USE_TIMESTAMP,USE_CLIENT,USE_USER\n");
+                        }
+                        // Write the actual USAGE data line
+                        fwrite($fp, "cilogon,$datestr,$client,$email\n");
+                        fflush($fp);
+                    } else {
+                        $error = 'Unable to seek to end of file.';
+                    }
+                    flock($fp, LOCK_UN);
+                } else { // Problem writing file
+                    $error = 'Unable to lock file.';
+                }
+                fclose($fp);
+            } else {
+                $error = 'Unable to open file.';
+            }
+
+            // Restore previous default timezone
+            date_default_timezone_set($deftz);
+
+            // If got an error while opening/writing file, log it.
+            if (strlen($error) > 0) {
+                $log = new Loggit();
+                $log->error("Error writing XSEDE USAGE file $filename: $error");
+            }
+        }
     }
 }

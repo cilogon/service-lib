@@ -2683,8 +2683,9 @@ in "handleGotUser()" for valid IdPs for the skin.'
                     Util::setSessionVar('p12', $p12);
                     $log->info('Generated New User Certificate="' . $p12link . '"');
                     //CIL-507 Special Log Message For XSEDE
-                    $log->info('USAGE email="' .
-                        Util::getSessionVar('email') . '" client="PKCS12"');
+                    $email = Util::getSessionVar('email');
+                    $log->info("USAGE email=\"$email\" client=\"PKCS12\"");
+                    Util::logXSEDEUsage('PKCS12', $email);
                 } else { // Empty or missing usercred.p12 file - shouldn't happen!
                     Util::setSessionVar(
                         'p12error',

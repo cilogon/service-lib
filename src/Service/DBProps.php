@@ -2,9 +2,10 @@
 
 namespace CILogon\Service;
 
+require_once 'DB.php';
+
 use CILogon\Service\Util;
 use PEAR;
-require_once 'DB.php';
 use DB;
 
 /**

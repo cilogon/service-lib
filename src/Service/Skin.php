@@ -2,10 +2,11 @@
 
 namespace CILogon\Service;
 
+require_once 'DB.php';
+
 use CILogon\Service\Util;
 use tubalmartin\CssMin\Minifier as CSSmin;
 use PEAR;
-require_once 'DB.php';
 use DB;
 
 /**

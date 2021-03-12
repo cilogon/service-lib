@@ -334,8 +334,8 @@ class DBService
     public $user_code;
 
     /**
-     * @var string|null $scope Space-separated list of OAuth 2.0 scopes 
-     *      associated with the user_code 
+     * @var string|null $scope Space-separated list of OAuth 2.0 scopes
+     *      associated with the user_code
      */
     public $scope;
 

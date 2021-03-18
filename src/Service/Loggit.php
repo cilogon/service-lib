@@ -36,7 +36,7 @@ class Loggit
      *        'console', 'syslog', or 'file'.
      * @param string $name (Optional) The name of the log file.
      */
-    public function __construct($logtype = DEFAULT_LOGTYPE, $logname = '')
+    public function __construct($logtype = DEFAULT_LOGTYPE, $logname = DEFAULT_LOGNAME)
     {
         $ident = Util::getServerVar('SERVER_NAME') .
                  Util::getServerVar('REQUEST_URI');

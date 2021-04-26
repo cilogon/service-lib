@@ -1198,6 +1198,7 @@ EOT;
         $shibarray['OU'] = Util::getServerVar('HTTP_OU');
         $shibarray['Member'] = Util::getServerVar('HTTP_MEMBER');
         $shibarray['Authn Context'] = Util::getServerVar('HTTP_SHIB_AUTHNCONTEXT_CLASS');
+        $shibarray['AMR'] = Util::getServerVar('HTTP_AMR');
         $shibarray['Entitlement'] = Util::getServerVar('HTTP_ENTITLEMENT');
         $shibarray['iTrustUIN'] = Util::getServerVar('HTTP_ITRUSTUIN');
         $shibarray['Subject ID'] = Util::getServerVar('HTTP_SUBJECT_ID');

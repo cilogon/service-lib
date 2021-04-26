@@ -1185,6 +1185,21 @@ EOT;
         ) {
             $entityID = $matches[1] . $matches[2];
         }
+
+        // CIL-959 Support for NSF.gov's AD-based IdP. As documented at
+        // https://wiki.refeds.org/x/N4BRAg , AD-based IdPs cannot assert
+        // MFA in the AuthnContextClassRef SAML attribute. Instead, the
+        // IdP must be configured to assert a new 'authnmethodsreferences'
+        // attribute. This is consumed by Shib SP as 'amr' (in the
+        // attribute-map.xml file). Here, check to see if the 'amr'
+        // attribute contains 'https://refeds.org/profile/mfa'. If so,
+        // overwrite 'Authn Context' with this value.
+        $acr = Util::getServerVar('HTTP_SHIB_AUTHNCONTEXT_CLASS');
+        $amr = Util::getServerVar('HTTP_AMR');
+        if (preg_match('%https://refeds.org/profile/mfa%', $amr)) {
+            $acr = 'https://refeds.org/profile/mfa';
+        }
+
         $shibarray['Identity Provider'] = $entityID;
         $shibarray['User Identifier'] = Util::getServerVar('REMOTE_USER');
         $shibarray['ePPN'] = Util::getServerVar('HTTP_EPPN');
@@ -1197,8 +1212,7 @@ EOT;
         $shibarray['Affiliation'] = Util::getServerVar('HTTP_AFFILIATION');
         $shibarray['OU'] = Util::getServerVar('HTTP_OU');
         $shibarray['Member'] = Util::getServerVar('HTTP_MEMBER');
-        $shibarray['Authn Context'] = Util::getServerVar('HTTP_SHIB_AUTHNCONTEXT_CLASS');
-        $shibarray['AMR'] = Util::getServerVar('HTTP_AMR');
+        $shibarray['Authn Context'] = $acr;
         $shibarray['Entitlement'] = Util::getServerVar('HTTP_ENTITLEMENT');
         $shibarray['iTrustUIN'] = Util::getServerVar('HTTP_ITRUSTUIN');
         $shibarray['Subject ID'] = Util::getServerVar('HTTP_SUBJECT_ID');

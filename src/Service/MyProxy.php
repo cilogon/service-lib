@@ -97,7 +97,7 @@ class MyProxy
         // MyProxy servers to try.
         $success = false;
         $retstr = '';
-        foreach ((explode($server, ',')) as $mpserver) {
+        foreach ((explode(',', $server)) as $mpserver) {
             $mpserver = trim($mpserver);
             $mpdn = '';
             if (

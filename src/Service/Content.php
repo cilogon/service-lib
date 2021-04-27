@@ -2018,22 +2018,28 @@ class Content
             // should automatically redirect to a specific IdP. Used mainly
             // by campus gateways.
             $bypassidp = '';
-            foreach (BYPASS_IDP_ARRAY as $key => $value) {
-                if (
-                    (preg_match($key, $redirect_uri)) ||
-                    (preg_match($key, $client_id))
-                ) {
-                    $bypassidp = $value;
-                    // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
-                    $skin->init(true);
-                    break;
+            if (defined('BYPASS_IDP_ARRAY')) {
+                foreach (BYPASS_IDP_ARRAY as $key => $value) {
+                    if (
+                        (preg_match($key, $redirect_uri)) ||
+                        (preg_match($key, $client_id))
+                    ) {
+                        $bypassidp = $value;
+                        // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
+                        $skin->init(true);
+                        break;
+                    }
                 }
             }
 
             // CIL-613 - Next, check for a match in the ALLOW_BYPASS_ARRAY.
             // If found, then allow the idphint/selected_idp to be used as the
             // IdP to redirect to.
-            if (empty($bypassidp) && (!empty($selected_idp))) {
+            if (
+                (defined('ALLOW_BYPASS_ARRAY')) &&
+                (empty($bypassidp)) &&
+                (!empty($selected_idp))
+            ) {
                 foreach (ALLOW_BYPASS_ARRAY as $value) {
                     if (
                         (preg_match($value, $redirect_uri)) ||

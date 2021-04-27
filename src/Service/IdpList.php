@@ -437,7 +437,10 @@ EOT;
                     }
 
                     // CIL-741 Omit IdPs in the global REDLIT_IDP_ARRAY
-                    if (in_array($entityID, REDLIT_IDP_ARRAY)) {
+                    if (
+                        (defined('REDLIT_IDP_ARRAY')) &&
+                        (in_array($entityID, REDLIT_IDP_ARRAY))
+                    ) {
                         continue;
                     }
 

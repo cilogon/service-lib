@@ -116,7 +116,11 @@ class Skin
         $this->skinname = '';
         $this->configxml = null;
         $this->css = '';
-        $this->forcearray = FORCE_SKIN_ARRAY;
+        if (defined('FORCE_SKIN_ARRAY')) {
+            $this->forcearray = FORCE_SKIN_ARRAY;
+        } else {
+            $this->forcearray = array();
+        }
         $this->readSkinConfig();
         $this->setMyProxyInfo();
     }

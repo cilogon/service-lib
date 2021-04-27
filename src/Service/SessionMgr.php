@@ -98,7 +98,10 @@ class SessionMgr
     {
         $retval = true;  // Assume connect to database succeeded
 
-        $storetype = STORAGE_PHPSESSIONS;
+        $storetype = 'file';
+        if (defined('STORAGE_PHPSESSIONS')) {
+            $storetype = STORAGE_PHPSESSIONS;
+        }
         $dbprops = new DBProps($storetype);
         $this->db = $dbprops->getDBConnect();
 

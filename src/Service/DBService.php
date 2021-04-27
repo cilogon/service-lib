@@ -567,10 +567,16 @@ class DBService
      */
     public function getPortalParameters($oauth_token)
     {
+        $retval = false;
+
         $this->clearPortal();
-        $this->setDBServiceURL(OAUTH1_DBSERVICE_URL);
-        return $this->call('action=getPortalParameter&oauth_token=' .
-            urlencode($oauth_token));
+        if (defined('OAUTH1_DBSERVICE_URL')) {
+            $this->setDBServiceURL(OAUTH1_DBSERVICE_URL);
+            $retval = $this->call('action=getPortalParameter&oauth_token=' .
+                urlencode($oauth_token));
+        }
+
+        return $retval;
     }
 
     /**
@@ -709,16 +715,22 @@ class DBService
         $loa = '',
         $myproxyinfo = ''
     ) {
-        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
-        return $this->call(
-            'action=setTransactionState' .
-            '&code=' . urlencode($code) .
-            '&user_uid=' . urlencode($uid) .
-            '&auth_time=' . urlencode($authntime) .
-            '&loa=' . urlencode($loa) .
-            ((strlen($myproxyinfo) > 0) ?
-                ('&cilogon_info=' . urlencode($myproxyinfo)) : '')
-        );
+        $retval = false;
+
+        if (defined('OAUTH2_DBSERVICE_URL')) {
+            $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
+            $retval = $this->call(
+                'action=setTransactionState' .
+                '&code=' . urlencode($code) .
+                '&user_uid=' . urlencode($uid) .
+                '&auth_time=' . urlencode($authntime) .
+                '&loa=' . urlencode($loa) .
+                ((strlen($myproxyinfo) > 0) ?
+                    ('&cilogon_info=' . urlencode($myproxyinfo)) : '')
+            );
+        }
+
+        return $retval;
     }
 
     /**
@@ -740,19 +752,25 @@ class DBService
      */
     public function checkUserCode($user_code)
     {
-        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
-        /*
-        return $this->call(
-            'action=userCodeApproved' .
-            '&user_code=' . urlencode($user_code)
-        );
-        */
-        // DEBUG PLACEHOLDER - return some dummy values
-        $this->status = 0;
-        $this->user_code = 'ABCD-JKLM';
-        $this->client_id = 'cilogon:/client_id/100c74e105fb9652d80817d4106b5696';
-        $this->scope = 'openid profile email';
-        return true;
+        $retval = false;
+
+        if (defined('OAUTH2_DBSERVICE_URL')) {
+            $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
+            /*
+            return $this->call(
+                'action=userCodeApproved' .
+                '&user_code=' . urlencode($user_code)
+            );
+            */
+            // DEBUG PLACEHOLDER - return some dummy values
+            $this->status = 0;
+            $this->user_code = 'ABCD-JKLM';
+            $this->client_id = 'cilogon:/client_id/100c74e105fb9652d80817d4106b5696';
+            $this->scope = 'openid profile email';
+            $retval = true;
+        }
+
+        return $retval;
     }
 
     /**
@@ -774,17 +792,23 @@ class DBService
      */
     public function userCodeApproved($user_code, $approved = 1)
     {
-        $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
-        /*
-        return $this->call(
-            'action=userCodeApproved' .
-            '&user_code=' . urlencode($user_code) .
-            '&approved=' . $approved
-        );
-        */
-        // DEBUG PLACEHOLDER - return some dummy values
-        $this->status = 0;
-        return true;
+        $retval = false;
+
+        if (defined('OAUTH2_DBSERVICE_URL')) {
+            $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
+            /*
+            return $this->call(
+                'action=userCodeApproved' .
+                '&user_code=' . urlencode($user_code) .
+                '&approved=' . $approved
+            );
+            */
+            // DEBUG PLACEHOLDER - return some dummy values
+            $this->status = 0;
+            $retval = true;
+        }
+
+        return $retval;
     }
 
     /**

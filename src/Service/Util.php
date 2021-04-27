@@ -390,7 +390,11 @@ class Util
     {
         // No parameter given? Use the value read in from cilogon.ini file.
         if (is_null($storetype)) {
-            $storetype = STORAGE_PHPSESSIONS;
+            if (defined('STORAGE_PHPSESSIONS')) {
+                $storetype = STORAGE_PHPSESSIONS;
+            } else {
+                $storetype = 'file';
+            }
         }
 
         if (preg_match('/^mysql/', $storetype)) {
@@ -815,7 +819,7 @@ Remote Address= ' . $remoteaddr . '
                 // from being sent to EMAIL_ALERTS, but still
                 // sent to 'cilogon-alerts@ligo.org'.
                 if (preg_match('/ligo\.org/', $idp)) {
-                    if (DISABLE_LIGO_ALERTS) {
+                    if (defined('DISABLE_LIGO_ALERTS') && DISABLE_LIGO_ALERTS) {
                         $mailto = '';
                     }
                     $mailto .= ((strlen($mailto) > 0) ? ',' : '') .
@@ -1412,7 +1416,9 @@ Remote Address= ' . $remoteaddr . '
             $deftz = date_default_timezone_get();
             $now = time();
             $datestr = gmdate('Y-m-d\TH:i:s\Z', $now);
-            date_default_timezone_set(LOCAL_TIMEZONE);
+            if (defined('LOCAL_TIMEZONE')) {
+                date_default_timezone_set(LOCAL_TIMEZONE);
+            }
             $filename = date('Ymd', $now) . '.upload.csv';
 
             // Open and lock the file

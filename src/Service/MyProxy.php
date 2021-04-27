@@ -48,8 +48,6 @@ class MyProxy
         $certreq = '',
         $env = ''
     ) {
-        $retstr = '';
-
         // Verify the myproxy-logon binary has been configured
         if ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON))) {
             Util::sendErrorAlert(
@@ -93,32 +91,56 @@ class MyProxy
                              'X509_USER_KEY='  . escapeshellarg($userkey);
         }
 
-        // Run the myproxy-logon command and capture the output and any error
-        $output = array();
-        $cmd = '/bin/env ' .
-               $USER_CERT_ENV . ' ' .
-               $env . ' ' .
-               'MYPROXY_SOCKET_TIMEOUT=1 ' .
-               MYPROXY_LOGON . ' ' .
-               ' -s ' . escapeshellarg($server) .
-               " -p $port" .
-               " -t $lifetime" .
-               ' -l ' . escapeshellarg($username) .
-               ' -S -o -' .
-               ((strlen($certreq) > 0) ?
-                   (' --certreq - <<< ' . escapeshellarg($certreq)) : '') .
-               ((strlen($passphrase) > 0) ?
-                   (' <<< ' . escapeshellarg($passphrase)) : ' -n') .
-               ' 2>&1';
-        exec($cmd, $output, $return_val);
-        $retstr = implode("\n", $output);
+        // CIL-951 Loop over the (comma-separated list of) MyProxy servers
+        // possibly using a different MYPROXY_SERVER_DN for each server.
+        // Continue until successfully fetched a certificate, or no more
+        // MyProxy servers to try.
+        $success = false;
+        $retstr = '';
+        foreach ((explode($server, ',')) as $mpserver) {
+            $mpserver = trim($mpserver);
+            $mpdn = '';
+            if (
+                (defined('MYPROXY_SERVER_DN_MAP')) &&
+                (array_key_exists($mpserver, MYPROXY_SERVER_DN_MAP))
+            ) {
+                $mpdn = 'MYPROXY_SERVER_DN=' . escapeshellarg(MYPROXY_SERVER_DN_MAP[$mpserver]);
+            }
 
-        if ($return_val > 0) {
+            // Run the myproxy-logon command and capture the output and any error
+            $output = array();
+            $cmd = '/bin/env ' .
+                   $USER_CERT_ENV . ' ' .
+                   $env . ' ' .
+                   $mpdn . ' ' .
+                   'MYPROXY_SOCKET_TIMEOUT=1 ' .
+                   MYPROXY_LOGON . ' ' .
+                   ' -s ' . escapeshellarg($mpserver) .
+                   " -p $port" .
+                   " -t $lifetime" .
+                   ' -l ' . escapeshellarg($username) .
+                   ' -S -o -' .
+                   ((strlen($certreq) > 0) ?
+                       (' --certreq - <<< ' . escapeshellarg($certreq)) : '') .
+                   ((strlen($passphrase) > 0) ?
+                       (' <<< ' . escapeshellarg($passphrase)) : ' -n') .
+                   ' 2>&1';
+            exec($cmd, $output, $return_val);
+            $retstr = implode("\n", $output);
+
+            if ($return_val > 0) { // Failure!
+                $retstr = '';
+            } else {
+                $success = true;
+                break;
+            }
+        } // End of looping over list of MyProxy servers
+
+        if (!$success) {
             Util::sendErrorAlert(
                 'getMyProxyCredential Error',
                 "MyProxy Error = $return_val\nMyProxy Output= $retstr"
             );
-            $retstr = '';
         }
 
         return $retstr;

@@ -2789,11 +2789,15 @@ in "handleGotUser()" for valid IdPs for the skin.'
     public static function getMachineHostname($idp = '')
     {
         $retval = DEFAULT_HOSTNAME;
-        // CIL-439 For Syngenta, use just a single 'hostname' value to
-        // match their Active Directory configuration for CILogon's
+        // CIL-439/CIL-975 For Syngenta and other ADFS IdPs (like NSF),
+        // use just a single 'hostname' value to match their
+        // Active Directory configuration for CILogon's
         // assertionConsumerService URL. Otherwise, map the local
-        // hostname to a *.cilogon.org domain name.
-        if ($idp != 'https://sts.windows.net/06219a4a-a835-44d5-afaf-3926343bfb89/') {
+        // hostname to a polo*.cilogon.org domain name.
+        if (
+            (!defined('ADFS_IDP_ARRAY')) ||
+            (!in_array($idp, ADFS_IDP_ARRAY))
+        ) {
             $localhost = php_uname('n');
             if (array_key_exists($localhost, HOSTNAME_ARRAY)) {
                 $retval = HOSTNAME_ARRAY[$localhost];

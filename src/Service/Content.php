@@ -150,8 +150,8 @@ class Content
         echo '
     </footer>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-            integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
             crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"
             integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd"
@@ -218,48 +218,6 @@ class Content
         $idps = static::getCompositeIdPList();
         $skin = Util::getSkin();
 
-        $rememberhelp = 'Check this box to bypass the welcome page on ' .
-            'subsequent visits and proceed directly to the selected ' .
-            'identity provider. You will need to clear your browser\'s ' .
-            'cookies to return here.';
-        $selecthelp = '<p>
-            CILogon facilitates secure access to CyberInfrastructure (CI).
-            In order to use the CILogon Service, you must first select
-            an identity provider. An identity provider (IdP) is an
-            organization where you have an account and can log on
-            to gain access to online services.
-        </p>
-        <p>
-            If you are a faculty, staff, or student member of a university
-            or college, please select it for your identity provider.
-            If your school is not listed, please contact <a
-            href=\'mailto:' . EMAIL_HELP . '\'>' . EMAIL_HELP . '</a>,
-            and we will try to add your school in the future.
-        </p>
-        ';
-
-        $googleauthz = Util::getAuthzUrl('Google');
-        if (isset($idps[$googleauthz])) {
-            $selecthelp .= '<p>If you have a <a target=\'_blank\'
-            href=\'https://myaccount.google.com\'>Google</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
-        }
-        $githubauthz = Util::getAuthzUrl('GitHub');
-        if (isset($idps[$githubauthz])) {
-            $selecthelp .= '<p> If you have a <a target=\'_blank\'
-            href=\'https://github.com/settings/profile\'>GitHub</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
-        }
-        $orcidauthz = Util::getAuthzUrl('ORCID');
-        if (isset($idps[$orcidauthz])) {
-            $selecthelp .= '<p> If you have a <a target=\'_blank\'
-            href=\'https://orcid.org/my-orcid\'>ORCID</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
-        }
-
         // Check if the user had previously selected an IdP from the list.
         // First, check the portalcookie, then the 'normal' cookie.
         $keepidp = '';
@@ -291,16 +249,6 @@ class Content
             $providerId = '';
         }
 
-        // If no previous providerId, get from skin, or default to Google.
-        if (strlen($providerId) == 0) {
-            $initialidp = (string)$skin->getConfigOption('initialidp');
-            if ((strlen($initialidp) > 0) && (isset($idps[$initialidp]))) {
-                $providerId = $initialidp;
-            } else {
-                $providerId = Util::getAuthzUrl('Google');
-            }
-        }
-
         // Check if an OIDC client selected an IdP for the transaction.
         // If so, verify that the IdP is in the list of available IdPs.
         $useselectedidp = false;
@@ -323,6 +271,60 @@ class Content
             });
         }
 
+        $googleauthz = Util::getAuthzUrl('Google');
+        $orcidauthz = Util::getAuthzUrl('ORCID');
+        $githubauthz = Util::getAuthzUrl('GitHub');
+
+        // If no previous providerId, get from skin, or default
+        // to Google, ORCID, or the first IdP in the list.
+        if (strlen($providerId) == 0) {
+            $initialidp = (string)$skin->getConfigOption('initialidp');
+            if ((strlen($initialidp) > 0) && (isset($idps[$initialidp]))) {
+                $providerId = $initialidp;
+            } elseif (isset($idps[$googleauthz])) {
+                $providerId = Util::getAuthzUrl('Google');
+            } elseif (isset($idps[$orcidauthz])) {
+                $providerId = Util::getAuthzUrl('ORCID');
+            } else {
+                $providerId = array_key_first($idps);
+            }
+        }
+
+        $selecthelp = '<p>
+            CILogon facilitates secure access to CyberInfrastructure (CI).
+            In order to use the CILogon Service, you must first select
+            an identity provider. An identity provider (IdP) is an
+            organization where you have an account and can log on
+            to gain access to online services.
+        </p>
+        <p>
+            If you are a faculty, staff, or student member of a university
+            or college, please select it for your identity provider.
+            If your school is not listed, please contact <a
+            href=\'mailto:' . EMAIL_HELP . '\'>' . EMAIL_HELP . '</a>,
+            and we will try to add your school in the future.
+        </p>
+        ';
+
+        if (isset($idps[$googleauthz])) {
+            $selecthelp .= '<p>If you have a <a target=\'_blank\'
+            href=\'https://myaccount.google.com\'>Google</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
+        if (isset($idps[$githubauthz])) {
+            $selecthelp .= '<p> If you have a <a target=\'_blank\'
+            href=\'https://github.com/settings/profile\'>GitHub</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
+        if (isset($idps[$orcidauthz])) {
+            $selecthelp .= '<p> If you have a <a target=\'_blank\'
+            href=\'https://orcid.org/my-orcid\'>ORCID</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
+
         echo '
       <div class="card text-center col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 mt-3">
         <h4 class="card-header">',
@@ -337,19 +339,12 @@ class Content
                 data-size="20" data-width="fit"
                 data-live-search="true"
                 data-live-search-placeholder="Type to search"
-                data-live-search-normalize="true"
-                >';
+                data-live-search-normalize="true">
 
+                <option data-tokens="', $providerId , '" value="',
+                $providerId , '" selected="selected">',
+                Util::htmlent($idps[$providerId]['Display_Name']), '</option>
 
-        foreach ($idps as $entityId => $names) {
-            echo '
-                <option data-tokens="', $entityId , '" value="',
-                $entityId , '"',
-                (($entityId == $providerId) ? ' selected="selected"' : ''),
-            '>', Util::htmlent($names['Display_Name']), '</option>';
-        }
-
-        echo '
             </select>
             <a href="#" tabindex="0" data-trigger="hover click"
             class="helpcursor"
@@ -361,6 +356,10 @@ class Content
             ';
 
         if ($showremember) {
+            $rememberhelp = 'Check this box to bypass the welcome page on ' .
+                'subsequent visits and proceed directly to the selected ' .
+                'identity provider. You will need to clear your browser\'s ' .
+                'cookies to return here.';
             echo '
             <div class="form-group">
               <div class="form-check">
@@ -380,6 +379,21 @@ class Content
         }
 
         echo Util::getCsrf()->hiddenFormElement();
+        echo Util::getSkin()->hiddenFormElement();
+        // Also need a hidden <input> element for "idphint" query parameter
+        // since it is needed by Ajax 'GET' of the /idplist endpoint.
+        if (!empty($idphintlist)) {
+            echo '<input type="hidden" name="idphintlist" id="idphintlist"',
+                 ' value="';
+            $numhints = count($idphintlist);
+            for ($i = 0; $i < $numhints; $i++) {
+                echo urlencode($idphintlist[$i]);
+                if ($i < ($numhints - 1)) {
+                    echo ',';
+                }
+            }
+            echo '" />';
+        }
         echo '<input type="hidden" name="previouspage" value="WAYF" />';
         $lobtext = static::getLogOnButtonText();
 

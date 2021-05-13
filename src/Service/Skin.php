@@ -650,4 +650,24 @@ class Skin
         }
         return $retval;
     }
+
+   /**
+     * hiddenFormElement
+     *
+     * Returns an <input ...> form element of type 'hidden' with the
+     * name of the skin. If there is no current skinname, return
+     * empty string.
+     *
+     * @return string The string of an <input> HTML element, or
+     *         empty string if skinname is blank.
+     */
+    public function hiddenFormElement()
+    {
+        $retval = '';
+        if (strlen($this->skinname) > 0) {
+            $retval = '<input type="hidden" name="skinname" id="skinname" ' .
+                'value="' . $this->skinname .  '" />';
+        }
+        return $retval;
+    }
 }

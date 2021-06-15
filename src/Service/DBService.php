@@ -164,6 +164,7 @@ class DBService
         'member_of',
         'acr',
         'amr',
+        'preferred_username',
         'entitlement',
         'itrustuin',
     ];
@@ -267,6 +268,11 @@ class DBService
      * @var string|null $amr Authentication Method Reference from ORCID
      */
     public $amr;
+
+    /**
+     * @var string|null $preferred_username The GitHub login name
+     */
+    public $preferred_username;
 
     /**
      * @var string|null $entitlement eduPersonEntitlement
@@ -477,8 +483,8 @@ class DBService
      *            $first_name, $last_name, $display_name, $email,
      *            $eppn, $eptid, $openid, $oidc,
      *            $subject_id, $pairwise_id, $affiliation,
-     *            $ou, $member_of, $acr, $amr, $entitlement,
-     *            $itrustuin
+     *            $ou, $member_of, $acr, $amr, $preferred_username,
+     *            $entitlement, $itrustuin
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -961,6 +967,9 @@ class DBService
                 if (isset($attr_arr['amr'])) {
                     $this->amr = $attr_arr['amr'];
                 }
+                if (isset($attr_arr['preferred_username'])) {
+                    $this->preferred_username = $attr_arr['preferred_username'];
+                }
                 if (isset($attr_arr['entitlement'])) {
                     $this->entitlement = $attr_arr['entitlement'];
                 }
@@ -1038,6 +1047,9 @@ class DBService
         }
         if (!is_null($this->amr)) {
             echo "amr=$this->amr\n";
+        }
+        if (!is_null($this->preferred_username)) {
+            echo "preferred_username=$this->preferred_username\n";
         }
         if (!is_null($this->entitlement)) {
             echo "entitlement=$this->entitlement\n";

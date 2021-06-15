@@ -1152,6 +1152,12 @@ class Content
                 <td>', Util::getSessionVar('pairwise_id'), '</td>
                 <td> </td>
               </tr>
+
+              <tr>
+                <th>Preferred Username:</th>
+                <td>', Util::getSessionVar('preferred_username'), '</td>
+                <td> </td>
+              </tr>
               </tbody>
             </table>
           </div> <!-- end card-body -->';
@@ -1576,6 +1582,7 @@ class Content
      * @param string $itrustuin
      * @param string $subject_id
      * @param string $pairwise_id
+     * @param string $preferred_username
      * @param string $clientparams
      * @param string $redirect The url for the <form> element
      * @param string $redirectform Additional hidden input fields for the
@@ -1601,6 +1608,7 @@ class Content
         $itrustuin,
         $subject_id,
         $pairwise_id,
+        $preferred_username,
         $clientparams,
         $redirect,
         $redirectform,
@@ -2488,6 +2496,7 @@ class Content
                     $itrustuin,
                     $subject_id,
                     $pairwise_id,
+                    $preferred_username,
                     $clientparams,
                     $redirect,
                     $redirectform,

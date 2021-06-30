@@ -2127,6 +2127,13 @@ class Content
             }
         }
 
+        // CIL-1023 If OIDC prompt=consent parameter is given, then ignore
+        // all methods for bypassing the "Select an IdP" page so that the
+        // "consent to release attributes" section is always displayed.
+        if ((isset($clientparams['prompt'])) && ($clientparams['prompt'] == 'consent')) {
+            $providerId = '';
+        }
+
         // If both 'keepidp' and 'providerId' were set (and the
         // providerId is a greenlit IdP or valid OpenID provider),
         // then skip the Logon page and proceed to the appropriate

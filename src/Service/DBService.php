@@ -772,7 +772,7 @@ class DBService
         if (defined('OAUTH2_DBSERVICE_URL')) {
             $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
             $retval = $this->call(
-                'action=userCodeApproved' .
+                'action=checkUserCode' .
                 '&user_code=' . urlencode($user_code)
             );
         }

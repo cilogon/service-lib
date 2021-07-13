@@ -89,10 +89,10 @@ class DBService
         'STATUS_NO_REMOTE_USER'            => 0xFFFFB, // 1048571
         'STATUS_NO_IDENTITY_PROVIDER'      => 0xFFFFD, // 1048573
         'STATUS_CLIENT_NOT_FOUND'          => 0xFFFFF, // 1048575
-        'STATUS_TRANSACTION_NOT_FOUND'     => 0x10001, //   65537
         'STATUS_EPTID_MISMATCH'            => 0x100001,// 1048577
         'STATUS_PAIRWISE_ID_MISMATCH'      => 0x100003,// 1048579
         'STATUS_SUBJECT_ID_MISMATCH'       => 0x100005,// 1048581
+        'STATUS_TRANSACTION_NOT_FOUND'     => 0x10001, //   65537
         'STATUS_EXPIRED_TOKEN'             => 0x10003, //   65539
         'STATUS_CREATE_TRANSACTION_FAILED' => 0x10005, //   65541
         'STATUS_UNKNOWN_CALLBACK'          => 0x10007, //   65543
@@ -123,10 +123,10 @@ class DBService
         'STATUS_NO_REMOTE_USER'            => 'Missing Remote User.',
         'STATUS_NO_IDENTITY_PROVIDER'      => 'Missing IdP.',
         'STATUS_CLIENT_NOT_FOUND'          => 'Missing client.',
-        'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
         'STATUS_EPTID_MISMATCH'            => 'EPTID mismatch.',
         'STATUS_PAIRWISE_ID_MISMATCH'      => 'Pairwise ID mismatch.',
         'STATUS_SUBJECT_ID_MISMATCH'       => 'Subject ID mismatch.',
+        'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
         'STATUS_EXPIRED_TOKEN'             => 'Expired token.',
         'STATUS_CREATE_TRANSACTION_FAILED' => 'Failed to initialize OIDC flow.',
         'STATUS_UNKNOWN_CALLBACK'          => 'The redirect_uri does not match a registered callback URI.',
@@ -346,6 +346,14 @@ class DBService
     public $scope;
 
     /**
+     * @var string|null $grant The authorization grant returned by
+     *      checkUserCode which can be used as the 'code' for
+     *      setTransactionState to associate an authenticated user_uid with
+     *      the device flow transaction.
+     */
+    public $grant;
+
+    /**
      * @var array $idp_uids IdPs stored in the 'values' of the array
      */
     public $idp_uids;
@@ -455,6 +463,7 @@ class DBService
         $this->user_code = null;
         $this->client_id = null;
         $this->scope = null;
+        $this->grant = null;
     }
 
     /**
@@ -762,18 +771,10 @@ class DBService
 
         if (defined('OAUTH2_DBSERVICE_URL')) {
             $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
-            /*
-            return $this->call(
+            $retval = $this->call(
                 'action=userCodeApproved' .
                 '&user_code=' . urlencode($user_code)
             );
-            */
-            // DEBUG PLACEHOLDER - return some dummy values
-            $this->status = 0;
-            $this->user_code = 'ABCD-JKLM';
-            $this->client_id = 'cilogon:/client_id/100c74e105fb9652d80817d4106b5696';
-            $this->scope = 'openid profile email';
-            $retval = true;
         }
 
         return $retval;
@@ -802,16 +803,11 @@ class DBService
 
         if (defined('OAUTH2_DBSERVICE_URL')) {
             $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
-            /*
-            return $this->call(
+            $retval = $this->call(
                 'action=userCodeApproved' .
                 '&user_code=' . urlencode($user_code) .
                 '&approved=' . $approved
             );
-            */
-            // DEBUG PLACEHOLDER - return some dummy values
-            $this->status = 0;
-            $retval = true;
         }
 
         return $retval;
@@ -943,6 +939,9 @@ class DBService
                     }
                     if (preg_match('/scope=([^\r\n]+)/', $output, $match)) {
                         $this->scope = urldecode($match[1]);
+                    }
+                    if (preg_match('/grant=([^\r\n]+)/', $output, $match)) {
+                        $this->grant = urldecode($match[1]);
                     }
                     if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $match)) {
                         foreach ($match[1] as $value) {
@@ -1092,6 +1091,9 @@ class DBService
         }
         if (!is_null($this->scope)) {
             echo "scope=$this->scope\n";
+        }
+        if (!is_null($this->grant)) {
+            echo "scope=$this->grant\n";
         }
         if (count($this->idp_uids) > 0) {
             uasort($this->idp_uids, 'strcasecmp');

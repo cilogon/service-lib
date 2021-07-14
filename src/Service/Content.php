@@ -238,11 +238,18 @@ class Content
         // selected IdP, check for 'initialidp=...' query parameter. Note
         // that this value will be overridden by the 'idphint=...' query
         // parameter (if also present).
-        if (
-            (strlen($providerId) == 0) &&
-            (!empty(Util::getGetVar('initialidp')))
-        ) {
-            $providerId = static::normalizeOAuth2IdP(Util::getGetVar('initialidp'));
+        if (strlen($providerId) == 0) {
+            $initialidp = '';
+            // Check clientparams first, then check GET parameters
+            $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
+            if (!empty(@$clientparams['initialidp'])) {
+                $initialidp = $clientparams['initialidp'];
+            } elseif (!empty(Util::getGetVar('initialidp'))) {
+                $initialidp = Util::getGetVar('initialidp');
+            }
+            if (strlen($initialidp) > 0) {
+                $providerId = static::normalizeOAuth2IdP($initialidp);
+            }
         }
 
         // Make sure previously selected IdP is in list of available IdPs.

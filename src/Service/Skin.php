@@ -150,11 +150,13 @@ class Skin
         // Check for matching IdP, callbackURI (OAuth1),
         // redirect_uri (OAuth2), or client_id (OAuth2)
         // in the FORCE_SKIN_ARRAY.
+        $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $uristocheck = array(
             Util::getGetVar('redirect_uri'),
             Util::getGetVar('client_id'),
+            @clientparams['client_id'],
             Util::getSessionVar('callbackuri'),
-            Util::getSessionVar('idp')
+            Util::getSessionVar('idp'),
         );
 
         foreach ($uristocheck as $value) {

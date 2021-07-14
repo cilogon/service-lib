@@ -187,7 +187,6 @@ class PortalCookie
             );
             if (
                 (isset($clientparams['client_id'])) &&
-                (isset($clientparams['redirect_uri'])) &&
                 (isset($clientparams['scope']))
             ) {
                 // Use the first element of the idphint list as the selected_idp.
@@ -197,9 +196,12 @@ class PortalCookie
                     $selected_idp = $idphintlist[0];
                 }
                 $retval = $clientparams['client_id'] . ';' .
-                          $clientparams['redirect_uri'] . ';' .
-                          $clientparams['scope'] .
-                          (empty($selected_idp) ? '' : ';' . $selected_idp);
+                    // redirect_uri is set for 'authorize' but not for 
+                    // 'device', so make it optional so the portal cookie 
+                    // can be set in both flows.
+                    ((isset($clientparams['redirect_uri'])) ? $clientparams['redirect_uri'] . ';' : '') .
+                    $clientparams['scope'] .
+                    (empty($selected_idp) ? '' : ';' . $selected_idp);
             }
         }
         return $retval;

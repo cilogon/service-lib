@@ -154,7 +154,7 @@ class Skin
         $uristocheck = array(
             Util::getGetVar('redirect_uri'),
             Util::getGetVar('client_id'),
-            @clientparams['client_id'],
+            @$clientparams['client_id'],
             Util::getSessionVar('callbackuri'),
             Util::getSessionVar('idp'),
         );

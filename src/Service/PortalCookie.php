@@ -196,8 +196,8 @@ class PortalCookie
                     $selected_idp = $idphintlist[0];
                 }
                 $retval = $clientparams['client_id'] . ';' .
-                    // redirect_uri is set for 'authorize' but not for 
-                    // 'device', so make it optional so the portal cookie 
+                    // redirect_uri is set for 'authorize' but not for
+                    // 'device', so make it optional so the portal cookie
                     // can be set in both flows.
                     ((isset($clientparams['redirect_uri'])) ? $clientparams['redirect_uri'] . ';' : '') .
                     $clientparams['scope'] .

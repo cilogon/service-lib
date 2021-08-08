@@ -25,7 +25,7 @@ use DB;
  * CREATE TABLE ciloa2.bypass (
  *     type ENUM('allow', 'idp', 'skin') NOT NULL DEFAULT 'allow',
  *     regex VARCHAR(255) NOT NULL DEFAULT '%%',
- *     value TEXT,
+ *     value VARCHAR(255) DEFAULT NULL,
  *     PRIMARY KEY(type,regex)
  * );
  * GRANT ALL PRIVILEGES ON `ciloa2`.`bypass` TO 'cilogon'@'localhost';

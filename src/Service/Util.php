@@ -37,6 +37,12 @@ class Util
     public static $timeit;
 
     /**
+     * @var Bypass $bypass A 'global' Bypass object so the 'bypass' database
+     *      table is read in only once.
+     */
+    public static $bypass = null;
+
+    /**
      * @var IdPList $idplist A 'global' IdpList object since dplist.xml is
      *      large and expensive to create multiple times.
      */
@@ -59,6 +65,24 @@ class Util
      */
     public static $oauth2idps = ['Google', 'GitHub', 'ORCID'];
 
+
+    /**
+     * getBypass
+     *
+     * This function initializes the class $bypass object (if not yet
+     * created) and returns it. This allows for a single 'global'
+     * $bypass to be used by other classes (since we want to read the
+     * bypass table from the database only once).
+     *
+     * @return Bypass|null The class instantiated Bypass object.
+     **/
+    public static function getBypass()
+    {
+        if (is_null(static::$bypass)) {
+            static::$bypass = new Bypass();
+        }
+        return static::$bypass;
+    }
 
     /**
      * getIdPList

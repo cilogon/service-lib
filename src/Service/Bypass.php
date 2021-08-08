@@ -1,0 +1,203 @@
+<?php
+
+namespace CILogon\Service;
+
+require_once 'DB.php';
+
+use CILogon\Service\Util;
+use PEAR;
+use DB;
+
+/**
+ * Bypass
+ *
+ * This class handles three configuration arrays which can be stored in the
+ * top-level config.php file or in the ciloa2.bypass database table.
+ *
+ * ALLOW_BYPASS_ARRAY / ciloa2.bypass table, 'type' = 'allow'
+ * BYPASS_IDP_ARRAY   / ciloa2.bypass table, 'type' = 'idp'
+ * FORCE_SKIN_ARRAY   / ciloa2.bypass table, 'type' = 'skin'
+ *
+ * When an *_ARRAY is defined in config.php, the corresponding database
+ * table 'type' is ignored, i.e., file configuration and database
+ * configuration are not merged. To create the ciloa2.bypass table:
+ *
+ * CREATE TABLE ciloa2.bypass (
+ *     type ENUM('allow', 'idp', 'skin') NOT NULL DEFAULT 'allow',
+ *     regex VARCHAR(255) NOT NULL DEFAULT '%%',
+ *     value TEXT,
+ *     PRIMARY KEY(type,regex)
+ * );
+ * GRANT ALL PRIVILEGES ON `ciloa2`.`bypass` TO 'cilogon'@'localhost';
+ *
+ * There are three methods which return each of the three configuration
+ * arrays. These three methods first check if the *_ARRAY is configured in
+ * the top-level config.php. If not, the corresponding database array is
+ * returned. In other words, you should not reference any of the *_ARRAY
+ * constants. Instead, call getAllowBypassArray(), getBypassIdPArray(), and
+ * getForceSkinArray() to get the appropriate values.
+ */
+class Bypass
+{
+    /**
+     * @var array|null $bypassarray The array containing the "bypass"
+     *      database table.
+     */
+    protected $bypassarray = [];
+
+
+    /**
+     *  __construct
+     *
+     * Default constructor. Calls init() to do the actual work.
+     *
+     * @return Bypass A new Bypass object.
+     */
+    public function __construct()
+    {
+        $this->init();
+    }
+
+    /**
+     * init
+     *
+     * This function is called by the constructor, and can also be called to
+     * force a re-read of the database. It attempts to read the bypass table
+     * which has three columns: type, regex, value. Type is one of 'allow',
+     * 'idp', or 'skin'. Regex is a Perl Compatible Regular Expression
+     * (http://www.php.net/manual/en/pcre.pattern.php) which matches either
+     * a client_id or a redirect_uri. Value is one of (1) NULL (for 'allow'
+     * since we just need to know that the regex client_id/redirect_uri
+     * honors the 'idphint' parameter to auto-select that IdP), (2) entityId
+     * (for 'idp' to auto-redirect to that IdP), or (3) skin name (for a
+     * skin that should be applied automatically). After the bypass table is
+     * read in, it is reformatted as a multi-dimensional array:
+     *     [type][regex] = value
+     * The result is stored in the class $bypassarray variable.
+     *
+     * @return bool True if the database was read in and not empty.
+     *              False if there was a database read error, or if the
+     *              bypass database table was empty.
+     */
+    public function init()
+    {
+        $readin = false; // Did we read the 'bypass' table from the database?
+        $this->bypassarray = []; // Reset the class bypassarray to empty
+
+        $dsn = array(
+            'phptype'  => 'mysqli',
+            'username' => MYSQLI_USERNAME,
+            'password' => MYSQLI_PASSWORD,
+            'database' => MYSQLI_DATABASE,
+            'hostspec' => MYSQLI_HOSTSPEC
+        );
+
+        $opts = array(
+            'persistent'  => true,
+            'portability' => DB_PORTABILITY_ALL
+        );
+
+        $db = DB::connect($dsn, $opts);
+        if (!PEAR::isError($db)) {
+            $data = $db->getAssoc(
+                'SELECT * FROM bypass',
+                true,
+                array(),
+                DB_FETCHMODE_ASSOC,
+                true
+            );
+            if ((!DB::isError($data)) && (!empty($data))) {
+                $readin = true;
+                // Convert indexed arrays to associative arrays
+                foreach ($data as $key => $valarr) {
+                    foreach ($valarr as $val) {
+                        $this->bypassarray[$key][$val['regex']] = $val['value'];
+                    }
+                }
+            }
+            $db->disconnect();
+        }
+
+        return $readin;
+    }
+
+    /**
+     * getAllowBypassArray
+     *
+     * This function returns an array of client_ids or redirect_uris which
+     * are allowed to bypass the 'Select an Identity Provider' page by
+     * passing the 'idphint'/'selected_idp' query parameter. It first checks
+     * for an ALLOW_BYPASS_ARRAY defined in the top-level config.php file.
+     * If not defined, then entries from the 'bypass' database table (where
+     * 'type='allow') is returned instead. If neither are defined, then an
+     * empty array is returned.
+     *
+     * @return array An array where keys are PCREs matching either
+     *         client_ids or redirect_uris, and values are null.
+     */
+    public function getAllowBypassArray()
+    {
+        $retarr = array();
+
+        if (defined('ALLOW_BYPASS_ARRAY')) {
+            $retarr = ALLOW_BYPASS_ARRAY;
+        } elseif (!empty($this->bypassarray)) {
+            $retarr = $this->bypassarray['allow'];
+        }
+
+        return $retarr;
+    }
+
+    /**
+     * getBypassIdPArray
+     *
+     * This function returns an array of client_ids or redirect_uris which
+     * are allowed to bypass the 'Select an Identity Provider' page by
+     * redirecting to a specific IdP entityId. It first checks for a
+     * BYPASS_IDP_ARRAY defined in the top-level config.php file.
+     * If not defined, then entries from the 'bypass' database table (where
+     * 'type='idp') is returned instead. If neither are defined, then an
+     * empty array is returned.
+     *
+     * @return array An array where keys are PCREs matching either
+     *         client_ids or redirect_uris, and values are IdP entityIds.
+     */
+    public function getBypassIdPArray()
+    {
+        $retarr = array();
+
+        if (defined('BYPASS_IDP_ARRAY')) {
+            $retarr = BYPASS_IDP_ARRAY;
+        } elseif (!empty($this->bypassarray)) {
+            $retarr = $this->bypassarray['idp'];
+        }
+
+        return $retarr;
+    }
+
+    /**
+     * getForceSkinArray
+     *
+     * This function returns an array of client_ids or redirect_uris which
+     * are forced to use a specific skin. It first checks for a
+     * FORCE_SKIN_ARRAY defined in the top-level config.php file.
+     * If not defined, then entries from the 'bypass' database table (where
+     * 'type='skin') is returned instead. If neither are defined, then an
+     * empty array is returned.
+     *
+     * @return array An array where keys are PCREs matching either
+     *         client_ids or redirect_uris, and values are skin names.
+     */
+    public function getForceSkinArray()
+    {
+        $retarr = array();
+
+        if (defined('FORCE_SKIN_ARRAY')) {
+            $retarr = FORCE_SKIN_ARRAY;
+        } elseif (!empty($this->bypassarray)) {
+            $retarr = $this->bypassarray['skin'];
+        }
+
+        return $retarr;
+    }
+}

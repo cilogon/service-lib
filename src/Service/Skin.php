@@ -116,11 +116,7 @@ class Skin
         $this->skinname = '';
         $this->configxml = null;
         $this->css = '';
-        if (defined('FORCE_SKIN_ARRAY')) {
-            $this->forcearray = FORCE_SKIN_ARRAY;
-        } else {
-            $this->forcearray = array();
-        }
+        $this->forcearray = Util::getBypass()->getForceSkinArray();
         $this->readSkinConfig();
         $this->setMyProxyInfo();
     }
@@ -129,7 +125,8 @@ class Skin
      * readSkinConfig
      *
      * This function checks for the name of the skin in several places:
-     * (1) The FORCE_SKIN_ARRAY for a matching IdP entityID or portal
+     * (1) The FORCE_SKIN_ARRAY (if defined) or ciloa2.bypass database table
+     * (where 'type'='skin') for a matching IdP entityID or portal
      * callbackURL, (2) in a URL parameter (can be '?skin=',
      * '?cilogon_skin=', '?vo='), (3) cilogon_vo form input variable
      * (POST for ECP case), or (4) 'cilogon_skin' PHP session
@@ -149,7 +146,8 @@ class Skin
 
         // Check for matching IdP, callbackURI (OAuth1),
         // redirect_uri (OAuth2), or client_id (OAuth2)
-        // in the FORCE_SKIN_ARRAY.
+        // in the FORCE_SKIN_ARRAY or ciloa2.bypass database table
+        // (where 'type' = 'skin').
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $uristocheck = array(
             Util::getGetVar('redirect_uri'),
@@ -629,20 +627,20 @@ class Skin
     /**
      * getForceSkin
      *
-     * The FORCE_SKIN_ARRAY contains 'uripattern'=>'skinname' pairs
+     * The $forcearray contains 'uripattern' => 'skinname' pairs
      * corresponding to IdP entityIDs, portal callbackurls, or client_ids
      * that should have a particular skin force-applied. This function
-     * looks in the FORCE_SKIN_ARRAY for a pattern-matched URI and returns
+     * looks in the $forcearray for a pattern-matched URI and returns
      * the corresponding skin name if found. If not found, empty
      * string is returned.
      *
-     * @param string $uri A URI to search for in the FORCE_SKIN_ARRAY.
+     * @param string $uri A URI to search for in the $forcearray.
      * @return string The skin name for the URI, or empty string if not
      *         found.
      */
     protected function getForceSkin($uri)
     {
-        $retval = '';  // Assume uri is not in FORCE_SKIN_ARRAY
+        $retval = '';  // Assume uri is not in $forcearray
 
         foreach ($this->forcearray as $key => $value) {
             if (preg_match($key, $uri)) {

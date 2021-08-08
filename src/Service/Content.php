@@ -2045,36 +2045,31 @@ class Content
 
         if ((strlen($redirect_uri) > 0) || (strlen($client_id) > 0)) {
             // CIL-431 - If the OAuth2/OIDC $redirect_uri or $client_id is set,
-            // then check for a match in the BYPASS_IDP_ARRAY to see if we
-            // should automatically redirect to a specific IdP. Used mainly
-            // by campus gateways.
+            // then check for a match in the BYPASS_IDP_ARRAY or
+            // ciloa2.bypass database table (where 'type'='idp') to see if
+            // we should automatically redirect to a specific IdP. Used
+            // mainly by campus gateways.
             $bypassidp = '';
-            if (defined('BYPASS_IDP_ARRAY')) {
-                foreach (BYPASS_IDP_ARRAY as $key => $value) {
-                    if (
-                        (preg_match($key, $redirect_uri)) ||
-                        (preg_match($key, $client_id))
-                    ) {
-                        $bypassidp = $value;
-                        // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
-                        $skin->init(true);
-                        break;
-                    }
+            foreach (Util::getBypass()->getBypassIdPArray() as $key => $value) {
+                if (
+                    (preg_match($key, $redirect_uri)) ||
+                    (preg_match($key, $client_id))
+                ) {
+                    $bypassidp = $value;
+                    // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
+                    $skin->init(true);
+                    break;
                 }
             }
 
             // CIL-613 - Next, check for a match in the ALLOW_BYPASS_ARRAY.
             // If found, then allow the idphint/selected_idp to be used as the
             // IdP to redirect to.
-            if (
-                (defined('ALLOW_BYPASS_ARRAY')) &&
-                (empty($bypassidp)) &&
-                (!empty($selected_idp))
-            ) {
-                foreach (ALLOW_BYPASS_ARRAY as $value) {
+            if ((empty($bypassidp)) && (!empty($selected_idp))) {
+                foreach (Util::getBypass()->getAllowBypassArray() as $key => $value) {
                     if (
-                        (preg_match($value, $redirect_uri)) ||
-                        (preg_match($value, $client_id))
+                        (preg_match($key, $redirect_uri)) ||
+                        (preg_match($key, $client_id))
                     ) {
                         $bypassidp = $selected_idp;
                         break;

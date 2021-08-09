@@ -20,7 +20,9 @@ use DB;
  *
  * When an *_ARRAY is defined in config.php, the corresponding database
  * table 'type' is ignored, i.e., file configuration and database
- * configuration are not merged. To create the ciloa2.bypass table:
+ * configuration are not merged. 
+ *
+ * To create the ciloa2.bypass table:
  *
  * CREATE TABLE ciloa2.bypass (
  *     type ENUM('allow', 'idp', 'skin') NOT NULL DEFAULT 'allow',
@@ -30,21 +32,35 @@ use DB;
  * );
  * GRANT ALL PRIVILEGES ON `ciloa2`.`bypass` TO 'cilogon'@'localhost';
  *
- * There are three methods which return each of the three configuration
- * arrays. These three methods first check if the *_ARRAY is configured in
- * the top-level config.php. If not, the corresponding database array is
- * returned. In other words, you should not reference any of the *_ARRAY
- * constants. Instead, call getAllowBypassArray(), getBypassIdPArray(), and
- * getForceSkinArray() to get the appropriate values.
+ * 'type' is one of 'allow', 'idp', or 'skin'.
+ *
+ * 'regex' is a Perl Compatible Regular Expression (PCRE) (see
+ * http://www.php.net/manual/en/pcre.pattern.php for details). It should 
+ * match a client_id or a redirect_uri. '%' (percent) is a good choice for 
+ * delimiter so that slashes do not need to be escaped. Note that period '.' 
+ * matches any character, so if you want to match a dot, prefix with a 
+ * backslash, e.g., '\.' . However, in practice this unnecessary since dots 
+ * appear mainly in the FQDN.
+ *
+ * 'value' depends on the 'type': 
+ * For 'type'='allow', 'value' is NULL (or empty string).
+ * For 'type'='idp',   'value' is an IdP entityId (from cilogon.org/idplist/).
+ * For 'type'='skin',  'value' is the name of a skin (from the 'skins' table).
+ *
+ * There are three class methods which return each of the three 
+ * configuration arrays. These three methods first check if the *_ARRAY is 
+ * defined in the top-level config.php. If not, the corresponding database 
+ * array is returned. In other words, code should not reference any 
+ * of the *_ARRAY constants. Instead, call getAllowBypassArray(), 
+ * getBypassIdPArray(), and getForceSkinArray() to get the appropriate 
+ * array values.
  */
 class Bypass
 {
     /**
-     * @var array|null $bypassarray The array containing the "bypass"
-     *      database table.
+     * @var array $bypassarray Array containing the 'bypass' database table.
      */
     protected $bypassarray = [];
-
 
     /**
      *  __construct
@@ -133,7 +149,8 @@ class Bypass
      * empty array is returned.
      *
      * @return array An array where keys are PCREs matching either
-     *         client_ids or redirect_uris, and values are null.
+     *         client_ids or redirect_uris, and values are null or empty 
+     *         string.
      */
     public function getAllowBypassArray()
     {

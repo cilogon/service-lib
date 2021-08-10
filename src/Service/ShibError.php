@@ -194,8 +194,8 @@ class ShibError
               <div class="card-text my-2">
                 Note that this error may be due to your selected Identity
                 Provider (IdP) not fully supporting &quot;forced
-                reauthentication&quot;. This setting forces users to log 
-                in at the IdP every time, thus bypassing Single Sign-On 
+                reauthentication&quot;. This setting forces users to log
+                in at the IdP every time, thus bypassing Single Sign-On
                 (SSO).
               </div> <!-- end card-text -->
             ';

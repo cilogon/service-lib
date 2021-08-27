@@ -50,8 +50,24 @@ class Content
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-    <title>', $title, '</title>
+    <title>', $title, '</title>';
 
+        // CIL-1068 Add config option for custom favicon
+        $favicon = (string)$skin->getConfigOption('favicon');
+        if (
+            (strlen($favicon) > 0) &&
+            (is_readable('/var/www/html' . $favicon))
+        ) {
+            $favicontype = (string)$skin->getConfigOption('favicontype');
+            // Default file type is '.ico'
+            if (strlen($favicontype) == 0) {
+                $favicontype = 'image/x-icon';
+            }
+            echo '
+    <link rel="shortcut icon" type="', $favicontype, '" href="', $favicon, '">';
+        }
+
+        echo '
     <!-- Font Awesome CSS -->
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"

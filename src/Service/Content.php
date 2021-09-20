@@ -300,6 +300,14 @@ class Content
             });
         }
 
+        // CIL-1080 If the providerId is in the HIDE_IDP_ARRAY, unset it.
+        if (
+            (defined('HIDE_IDP_ARRAY')) &&
+            (in_array($providerId, HIDE_IDP_ARRAY))
+        ) {
+            $providerId = '';
+        }
+
         $googleauthz = Util::getAuthzUrl('Google');
         $orcidauthz = Util::getAuthzUrl('ORCID');
         $githubauthz = Util::getAuthzUrl('GitHub');

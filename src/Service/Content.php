@@ -160,9 +160,13 @@ class Content
         echo '
     </div> <!-- Close Main Bootstrap Container -->
     <footer class="footer">';
-
         echo $footertext;
-
+        if ((defined('HOSTNAME_FOOTER')) && (HOSTNAME_FOOTER === true)) {
+            echo '
+      <p style="font-size:xx-small;color:#f5f5f5;color:rgba(245,245,245,0.0);">',
+            gethostname(),
+      '</p>';
+        }
         echo '
     </footer>
 

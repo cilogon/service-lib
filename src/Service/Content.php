@@ -318,10 +318,10 @@ class Content
             $initialidp = (string)$skin->getConfigOption('initialidp');
             if ((strlen($initialidp) > 0) && (isset($idps[$initialidp]))) {
                 $providerId = $initialidp;
-            } elseif (isset($idps[$googleauthz])) {
-                $providerId = Util::getAuthzUrl('Google');
             } elseif (isset($idps[$orcidauthz])) {
                 $providerId = Util::getAuthzUrl('ORCID');
+            } elseif (isset($idps[$googleauthz])) {
+                $providerId = Util::getAuthzUrl('Google');
             } else {
                 $providerId = array_key_first($idps);
             }
@@ -343,6 +343,12 @@ class Content
         </p>
         ';
 
+        if (isset($idps[$orcidauthz])) {
+            $selecthelp .= '<p> If you have a <a target=\'_blank\'
+            href=\'https://orcid.org/my-orcid\'>ORCID</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
         if (isset($idps[$googleauthz])) {
             $selecthelp .= '<p>If you have a <a target=\'_blank\'
             href=\'https://myaccount.google.com\'>Google</a> account,
@@ -352,12 +358,6 @@ class Content
         if (isset($idps[$githubauthz])) {
             $selecthelp .= '<p> If you have a <a target=\'_blank\'
             href=\'https://github.com/settings/profile\'>GitHub</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
-        }
-        if (isset($idps[$orcidauthz])) {
-            $selecthelp .= '<p> If you have a <a target=\'_blank\'
-            href=\'https://orcid.org/my-orcid\'>ORCID</a> account,
             you can select it for authenticating to the CILogon Service.</p>
             ';
         }

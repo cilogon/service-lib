@@ -48,8 +48,10 @@ class MyProxy
         $certreq = '',
         $env = ''
     ) {
+        $log = new Loggit();
         // Verify the myproxy-logon binary has been configured
         if ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON))) {
+            $log->error('getMyProxyCredential Error: myproxy-logon binary not configured');
             Util::sendErrorAlert(
                 'getMyProxyCredential Error',
                 'MyProxy Error = myproxy-logon binary not configured'
@@ -59,6 +61,7 @@ class MyProxy
 
         // Make sure the username passed in is not empty
         if (strlen($username) == 0) {
+            $log->error('getMyProxyCredential Error: Missing MyProxy username');
             Util::sendErrorAlert(
                 'getMyProxyCredential Error',
                 'MyProxy Error = Missing MyProxy username'
@@ -137,9 +140,11 @@ class MyProxy
         } // End of looping over list of MyProxy servers
 
         if (!$success) {
+            $log->error('getMyProxyCredential Error: MyProxy Error = ' .
+                $return_val . ', MyProxy Output = ' . $retstr);
             Util::sendErrorAlert(
                 'getMyProxyCredential Error',
-                "MyProxy Error = $return_val\nMyProxy Output= $retstr"
+                "MyProxy Error = $return_val\nMyProxy Output = $retstr"
             );
         }
 

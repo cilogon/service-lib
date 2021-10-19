@@ -164,8 +164,8 @@ class Content
         if ((defined('HOSTNAME_FOOTER')) && (HOSTNAME_FOOTER === true)) {
             echo '
       <p style="font-size:xx-small;color:#f5f5f5;color:rgba(245,245,245,0.0);">',
-            gethostname(),
-      '</p>';
+            gethostname(), '
+      </p>';
         }
         echo '
     </footer>
@@ -2566,6 +2566,9 @@ class Content
                     'logonerror',
                     'Invalid IdP selected. Please try again.'
                 );
+                $log->warn('Authentication attempt using non-greenlit IdP');
+                // CIL-1098 Don't send email alerts for IdP-generated errors
+                /*
                 Util::sendErrorAlert(
                     'Authentication attempt using non-greenlit IdP',
                     '
@@ -2574,6 +2577,7 @@ was not in the list of greenlit IdPs as determined by the current skin.
 This might indicate the user attempted to circumvent the security check
 in "handleGotUser()" for valid IdPs for the skin.'
                 );
+                */
                 Util::unsetCookieVar('providerId');
                 Util::unsetUserSessionVars();
                 printLogonPage();
@@ -2615,10 +2619,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
                 $htmldn = Util::htmlent($dn);
                 if (strcmp($dn, $htmldn) != 0) {
+                    $log->warn('New user DN contains HTML entities: htmlentites(DN) = ' . $htmldn);
+                    // CIL-1098 Don't send email alerts for IdP-generated errors
+                    /*
                     Util::sendErrorAlert(
                         'New user DN contains HTML entities',
                         "htmlentites(DN) = $htmldn\n"
                     );
+                    */
                 }
             }
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {
@@ -2763,21 +2771,21 @@ in "handleGotUser()" for valid IdPs for the skin.'
                         'Error creating certificate. Please try again.'
                     );
                     Util::deleteDir($tdir); // Remove the temporary directory
-                    $log->info('Error creating certificate - missing usercred.p12');
+                    $log->error('Error creating certificate - missing usercred.p12');
                 }
             } else { // The myproxy-logon command failed - shouldn't happen!
                 Util::setSessionVar(
                     'p12error',
                     'Error! MyProxy unable to create certificate.'
                 );
-                $log->info('Error creating certificate - myproxy-logon failed');
+                $log->error('Error creating certificate - myproxy-logon failed');
             }
         } else { // Couldn't find the 'distinguished_name' PHP session value
             Util::setSessionVar(
                 'p12error',
                 'Cannot create certificate due to missing attributes.'
             );
-            $log->info('Error creating certificate - missing dn session variable');
+            $log->error('Error creating certificate - missing dn session variable');
         }
     }
 

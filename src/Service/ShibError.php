@@ -222,6 +222,7 @@ class ShibError
         Content::printCollapseEnd();
         Content::printFooter();
 
-        Util::sendErrorAlert('Shibboleth Error', $errorstr2);
+        // CIL-1098 Don't send email alerts for IdP-generated errors
+        // Util::sendErrorAlert('Shibboleth Error', $errorstr2);
     }
 }

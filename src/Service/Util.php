@@ -748,6 +748,7 @@ Remote Address= ' . $remoteaddr . '
     public static function saveUserToDataStore(...$args)
     {
         $dbs = new DBService();
+        $log = new Loggit();
 
         // Save the passed-in variables to the session for later use
         // (e.g., by the error handler in handleGotUser). Then get these
@@ -808,6 +809,7 @@ Remote Address= ' . $remoteaddr . '
             static::setSessionVar('distinguished_name', $dbs->distinguished_name);
             static::setSessionVar('status', $dbs->status);
         } else {
+            $log->error('In Util::saveUserToDataStore(): Error calling dbservice action "getUser".');
             static::sendErrorAlert(
                 'dbService Error',
                 'Error calling dbservice action "getUser" in ' .
@@ -826,7 +828,6 @@ Remote Address= ' . $remoteaddr . '
                 $status ==
                 DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']
             ) {
-                $log = new Loggit();
                 $log->error('STATUS_MISSING_PARAMETER_ERROR', true);
             }
 

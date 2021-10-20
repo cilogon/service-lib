@@ -104,6 +104,11 @@ class DBService
         'STATUS_MALFORMED_SCOPE'           => 0x10013, //   65555
     );
 
+    /**
+     * @var array $STATUS_TEXT The human-readable error messages
+     *      corresponding to the STATUS_* constants.
+     * @see statusText()
+     */
     public static $STATUS_TEXT = array(
         'STATUS_OK'                        => 'Status OK.',
         'STATUS_ACTION_NOT_FOUND'          => 'Action not found.',
@@ -136,6 +141,25 @@ class DBService
         'STATUS_UNAPPROVED_CLIENT'         => 'Client has not been approved.',
         'STATUS_NO_SCOPES'                 => 'Missing or empty scope parameter.',
         'STATUS_MALFORMED_SCOPE'           => 'Malformed scope parameter.',
+    );
+
+    /**
+     * @var array $CLIENT_ERRORS An array of integer/hex values of
+     *      client-intiated errors that should NOT generate an email alert.
+     */
+    public static $CLIENT_ERRORS = array(
+        0xFFFF1, // STATUS_DUPLICATE_PARAMETER_FOUND
+        0xFFFF7, // STATUS_MALFORMED_INPUT_ERROR
+        0xFFFF9, // STATUS_MISSING_PARAMETER_ERROR
+        0xFFFFF, // STATUS_CLIENT_NOT_FOUND
+        0x10001, // STATUS_TRANSACTION_NOT_FOUND
+        0x10003, // STATUS_EXPIRED_TOKEN
+        0x10007, // STATUS_UNKNOWN_CALLBACK
+        0x10009, // STATUS_MISSING_CLIENT_ID
+        0x1000D, // STATUS_UNKNOWN_CLIENT
+        0x1000F, // STATUS_UNAPPROVED_CLIENT
+        0x10011, // STATUS_NO_SCOPES
+        0x10013, // STATUS_MALFORMED_SCOPE
     );
 
     /**
@@ -981,6 +1005,32 @@ class DBService
         }
 
         return $success;
+    }
+
+    /**
+     * statusText
+     *
+     * This method returns the human-readable description of the current
+     * $status (which corresponding to a STATUS_* (hex) number in the
+     * $STATUS array).
+     *
+     * @return string A human-readable version of the $status, or empty
+     *         string if no such $status is found in the $STATUS array.
+     */
+    public function statusText()
+    {
+        $retstr = '';
+
+        if (!is_null($this->status)) {
+            $status_value = array_search($this->status, static::$STATUS);
+            if ($status_value !== false) {
+                if (array_key_exists($status_value, static::$STATUS_TEXT)) {
+                    $retstr = static::$STATUS_TEXT[$status_value];
+                }
+            }
+        }
+
+        return $retstr;
     }
 
     /**

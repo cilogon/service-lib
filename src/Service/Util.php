@@ -809,7 +809,7 @@ Remote Address= ' . $remoteaddr . '
             static::setSessionVar('distinguished_name', $dbs->distinguished_name);
             static::setSessionVar('status', $dbs->status);
         } else {
-            $log->error('In Util::saveUserToDataStore(): Error calling dbservice action "getUser".');
+            $log->error('Error in Util::saveUserToDataStore(): Error calling dbservice action "getUser".');
             static::sendErrorAlert(
                 'dbService Error',
                 'Error calling dbservice action "getUser" in ' .
@@ -828,7 +828,7 @@ Remote Address= ' . $remoteaddr . '
                 $status ==
                 DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']
             ) {
-                $log->error('STATUS_MISSING_PARAMETER_ERROR', true);
+                $log->error('Error in Util::saveUserToDataStore(): STATUS_MISSING_PARAMETER_ERROR', true);
             }
 
             // For other dbservice errors OR for any error involving

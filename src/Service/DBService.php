@@ -843,7 +843,7 @@ class DBService
             $output = curl_exec($ch);
             if (curl_errno($ch)) { // Send alert on curl errors
                 $log = new Loggit();
-                $log->error('In DBService::call(): cUrl Error = ' . curl_error($ch) . ', URL Accessed = ' . $url);
+                $log->error('Error in DBService::call(): cUrl Error = ' . curl_error($ch) . ', URL Accessed = ' . $url);
                 Util::sendErrorAlert(
                     'cUrl Error',
                     'cUrl Error    = ' . curl_error($ch) . "\n" .

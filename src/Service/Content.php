@@ -1565,8 +1565,7 @@ class Content
         echo '
               <div class="card-body px-5">';
 
-        static::printErrorBox('An error has occurred. System
-            administrators have been notified. This may be a temporary
+        static::printErrorBox('An error has occurred. This may be a temporary
             error. Please try again later, or contact us at the the email
             address at the bottom of the page.');
 

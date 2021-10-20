@@ -181,7 +181,6 @@ class ShibError
 
         echo '
               <div class="card-text my-2">
-                System administrators have been notified.
                 This may be a temporary error. Please try again later, or
                 contact us at the email address at the bottom of the page.
               </div> <!-- end card-text -->

@@ -63,7 +63,7 @@ class Util
     /**
      * @var array $oauth2idps An array of OAuth2 Identity Providers.
      */
-    public static $oauth2idps = ['Google', 'GitHub', 'ORCID'];
+    public static $oauth2idps = ['Google', 'GitHub', 'ORCID', 'Microsoft'];
 
 
     /**
@@ -697,9 +697,10 @@ Remote Address= ' . $remoteaddr . '
     {
         $url = null;
         $idptourl = array(
-            'Google' => 'https://accounts.google.com/o/oauth2/auth',
-            'GitHub' => 'https://github.com/login/oauth/authorize',
-            'ORCID'  => 'https://orcid.org/oauth/authorize',
+            'Google'    => 'https://accounts.google.com/o/oauth2/auth',
+            'GitHub'    => 'https://github.com/login/oauth/authorize',
+            'ORCID'     => 'https://orcid.org/oauth/authorize',
+            'Microsoft' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
         );
         if (array_key_exists($idp, $idptourl)) {
             $url = $idptourl[$idp];
@@ -723,6 +724,7 @@ Remote Address= ' . $remoteaddr . '
             'https://accounts.google.com/o/oauth2/auth' => 'Google',
             'https://github.com/login/oauth/authorize'  => 'GitHub',
             'https://orcid.org/oauth/authorize'         => 'ORCID',
+            'https://login.microsoftonline.com/common/oauth2/v2.0/authorize' => 'Microsoft',
         );
         if (array_key_exists($url, $urltoidp)) {
             $idp = $urltoidp[$url];

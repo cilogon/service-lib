@@ -311,6 +311,7 @@ class Content
         $googleauthz = Util::getAuthzUrl('Google');
         $orcidauthz = Util::getAuthzUrl('ORCID');
         $githubauthz = Util::getAuthzUrl('GitHub');
+        $microsoftauthz = Util::getAuthzUrl('Microsoft');
 
         // If no previous providerId, get from skin, or default
         // to Google, ORCID, or the first IdP in the list.
@@ -358,6 +359,12 @@ class Content
         if (isset($idps[$githubauthz])) {
             $selecthelp .= '<p> If you have a <a target=\'_blank\'
             href=\'https://github.com/settings/profile\'>GitHub</a> account,
+            you can select it for authenticating to the CILogon Service.</p>
+            ';
+        }
+        if (isset($idps[$microsoftauthz])) {
+            $selecthelp .= '<p>If you have a <a target=\'_blank\'
+            href=\'https://account.microsoft.com\'>Microsoft</a> account,
             you can select it for authenticating to the CILogon Service.</p>
             ';
         }
@@ -1953,6 +1960,25 @@ class Content
                 please contact us at the email address at the bottom of the
                 page.
               </div>';
+        } elseif ($idp_display_name == 'Microsoft') {
+            echo '
+              <div class="card-text my-2">
+                There was a problem logging on. It appears that you have
+                attempted to use Microsoft as your identity provider, but your
+                name or email address was missing. To rectify this problem,
+                go to your <a target="_blank"
+                href="https://account.microsoft.com">Microsoft
+                Account page</a>, and enter your name and email address.
+                (All other Microsfot account information is not required by
+                the CILogon Service.)
+              </div>
+              <div class="card-text my-2">
+                After you have updated your Microsoft account profile, click
+                the "Proceed" button below and attempt to log on
+                with your Microsoft account again. If you have any questions,
+                please contact us at the email address at the bottom of the
+                page.
+              </div>';
         }
 
         static::printFormHead($redirect, 'get');
@@ -3044,8 +3070,9 @@ in "handleGotUser()" for valid IdPs for the skin.'
      * normalizeOAuth2IdP
      *
      * This function takes in a URL for one of the CILogon-supported OAuth2
-     * issuers (i.e., Google, GitHub, ORCID) and transforms it into a URL
-     * used by CILogon as shown in the 'Select an Identity Provider' list.
+     * issuers (i.e., Google, GitHub, ORCID, Microsoft) and transforms it
+     * into a URL used by CILogon as shown in the 'Select an Identity
+     * Provider' list.
      *
      * @param string An OAuth2 issuer string (i.e., 'iss') for one of the
      *        OAuth2 IdPs supported by CILogon.
@@ -3062,6 +3089,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
             $idp = 'https://github.com/login/oauth/authorize';
         } elseif (preg_match('%^https?://orcid.org%', $idp)) {
             $idp = 'https://orcid.org/oauth/authorize';
+        } elseif (preg_match('%^https?://login.microsoftonline.com%', $idp)) {
+            $idp = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
         }
         return $idp;
     }

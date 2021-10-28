@@ -7,6 +7,7 @@ use League\OAuth2\Client\Provider;
 use League\OAuth2\Client\Provider\Github;
 use League\OAuth2\Client\Provider\Google;
 use CILogon\OAuth2\Client\Provider\ORCID;
+use TheNetworg\OAuth2\Client\Provider\Azure;
 
 /**
  * OAuth2Provider
@@ -64,6 +65,12 @@ class OAuth2Provider
                 // CIL-799 Use Member API and fetch id_token in order to get 'amr' claim
                 $this->authzUrlOpts = ['scope' => ['openid']];
                 $extraparams = array('member' => 'true');
+            } elseif ($idpdn == 'microsoft') {
+                $classname     = 'TheNetworg\OAuth2\Client\Provider\Azure';
+                $this->authzUrlOpts = [
+                    'scope' => ['openid','email','profile'],
+                    'defaultEndPointVersion' => '2.0',
+                ];
             }
 
             $this->provider = new $classname(array_merge(array(

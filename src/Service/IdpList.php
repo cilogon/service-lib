@@ -1066,7 +1066,8 @@ EOT;
         if (
             ($entityID == Util::getAuthzUrl('Google')) ||
             ($entityID == Util::getAuthzUrl('GitHub')) ||
-            ($entityID == Util::getAuthzUrl('ORCID'))
+            ($entityID == Util::getAuthzUrl('ORCID')) ||
+            ($entityID == Util::getAuthzUrl('Microsoft'))
         ) {
             $retval = true;
         }
@@ -1270,6 +1271,11 @@ EOT;
             $shibarray['Home Page'] = 'https://orcid.org';
             $shibarray['Support Name'] = 'ORCID Help';
             $shibarray['Support Address'] = 'help@orcid.org';
+        } elseif ($entityID == Util::getAuthzUrl('Microsoft')) {
+            $shibarray['Organization Name'] = 'Microsoft';
+            $shibarray['Home Page'] = 'https://account.microsoft.com';
+            $shibarray['Support Name'] = 'Microsoft Help';
+            $shibarray['Support Address'] = 'help@microsoft.com';
         }
 
         return $shibarray;

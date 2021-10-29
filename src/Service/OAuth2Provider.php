@@ -67,10 +67,8 @@ class OAuth2Provider
                 $extraparams = array('member' => 'true');
             } elseif ($idpdn == 'microsoft') {
                 $classname     = 'TheNetworg\OAuth2\Client\Provider\Azure';
-                $this->authzUrlOpts = [
-                    'scope' => ['openid','email','profile'],
-                    'defaultEndPointVersion' => '2.0',
-                ];
+                $this->authzUrlOpts = ['scope' => ['openid','email','profile']];
+                $extraparams = array('defaultEndPointVersion' => '2.0');
             }
 
             $this->provider = new $classname(array_merge(array(

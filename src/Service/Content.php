@@ -2943,7 +2943,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         foreach (Util::$oauth2idps as $value) {
             // CIL-617 Show OAuth2 IdPs only if client_id is configured
             $client_id = constant(strtoupper($value) . '_OAUTH2_CLIENT_ID');
-            if (!empty($client_id)) {
+            if ((defined($client_id) && (!empty($client_id))) {
                 $retarray[Util::getAuthzUrl($value)]['Organization_Name'] =
                     $value;
                 $retarray[Util::getAuthzUrl($value)]['Display_Name'] =

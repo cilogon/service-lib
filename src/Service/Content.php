@@ -344,28 +344,59 @@ class Content
         </p>
         ';
 
+        // Count number of OAuth2 providers for commas/"or" in help text
+        $count = 0;
         if (isset($idps[$orcidauthz])) {
-            $selecthelp .= '<p> If you have a <a target=\'_blank\'
-            href=\'https://orcid.org/my-orcid\'>ORCID</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
+            $count++;
         }
         if (isset($idps[$googleauthz])) {
-            $selecthelp .= '<p>If you have a <a target=\'_blank\'
-            href=\'https://myaccount.google.com\'>Google</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
+            $count++;
         }
         if (isset($idps[$githubauthz])) {
-            $selecthelp .= '<p> If you have a <a target=\'_blank\'
-            href=\'https://github.com/settings/profile\'>GitHub</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
-            ';
+            $count++;
         }
         if (isset($idps[$microsoftauthz])) {
-            $selecthelp .= '<p>If you have a <a target=\'_blank\'
-            href=\'https://account.microsoft.com\'>Microsoft</a> account,
-            you can select it for authenticating to the CILogon Service.</p>
+            $count++;
+        }
+
+        if ($count > 0) {
+            $selecthelp .= '<p> If you have a ';
+
+            if (isset($idps[$orcidauthz])) {
+                $selecthelp .= '<a target=\'_blank\' ' .
+                   'href=\'https://orcid.org/my-orcid\'>ORCID</a>';
+                if ($count > 2) {
+                    $selecthelp .= ', ';
+                } elseif ($count == 2) {
+                    $selecthelp .= ' or ';
+                }
+                $count--;
+            }
+            if (isset($idps[$googleauthz])) {
+                $selecthelp .= '<a target=\'_blank\' ' .
+                    'href=\'https://myaccount.google.com\'>Google</a>';
+                if ($count > 2) {
+                    $selecthelp .= ', ';
+                } elseif ($count == 2) {
+                    $selecthelp .= ' or ';
+                }
+                $count--;
+            }
+            if (isset($idps[$githubauthz])) {
+                $selecthelp .= '<a target=\'_blank\' ' .
+                    'href=\'https://github.com/settings/profile\'>GitHub</a>';
+                if ($count == 2) {
+                    $selecthelp .= ' or ';
+                }
+                $count--;
+            }
+            if (isset($idps[$microsoftauthz])) {
+                $selecthelp .= '<a target=\'_blank\' ' .
+                    'href=\'https://account.microsoft.com\'>Microsoft</a>';
+            }
+
+            $selecthelp .= ' account, you can select it for ' .
+                'authenticating to the CILogon Service.</p>
             ';
         }
 

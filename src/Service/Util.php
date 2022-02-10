@@ -670,16 +670,22 @@ Remote Address= ' . $remoteaddr . '
      * getDN
      *
      * This function calculates and returns the 'domainname' for the
-     * server. It uses the hostname value calculated by getHN() and
-     * uses the last two segments.
+     * server. It returns DEFAULT_DOMAINNAME, defined in the top-level
+     * config.php file. If not defined, the last two segments of the
+     * hostname (from getHN()) is returned.
      *
      * @return string The 'Domainname' for the web server.
      */
     public static function getDN()
     {
-        $thedomainname = static::getHN();
-        if (preg_match('/[^\.]+\.[^\.]+$/', $thedomainname, $matches)) {
-            $thedomainname = $matches[0];
+        $thedomainname = '';
+        if ((defined('DEFAULT_DOMAINNAME')) && (!empty(DEFAULT_DOMAINNAME))) {
+            $thedomainname = DEFAULT_DOMAINNAME;
+        } else {
+            $thedomainname = static::getHN();
+            if (preg_match('/[^\.]+\.[^\.]+$/', $thedomainname, $matches)) {
+                $thedomainname = $matches[0];
+            }
         }
         return $thedomainname;
     }

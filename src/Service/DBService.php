@@ -878,99 +878,99 @@ class DBService
                 $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 if ($httpcode == 200) {
                     $success = true;
-                    if (preg_match('/status=([^\r\n]+)/', $output, $match)) {
-                        $this->status = (int)(urldecode($match[1]));
+                    if (preg_match('/status=([^\r\n]+)/', $output, $matches)) {
+                        $this->status = (int)(urldecode($matches[1]));
                     }
-                    if (preg_match('/user_uid=([^\r\n]+)/', $output, $match)) {
-                        $this->user_uid = urldecode($match[1]);
+                    if (preg_match('/user_uid=([^\r\n]+)/', $output, $matches)) {
+                        $this->user_uid = urldecode($matches[1]);
                     }
-                    if (preg_match('/remote_user=([^\r\n]+)/', $output, $match)) {
-                        $this->remote_user = urldecode($match[1]);
+                    if (preg_match('/remote_user=([^\r\n]+)/', $output, $matches)) {
+                        $this->remote_user = urldecode($matches[1]);
                     }
-                    if (preg_match('/idp=([^\r\n]+)/', $output, $match)) {
-                        $this->idp = urldecode($match[1]);
+                    if (preg_match('/idp=([^\r\n]+)/', $output, $matches)) {
+                        $this->idp = urldecode($matches[1]);
                     }
-                    if (preg_match('/idp_display_name=([^\r\n]+)/', $output, $match)) {
-                        $this->idp_display_name = urldecode($match[1]);
+                    if (preg_match('/idp_display_name=([^\r\n]+)/', $output, $matches)) {
+                        $this->idp_display_name = urldecode($matches[1]);
                     }
-                    if (preg_match('/first_name=([^\r\n]+)/', $output, $match)) {
-                        $this->first_name = urldecode($match[1]);
+                    if (preg_match('/first_name=([^\r\n]+)/', $output, $matches)) {
+                        $this->first_name = urldecode($matches[1]);
                     }
-                    if (preg_match('/last_name=([^\r\n]+)/', $output, $match)) {
-                        $this->last_name = urldecode($match[1]);
+                    if (preg_match('/last_name=([^\r\n]+)/', $output, $matches)) {
+                        $this->last_name = urldecode($matches[1]);
                     }
-                    if (preg_match('/[^_]display_name=([^\r\n]+)/', $output, $match)) {
-                        $this->display_name = urldecode($match[1]);
+                    if (preg_match('/[^_]display_name=([^\r\n]+)/', $output, $matches)) {
+                        $this->display_name = urldecode($matches[1]);
                     }
-                    if (preg_match('/email=([^\r\n]+)/', $output, $match)) {
-                        $this->email = urldecode($match[1]);
+                    if (preg_match('/email=([^\r\n]+)/', $output, $matches)) {
+                        $this->email = urldecode($matches[1]);
                     }
-                    if (preg_match('/distinguished_name=([^\r\n]+)/', $output, $match)) {
-                        $this->distinguished_name = urldecode($match[1]);
+                    if (preg_match('/distinguished_name=([^\r\n]+)/', $output, $matches)) {
+                        $this->distinguished_name = urldecode($matches[1]);
                     }
-                    if (preg_match('/eppn=([^\r\n]+)/', $output, $match)) {
-                        $this->eppn = urldecode($match[1]);
+                    if (preg_match('/eppn=([^\r\n]+)/', $output, $matches)) {
+                        $this->eppn = urldecode($matches[1]);
                     }
-                    if (preg_match('/eptid=([^\r\n]+)/', $output, $match)) {
-                        $this->eptid = urldecode($match[1]);
+                    if (preg_match('/eptid=([^\r\n]+)/', $output, $matches)) {
+                        $this->eptid = urldecode($matches[1]);
                     }
-                    if (preg_match('/open_id=([^\r\n]+)/', $output, $match)) {
-                        $this->open_id = urldecode($match[1]);
+                    if (preg_match('/open_id=([^\r\n]+)/', $output, $matches)) {
+                        $this->open_id = urldecode($matches[1]);
                     }
-                    if (preg_match('/oidc=([^\r\n]+)/', $output, $match)) {
-                        $this->oidc = urldecode($match[1]);
+                    if (preg_match('/oidc=([^\r\n]+)/', $output, $matches)) {
+                        $this->oidc = urldecode($matches[1]);
                     }
-                    if (preg_match('/subject_id=([^\r\n]+)/', $output, $match)) {
-                        $this->subject_id = urldecode($match[1]);
+                    if (preg_match('/subject_id=([^\r\n]+)/', $output, $matches)) {
+                        $this->subject_id = urldecode($matches[1]);
                     }
-                    if (preg_match('/pairwise_id=([^\r\n]+)/', $output, $match)) {
-                        $this->pairwise_id = urldecode($match[1]);
+                    if (preg_match('/pairwise_id=([^\r\n]+)/', $output, $matches)) {
+                        $this->pairwise_id = urldecode($matches[1]);
                     }
-                    if (preg_match('/affiliation=([^\r\n]+)/', $output, $match)) {
-                        $this->affiliation = urldecode($match[1]);
+                    if (preg_match('/affiliation=([^\r\n]+)/', $output, $matches)) {
+                        $this->affiliation = urldecode($matches[1]);
                     }
-                    if (preg_match('/ou=([^\r\n]+)/', $output, $match)) {
-                        $this->ou = urldecode($match[1]);
+                    if (preg_match('/ou=([^\r\n]+)/', $output, $matches)) {
+                        $this->ou = urldecode($matches[1]);
                     }
-                    if (preg_match('/attr_json=([^\r\n]+)/', $output, $match)) {
+                    if (preg_match('/attr_json=([^\r\n]+)/', $output, $matches)) {
                         // Decode $attr_json into class members later
-                        $attr_json = urldecode($match[1]);
+                        $attr_json = urldecode($matches[1]);
                     }
-                    if (preg_match('/serial_string=([^\r\n]+)/', $output, $match)) {
-                        $this->serial_string = urldecode($match[1]);
+                    if (preg_match('/serial_string=([^\r\n]+)/', $output, $matches)) {
+                        $this->serial_string = urldecode($matches[1]);
                     }
-                    if (preg_match('/create_time=([^\r\n]+)/', $output, $match)) {
-                        $this->create_time = urldecode($match[1]);
+                    if (preg_match('/create_time=([^\r\n]+)/', $output, $matches)) {
+                        $this->create_time = urldecode($matches[1]);
                     }
-                    if (preg_match('/oauth_token=([^\r\n]+)/', $output, $match)) {
-                        $this->oauth_token = urldecode($match[1]);
+                    if (preg_match('/oauth_token=([^\r\n]+)/', $output, $matches)) {
+                        $this->oauth_token = urldecode($matches[1]);
                     }
-                    if (preg_match('/cilogon_callback=([^\r\n]+)/', $output, $match)) {
-                        $this->cilogon_callback = urldecode($match[1]);
+                    if (preg_match('/cilogon_callback=([^\r\n]+)/', $output, $matches)) {
+                        $this->cilogon_callback = urldecode($matches[1]);
                     }
-                    if (preg_match('/cilogon_success=([^\r\n]+)/', $output, $match)) {
-                        $this->cilogon_success = urldecode($match[1]);
+                    if (preg_match('/cilogon_success=([^\r\n]+)/', $output, $matches)) {
+                        $this->cilogon_success = urldecode($matches[1]);
                     }
-                    if (preg_match('/cilogon_failure=([^\r\n]+)/', $output, $match)) {
-                        $this->cilogon_failure = urldecode($match[1]);
+                    if (preg_match('/cilogon_failure=([^\r\n]+)/', $output, $matches)) {
+                        $this->cilogon_failure = urldecode($matches[1]);
                     }
-                    if (preg_match('/cilogon_portal_name=([^\r\n]+)/', $output, $match)) {
-                        $this->cilogon_portal_name = urldecode($match[1]);
+                    if (preg_match('/cilogon_portal_name=([^\r\n]+)/', $output, $matches)) {
+                        $this->cilogon_portal_name = urldecode($matches[1]);
                     }
-                    if (preg_match('/user_code=([^\r\n]+)/', $output, $match)) {
-                        $this->user_code = urldecode($match[1]);
+                    if (preg_match('/user_code=([^\r\n]+)/', $output, $matches)) {
+                        $this->user_code = urldecode($matches[1]);
                     }
-                    if (preg_match('/client_id=([^\r\n]+)/', $output, $match)) {
-                        $this->client_id = urldecode($match[1]);
+                    if (preg_match('/client_id=([^\r\n]+)/', $output, $matches)) {
+                        $this->client_id = urldecode($matches[1]);
                     }
-                    if (preg_match('/scope=([^\r\n]+)/', $output, $match)) {
-                        $this->scope = urldecode($match[1]);
+                    if (preg_match('/scope=([^\r\n]+)/', $output, $matches)) {
+                        $this->scope = urldecode($matches[1]);
                     }
-                    if (preg_match('/grant=([^\r\n]+)/', $output, $match)) {
-                        $this->grant = urldecode($match[1]);
+                    if (preg_match('/grant=([^\r\n]+)/', $output, $matches)) {
+                        $this->grant = urldecode($matches[1]);
                     }
-                    if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $match)) {
-                        foreach ($match[1] as $value) {
+                    if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $matches)) {
+                        foreach ($matches[1] as $value) {
                             $this->idp_uids[] = urldecode($value);
                         }
                     }

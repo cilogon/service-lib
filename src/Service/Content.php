@@ -589,9 +589,9 @@ class Content
             $p12link = '';
             $p12linkisactive = false;
             $p12 = Util::getSessionVar('p12');
-            if (preg_match('/([^\s]*)\s(.*)/', $p12, $match)) {
-                $p12expire = $match[1];
-                $p12link = $match[2];
+            if (preg_match('/([^\s]*)\s(.*)/', $p12, $matches)) {
+                $p12expire = $matches[1];
+                $p12link = $matches[2];
             }
 
             if (
@@ -2785,13 +2785,13 @@ in "handleGotUser()" for valid IdPs for the skin.'
                     '-----BEGIN RSA PRIVATE KEY-----([^-]+)' .
                     '-----END RSA PRIVATE KEY-----/',
                     $cert,
-                    $match
+                    $matches
                 )
             ) {
                 $cert2 = "-----BEGIN RSA PRIVATE KEY-----" .
-                         $match[2] . "-----END RSA PRIVATE KEY-----\n" .
+                         $matches[2] . "-----END RSA PRIVATE KEY-----\n" .
                          "-----BEGIN CERTIFICATE-----" .
-                         $match[1] . "-----END CERTIFICATE-----";
+                         $matches[1] . "-----END CERTIFICATE-----";
             }
 
             if (strlen($cert2) > 0) { // Successfully got a certificate!
@@ -2886,11 +2886,11 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 (preg_match(
                     '%/DC=(.*)/DC=(.*)/C=(.*)/O=(.*)/CN=(.*)%',
                     $dn,
-                    $match
+                    $matches
                 ))
             ) {
-                array_shift($match);
-                $m = array_reverse(Net_LDAP2_Util::escape_dn_value($match));
+                array_shift($matches);
+                $m = array_reverse(Net_LDAP2_Util::escape_dn_value($matches));
                 $newdn = "CN=$m[0],O=$m[1],C=$m[2],DC=$m[3],DC=$m[4]";
             }
         }

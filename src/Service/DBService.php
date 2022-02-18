@@ -383,6 +383,24 @@ class DBService
     public $idp_uids;
 
     /**
+     * @var string|null $error OAuth2/OIDC authentication error response
+     *      code
+     */
+    public $error;
+
+    /**
+     * @var string|null $error_description Optional OAuth2/OIDC
+     *      authentication error response human-readable description
+     */
+    public $error_description;
+
+    /**
+     * @var string|null $error_uri Optional OAuth2/OIDC authentication error
+     *      response web page of additional error information
+     */
+    public $error_uri;
+
+    /**
      * @var string|null $dbservice URL The URL to use for the dbService
      */
     private $dbserviceurl;
@@ -439,6 +457,7 @@ class DBService
         $this->clearPortal();
         $this->clearUserCode();
         $this->clearIdps();
+        $this->clearErrorResponse();
     }
 
     /**
@@ -499,6 +518,20 @@ class DBService
     {
         $this->status = null;
         $this->idp_uids = array();
+    }
+
+    /**
+     * clearErrorResponse
+     *
+     * Set the class member variables associated with setTransactionState()
+     * to 'null'.
+     */
+    public function clearErrorResponse()
+    {
+        $this->status = null;
+        $this->error = null;
+        $this->error_description = null;
+        $this->error_uri = null;
     }
 
     /**
@@ -757,6 +790,7 @@ class DBService
         $retval = false;
 
         if (defined('OAUTH2_DBSERVICE_URL')) {
+            $this->clearErrorResponse();
             $this->setDBServiceURL(OAUTH2_DBSERVICE_URL);
             $retval = $this->call(
                 'action=setTransactionState' .
@@ -974,6 +1008,15 @@ class DBService
                             $this->idp_uids[] = urldecode($value);
                         }
                     }
+                    if (preg_match('/error=([^\r\n]+)/', $output, $matches)) {
+                        $this->error = urldecode($matches[1]);
+                    }
+                    if (preg_match('/error_description=([^\r\n]+)/', $output, $matches)) {
+                        $this->error_description = urldecode($matches[1]);
+                    }
+                    if (preg_match('/error_uri=([^\r\n]+)/', $output, $matches)) {
+                        $this->error_uri = urldecode($matches[1]);
+                    }
                 }
             }
             curl_close($ch);
@@ -1154,6 +1197,15 @@ class DBService
                 echo "    $value\n";
             }
             echo "}\n";
+        }
+        if (!is_null($this->error)) {
+            echo "scope=$this->error\n";
+        }
+        if (!is_null($this->error_description)) {
+            echo "scope=$this->error\n";
+        }
+        if (!is_null($this->error_uri)) {
+            echo "scope=$this->error\n";
         }
     }
 }

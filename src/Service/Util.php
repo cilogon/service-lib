@@ -974,11 +974,6 @@ Remote Address= ' . $remoteaddr . '
     {
         static::unsetSessionVar('submit');
 
-        // Specific to 'Download Certificate' page
-        static::unsetSessionVar('p12');
-        static::unsetSessionVar('p12lifetime');
-        static::unsetSessionVar('p12multiplier');
-
         // Specific to OAuth 1.0a flow
         static::unsetSessionVar('portalstatus');
         static::unsetSessionVar('callbackuri');
@@ -989,6 +984,8 @@ Remote Address= ' . $remoteaddr . '
 
         // Specific to OIDC flow
         static::unsetSessionVar('clientparams');
+
+        static::unsetP12SessionVars();
     }
 
     /**
@@ -1009,6 +1006,19 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('distinguished_name');
         static::unsetSessionVar('authntime');
         static::unsetSessionVar('cilogon_skin');
+    }
+
+    /**
+     * unsetP12SessionVars
+     *
+     * This function removes all of the PHP session variables related to
+     * the 'Download Certificate' page.
+     */
+    public static function unsetP12SessionVars()
+    {
+        static::unsetSessionVar('p12');
+        static::unsetSessionVar('p12lifetime');
+        static::unsetSessionVar('p12multiplier');
     }
 
     /**
@@ -1494,5 +1504,346 @@ Remote Address= ' . $remoteaddr . '
                 $log->error("Error writing XSEDE USAGE file $filename: $error");
             }
         }
+    }
+
+    /**
+     * updateIdPList
+     *
+     * This function is called by the '/updateidplist/' endpoint to update the CILogon
+     * idplist.xml and idplist.json files. These files are 'pared down' versions of
+     * the IdP-specific InCommon-metadata.xml file, extracting just the useful
+     * portions of XML for display on CILogon. This endpoint downloads the InCommon
+     * metadata and creates both idplist.xml and idplist.json. It then looks for
+     * existing idplist.{json,xml} files and sees if there are any differences. If so,
+     * it prints out the differences and sends email. It also checks for newly
+     * added IdPs and sends email. Finally, it copies the newly created idplist
+     * files to the old location.
+     */
+    public static function updateIdPList()
+    {
+        // Use a semaphore to prevent multiple processes running at the same time
+        $idplist_dir = dirname(DEFAULT_IDP_JSON);
+        $check_filename = $idplist_dir . '/.last_checked';
+        $key = ftok($check_filename, '1');
+        if ($key == -1) {
+            echo "<p>Another process is running.</p>\n";
+            return;
+        }
+        $semaphore = sem_get($key, 1);
+        if (($semaphore === false) || (sem_acquire($semaphore, 1) === false)) {
+            echo "<p>Another process is running.</p>\n";
+            return;
+        }
+
+        $mailto = EMAIL_ALERTS;
+        $mailtoidp = defined('EMAIL_IDP_UPDATES') ? EMAIL_ALERTS . ',' . EMAIL_IDP_UPDATES : '';
+        $mailfrom = 'From: ' . EMAIL_ALERTS . "\r\n" . 'X-Mailer: PHP/' . phpversion();
+        $httphost = static::getHN();
+
+        $needtowait = static::checkFileWait($check_filename);
+        if ($needtowait > 0) {
+            echo "<p>Please wait $needtowait seconds.</p>\n";
+            return;
+        }
+
+        // Download InCommon metadata to a new temporary directory .
+        // Be sure to delete the temporary directory before script exit.
+        $tmpdir = static::tempDir(sys_get_temp_dir());
+        register_shutdown_function(['CILogon\Service\Util','deleteDir'], $tmpdir);
+        $tmpincommon = $tmpdir . '/InCommon-metadata.xml';
+        $incommon_url = 'https://mdq.incommon.org/entities/idps/all';
+        $incommondownloaded = false;
+        if (($ch = curl_init()) !== false) {
+            if (($fp = fopen($tmpincommon, 'w')) !== false) {
+                curl_setopt($ch, CURLOPT_URL, $incommon_url);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_FILE, $fp);
+                $incommondownloaded = curl_exec($ch);
+                fflush($fp);
+                fclose($fp);
+            }
+            curl_close($ch);
+        }
+
+        if (!$incommondownloaded) {
+            $errmsg = "Error: Unable to save InCommon-metadata.xml to temporary directory.";
+            echo "<p>$errmsg</p>\n";
+            mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+            http_response_code(500);
+            return;
+        }
+
+        // Now, create new idplist.xml and idplist.json files from the
+        // InCommon Metadata.
+        $tmpxml = $tmpdir . '/idplist.xml';
+        $newidplist = new IdpList($tmpxml, $tmpincommon, false, 'xml');
+        $newidplist->create();
+        if (!$newidplist->write('xml')) {
+            $errmsg = "Error: Unable to create temporary idplist.xml file.";
+            echo "<p>$errmsg</p>\n";
+            mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+            http_response_code(500);
+            return;
+        }
+        $tmpjson = $tmpdir . '/idplist.json';
+        $newidplist->setFilename($tmpjson);
+        if (!$newidplist->write('json')) {
+            $errmsg = "Error: Unable to create temporary idplist.json file.";
+            echo "<p>$errmsg</p>\n";
+            mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+            http_response_code(500);
+            return;
+        }
+
+        // Try to read in an existing idplist.xml file so we can do a 'diff' later.
+        $idpxml_filename = preg_replace('/\.json$/', '.xml', DEFAULT_IDP_JSON);
+        $oldidplist = new IdpList($idpxml_filename, '', false, 'xml');
+
+        // If we successfully read in an existing idplist.xml file,
+        // check for differences, and also look for newly added IdPs.
+        $oldidplistempty = true;
+        $oldidplistdiff = false;
+        $idpemail = '';
+        if (!empty($oldidplist->idparray)) {
+            $oldidplistempty = false;
+
+            // Check for differences using weird json_encode method found at
+            // https://stackoverflow.com/a/42530586/12381604
+            $diffarray = array_map(
+                'json_decode',
+                array_merge(
+                    array_diff(
+                        array_map('json_encode', $newidplist->idparray),
+                        array_map('json_encode', $oldidplist->idparray)
+                    ),
+                    array_diff(
+                        array_map('json_encode', $oldidplist->idparray),
+                        array_map('json_encode', $newidplist->idparray)
+                    )
+                )
+            );
+
+            if (!empty($diffarray)) {
+                $oldidplistdiff = true;
+
+                $oldIdPs = array();
+                $newIdPs = array();
+                $oldEntityIDs = $oldidplist->getEntityIDs();
+                $newEntityIDs = $newidplist->getEntityIDs();
+
+                // Check to see if any new IdPs were added to the InCommon metadata.
+                if (!empty($oldEntityIDs)) {
+                    foreach ($newEntityIDs as $value) {
+                        if (!in_array($value, $oldEntityIDs)) {
+                            $newIdPs[$value] = 1;
+                        }
+                    }
+                }
+
+                // Check to see if any old IdPs were removed.
+                if (!empty($newEntityIDs)) {
+                    foreach ($oldEntityIDs as $value) {
+                        if (!in_array($value, $newEntityIDs)) {
+                            $oldIdPs[$value] = 1;
+                        }
+                    }
+                }
+
+                // If new IdPs were added or old IdPs were removed, save them in
+                // a string to be emailed to idp-updates@cilogon.org.
+                if ((!empty($newIdPs)) || (!empty($oldIdPs))) {
+                    // First, show any new IdPs added
+                    if (empty($newIdPs)) {
+                        $idpemail .= "No new Identity Providers were found in metadata.\n";
+                    } else {
+                        $plural = (count($newIdPs) > 1);
+                        $idpemail .= ($plural ? 'New' : 'A new') . ' Identity Provider' .
+                            ($plural ? 's were' : ' was') . ' found in metadata ' .
+                            "and\nADDED to the list of available IdPs.\n" .
+                            '--------------------------------------------------------------' .
+                            "\n\n";
+                        foreach ($newIdPs as $entityID => $value) {
+                            $idpemail .= "EntityId               = $entityID\n";
+                            $idpemail .= "Organization Name      = " .
+                                $newidplist->getOrganizationName($entityID) . "\n";
+                            $idpemail .= "Display Name           = " .
+                                $newidplist->getDisplayName($entityID) . "\n";
+                            if ($newidplist->isRegisteredByInCommon($entityID)) {
+                                $idpemail .= "Registered by InCommon = Yes\n";
+                            }
+                            if ($newidplist->isInCommonRandS($entityID)) {
+                                $idpemail .= "InCommon R & S         = Yes\n";
+                            }
+                            if ($newidplist->isREFEDSRandS($entityID)) {
+                                $idpemail .= "REFEDS R & S           = Yes\n";
+                            }
+                            if ($newidplist->isSIRTFI($entityID)) {
+                                $idpemail .= "SIRTFI                 = Yes\n";
+                            }
+                            $idpemail .= "\n";
+                        }
+                    }
+
+                    // Then, show any old IdPs removed
+                    if (!empty($oldIdPs)) {
+                        $idpemail .= "\n" .
+                            '==============================================================' .
+                            "\n\n" .
+                            'One or more Identity Providers were removed from ' .
+                            "metadata and\n" .
+                            "DELETED from the list of available IdPs.\n" .
+                            '--------------------------------------------------------------' .
+                            "\n\n";
+                        foreach ($oldIdPs as $entityID => $value) {
+                            $idpemail .= "EntityId               = $entityID\n";
+                            $idpemail .= "Organization Name      = " .
+                                $oldidplist->getOrganizationName($entityID) . "\n";
+                            $idpemail .= "Display Name           = " .
+                                $oldidplist->getDisplayName($entityID) . "\n";
+                            if ($oldidplist->isRegisteredByInCommon($entityID)) {
+                                $idpemail .= "Registered by InCommon = Yes\n";
+                            }
+                            if ($oldidplist->isInCommonRandS($entityID)) {
+                                $idpemail .= "InCommon R & S         = Yes\n";
+                            }
+                            if ($oldidplist->isREFEDSRandS($entityID)) {
+                                $idpemail .= "REFEDS R & S           = Yes\n";
+                            }
+                            if ($oldidplist->isSIRTFI($entityID)) {
+                                $idpemail .= "SIRTFI                 = Yes\n";
+                            }
+                            $idpemail .= "\n";
+                        }
+                    }
+                }
+            }
+        }
+
+        // If we found new IdPs, print them out and send email (if on prod).
+        if (strlen($idpemail) > 0) {
+            echo "<xmp>\n";
+            echo $idpemail;
+            echo "</xmp>\n";
+
+            if (strlen($mailtoidp) > 0) {
+                // Send "New IdPs Added" email only from production server
+                if (
+                    ($httphost == 'cilogon.org') ||
+                    ($httphost == 'polo1.cilogon.org')
+                ) {
+                    mail(
+                        $mailtoidp,
+                        "CILogon Service on $httphost - New IdP Automatically Added",
+                        $idpemail,
+                        $mailfrom
+                    );
+                }
+            }
+        }
+
+        // If other differences were found, do an actual 'diff' and send email.
+        if ($oldidplistdiff) {
+            $idpdiff = `diff -u $idpxml_filename $tmpxml 2>&1`;
+            echo "<xmp>\n\n";
+            echo $idpdiff;
+            echo "</xmp>\n";
+
+            mail(
+                $mailto,
+                "idplist.xml changed on $httphost",
+                "idplist.xml changed on $httphost\n\n" . $idpdiff,
+                $mailfrom
+            );
+        }
+
+        // Copy temporary idplist.{json,xml} files to production directory.
+        if ($oldidplistempty || $oldidplistdiff) {
+            if (copy($tmpxml, $idplist_dir . '/idplist.xml')) {
+                @chmod($idpxml_filename, 0664);
+                @chgrp($idpxml_filename, 'apache');
+            } else {
+                $errmsg = "Error: Unable to copy idplist.xml to destination.";
+                echo "<p>$errmsg</p>\n";
+                mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+                http_response_code(500);
+                return;
+            }
+            if (copy($tmpjson, $idplist_dir . '/idplist.json')) {
+                @chmod(DEFAULT_IDP_JSON, 0664);
+                @chgrp(DEFAULT_IDP_JSON, 'apache');
+            } else {
+                $errmsg = "Error: Unable to copy idplist.json to destination.";
+                echo "<p>$errmsg</p>\n";
+                mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+                http_response_code(500);
+                return;
+            }
+
+            if ($oldidplistempty) {
+                echo "<h3>New idplist.{json,xml} files were created.</h3>\n";
+            } else {
+                echo "<h3>Existing idplist.{json,xml} files were updated.</h3>\n";
+            }
+        } else {
+            echo "<p>No change detected in InCommon metadata.</p>\n";
+        }
+
+        // Write the current time to .last_checked
+        file_put_contents($check_filename, time());
+        @sem_release($semaphore);
+    }
+
+    /**
+     * cleanCerts()
+     *
+     * This function is called by the '/cleancerts/' endpoint. It scans the
+     * DEFAULT_PKCS12_DIR for certificates/directories that are older than
+     * 10 minutes and removes them. There is a 5 minute timeout so that
+     * this function doesn't run too frequently.
+     */
+    public static function cleanCerts()
+    {
+        $check_filename = DEFAULT_PKCS12_DIR . '.last_checked';
+
+        $needtowait = static::checkFileWait($check_filename);
+        if ($needtowait > 0) {
+            echo "<p>Please wait $needtowait seconds.</p>\n";
+            return;
+        }
+
+        $numdel = static::cleanupPKCS12();
+        echo "<p>$numdel certificate(s) cleaned up.</p>\n";
+
+        // Write the current time to .last_checked
+        file_put_contents($check_filename, time());
+    }
+
+    /**
+     * checkFileWait
+     *
+     * This function assumes the existence of a file containing a Unix Epoch
+     * timestamp. The function returns the difference of a $timeout (defaults to 300
+     * seconds / 5 minutes) and the "age" of the timestamp (i.e., current time - file
+     * time). For example, if the file timestamp is 4 minutes ago, and the $timeout is
+     * 5 minutes, then 1 minute is returned. Negative differences are returned as 0
+     * letting the calling function know that the file timestamp is older than the
+     * timeout.
+     *
+     * @param string $filename The full path name of the file to be checked.
+     * @param int $timeout The time in seconds of how old the $filename must be
+     *        before the file should be written again. Defaults to 300 (5 minutes).
+     * @return int The number of seconds the calling function should wait before the
+     *         $filename's timestamp 'expires', or 0 if the timestamp is older than
+     *         the $timeout.
+     */
+    public static function checkFileWait($filename, $timeout = 300)
+    {
+        $lastcheck = (int)(file_get_contents($filename) ?: 0);
+        $needtowait = $timeout - abs(time() - $lastcheck);
+        if ($needtowait < 0) {
+            $needtowait = 0;
+        }
+
+        return $needtowait;
     }
 }

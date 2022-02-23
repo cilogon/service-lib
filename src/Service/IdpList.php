@@ -237,7 +237,7 @@ class IdpList
             $this->idpdom->preserveWhiteSpace = false;
             $this->idpdom->formatOutput = true;
             $filename = $this->getFilename();
-            $tmpfname = tempnam('/tmp', 'IDP');
+            $tmpfname = tempnam(sys_get_temp_dir(), 'IDP');
             if (
                 ($this->idpdom->save($tmpfname) > 0) &&
                 (@rename($tmpfname, $filename))
@@ -268,7 +268,7 @@ class IdpList
 
         if (!is_null($this->idparray)) {
             $filename = $this->getFilename();
-            $tmpfname = tempnam('/tmp', 'JSON');
+            $tmpfname = tempnam(sys_get_temp_dir(), 'JSON');
             $json = json_encode(
                 $this->idparray,
                 JSON_FORCE_OBJECT | JSON_UNESCAPED_SLASHES

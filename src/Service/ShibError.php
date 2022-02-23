@@ -32,7 +32,6 @@ use CILogon\Service\Loggit;
  */
 class ShibError
 {
-
     /**
      * @var array $errorarray Holds the values of the various shibboleth
      *      error parameters

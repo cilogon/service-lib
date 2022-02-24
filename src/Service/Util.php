@@ -1509,19 +1509,20 @@ Remote Address= ' . $remoteaddr . '
     /**
      * updateIdPList
      *
-     * This function is called by the '/updateidplist/' endpoint to update the CILogon
-     * idplist.xml and idplist.json files. These files are 'pared down' versions of
-     * the IdP-specific InCommon-metadata.xml file, extracting just the useful
-     * portions of XML for display on CILogon. This endpoint downloads the InCommon
-     * metadata and creates both idplist.xml and idplist.json. It then looks for
-     * existing idplist.{json,xml} files and sees if there are any differences. If so,
-     * it prints out the differences and sends email. It also checks for newly
-     * added IdPs and sends email. Finally, it copies the newly created idplist
-     * files to the old location.
+     * This function is called by the '/updateidplist/' endpoint to update
+     * the CILogon idplist.xml and idplist.json files. These files are 'pared
+     * down' versions of the IdP-specific InCommon-metadata.xml file,
+     * extracting just the useful portions of XML for display on CILogon.
+     * This endpoint downloads the InCommon metadata and creates both
+     * idplist.xml and idplist.json. It then looks for existing
+     * idplist.{json,xml} files and sees if there are any differences. If so,
+     * it prints out the differences and sends email. It also checks for
+     * newly added IdPs and sends email. Finally, it copies the newly created
+     * idplist files to the old location.
      */
     public static function updateIdPList()
     {
-        // Use a semaphore to prevent multiple processes running at the same time
+        // Use a semaphore to prevent processes running at the same time.
         $idplist_dir = dirname(DEFAULT_IDP_JSON);
         $check_filename = $idplist_dir . '/.last_checked';
         $key = ftok($check_filename, '1');
@@ -1536,22 +1537,41 @@ Remote Address= ' . $remoteaddr . '
         }
 
         $mailto = EMAIL_ALERTS;
-        $mailtoidp = defined('EMAIL_IDP_UPDATES') ? EMAIL_ALERTS . ',' . EMAIL_IDP_UPDATES : '';
-        $mailfrom = 'From: ' . EMAIL_ALERTS . "\r\n" . 'X-Mailer: PHP/' . phpversion();
+        $mailtoidp = defined('EMAIL_IDP_UPDATES') ?
+            EMAIL_ALERTS . ',' . EMAIL_IDP_UPDATES : '';
+        $mailfrom = 'From: ' . EMAIL_ALERTS . "\r\n" .
+            'X-Mailer: PHP/' . phpversion();
         $httphost = static::getHN();
 
-        $needtowait = static::checkFileWait($check_filename);
-        if ($needtowait > 0) {
-            echo "<p>Please wait $needtowait seconds.</p>\n";
+        // Get the HEAD of the InCommon Metadata and check Last-Modified.
+        $incommon_url = 'https://mdq.incommon.org/entities/idps/all';
+        $head = get_headers($incommon_url, true);
+        if (($head === false) || (!array_key_exists('Last-Modified', $head))) {
+            $errmsg = "Error: Unable to download InCommon-metadata.xml headers.";
+            echo "<p>$errmsg</p>\n";
+            mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+            http_response_code(500);
             return;
         }
 
-        // Download InCommon metadata to a new temporary directory .
-        // Be sure to delete the temporary directory before script exit.
+        // Compare the HEAD Last-Modified with the previously saved timestamp.
+        $last_modified = $head['Last-Modified'];
+        $saved_modified = file_get_contents($check_filename);
+        if (
+            ($saved_modified !== false) &&
+            (strcmp($last_modified, $saved_modified) == 0)
+        ) {
+            echo "<p>No change detected in InCommon metadata.</p>\n";
+            return;
+        }
+        // Save the Last-Modified timestamp.
+        file_put_contents($check_filename, $last_modified);
+
+        // Download InCommon metadata to a new temporary directory.
+        // Delete the temporary directory when the script exits.
         $tmpdir = static::tempDir(sys_get_temp_dir());
         register_shutdown_function(['CILogon\Service\Util','deleteDir'], $tmpdir);
         $tmpincommon = $tmpdir . '/InCommon-metadata.xml';
-        $incommon_url = 'https://mdq.incommon.org/entities/idps/all';
         $incommondownloaded = false;
         if (($ch = curl_init()) !== false) {
             if (($fp = fopen($tmpincommon, 'w')) !== false) {
@@ -1595,7 +1615,7 @@ Remote Address= ' . $remoteaddr . '
             return;
         }
 
-        // Try to read in an existing idplist.xml file so we can do a 'diff' later.
+        // Try to read in an existing idplist.xml file so we can 'diff' later
         $idpxml_filename = preg_replace('/\.json$/', '.xml', DEFAULT_IDP_JSON);
         $oldidplist = new IdpList($idpxml_filename, '', false, 'xml');
 
@@ -1631,7 +1651,7 @@ Remote Address= ' . $remoteaddr . '
                 $oldEntityIDs = $oldidplist->getEntityIDs();
                 $newEntityIDs = $newidplist->getEntityIDs();
 
-                // Check to see if any new IdPs were added to the InCommon metadata.
+                // Check to see if any new IdPs were added to the metadata.
                 if (!empty($oldEntityIDs)) {
                     foreach ($newEntityIDs as $value) {
                         if (!in_array($value, $oldEntityIDs)) {
@@ -1649,8 +1669,8 @@ Remote Address= ' . $remoteaddr . '
                     }
                 }
 
-                // If new IdPs were added or old IdPs were removed, save them in
-                // a string to be emailed to idp-updates@cilogon.org.
+                // If new IdPs were added or old IdPs were removed, save them
+                // in a string to be emailed to idp-updates@cilogon.org.
                 if ((!empty($newIdPs)) || (!empty($oldIdPs))) {
                     // First, show any new IdPs added
                     if (empty($newIdPs)) {
@@ -1726,7 +1746,7 @@ Remote Address= ' . $remoteaddr . '
             echo "</xmp>\n";
 
             if (strlen($mailtoidp) > 0) {
-                // Send "New IdPs Added" email only from production server
+                // Send "New IdPs Added" email only from production server.
                 if (
                     ($httphost == 'cilogon.org') ||
                     ($httphost == 'polo1.cilogon.org')
@@ -1788,8 +1808,6 @@ Remote Address= ' . $remoteaddr . '
             echo "<p>No change detected in InCommon metadata.</p>\n";
         }
 
-        // Write the current time to .last_checked
-        file_put_contents($check_filename, time());
         @sem_release($semaphore);
     }
 
@@ -1822,19 +1840,20 @@ Remote Address= ' . $remoteaddr . '
      * checkFileWait
      *
      * This function assumes the existence of a file containing a Unix Epoch
-     * timestamp. The function returns the difference of a $timeout (defaults to 300
-     * seconds / 5 minutes) and the "age" of the timestamp (i.e., current time - file
-     * time). For example, if the file timestamp is 4 minutes ago, and the $timeout is
-     * 5 minutes, then 1 minute is returned. Negative differences are returned as 0
-     * letting the calling function know that the file timestamp is older than the
-     * timeout.
+     * timestamp. The function returns the difference of a $timeout (defaults
+     * to 300 seconds / 5 minutes) and the "age" of the timestamp (i.e.,
+     * current time - file time). For example, if the file timestamp is
+     * 4 minutes ago, and the $timeout is 5 minutes, then 1 minute is returned.
+     * Negative differences are returned as 0 letting the calling function
+     * know that the file timestamp is older than the timeout.
      *
      * @param string $filename The full path name of the file to be checked.
-     * @param int $timeout The time in seconds of how old the $filename must be
-     *        before the file should be written again. Defaults to 300 (5 minutes).
-     * @return int The number of seconds the calling function should wait before the
-     *         $filename's timestamp 'expires', or 0 if the timestamp is older than
-     *         the $timeout.
+     * @param int $timeout The time in seconds of how old the $filename must
+     *        be before the file should be written again. Defaults to 300
+     *        seconds.
+     * @return int The number of seconds the calling function should wait
+     *         before the $filename's timestamp 'expires', or 0 if the
+     *         timestamp is older than the $timeout.
      */
     public static function checkFileWait($filename, $timeout = 300)
     {

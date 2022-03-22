@@ -1739,43 +1739,6 @@ Remote Address= ' . $remoteaddr . '
             }
         }
 
-        // If we found new IdPs, print them out and send email (if on prod).
-        if (strlen($idpemail) > 0) {
-            echo "<xmp>\n";
-            echo $idpemail;
-            echo "</xmp>\n";
-
-            if (strlen($mailtoidp) > 0) {
-                // Send "New IdPs Added" email only from production server.
-                if (
-                    ($httphost == 'cilogon.org') ||
-                    ($httphost == 'polo1.cilogon.org')
-                ) {
-                    mail(
-                        $mailtoidp,
-                        "CILogon Service on $httphost - New IdP Automatically Added",
-                        $idpemail,
-                        $mailfrom
-                    );
-                }
-            }
-        }
-
-        // If other differences were found, do an actual 'diff' and send email.
-        if ($oldidplistdiff) {
-            $idpdiff = `diff -u $idpxml_filename $tmpxml 2>&1`;
-            echo "<xmp>\n\n";
-            echo $idpdiff;
-            echo "</xmp>\n";
-
-            mail(
-                $mailto,
-                "idplist.xml changed on $httphost",
-                "idplist.xml changed on $httphost\n\n" . $idpdiff,
-                $mailfrom
-            );
-        }
-
         // Copy temporary idplist.{json,xml} files to production directory.
         if ($oldidplistempty || $oldidplistdiff) {
             if (copy($tmpxml, $idplist_dir . '/idplist.xml')) {
@@ -1797,6 +1760,43 @@ Remote Address= ' . $remoteaddr . '
                 mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
                 http_response_code(500);
                 return;
+            }
+
+            // If we found new IdPs, print them out and send email (if on prod).
+            if (strlen($idpemail) > 0) {
+                echo "<xmp>\n";
+                echo $idpemail;
+                echo "</xmp>\n";
+
+                if (strlen($mailtoidp) > 0) {
+                    // Send "New IdPs Added" email only from production server.
+                    if (
+                        ($httphost == 'cilogon.org') ||
+                        ($httphost == 'polo1.cilogon.org')
+                    ) {
+                        mail(
+                            $mailtoidp,
+                            "CILogon Service on $httphost - New IdP Automatically Added",
+                            $idpemail,
+                            $mailfrom
+                        );
+                    }
+                }
+            }
+
+            // If other differences were found, do an actual 'diff' and send email.
+            if ($oldidplistdiff) {
+                $idpdiff = `diff -u $idpxml_filename $tmpxml 2>&1`;
+                echo "<xmp>\n\n";
+                echo $idpdiff;
+                echo "</xmp>\n";
+
+                mail(
+                    $mailto,
+                    "idplist.xml changed on $httphost",
+                    "idplist.xml changed on $httphost\n\n" . $idpdiff,
+                    $mailfrom
+                );
             }
 
             if ($oldidplistempty) {

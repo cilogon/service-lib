@@ -1741,6 +1741,7 @@ Remote Address= ' . $remoteaddr . '
 
         // Copy temporary idplist.{json,xml} files to production directory.
         if ($oldidplistempty || $oldidplistdiff) {
+            $idpdiff = `diff -u $idpxml_filename $tmpxml 2>&1`;
             if (copy($tmpxml, $idplist_dir . '/idplist.xml')) {
                 @chmod($idpxml_filename, 0664);
                 @chgrp($idpxml_filename, 'apache');
@@ -1786,7 +1787,6 @@ Remote Address= ' . $remoteaddr . '
 
             // If other differences were found, do an actual 'diff' and send email.
             if ($oldidplistdiff) {
-                $idpdiff = `diff -u $idpxml_filename $tmpxml 2>&1`;
                 echo "<xmp>\n\n";
                 echo $idpdiff;
                 echo "</xmp>\n";

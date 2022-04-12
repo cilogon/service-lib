@@ -620,8 +620,8 @@ class Util
         $remotehost = gethostbyaddr($remoteaddr);
         $mailfrom = 'From: ' . EMAIL_ALERTS . "\r\n" .
                     'X-Mailer: PHP/' . phpversion();
-        $mailsubj = 'CILogon Service on ' . php_uname('n') .
-                    ' - ' . $summary;
+        $mailsubj = 'CILogon Service on ' . static::getHN() .
+                    ' (' . php_uname('n') . ') - ' . $summary;
         $mailmsg  = '
 CILogon Service - ' . $summary . '
 -----------------------------------------------------------

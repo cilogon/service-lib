@@ -2310,6 +2310,7 @@ class Content
      * redirectToGetShibUser
      *
      * This method redirects control flow to the getuser script for
+     * when the user logs in with a Shibboleth Identity Provider.
      * If the first parameter (a greenlit entityId) is not specified,
      * we check to see if either the providerId PHP session variable or the
      * providerId cookie is set (in that order) and use one if available.

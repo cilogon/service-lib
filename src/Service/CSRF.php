@@ -273,11 +273,11 @@ class CSRF
         $retval = false;  // Assume csrf values don't match
 
         $csrfcookievalue = $this->getTheCookie();
-        $csrfsesionvalue = $this->getTheSession();
+        $csrfsessionvalue = $this->getTheSession();
         if (
             (strlen($csrfcookievalue) > 0) &&
-            (strlen($csrfsesionvalue) > 0) &&
-            (strcmp($csrfcookievalue, $csrfsesionvalue) == 0)
+            (strlen($csrfsessionvalue) > 0) &&
+            (strcmp($csrfcookievalue, $csrfsessionvalue) == 0)
         ) {
             $retval = true;
         }

@@ -318,25 +318,29 @@ class CSRF
     public function verifyCookieAndGetSubmit($submit = 'submit')
     {
         $retval = '';
-        // First, check <form> hidden csrf element
-        if ($this->isCookieEqualToForm()) {
-            $retval = Util::getPostVar($submit);
-            // Hack for Duo Security - look for all uppercase e.g., 'SUBMIT'
-            if (strlen($retval) == 0) {
-                $retval = Util::getPostVar(strtoupper($submit));
+
+        // CIL-1247 Verify the CSRF cookie only if it's not empty
+        if (strlen($this->getTheCookie()) > 0) {
+            // First, check <form> hidden csrf element
+            if ($this->isCookieEqualToForm()) {
+                $retval = Util::getPostVar($submit);
+                // Hack for Duo Security - look for all uppercase e.g., 'SUBMIT'
+                if (strlen($retval) == 0) {
+                    $retval = Util::getPostVar(strtoupper($submit));
+                }
             }
-        }
-        // If <form> element missing or bad, check PHP session csrf variable
-        if ((strlen($retval) == 0) && ($this->isCookieEqualToSession())) {
-            $retval = Util::getSessionVar($submit);
-            $this->removeTheSession();  // No need to use it again
-        }
-        // If csrf failed or no 'submit' element in <form> or session,
-        // remove the csrf cookie.
-        if (strlen($retval) == 0) {
-            $this->removeTheCookie();
-            $log = new Loggit();
-            $log->info('CSRF check failed.');
+            // If <form> element missing or bad, check PHP session csrf variable
+            if ((strlen($retval) == 0) && ($this->isCookieEqualToSession())) {
+                $retval = Util::getSessionVar($submit);
+                $this->removeTheSession();  // No need to use it again
+            }
+            // If csrf failed or no 'submit' element in <form> or session,
+            // remove the csrf cookie.
+            if (strlen($retval) == 0) {
+                $this->removeTheCookie();
+                $log = new Loggit();
+                $log->info('CSRF check failed.');
+            }
         }
         return $retval;
     }

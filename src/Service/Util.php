@@ -263,6 +263,7 @@ class Util
         }
         setcookie($cookie, $value, $exp, '/', '.' . static::getDN(), true);
         $_COOKIE[$cookie] = $value;
+        static::dedupeCookies();
     }
 
     /**
@@ -278,6 +279,73 @@ class Util
     {
         setcookie($cookie, '', 1, '/', '.' . static::getDN(), true);
         unset($_COOKIE[$cookie]);
+        static::dedupeCookies();
+    }
+
+    /**
+     * dedupeCookies
+     *
+     * This function scans the list of 'Set-Cookie' headers and removes
+     * any duplicate entries, keeping only the most recent cookies.
+     * This function was adapted from code found at
+     * https://stackoverflow.com/a/43638878/12381604 .
+     */
+    public static function dedupeCookies()
+    {
+        if (!headers_sent()) {
+            $cookie_set = []; // Array to store the most recent cookies
+            $dedupe_cookies = false; // Multiple values detected for same cookie name?
+
+            foreach (headers_list() as $header_string) {
+                if (stripos($header_string, 'Set-Cookie:') !== false) {
+                    list($set_cookie, $cookie_string) = explode(':', $header_string, 2);
+                    // $set_cookie = 'Set-Cookie'
+                    // $cookie_string = ' CSRF=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT;
+                    //                   Max-Age=0; path=/; domain=.cilogon.org; secure'
+                    list ($cookie_name, $cookie_rest) = explode('=', trim($cookie_string), 2);
+                    // $cookie_name = 'CSRF'
+                    // $cookie_rest = 'deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT;
+                    //                 Max-Age=0; path=/; domain=.cilogon.org; secure'
+                    if (array_key_exists($cookie_name, $cookie_set)) {
+                        $dedupe_cookies = true;
+                    }
+                    $cookie_set[$cookie_name] = $cookie_rest; // Keeps the most recent
+                }
+            }
+
+            if ($dedupe_cookies) {
+                header_remove('Set-Cookie'); // Removes ALL cookies
+                foreach ($cookie_set as $name => $rest) {
+                    list ($value, $param_string) = explode(';', $rest, 2);
+                    // $value = 'deleted'
+                    // $param_string = ' expires=Thu, 01-Jan-1970 00:00:01 GMT;
+                    //                  Max-Age=0; path=/; domain=.cilogon.org; secure'
+                    // Put each cookie parameter in an array
+                    $params = explode(';', $param_string);
+                    $expires = 0;
+                    $path = '';
+                    $domain = '';
+                    $secure = false;
+                    $httponly = false;
+                    foreach ($params as $param) {
+                        if (preg_match('/^\s*Expires=(.*)/i', $param, $matches)) {
+                            $date = new DateTime($matches[1]);
+                            $expires = $date->format('U'); // Unix timestamp
+                        } elseif (preg_match('/^\s*Path=(.*)/i', $param, $matches)) {
+                            $path = $matches[1];
+                        } elseif (preg_match('/^\s*Domain=(.*)/i', $param, $matches)) {
+                            $domain = $matches[1];
+                        } elseif (preg_match('/^\s*Secure$/i', $param, $matches)) {
+                            $secure = true;
+                        } elseif (preg_match('/^\s*HttpOnly$/i', $param, $matches)) {
+                            $httponly = true;
+                        }
+                    }
+
+                    setrawcookie($name, $value, $expires, $path, $domain, $secure, $httponly);
+                }
+            }
+        }
     }
 
     /**

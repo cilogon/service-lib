@@ -15,6 +15,7 @@ use CILogon\Service\PortalCookie;
 use PEAR;
 use DB;
 use \DateTime;
+use \Exception;
 
 /**
  * Util
@@ -330,8 +331,13 @@ class Util
                     $httponly = false;
                     foreach ($params as $param) {
                         if (preg_match('/^\s*Expires=(.*)/i', $param, $matches)) {
-                            $date = new DateTime($matches[1]);
-                            $expires = $date->format('U'); // Unix timestamp
+                            try {
+                                $date = new DateTime($matches[1]);
+                                $expires = $date->format('U'); // Unix timestamp
+                            } catch (\Exception $e) {
+                                $log = new Loggit();
+                                $log->error('DateTime exception ' . $e->getMessage());
+                            }
                         } elseif (preg_match('/^\s*Path=(.*)/i', $param, $matches)) {
                             $path = $matches[1];
                         } elseif (preg_match('/^\s*Domain=(.*)/i', $param, $matches)) {

@@ -14,6 +14,7 @@ use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
 use PEAR;
 use DB;
+use \DateTime;
 
 /**
  * Util

@@ -1,3 +1,117 @@
+bfef176 2022-04-16 Catch potential Exception from DateTime()
+420bc6d 2022-04-16 Bug: need to 'use DateTime'
+9114351 2022-04-15 CIL-1247 De-duplicate Set-Cookie headers
+0b9d252 2022-04-14 CIL-1247 Verify CSRF cookie only when it's not empty
+f34a7a2 2022-04-12 Fix minor typos
+27efe11 2022-04-04 CIL-1215 Calculate diffs BEFORE copying tempfile
+a08fb6a 2022-03-21 CIL-1215 Send emails for /updateidplist/ AFTER copying files
+666b29c 2022-02-24 CIL-1190 Check Last-Modified timestamp of InCommon Metadata in /updateidplist/
+a244c99 2022-02-23 Move several endpoints' code to library functions.
+4d24b1a 2022-02-18 CIL-1187 Handle Authn error response fields from setTransactionState
+caa69db 2022-02-14 'match' is a reserved keyword in PHP 8
+fa59b4b 2022-02-10 CIL-1171 Optionally set domain name
+e5163b0 2021-11-18 Compact the popup help text for the OAuth2 providers down to a single sentence.
+24016b4 2021-11-01 Don't use a constant before checking if it's available.
+a034de7 2021-10-29 For Microsoft OAuth2, pass defaultEndPointVersion in the extraparams array.
+5a3ad36 2021-10-29 Call defined() on the OAuth2 CLIENT_ID DEFINE, not on the value.
+1decaf4 2021-10-29 Add missing parens.
+3cc498f 2021-10-29 Check OAuth2 CLIENT_ID is defined before using.
+c2642be 2021-10-28 CIL-1116 Attempt to get Microsoft Azure Active Directory IdP working.
+2465570 2021-10-20 Do not show 'system admins have been notified' when no email alert was sent.
+24008f6 2021-10-20 Add statusText() method to return human-readable version of current status. Also add array of client-initiated errors to ignore during sending of alert emails.
+de9c239 2021-10-20 CIL-1098 Update log messages for client-initiated errors.
+5f6b7eb 2021-10-19 CIL-1098 Don't send email for client-initiated errors.
+88fd4e0 2021-10-14 Update PHP libraries to latest versions.
+ea7c00e 2021-10-14 Update PHP libraries to latest versions.
+bca4696 2021-10-14 CIL-1103 Change default IdP from Google to ORCID.
+41bad29 2021-09-20 Define HOSTNAME_FOOTER to print out local hostname below page footer.
+89124e7 2021-09-10 CIL-1080 Hide problematic IdPs from 'Select an Identity Provider' list.
+44f8544 2021-08-27 CIL-1068 Add config option for custom favicon.
+50175e3 2021-08-10 Remove line-ending spaces.
+dd65e1e 2021-08-09 Update Bypass class documentation.
+111eb0e 2021-08-08 Change 'value' column from TEXT to VARCHAR(255).
+6710c4e 2021-08-07 Remove trailing spaces.
+426672c 2021-08-07 CIL-1052 Allow the 3 config.php *_ARRAYs to be stored in the database.  This needs a new class 'Bypass' which reads entries from a new database table 'bypass' and formats the results in arrays which match the existing arrays. If an ARRAY is defined in the top-level config.php file, the corresponding database array is ignored.
+34e7d28 2021-08-04 Update Bootstrap CSS to v4.6.0.
+cabb8e3 2021-07-14 Fix typo.
+85a7a6e 2021-07-14 When forcing a skin, also check clientparams for matching client_id.
+e0997e9 2021-07-14 Check clientparams and GET params for initialidp option.
+5e8783c 2021-07-14 Enable PortalCookie to save 'authorize' AND 'device' flows by making 'redirect_uri' an optional parameter (i.e., present for 'authorize' flow, absent for 'device' flow).
+5bcec00 2021-07-13 CIL-935 Fix typo.
+34750e8 2021-07-13 CIL-935 Device flow. Call new dbService methods checkUserCode and userCodeApproved.
+d36f74b 2021-07-13 Update Bootstrap to v4.6.0 and Bootstrap-Select to v.1.13.18
+ca10f24 2021-06-30 CIL-1023 OIDC prompt parameter can contain multiple space-delimited values, so check for 'consent' as an array element.
+757cc9d 2021-06-30 CIL-1023 If OIDC prompt=consent parameter is given, then ignore all methods for bypassing the "Select an IdP" page so that the "consent to release attributes" section is always displayed.
+8ed97f3 2021-06-15 CIL-1003 Capture GitHub 'login' as 'preferred_username' claim.
+c788e96 2021-05-13 CIL-979 Speed up display of "Select an Identity Provider" page by loading the list of IdPs with an Ajax 'GET' after the page has rendered.
+6dec59c 2021-05-04 CIL-975 Generalize handling of AssertionConsumerServiceURL rewriting for ADFS IdPs (like Syngenta and NSF).
+db2175f 2021-04-27 Fix order of parameters in explode().
+9eba193 2021-04-27 CIL-951 Add MYPROXY_SERVER_DN_MAP and looping over MyProxy hostnames to set MYPROXY_SERVER_DN for hosts which do not match the configured MyProxy CA server name.
+1de626b 2021-04-27 Add sanity checks to verify 'defines' exist in config.php.
+39d2ab0 2021-04-26 CIL-959 Support for NSF.gov's new AD-based IdP. Check AMR attribute for MFA. If found, overwrite ACR with this value.
+f0efb38 2021-04-26 CIL-959 Add support for SAML attribute 'AMR' (authnmethodsreferences) asserted by NSF.gov's new AD-based IdP.
+e063296 2021-03-18 Add DEFAULT_LOGNAME for writing logs to file.
+c385b90 2021-03-11 CIL-938 Write XSEDE USAGE messages to CVS files in a configurable directory.
+40b373a 2021-03-11 Formatting to make phpcs happier.
+a8d1053 2021-03-10 Remove '&' from Log::singleton() (even though the docs say it's necessary) since it causes PHP warnings.
+4a345f4 2021-03-10 Enable Loggit to write to console (stdout).
+591d39c 2021-03-09 Require 'DB.php' to avoid warning message for DB_PORTABILITY_ALL.
+b145bba 2021-03-09 Suppress warning message durind DOM load().
+a5b13fc 2021-03-09 in_array() should be array_key_exists().
+ee9d9ec 2021-03-09 Update database connection to use configured database and host.
+2136e0b 2021-03-08 Device client could also request scopes which differ from the registered scopes, so ask for those as well.
+23d3c8b 2021-03-08 Move printOIDCConsent from authorize/index-functions.php to Util.php.  Allow 'Cancel' button in WAYF page to be forced to be displayed.
+5194386 2021-03-08 CIL-934 Initial implementation of dbService actions checkUserCode and userCodeApproved. Currently returning dummy values for testing purposes.
+1ed091d 2021-03-08 Fixes for CodeSniffer and comment tag.
+ddecf75 2021-03-04 In getHN(), verify the hostname has a '.' in it for AWS.
+2f4f65f 2021-02-25 Put MyProxy client credential in config.php.
+6f9c347 2021-02-25 Update to newer version of coveralls.
+3bdcd5c 2021-01-02 Fix email for Attribute Release Problem. Need to remove quote characters.
+c64a316 2020-12-10 Check if incoming $storetype is null before crushing it.
+562ec10 2020-12-10 CIL-895 Config option for PHP session file store directory.
+c5dd1cd 2020-11-10 Remove pear/DB repo from composer.json
+9be0c98 2020-11-05 CIL-865 Return number of certificate directories cleaned up.
+ab08c73 2020-11-05 CIL-866 Make IdpList->idparray public to be accessible by new '/updateidplist/' web endpoint.
+689cad8 2020-11-05 CIL-865 Add new function cleanupPKCS12 which can be called by a new '/cleancerts/' web endpoint to remove PKCS12 certs that are older than 10 minutes.
+981d0d8 2020-11-02 CIL-865 Clean up PKCS12 directory after generating new PKCS12 cert
+57b4ba7 2020-11-02 CIL-865 Clean up PKCS12 directory after generating new PKCS12 cert
+604994c 2020-09-30 CIL-837 BYPASS_IDP_ARRAY should reset 'skin' to unset green/red-lit IdPs.
+0b2ea38 2020-09-29 CIL-697 New 'status' codes for missing/malformed 'scope' parameter.'
+bfc6593 2020-09-08 Attempt to add the OAuth1/OIDC client name to the "Attribute Release Problem" email.
+4b8637d 2020-09-02 Remove whitespace at end of line.
+c9313b4 2020-09-02 Move composer require lcobucci/jwt to top-level CILogon service since it is not used by CILogon service-lib.
+099118f 2020-09-02 CIL-799 Get AMR (AuthnMethodRef) from ORCID id_token.
+82b9572 2020-08-24 CIL-793 When splitting display_name for missing first and last names, check for comma (,) and split into last_name, first_name.
+870b1ee 2020-08-24 CIL-793 For the OAuth 1.0a flow, check for missing first_name or last_name. If so, use display_name to split on space like we used to.
+ab7cdd6 2020-08-10 CIL-781 Show 'CILogon User Identifier' (user_uid) in 'User Attributes' block.
+36b9e7e 2020-08-07 CIL-779, CIL-618 Also read OIDC client scopes from the database.
+975193c 2020-08-07 Remove unused getClient/clearClient and associated variables. The database is now queried directly (CIL-618) rather than using the dbService.
+f06884d 2020-08-05 CIL-728 Update Privacy Policy link.
+fd55c45 2020-08-04 CIL-742 Remove extra check for idpwhitelist/idpblacklist in favor of idpgreenlit/idpredlit.
+3979db7 2020-07-22 Minor bug fixes.
+0c75c19 2020-07-22 CIL-742 Change whitelisted/blacklisted to greenlit/redlit.
+be80c65 2020-07-22 CIL-767 Add skin option for customized footer HTML.
+b456e1d 2020-07-22 CIL-741 For IdPs in the global blacklist array, simply omit them from the resulting idplist.xml file rather than remove their <whitelisted> tags.
+7793309 2020-07-21 CIL-763 New query parameter "initialidp" to allow a client to set the initially selected IdP to something other than Google.
+380a006 2020-06-05 CIL-723 Remove "InCommon R & S", "InCommon Bronze", and "InCommon Silver" lines from the "Identity Provider Attributes" block.
+e110ac2 2020-06-04 CIL-719 If no OIDC cookie is set for the current 'portal', attempt to use ONLY the 'providerId' from the most recent portal cookie.
+456718e 2020-06-03 CIL-719 If there is no OIDC cookie set for the current 'portal' (which is a combination of client_id, redirect_uri, and scopes), then read values from the most recently saved OIDC portal cookie.
+0980b2e 2020-06-02 Update to Bootstrap CSS v4.5 and jQuery v3.5.1.
+1562a64 2020-05-27 CIL-712 Add skin config option to display text in an informational banner at the top of the page.
+d3f5daf 2020-05-15 Improperly placed bracket prevented default skin config.xml from being read in.
+11fca45 2020-05-04 Remove dependency on PEAR Config which was used to read GridShibCA configuration.
+b1697a0 2020-05-04 Remove dependency on PEAR Config which was used to read GridShibCA configuration.
+5b22265 2020-05-01 Remove dependency on PEAR Config which was used to read GridShibCA configuration.
+d8c27c6 2020-04-28 Bug: Unset previous user attributes to avoid session pollution.
+4e54e43 2020-04-28 Fix preg_match() regex.
+e9954f4 2020-04-26 CIL-618 BUG: When getting OIDC client parameters, don't fetch everything, just name, home_url, and callback_uri.
+eb79f1f 2020-04-25 Update to latest versions of Bootstrap and Bootstrap-Select.
+36b1963 2020-04-25 CIL-624 Add config option DISABLE_X509 to prevent downloading of certificates.
+fca0dd6 2020-04-24 Fix typo in simplexml_load_string().
+4c77344 2020-04-24 CIL-690 Allow skins to be read in from either the filesystem (i.e., from the /skin/SKINNAME directory) or from the database. Next step is to migrate filesystem skins to database.
+97ce2e3 2020-04-24 CIL-690 As part of the move of skins from filesystem to database, put skin CSS "internal" (i.e., in the HTML) rather than "external" (i.e., referenced via <link> and read from disk).
+0e8d40e 2020-04-24 Add cssmin as requirement.
+a832985 2020-04-07 Update ChangeLog.
 e49003e 2020-04-07 Add log message for new users without a distinguished_name value.
 8e14a82 2020-04-07 Relax checking of eduGAIN and getcert check for basic download of X509 certs to allow users to log in.
 b9f3f70 2020-04-06 Add comments to explain the 'for' loop with '$$value'.

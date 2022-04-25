@@ -14,8 +14,8 @@ use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
 use PEAR;
 use DB;
-use \DateTime;
-use \Exception;
+use DateTime;
+use Exception;
 
 /**
  * Util
@@ -1702,21 +1702,28 @@ Remote Address= ' . $remoteaddr . '
         if (!empty($oldidplist->idparray)) {
             $oldidplistempty = false;
 
-            // Check for differences using weird json_encode method found at
-            // https://stackoverflow.com/a/42530586/12381604
-            $diffarray = array_map(
-                'json_decode',
-                array_merge(
-                    array_diff(
-                        array_map('json_encode', $newidplist->idparray),
-                        array_map('json_encode', $oldidplist->idparray)
-                    ),
-                    array_diff(
-                        array_map('json_encode', $oldidplist->idparray),
-                        array_map('json_encode', $newidplist->idparray)
-                    )
-                )
+            // CIL-1271 First, check for entityID differences
+            $newkeys = array_keys($newidplist->idparray);
+            $oldkeys = array_keys($oldidplist->idparray);
+            $diffarray = array_merge(
+                array_diff($newkeys, $oldkeys),
+                array_diff($oldkeys, $newkeys)
             );
+
+            if (empty($diffarray)) {
+                // Next, check for IdP attribute differences using tricky
+                // json_encode method found in a comment at
+                // https://stackoverflow.com/a/42530586/12381604
+                $newjson = array_map('json_encode', $newidplist->idparray);
+                $oldjson = array_map('json_encode', $oldidplist->idparray);
+                $diffarray = array_map(
+                    'json_decode',
+                    array_merge(
+                        array_diff($newjson, $oldjson),
+                        array_diff($oldjson, $newjson)
+                    )
+                );
+            }
 
             if (!empty($diffarray)) {
                 $oldidplistdiff = true;

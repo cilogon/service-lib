@@ -1569,7 +1569,7 @@ Remote Address= ' . $remoteaddr . '
                 fclose($fp);
                 if (empty($error)) {
                     // CIL-1283 Set upload.csv files as world-writable
-                    chmod($fullname, 0666);
+                    @chmod($fullname, 0666);
                 }
             } else {
                 $error = 'Unable to open file.';

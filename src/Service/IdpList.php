@@ -242,7 +242,7 @@ class IdpList
                 ($this->idpdom->save($tmpfname) > 0) &&
                 (@rename($tmpfname, $filename))
             ) {
-                chmod($filename, 0664);
+                @chmod($filename, 0664);
                 $retval = true;
             } else {
                 @unlink($tmpfname);
@@ -277,7 +277,7 @@ class IdpList
                 ((file_put_contents($tmpfname, $json)) !== false) &&
                 (@rename($tmpfname, $filename))
             ) {
-                chmod($filename, 0664);
+                @chmod($filename, 0664);
                 $retval = true;
             } else {
                 @unlink($tmpfname);

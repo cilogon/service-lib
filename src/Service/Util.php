@@ -1542,9 +1542,10 @@ Remote Address= ' . $remoteaddr . '
                 date_default_timezone_set(LOCAL_TIMEZONE);
             }
             $filename = date('Ymd', $now) . '.upload.csv';
+            $fullname = XSEDE_USAGE_DIR . DIRECTORY_SEPARATOR . $filename;
 
             // Open and lock the file
-            $fp = fopen(XSEDE_USAGE_DIR . DIRECTORY_SEPARATOR . $filename, 'c');
+            $fp = fopen($fullname, 'c');
             if ($fp !== false) {
                 if (flock($fp, LOCK_EX)) {
                     // Move file pointer to the end of the file.
@@ -1566,6 +1567,10 @@ Remote Address= ' . $remoteaddr . '
                     $error = 'Unable to lock file.';
                 }
                 fclose($fp);
+                if (empty($error)) {
+                    // CIL-1283 Set upload.csv files as world-writable
+                    chmod($fullname, 0666);
+                }
             } else {
                 $error = 'Unable to open file.';
             }

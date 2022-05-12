@@ -1217,7 +1217,7 @@ class Content
               </tr>
 
               <tr>
-                <th>eduPersonOrcid (eduPersonOrcid):</th>
+                <th>eduPersonOrcid:</th>
                 <td>', Util::getSessionVar('eduPersonOrcid'), '</td>
                 <td> </td>
               </tr>

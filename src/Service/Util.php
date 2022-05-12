@@ -687,6 +687,7 @@ class Util
             'preferred_username' => 'Preferred Username',
             'entitlement'        => 'Entitlement',
             'itrustuin'          => 'iTrustUIN',
+            'eduPersonOrcid'     => 'eduPersonOrcid',
             'cilogon_skin'       => 'Skin Name',
             'authntime'          => 'Authn Time'
         );
@@ -885,7 +886,8 @@ Remote Address= ' . $remoteaddr . '
             $amr,
             $preferred_username,
             $entitlement,
-            $itrustuin
+            $itrustuin,
+            $eduPersonOrcid
         );
         if ($result) {
             static::setSessionVar('user_uid', $dbs->user_uid);
@@ -983,6 +985,8 @@ Remote Address= ' . $remoteaddr . '
                         $entitlement : '<MISSING>') . "\n" .
                     'iTrustUIN     = ' . ((strlen($itrustuin) > 0) ?
                         $itrustuin : '<MISSING>') . "\n" .
+                    'eduPersonOrcid= ' . ((strlen($eduPersonOrcid) > 0) ?
+                        $eduPersonOrcid : '<MISSING>') . "\n" .
                     'User UID      = ' . ((strlen(
                         $i = static::getSessionVar('user_uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .

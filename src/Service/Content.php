@@ -1217,6 +1217,12 @@ class Content
               </tr>
 
               <tr>
+                <th>eduPersonOrcid (eduPersonOrcid):</th>
+                <td>', Util::getSessionVar('eduPersonOrcid'), '</td>
+                <td> </td>
+              </tr>
+
+              <tr>
                 <th>Subject ID (subject-id):</th>
                 <td>', Util::getSessionVar('subject_id'), '</td>
                 <td> </td>
@@ -1654,6 +1660,7 @@ class Content
      * @param string $amr
      * @param string $entitlement
      * @param string $itrustuin
+     * @param string $eduPersonOrcid
      * @param string $subject_id
      * @param string $pairwise_id
      * @param string $preferred_username
@@ -1680,6 +1687,7 @@ class Content
         $amr,
         $entitlement,
         $itrustuin,
+        $eduPersonOrcid,
         $subject_id,
         $pairwise_id,
         $preferred_username,
@@ -2593,6 +2601,7 @@ class Content
                     $amr,
                     $entitlement,
                     $itrustuin,
+                    $eduPersonOrcid,
                     $subject_id,
                     $pairwise_id,
                     $preferred_username,

@@ -191,6 +191,7 @@ class DBService
         'preferred_username',
         'entitlement',
         'itrustuin',
+        'eduPersonOrcid'
     ];
 
     /**
@@ -307,6 +308,11 @@ class DBService
      * @var string|null $itrustuin Person's univeristy ID number
      */
     public $itrustuin;
+
+    /**
+     * @var string|null $eduPersonOrcid ORCID identifier
+     */
+    public $eduPersonOrcid;
 
     /**
      * @var string|null $subject_id Person's univeristy subject identifier
@@ -550,7 +556,7 @@ class DBService
      *            $eppn, $eptid, $openid, $oidc,
      *            $subject_id, $pairwise_id, $affiliation,
      *            $ou, $member_of, $acr, $amr, $preferred_username,
-     *            $entitlement, $itrustuin
+     *            $entitlement, $itrustuin, $eduPersonOrcid
      *
      * @return bool True if the servlet returned correctly. Else false.
      */
@@ -1044,6 +1050,9 @@ class DBService
                 if (isset($attr_arr['itrustuin'])) {
                     $this->itrustuin = $attr_arr['itrustuin'];
                 }
+                if (isset($attr_arr['eduPersonOrcid'])) {
+                    $this->eduPersonOrcid = $attr_arr['eduPersonOrcid'];
+                }
             }
         }
 
@@ -1150,6 +1159,9 @@ class DBService
         }
         if (!is_null($this->itrustuin)) {
             echo "itrustuin=$this->itrustuin\n";
+        }
+        if (!is_null($this->eduPersonOrcid)) {
+            echo "eduPersonOrcid=$this->eduPersonOrcid\n";
         }
         if (!is_null($this->subject_id)) {
             echo "subject_id=$this->subject_id\n";

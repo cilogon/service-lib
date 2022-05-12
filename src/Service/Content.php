@@ -946,9 +946,15 @@ class Content
      */
     public static function printUserAttributes()
     {
+        // Extract all of the user attributes from the session
+        $attr_arr = array();
+        foreach (DBService::$user_attrs as $value) {
+            $attr_arr[$value] = Util::getSessionVar($value);
+        }
+
         $idplist = Util::getIdpList();
-        $idp = Util::getSessionVar('idp');
-        $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
+        $samlidp = ((!empty($attr_arr['idp'])) &&
+                    (!$idplist->isOAuth2($attr_arr['idp'])));
 
         // Set various booleans for warning/error messages early so that we
         // can display a "general" warning/error icon on the card title.
@@ -956,40 +962,40 @@ class Content
         $errors = array();
 
         // CIL-416 Show warning for missing ePPN
-        if (($samlidp) && (empty(Util::getSessionVar('eppn')))) {
-            if (empty(Util::getSessionVar('eptid'))) {
+        if (($samlidp) && (empty($attr_arr['eppn']))) {
+            if (empty($attr_arr['eptid'])) {
                 $errors['no_eppn_or_eptid'] = true;
             } else {
                 $warnings['no_eppn'] = true;
             }
         }
 
-        if (empty($idp)) {
+        if (empty($attr_arr['idp'])) {
             $errors['no_entityID'] = true;
         } else {
-            if ((!$samlidp) && (empty(Util::getSessionVar('oidc')))) {
+            if ((!$samlidp) && (empty($attr_arr['oidc']))) {
                 $errors['no_oidc'] = true;
             }
         }
 
-        if ((empty(Util::getSessionVar('first_name'))) && (empty(Util::getSessionVar('display_name')))) {
+        if ((empty($attr_arr['first_name'])) && (empty($attr_arr['display_name']))) {
             $errors['no_first_name'] = true;
         }
 
-        if ((empty(Util::getSessionVar('last_name'))) && (empty(Util::getSessionVar('display_name')))) {
+        if ((empty($attr_arr['last_name'])) && (empty($attr_arr['display_name']))) {
             $errors['no_last_name'] = true;
         }
 
         if (
-            (empty(Util::getSessionVar('display_name'))) &&
-            ((empty(Util::getSessionVar('first_name'))) ||
-            (empty(Util::getSessionVar('last_name'))))
+            (empty($attr_arr['display_name'])) &&
+            ((empty($attr_arr['first_name'])) ||
+            (empty($attr_arr['last_name'])))
         ) {
             $errors['no_display_name'] = true;
         }
 
-        $emailvalid = filter_var(Util::getSessionVar('email'), FILTER_VALIDATE_EMAIL);
-        if ((empty(Util::getSessionVar('email'))) || (!$emailvalid)) {
+        $emailvalid = filter_var($attr_arr['email'], FILTER_VALIDATE_EMAIL);
+        if ((empty($attr_arr['email'])) || (!$emailvalid)) {
             $errors['no_valid_email'] = true;
         }
 
@@ -1028,7 +1034,7 @@ class Content
         echo '
               <tr>
                 <th>Identity Provider (entityID):</th>
-                <td>', $idp , '</td>
+                <td>', $attr_arr['idp'] , '</td>
                 <td>';
 
         if (@$errors['no_entityID']) {
@@ -1042,118 +1048,140 @@ class Content
         echo '
                 </td>
               </tr>
+        ';
 
+        if ($samlidp) {
+            echo '
               <tr>
                 <th>ePTID:</th>
-                <td>', Util::getSessionVar('eptid'), '</td>
+                <td>', $attr_arr['eptid'], '</td>
                 <td>';
 
-        if (@$errors['no_eppn_or_eptid']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Must have either ePPN -OR- ePTID.'
-            );
-        }
+            if (@$errors['no_eppn_or_eptid']) {
+                echo static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'Must have either ePPN -OR- ePTID.'
+                );
+            }
 
-        echo '
+            echo '
                 </td>
               </tr>
 
               <tr>
                 <th>ePPN:</th>
-                <td>', Util::getSessionVar('eppn'), '</td>
+                <td>', $attr_arr['eppn'], '</td>
                 <td>';
 
-        if (@$errors['no_eppn_or_eptid']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Must have either ePPN -OR- ePTID.'
-            );
-        } elseif (@$warnings['no_eppn']) {
-            echo static::getIcon(
-                'fa-exclamation-triangle',
-                'gold',
-                'Some CILogon clients (e.g., Globus) require ePPN.'
-            );
-        }
+            if (@$errors['no_eppn_or_eptid']) {
+                echo static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'Must have either ePPN -OR- ePTID.'
+                );
+            } elseif (@$warnings['no_eppn']) {
+                echo static::getIcon(
+                    'fa-exclamation-triangle',
+                    'gold',
+                    'Some CILogon clients (e.g., Globus) require ePPN.'
+                );
+            }
 
-        echo '
+            echo '
                 </td>
               </tr>
+            ';
+        }
 
+        if ((!empty($attr_arr['idp'])) && (!$samlidp)) {
+            echo '
               <tr>
                 <th>OpenID:</th>
-                <td>', Util::getSessionVar('oidc'), '</td>
+                <td>', $attr_arr['oidc'], '</td>
                 <td>';
 
-        if (@$errors['no_oidc']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Missing the OpenID identifier.'
-            );
-        }
+            if (@$errors['no_oidc']) {
+                echo static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'Missing the OpenID identifier.'
+                );
+            }
 
-        echo '
+            echo '
                 </td>
               </tr>
+            ';
+        }
 
+        if ((!empty($attr_arr['first_name'])) || (@$errors['no_first_name'])) {
+            echo '
               <tr>
                 <th>First Name (givenName):</th>
-                <td>', Util::getSessionVar('first_name'), '</td>
+                <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
-        if (@$errors['no_first_name']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Must have either givenName + sn -OR- displayName.'
-            );
-        }
+            if (@$errors['no_first_name']) {
+                echo static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'Must have either givenName + sn -OR- displayName.'
+                );
+            }
 
-        echo '
+            echo '
                 </td>
               </tr>
+            ';
+        }
 
+        if ((!empty($attr_arr['last_name'])) || (@$errors['no_last_name'])) {
+            echo '
               <tr>
                 <th>Last Name (sn):</th>
-                <td>', Util::getSessionVar('last_name'), '</td>
+                <td>', $attr_arr['last_name'], '</td>
                 <td>';
 
-        if (@$errors['no_last_name']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Must have either givenName + sn -OR- displayName.'
-            );
-        }
+            if (@$errors['no_last_name']) {
+                echo static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'Must have either givenName + sn -OR- displayName.'
+                );
+            }
 
-        echo '
+            echo '
                 </td>
               </tr>
+            ';
+        }
 
+        if ((!empty($attr_arr['display_name'])) || (@$errors['no_display_name'])) {
+            echo '
               <tr>
                 <th>Display Name (displayName):</th>
-                <td>', Util::getSessionVar('display_name'), '</td>
+                <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
-        if (@$errors['no_display_name']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Must have either displayName -OR- givenName + sn.'
-            );
+            if (@$errors['no_display_name']) {
+                echo static::getIcon(
+                    'fa-exclamation-circle',
+                    'red',
+                    'Must have either displayName -OR- givenName + sn.'
+                );
+            }
+
+            echo '
+                </td>
+              </tr>
+            ';
         }
 
         echo '
-                </td>
-              </tr>
-
               <tr>
                 <th>Email Address (email):</th>
-                <td>', Util::getSessionVar('email'), '</td>
+                <td>', $attr_arr['email'], '</td>
                 <td>';
 
         if (@$errors['no_valid_email']) {
@@ -1166,79 +1194,117 @@ class Content
 
         echo '
                 </td>
-              </tr>
+              </tr>';
 
+        if (!empty($attr_arr['loa'])) {
+            echo '
               <tr>
                 <th>Level of Assurance (assurance):</th>
-                <td>', Util::getSessionVar('loa'), '</td>
+                <td>', $attr_arr['loa'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['acr'])) {
+            echo '
               <tr>
                 <th>AuthnContextClassRef:</th>
-                <td>', Util::getSessionVar('acr'), '</td>
+                <td>', $attr_arr['acr'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['amr'])) {
+            echo '
               <tr>
                 <th>AuthnMethodRef:</th>
-                <td>', Util::getSessionVar('amr'), '</td>
+                <td>', $attr_arr['amr'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['affiliation'])) {
+            echo '
               <tr>
                 <th>Affiliation (affiliation):</th>
-                <td>', Util::getSessionVar('affiliation'), '</td>
+                <td>', $attr_arr['affiliation'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['entitlement'])) {
+            echo '
               <tr>
                 <th>Entitlement (entitlement):</th>
-                <td>', Util::getSessionVar('entitlement'), '</td>
+                <td>', $attr_arr['entitlement'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['ou'])) {
+            echo '
               <tr>
                 <th>Organizational Unit (ou):</th>
-                <td>', Util::getSessionVar('ou'), '</td>
+                <td>', $attr_arr['ou'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['member_of'])) {
+            echo '
               <tr>
                 <th>Member (member):</th>
-                <td>', Util::getSessionVar('member_of'), '</td>
+                <td>', $attr_arr['member_of'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['itrustuin'])) {
+            echo '
               <tr>
                 <th>iTrustUIN (itrustuin):</th>
-                <td>', Util::getSessionVar('itrustuin'), '</td>
+                <td>', $attr_arr['itrustuin'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['eduPersonOrcid'])) {
+            echo '
               <tr>
                 <th>eduPersonOrcid:</th>
-                <td>', Util::getSessionVar('eduPersonOrcid'), '</td>
+                <td>', $attr_arr['eduPersonOrcid'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['subject_id'])) {
+            echo '
               <tr>
                 <th>Subject ID (subject-id):</th>
-                <td>', Util::getSessionVar('subject_id'), '</td>
+                <td>', $attr_arr['subject_id'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['pairwise_id'])) {
+            echo '
               <tr>
                 <th>Pairwise ID (pairwise-id):</th>
-                <td>', Util::getSessionVar('pairwise_id'), '</td>
+                <td>', $attr_arr['pairwise_id'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
 
+        if (!empty($attr_arr['preferred_username'])) {
+            echo '
               <tr>
                 <th>Preferred Username:</th>
-                <td>', Util::getSessionVar('preferred_username'), '</td>
+                <td>', $attr_arr['preferred_username'], '</td>
                 <td> </td>
-              </tr>
+              </tr>';
+        }
+
+        echo '
               </tbody>
             </table>
           </div> <!-- end card-body -->';

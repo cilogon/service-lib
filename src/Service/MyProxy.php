@@ -112,7 +112,7 @@ class MyProxy
 
             // Run the myproxy-logon command and capture the output and any error
             $output = array();
-            $cmd = '/bin/env ' .
+            $cmd = '/usr/bin/env ' .
                    $USER_CERT_ENV . ' ' .
                    $env . ' ' .
                    $mpdn . ' ' .

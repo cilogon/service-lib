@@ -614,7 +614,7 @@ class Util
                         static::deleteDir($dir . "/" . $object);
                     } else {
                         if ($shred) {
-                            @exec('/bin/env /usr/bin/shred -u -z ' . $dir . "/" . $object);
+                            @exec('/usr/bin/env /usr/bin/shred -u -z ' . $dir . "/" . $object);
                         } else {
                             @unlink($dir . "/" . $object);
                         }

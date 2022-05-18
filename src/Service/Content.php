@@ -2877,7 +2877,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 $p12file = $tdir . '/usercred.p12';
 
                 // Call the openssl pkcs12 program to convert certificate
-                exec('/bin/env ' .
+                exec('/usr/bin/env ' .
                      'RANDFILE=' . sys_get_temp_dir() . '/.rnd ' .
                      'CILOGON_PKCS12_PW=' . escapeshellarg($password1) . ' ' .
                      '/usr/bin/openssl pkcs12 -export ' .

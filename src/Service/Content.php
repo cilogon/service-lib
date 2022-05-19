@@ -2850,40 +2850,33 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 ''
             );
 
-            // The 'openssl pkcs12' command is picky in that the private
-            // key must appear BEFORE the public certificate. But MyProxy
-            // returns the private key AFTER. So swap them around.
-            $cert2 = '';
+            // Extract the public and private keys from the certificate
+            $pubkey = '';
+            $privkey = '';
             if (
                 preg_match(
-                    '/-----BEGIN CERTIFICATE-----([^-]+)' .
-                    '-----END CERTIFICATE-----[^-]*' .
-                    '-----BEGIN RSA PRIVATE KEY-----([^-]+)' .
-                    '-----END RSA PRIVATE KEY-----/',
+                    '/(-----BEGIN CERTIFICATE-----[^-]+' .
+                    '-----END CERTIFICATE-----)[^-]*' .
+                    '(-----BEGIN RSA PRIVATE KEY-----[^-]+' .
+                    '-----END RSA PRIVATE KEY-----)/',
                     $cert,
                     $matches
                 )
             ) {
-                $cert2 = "-----BEGIN RSA PRIVATE KEY-----" .
-                         $matches[2] . "-----END RSA PRIVATE KEY-----\n" .
-                         "-----BEGIN CERTIFICATE-----" .
-                         $matches[1] . "-----END CERTIFICATE-----";
+                $pubkey = $matches[1];
+                $privkey = $matches[2];
             }
 
-            if (strlen($cert2) > 0) { // Successfully got a certificate!
+            if (strlen($pubkey) > 0) { // Successfully got a certificate!
                 // Create a temporary directory in DEFAULT_PKCS12_DIR
                 $tdir = Util::tempDir(DEFAULT_PKCS12_DIR, '', 0770);
                 $p12dir = str_replace(DEFAULT_PKCS12_DIR, '', $tdir);
                 $p12file = $tdir . '/usercred.p12';
 
-                // Call the openssl pkcs12 program to convert certificate
-                exec('/usr/bin/env ' .
-                     'RANDFILE=' . sys_get_temp_dir() . '/.rnd ' .
-                     'CILOGON_PKCS12_PW=' . escapeshellarg($password1) . ' ' .
-                     '/usr/bin/openssl pkcs12 -export ' .
-                     '-passout env:CILOGON_PKCS12_PW ' .
-                     "-out $p12file " .
-                     '<<< ' . escapeshellarg($cert2));
+                // CIL-1294 Convert the X.509 pub/priv keys to PKCS12 file
+                if (($x509 = openssl_x509_read($pubkey)) !== false) {
+                    openssl_pkcs12_export_to_file($x509, $p12file, $privkey, $password1);
+                }
 
                 // Verify the usercred.p12 file was actually created
                 $size = @filesize($p12file);

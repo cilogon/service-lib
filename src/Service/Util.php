@@ -63,9 +63,18 @@ class Util
     public static $skin = null;
 
     /**
-     * @var array $oauth2idps An array of OAuth2 Identity Providers.
+     * @var array $oauth2idps An array of OAuth2 Identity Providers and
+     * their associated "authorization URLs" stored in the database. Notice
+     * that these URLs are all "http://" without any leading "www.". This
+     * was done because the Google URL was the the old OAuth 1.0a URL, which
+     * had http (instead of the now standard https).
      */
-    public static $oauth2idps = ['Google', 'GitHub', 'ORCID', 'Microsoft'];
+    public static $oauth2idps = [
+        'Google'    => 'http://google.com/accounts/o8/id',
+        'GitHub'    => 'http://github.com/login/oauth/authorize',
+        'ORCID'     => 'http://orcid.org/oauth/authorize',
+        'Microsoft' => 'http://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+    ];
 
 
     /**
@@ -767,7 +776,7 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
-     * getAuthzUrl
+     * getOAuth2Url
      *
      * This funtion takes in the name of an IdP (e.g., 'Google') and
      * returns the assoicated OAuth2 authorization URL.
@@ -775,23 +784,17 @@ Remote Address= ' . $remoteaddr . '
      * @param string $idp The name of an OAuth2 Identity Provider.
      * @return string The authorization URL for the given IdP.
      */
-    public static function getAuthzUrl($idp)
+    public static function getOAuth2Url($idp)
     {
         $url = null;
-        $idptourl = array(
-            'Google'    => 'https://accounts.google.com/o/oauth2/auth',
-            'GitHub'    => 'https://github.com/login/oauth/authorize',
-            'ORCID'     => 'https://orcid.org/oauth/authorize',
-            'Microsoft' => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-        );
-        if (array_key_exists($idp, $idptourl)) {
-            $url = $idptourl[$idp];
+        if (array_key_exists($idp, static::$oauth2idps)) {
+            $url = static::$oauth2idps[$idp];
         }
         return $url;
     }
 
     /**
-     * getAuthzIdP
+     * getOAuth2IdP
      *
      * This function takes in the OAuth2 authorization URL and returns
      * the associated pretty-print name of the IdP.
@@ -799,17 +802,44 @@ Remote Address= ' . $remoteaddr . '
      * @param string $url The authorization URL of an OAuth2 Identity Provider.
      * @return string The name of the IdP.
      */
-    public static function getAuthzIdP($url)
+    public static function getOAuth2IdP($url)
     {
         $idp = null;
-        $urltoidp = array(
-            'https://accounts.google.com/o/oauth2/auth' => 'Google',
-            'https://github.com/login/oauth/authorize'  => 'GitHub',
-            'https://orcid.org/oauth/authorize'         => 'ORCID',
-            'https://login.microsoftonline.com/common/oauth2/v2.0/authorize' => 'Microsoft',
-        );
-        if (array_key_exists($url, $urltoidp)) {
-            $idp = $urltoidp[$url];
+        $url = static::normalizeOAuth2IdP($url);
+        if (in_array($url, static::$oauth2idps)) {
+            $idp = array_search($url, static::$oauth2idps);
+        }
+        return $idp;
+    }
+
+    /**
+     * normalizeOAuth2IdP
+     *
+     * This function takes in a URL for one of the CILogon-supported OAuth2
+     * issuers (i.e., Google, GitHub, ORCID, Microsoft) and transforms it
+     * into a URL used by CILogon as shown in the 'Select an Identity
+     * Provider' list.
+     *
+     * @param string An OAuth2 issuer string (i.e., 'iss') for one of the
+     *        OAuth2 IdPs supported by CILogon.
+     * @return string The input string transformed to a URL to be used in
+     *         the 'Select an Identity Provider' list. If the incoming
+     *         string does not match one of the OAuth2 issuers, the string
+     *         is returned unmodified.
+     */
+    public static function normalizeOAuth2IdP($idp)
+    {
+        if (
+            (!preg_match('%^https?://accounts.google.com/o/saml2%', $idp)) &&
+            (preg_match('%^https?://(accounts.)?google.com%', $idp))
+        ) {
+            $idp = static::getOAuth2Url('Google');
+        } elseif (preg_match('%^https?://github.com%', $idp)) {
+            $idp = static::getOAuth2Url('GitHub');
+        } elseif (preg_match('%^https?://orcid.org%', $idp)) {
+            $idp = static::getOAuth2Url('ORCID');
+        } elseif (preg_match('%^https?://login.microsoftonline.com%', $idp)) {
+            $idp = static::getOAuth2Url('Microsoft');
         }
         return $idp;
     }
@@ -843,24 +873,6 @@ Remote Address= ' . $remoteaddr . '
         // that was just populated, using the names in the $user_attrs array.
         foreach (DBService::$user_attrs as $value) {
             $$value = static::getSessionVar($value);
-        }
-
-        // For the new Google OAuth 2.0 endpoint, we want to keep the
-        // old Google OpenID endpoint URL in the database (so user does
-        // not get a new certificate subject DN). Change the idp
-        // and idp_display_name to the old Google OpenID values.
-        if (
-            ($idp_display_name == 'Google+') ||
-            ($idp == static::getAuthzUrl('Google'))
-        ) {
-            $idp_display_name = 'Google';
-            $idp = 'https://www.google.com/accounts/o8/id';
-        }
-
-        // In the database, keep a consistent ProviderId format: only
-        // allow 'http' (not 'https') and remove any 'www.' prefix.
-        if ($loa == 'openid') {
-            $idp = preg_replace('%^https://(www\.)?%', 'http://', $idp);
         }
 
         // Call the dbService to get the user using IdP attributes.
@@ -1196,7 +1208,7 @@ Remote Address= ' . $remoteaddr . '
         if (
             ((strlen($idp) > 0) &&
             (strlen($idp_display_name) > 0) &&
-            (!in_array($idp_display_name, static::$oauth2idps))) &&
+            (!array_key_exists($idp_display_name, static::$oauth2idps))) &&
                 (
                 // Next, check for eduGAIN without REFEDS R&S and SIRTFI
                 ((!$idplist->isRegisteredByInCommon($idp)) &&
@@ -1243,9 +1255,9 @@ Remote Address= ' . $remoteaddr . '
             }
         } else { // If portal name is not valid, then use the 'normal' cookie
             if (strlen($value) > 0) {
-                Util::setCookieVar($key, $value);
+                static::setCookieVar($key, $value);
             } else { // If $value is empty, then UNset the 'normal' cookie
-                Util::unsetCookieVar($key);
+                static::unsetCookieVar($key);
             }
         }
     }
@@ -1325,7 +1337,7 @@ Remote Address= ' . $remoteaddr . '
     {
         $minlifetime = 1;    // Default minimum lifetime is 1 hour
         $maxlifetime = $defaultmaxlifetime;
-        $skin = Util::getSkin();
+        $skin = static::getSkin();
         $skinminlifetime = $skin->getConfigOption($section, 'minlifetime');
         // Read the skin's minlifetime value from the specified section
         if ((!is_null($skinminlifetime)) && ((int)$skinminlifetime > 0)) {
@@ -1414,9 +1426,9 @@ Remote Address= ' . $remoteaddr . '
     public static function getLOAPort()
     {
         $port = 7512; // Basic
-        if (Util::isLOASilver()) {
+        if (static::isLOASilver()) {
             $port = 7514;
-        } elseif (Util::getSessionVar('loa') == 'openid') {
+        } elseif (static::getSessionVar('loa') == 'openid') {
             $port = 7516;
         }
         return $port;

@@ -602,7 +602,7 @@ class DBService
             $idp_display_name = $args[2];
             if (
                 (Util::getIdpList()->isRegisteredByInCommon($idp)) ||
-                (in_array($idp_display_name, Util::$oauth2idps))
+                (array_key_exists($idp_display_name, Util::$oauth2idps))
             ) {
                 $us_idp = 1;
             }

@@ -453,9 +453,11 @@ class Skin
     {
         $retval = true;  // Assume the entityId is 'greenlit'
         if ($this->hasGreenlitIdps()) {
+            $entityId = Util::normalizeOAuth2IdP($entityId);
             $idpgreenlit = $this->getConfigOption('idpgreenlit');
             $found = false;
             foreach ($idpgreenlit->idp as $greenidp) {
+                $greenidp = Util::normalizeOAuth2IdP($greenidp);
                 if ($entityId == ((string)$greenidp)) {
                     $found = true;
                     break;
@@ -483,6 +485,7 @@ class Skin
     {
         $retval = false;  // Assume entityId is NOT in the idpredlit
         if ($this->hasRedlitIdps()) {
+            $entityId = Util::normalizeOAuth2IdP($entityId);
             $idpredlit = $this->getConfigOption('idpredlit');
             foreach ($idpredlit->idp as $redidp) {
                 if ($entityId == ((string)$redidp)) {

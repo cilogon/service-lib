@@ -1064,10 +1064,10 @@ EOT;
     {
         $retval = false;
         if (
-            ($entityID == Util::getAuthzUrl('Google')) ||
-            ($entityID == Util::getAuthzUrl('GitHub')) ||
-            ($entityID == Util::getAuthzUrl('ORCID')) ||
-            ($entityID == Util::getAuthzUrl('Microsoft'))
+            ($entityID == Util::getOAuth2Url('Google')) ||
+            ($entityID == Util::getOAuth2Url('GitHub')) ||
+            ($entityID == Util::getOAuth2Url('ORCID')) ||
+            ($entityID == Util::getOAuth2Url('Microsoft'))
         ) {
             $retval = true;
         }
@@ -1256,22 +1256,22 @@ EOT;
         }
 
         // Special processing for OAuth 2.0 IdPs
-        if ($entityID == Util::getAuthzUrl('Google')) {
+        if ($entityID == Util::getOAuth2Url('Google')) {
             $shibarray['Organization Name'] = 'Google';
             $shibarray['Home Page'] = 'https://myaccount.google.com';
             $shibarray['Support Name'] = 'Google Help';
             $shibarray['Support Address'] = 'help@google.com';
-        } elseif ($entityID == Util::getAuthzUrl('GitHub')) {
+        } elseif ($entityID == Util::getOAuth2Url('GitHub')) {
             $shibarray['Organization Name'] = 'GitHub';
             $shibarray['Home Page'] = 'https://github.com';
             $shibarray['Support Name'] = 'GitHub Help';
             $shibarray['Support Address'] = 'help@github.com';
-        } elseif ($entityID == Util::getAuthzUrl('ORCID')) {
+        } elseif ($entityID == Util::getOAuth2Url('ORCID')) {
             $shibarray['Organization Name'] = 'ORCID';
             $shibarray['Home Page'] = 'https://orcid.org';
             $shibarray['Support Name'] = 'ORCID Help';
             $shibarray['Support Address'] = 'help@orcid.org';
-        } elseif ($entityID == Util::getAuthzUrl('Microsoft')) {
+        } elseif ($entityID == Util::getOAuth2Url('Microsoft')) {
             $shibarray['Organization Name'] = 'Microsoft';
             $shibarray['Home Page'] = 'https://account.microsoft.com';
             $shibarray['Support Name'] = 'Microsoft Help';

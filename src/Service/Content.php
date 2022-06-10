@@ -268,7 +268,7 @@ class Content
                 $initialidp = Util::getGetVar('initialidp');
             }
             if (strlen($initialidp) > 0) {
-                $providerId = static::normalizeOAuth2IdP($initialidp);
+                $providerId = Util::normalizeOAuth2IdP($initialidp);
             }
         }
 
@@ -308,21 +308,23 @@ class Content
             $providerId = '';
         }
 
-        $googleauthz = Util::getAuthzUrl('Google');
-        $orcidauthz = Util::getAuthzUrl('ORCID');
-        $githubauthz = Util::getAuthzUrl('GitHub');
-        $microsoftauthz = Util::getAuthzUrl('Microsoft');
+        $googleoauth2 = Util::getOAuth2Url('Google');
+        $orcidoauth2 = Util::getOAuth2Url('ORCID');
+        $githuboauth2 = Util::getOAuth2Url('GitHub');
+        $microsoftoauth2 = Util::getOAuth2Url('Microsoft');
 
         // If no previous providerId, get from skin, or default
-        // to Google, ORCID, or the first IdP in the list.
+        // to ORCID, Google, or the first IdP in the list.
         if (strlen($providerId) == 0) {
-            $initialidp = (string)$skin->getConfigOption('initialidp');
+            $initialidp = Util::normalizeOAuth2IdP(
+                (string)$skin->getConfigOption('initialidp')
+            );
             if ((strlen($initialidp) > 0) && (isset($idps[$initialidp]))) {
                 $providerId = $initialidp;
-            } elseif (isset($idps[$orcidauthz])) {
-                $providerId = Util::getAuthzUrl('ORCID');
-            } elseif (isset($idps[$googleauthz])) {
-                $providerId = Util::getAuthzUrl('Google');
+            } elseif (isset($idps[$orcidoauth2])) {
+                $providerId = $orcidoauth2;
+            } elseif (isset($idps[$googleoauth2])) {
+                $providerId = $googleoauth2;
             } else {
                 $providerId = array_key_first($idps);
             }
@@ -346,23 +348,23 @@ class Content
 
         // Count number of OAuth2 providers for commas/"or" in help text
         $count = 0;
-        if (isset($idps[$orcidauthz])) {
+        if (isset($idps[$orcidoauth2])) {
             $count++;
         }
-        if (isset($idps[$googleauthz])) {
+        if (isset($idps[$googleoauth2])) {
             $count++;
         }
-        if (isset($idps[$githubauthz])) {
+        if (isset($idps[$githuboauth2])) {
             $count++;
         }
-        if (isset($idps[$microsoftauthz])) {
+        if (isset($idps[$microsoftoauth2])) {
             $count++;
         }
 
         if ($count > 0) {
             $selecthelp .= '<p> If you have a ';
 
-            if (isset($idps[$orcidauthz])) {
+            if (isset($idps[$orcidoauth2])) {
                 $selecthelp .= '<a target=\'_blank\' ' .
                    'href=\'https://orcid.org/my-orcid\'>ORCID</a>';
                 if ($count > 2) {
@@ -372,7 +374,7 @@ class Content
                 }
                 $count--;
             }
-            if (isset($idps[$googleauthz])) {
+            if (isset($idps[$googleoauth2])) {
                 $selecthelp .= '<a target=\'_blank\' ' .
                     'href=\'https://myaccount.google.com\'>Google</a>';
                 if ($count > 2) {
@@ -382,7 +384,7 @@ class Content
                 }
                 $count--;
             }
-            if (isset($idps[$githubauthz])) {
+            if (isset($idps[$githuboauth2])) {
                 $selecthelp .= '<a target=\'_blank\' ' .
                     'href=\'https://github.com/settings/profile\'>GitHub</a>';
                 if ($count == 2) {
@@ -390,7 +392,7 @@ class Content
                 }
                 $count--;
             }
-            if (isset($idps[$microsoftauthz])) {
+            if (isset($idps[$microsoftoauth2])) {
                 $selecthelp .= '<a target=\'_blank\' ' .
                     'href=\'https://account.microsoft.com\'>Microsoft</a>';
             }
@@ -2096,7 +2098,7 @@ class Content
                     <div class="col-auto">
                       <input type="hidden" name="providerId"
                       value="' ,
-                      Util::getAuthzUrl($idp_display_name) , '" />
+                      Util::getOAuth2Url($idp_display_name) , '" />
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
@@ -2149,8 +2151,8 @@ class Content
             true
         );
         if ($providerIdValid) {
-            $providerName = Util::getAuthzIdP($providerId);
-            if (in_array($providerName, Util::$oauth2idps)) {
+            $providerName = Util::getOAuth2IdP($providerId);
+            if (array_key_exists($providerName, Util::$oauth2idps)) {
                 // Log in with an OAuth2 IdP
                 static::redirectToGetOAuth2User($providerId);
             } else { // Use InCommon authn
@@ -2183,7 +2185,9 @@ class Content
         $readidpcookies = true;  // Assume config options are not set
         $skin = Util::getSkin();
         $forceinitialidp = (int)$skin->getConfigOption('forceinitialidp');
-        $initialidp = (string)$skin->getConfigOption('initialidp');
+        $initialidp = Util::normalizeOAuth2IdP(
+            (string)$skin->getConfigOption('initialidp')
+        );
 
         // If this is a OIDC transaction, get the redirect_uri and
         // client_id parameters from the session var clientparams.
@@ -2309,8 +2313,8 @@ class Content
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
                 Util::setPortalOrCookieVar($pc, 'providerId', $providerId, true);
-                $providerName = Util::getAuthzIdP($providerId);
-                if (in_array($providerName, Util::$oauth2idps)) {
+                $providerName = Util::getOAuth2IdP($providerId);
+                if (array_key_exists($providerName, Util::$oauth2idps)) {
                     // Log in with an OAuth2 IdP
                     static::redirectToGetOAuth2User($providerId);
                 } elseif (Util::getIdpList()->exists($providerId)) {
@@ -2536,7 +2540,7 @@ class Content
             }
 
             // Get the provider name based on the provider authz URL
-            $providerName = Util::getAuthzIdP($providerId);
+            $providerName = Util::getOAuth2IdP($providerId);
 
             // Get the authz URL and redirect
             $oauth2 = new OAuth2Provider($providerName);
@@ -3040,16 +3044,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
         }
 
         // Add all OAuth2 IdPs to the list
-        foreach (Util::$oauth2idps as $value) {
+        foreach (Util::$oauth2idps as $name => $url) {
             // CIL-617 Show OAuth2 IdPs only if client_id is configured
-            $client_id_def = strtoupper($value) . '_OAUTH2_CLIENT_ID';
+            $client_id_def = strtoupper($name) . '_OAUTH2_CLIENT_ID';
             if (defined($client_id_def)) {
                 $client_id = constant($client_id_def);
                 if (!empty($client_id)) {
-                    $retarray[Util::getAuthzUrl($value)]['Organization_Name'] =
-                        $value;
-                    $retarray[Util::getAuthzUrl($value)]['Display_Name'] =
-                        $value;
+                    $retarray[$url]['Organization_Name'] = $name;
+                    $retarray[$url]['Display_Name'] = $name;
                 }
             }
         }
@@ -3058,6 +3060,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         // If so, go thru master IdP list and keep only those IdPs.
         if ($skin->hasGreenlitIdps()) {
             foreach ($retarray as $entityId => $names) {
+                $entityId = Util::normalizeOAuth2IdP($entityId);
                 if (!$skin->idpGreenlit($entityId)) {
                     unset($retarray[$entityId]);
                 }
@@ -3068,6 +3071,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         if ($skin->hasRedlitIdps()) {
             $idpredlit = $skin->getConfigOption('idpredlit');
             foreach ($idpredlit->idp as $redidp) {
+                $redidp = Util::normalizeOAuth2IdP($redidp);
                 unset($retarray[(string)$redidp]);
             }
         }
@@ -3150,7 +3154,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 if (preg_match('%([^\?]*)\?%', $value, $matches)) {
                     $value = $matches[1];
                 }
-                $value = static::normalizeOAuth2IdP($value);
+                $value = Util::normalizeOAuth2IdP($value);
             }
             unset($value); // Break the reference with the last element.
 
@@ -3167,35 +3171,6 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
         }
         return $hintarray;
-    }
-
-    /**
-     * normalizeOAuth2IdP
-     *
-     * This function takes in a URL for one of the CILogon-supported OAuth2
-     * issuers (i.e., Google, GitHub, ORCID, Microsoft) and transforms it
-     * into a URL used by CILogon as shown in the 'Select an Identity
-     * Provider' list.
-     *
-     * @param string An OAuth2 issuer string (i.e., 'iss') for one of the
-     *        OAuth2 IdPs supported by CILogon.
-     * @return string The input string transformed to a URL to be used in
-     *         the 'Select an Identity Provider' list. If the incoming
-     *         string does not match one of the OAuth2 issuers, the string
-     *         is returned unmodified.
-     */
-    public static function normalizeOAuth2IdP($idp)
-    {
-        if (preg_match('%^https?://accounts.google.com%', $idp)) {
-            $idp = 'https://accounts.google.com/o/oauth2/auth';
-        } elseif (preg_match('%^https?://github.com%', $idp)) {
-            $idp = 'https://github.com/login/oauth/authorize';
-        } elseif (preg_match('%^https?://orcid.org%', $idp)) {
-            $idp = 'https://orcid.org/oauth/authorize';
-        } elseif (preg_match('%^https?://login.microsoftonline.com%', $idp)) {
-            $idp = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
-        }
-        return $idp;
     }
 
     /**
@@ -3315,7 +3290,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               </div> <!-- end card-text -->
         ';
 
-        if ($idp == 'https://accounts.google.com/o/oauth2/auth') {
+        if ($idp == Util::getOAuth2Url('Google')) {
             echo '
               <div class="card-text my-2">
                 You can optionally click the link below to log out of Google.
@@ -3330,7 +3305,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
-        } elseif ($idp == 'https://github.com/login/oauth/authorize') {
+        } elseif ($idp == Util::getOAuth2Url('GitHub')) {
             echo '
               <div class="card-text my-2">
                 You can optionally click the link below to log out of GitHub.
@@ -3342,7 +3317,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
-        } elseif ($idp == 'https://orcid.org/oauth/authorize') {
+        } elseif ($idp == Util::getOAuth2Url('ORCID')) {
             echo '
               <div class="card-text my-2">
                 You can optionally click the link below to log out of ORCID.
@@ -3357,7 +3332,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
-        } elseif ($idp == 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize') {
+        } elseif ($idp == Util::getOAuth2Url('Microsoft')) {
             echo '
               <div class="card-text my-2">
                 You can optionally click the link below to log out of Microsoft.

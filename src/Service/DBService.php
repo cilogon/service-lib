@@ -200,6 +200,12 @@ class DBService
     public $status;
 
     /**
+     * @var string|null $call_output The output returned by curl_exec() in
+     *      the call() function.
+     */
+    public $call_output;
+
+    /**
      * @var string|null $user_uid The CILogon UID
      */
     public $user_uid;
@@ -478,6 +484,7 @@ class DBService
             $this->$value = null;
         }
         $this->status = null;
+        $this->call_output = null;
         $this->user_uid = null;
         $this->distinguished_name = null;
         $this->serial_string = null;
@@ -493,6 +500,7 @@ class DBService
     public function clearPortal()
     {
         $this->status = null;
+        $this->call_output = null;
         $this->oauth_token = null;
         $this->cilogon_callback = null;
         $this->cilogon_success = null;
@@ -509,6 +517,7 @@ class DBService
     public function clearUserCode()
     {
         $this->status = null;
+        $this->call_output = null;
         $this->user_code = null;
         $this->client_id = null;
         $this->scope = null;
@@ -523,6 +532,7 @@ class DBService
     public function clearIdps()
     {
         $this->status = null;
+        $this->call_output = null;
         $this->idp_uids = array();
     }
 
@@ -535,6 +545,7 @@ class DBService
     public function clearErrorResponse()
     {
         $this->status = null;
+        $this->call_output = null;
         $this->error = null;
         $this->error_description = null;
         $this->error_uri = null;
@@ -905,6 +916,7 @@ class DBService
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             $output = curl_exec($ch);
+            $this->call_output = $output;
             if (curl_errno($ch)) { // Send alert on curl errors
                 $log = new Loggit();
                 $log->error('Error in DBService::call(): cUrl Error = ' . curl_error($ch) . ', URL Accessed = ' . $url);

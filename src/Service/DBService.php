@@ -200,6 +200,12 @@ class DBService
     public $status;
 
     /**
+     * @var string|null $call_input The input parameters passed to the
+     *      dbService in the call() function.
+     */
+    public $call_input;
+
+    /**
      * @var string|null $call_output The output returned by curl_exec() in
      *      the call() function.
      */
@@ -484,6 +490,7 @@ class DBService
             $this->$value = null;
         }
         $this->status = null;
+        $this->call_input = null;
         $this->call_output = null;
         $this->user_uid = null;
         $this->distinguished_name = null;
@@ -500,6 +507,7 @@ class DBService
     public function clearPortal()
     {
         $this->status = null;
+        $this->call_input = null;
         $this->call_output = null;
         $this->oauth_token = null;
         $this->cilogon_callback = null;
@@ -517,6 +525,7 @@ class DBService
     public function clearUserCode()
     {
         $this->status = null;
+        $this->call_input = null;
         $this->call_output = null;
         $this->user_code = null;
         $this->client_id = null;
@@ -532,6 +541,7 @@ class DBService
     public function clearIdps()
     {
         $this->status = null;
+        $this->call_input = null;
         $this->call_output = null;
         $this->idp_uids = array();
     }
@@ -545,6 +555,7 @@ class DBService
     public function clearErrorResponse()
     {
         $this->status = null;
+        $this->call_input = null;
         $this->call_output = null;
         $this->error = null;
         $this->error_description = null;
@@ -912,6 +923,7 @@ class DBService
         $ch = curl_init();
         if ($ch !== false) {
             $url = $this->getDBServiceURL() . '?' . $params;
+            $this->call_input = $url;
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);

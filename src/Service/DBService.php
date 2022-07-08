@@ -92,6 +92,8 @@ class DBService
         'STATUS_EPTID_MISMATCH'            => 0x100001,// 1048577
         'STATUS_PAIRWISE_ID_MISMATCH'      => 0x100003,// 1048579
         'STATUS_SUBJECT_ID_MISMATCH'       => 0x100005,// 1048581
+        'STATUS_QDL_ERROR'                 => 0x100007,// 1048583
+        'STATUS_QDL_RUNTIME_ERROR'         => 0x100009,// 1048585
         'STATUS_TRANSACTION_NOT_FOUND'     => 0x10001, //   65537
         'STATUS_EXPIRED_TOKEN'             => 0x10003, //   65539
         'STATUS_CREATE_TRANSACTION_FAILED' => 0x10005, //   65541
@@ -131,6 +133,8 @@ class DBService
         'STATUS_EPTID_MISMATCH'            => 'EPTID mismatch.',
         'STATUS_PAIRWISE_ID_MISMATCH'      => 'Pairwise ID mismatch.',
         'STATUS_SUBJECT_ID_MISMATCH'       => 'Subject ID mismatch.',
+        'STATUS_QDL_ERROR'                 => 'General QDL script error.',
+        'STATUS_QDL_RUNTIME_ERROR'         => 'Runtime QDL script error.',
         'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
         'STATUS_EXPIRED_TOKEN'             => 'Expired token.',
         'STATUS_CREATE_TRANSACTION_FAILED' => 'Failed to initialize OIDC flow.',

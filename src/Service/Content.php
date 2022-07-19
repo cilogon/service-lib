@@ -2139,7 +2139,7 @@ class Content
         );
 
         // Get the user-chosen IdP from the posted form
-        $providerId = Util::getPostVar('providerId');
+        $providerId = Util::normalizeOAuth2IdP(Util::getPostVar('providerId'));
         $providerIdValid = ((strlen($providerId) > 0) &&
                             (isset($idps[$providerId])));
 
@@ -2202,7 +2202,7 @@ class Content
         // Use the first element of the idphint list as the selected_idp.
         $idphintlist = static::getIdphintList();
         if (!empty($idphintlist)) {
-            $selected_idp = $idphintlist[0];
+            $selected_idp = Util::normalizeOAuth2IdP($idphintlist[0]);
         }
 
         if ((strlen($redirect_uri) > 0) || (strlen($client_id) > 0)) {
@@ -2308,6 +2308,8 @@ class Content
         // then skip the Logon page and proceed to the appropriate
         // getuser script.
         if ((strlen($providerId) > 0) && (strlen($keepidp) > 0)) {
+            $providerId = Util::normalizeOAuth2IdP($providerId);
+
             // If selected_idp was specified at the OIDC authorize endpoint,
             // make sure that it matches the saved providerId. If not,
             // then show the Logon page and uncheck the keepidp checkbox.
@@ -2696,7 +2698,7 @@ class Content
             // Select an Identity Provider page again.
             Util::getSkin()->init();  // Check for forced skin
             $idps = static::getCompositeIdPList();
-            $providerId = Util::getSessionVar('idp');
+            $providerId = Util::normalizeOAuth2IdP(Util::getSessionVar('idp'));
             if ((strlen($providerId) > 0) && (!isset($idps[$providerId]))) {
                 Util::setSessionVar(
                     'logonerror',

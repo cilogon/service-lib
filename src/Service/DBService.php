@@ -423,6 +423,12 @@ class DBService
     public $error_uri;
 
     /**
+     * @var string|null $custom_error_uri A non-OAuth2-spec redirect URI
+     *      when a QDL script determines user authz error (CIL-1342).
+     */
+    public $custom_error_uri;
+
+    /**
      * @var string|null $dbservice URL The URL to use for the dbService
      */
     private $dbserviceurl;
@@ -564,6 +570,7 @@ class DBService
         $this->error = null;
         $this->error_description = null;
         $this->error_uri = null;
+        $this->custom_error_uri = null;
     }
 
     /**
@@ -1048,7 +1055,10 @@ class DBService
                     if (preg_match('/error_description=([^\r\n]+)/', $output, $matches)) {
                         $this->error_description = urldecode($matches[1]);
                     }
-                    if (preg_match('/error_uri=([^\r\n]+)/', $output, $matches)) {
+                    // CIL-1342 Redirect to custom URL upon QDL errors
+                    if (preg_match('/custom_error_uri=([^\r\n]+)/', $output, $matches)) {
+                        $this->custom_error_uri = urldecode($matches[1]);
+                    } elseif (preg_match('/error_uri=([^\r\n]+)/', $output, $matches)) {
                         $this->error_uri = urldecode($matches[1]);
                     }
                 }
@@ -1242,10 +1252,13 @@ class DBService
             echo "scope=$this->error\n";
         }
         if (!is_null($this->error_description)) {
-            echo "scope=$this->error\n";
+            echo "scope=$this->error_description\n";
         }
         if (!is_null($this->error_uri)) {
-            echo "scope=$this->error\n";
+            echo "scope=$this->error_uri\n";
+        }
+        if (!is_null($this->custom_error_uri)) {
+            echo "scope=$this->custom_error_uri\n";
         }
     }
 }

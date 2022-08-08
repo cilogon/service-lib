@@ -22,7 +22,7 @@
         "cilogon/oauth2-orcid": "^1.0.7",
         "pear/net_ldap2": "^2.2.0",
         "pear/log": "^1.13.3",
-        "pear/db": "dev-trunk@dev",
+        "pear/db": "dev-trunk as v1.11.0-dev",
         "thenetworg/oauth2-azure": "^2.1.1",
         "tubalmartin/cssmin": "^4.1.1"
     },

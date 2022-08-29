@@ -1112,7 +1112,29 @@ class DBService
         $retstr = '';
 
         if (!is_null($this->status)) {
-            $status_value = array_search($this->status, static::$STATUS);
+            $retstr = statusToStatusText($this->status);
+        }
+
+        return $retstr;
+    }
+
+    /**
+     * statusToStatusText
+     *
+     * This method returns a human-readable description of the passed-in
+     * $status, which corresponds to a STATUS_* (hex) number in the $STATUS
+     * array. If the incoming $status is blank, return empty string.
+     *
+     * @param string $status The status returned by a call to the dbService.
+     * @return string A human-readable version of the $status, or empty
+     *         string if no such $status is empty.
+     */
+    public function statusTostatusText($status)
+    {
+        $retstr = '';
+
+        if (strlen($status) > 0) {
+            $status_value = array_search(((int)$status), static::$STATUS);
             if ($status_value !== false) {
                 if (array_key_exists($status_value, static::$STATUS_TEXT)) {
                     $retstr = static::$STATUS_TEXT[$status_value];

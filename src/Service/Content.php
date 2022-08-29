@@ -2644,7 +2644,10 @@ class Content
         ) {
             $log->error(
                 'Failed to getuser' .
-                ($isEduGAINAndGetCert ? ' due to eduGAIN IdP restriction.' : '.')
+                ($isEduGAINAndGetCert ? ' due to eduGAIN IdP restriction.' : '.') .
+                ' status="' . DBService::statusToStatusText($status) . '"' .
+                ' user_uid="' .
+                ((strlen($user_uid) > 0) ? $user_uid : '<MISSING>') . '"';
             );
 
             // Is this a SAML IdP?

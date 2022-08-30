@@ -2246,6 +2246,31 @@ class Content
                 $forceinitialidp = 0;     // Skip checking this option
                 $selected_idp = '';       // Skip any passed-in option
                 $readidpcookies = false;  // Don't read in the IdP cookies
+            } else {
+                // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
+                // OIDC clients. Check if the $client_id has been configured
+                // with an ACCESS Named Configuration. If so, then use the
+                // currently authenticated IdP to bypass the "Select an
+                // Identity Provider" page.
+                $idp = Util::getSessionVar('idp');
+                if (
+                    (strlen($idp) > 0) &&
+                    (Util::isACCESSNamedConfiguration($client_id))
+                ) {
+                    $anc = Util::getSessionVar('access_named_config');
+                    Util::setSessionVar('access_named_config', $idp);
+                    if (
+                        (strlen($anc) > 0) &&
+                        ($anc == $idp)
+                    ) {
+                        $providerId = $idp;
+                        $keepidp = 'checked';
+                        // To skip the next code blocks, unset a few variables.
+                        $forceinitialidp = 0;     // Skip checking this option
+                        $selected_idp = '';       // Skip any passed-in option
+                        $readidpcookies = false;  // Don't read in the IdP cookies
+                    }
+                }
             }
         }
 
@@ -2357,11 +2382,11 @@ class Content
     {
         $retval = false;
 
-        $idp       = Util::getSessionVar('idp');
-        $idp_display_name   = Util::getSessionVar('idp_display_name');
-        $user_uid  = Util::getSessionVar('user_uid');
-        $status    = Util::getSessionVar('status');
-        $authntime = Util::getSessionVar('authntime');
+        $idp              = Util::getSessionVar('idp');
+        $idp_display_name = Util::getSessionVar('idp_display_name');
+        $user_uid         = Util::getSessionVar('user_uid');
+        $status           = Util::getSessionVar('status');
+        $authntime        = Util::getSessionVar('authntime');
 
         // CIL-410 When using the /testidp/ flow, the 'storeattributes'
         // session var is set. In this case, the only attribute that
@@ -2647,7 +2672,7 @@ class Content
                 ($isEduGAINAndGetCert ? ' due to eduGAIN IdP restriction.' : '.') .
                 ' status="' . DBService::statusToStatusText($status) . '"' .
                 ' user_uid="' .
-                ((strlen($user_uid) > 0) ? $user_uid : '<MISSING>') . '"';
+                ((strlen($user_uid) > 0) ? $user_uid : '<MISSING>') . '"'
             );
 
             // Is this a SAML IdP?

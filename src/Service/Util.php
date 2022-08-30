@@ -1097,6 +1097,7 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('distinguished_name');
         static::unsetSessionVar('authntime');
         static::unsetSessionVar('cilogon_skin');
+        static::unsetSessionVar('access_named_config');
     }
 
     /**
@@ -1310,6 +1311,65 @@ Remote Address= ' . $remoteaddr . '
                         $clientparams['clientstatus'] = DBService::$STATUS['STATUS_OK'];
                         $retval = true;
                     }
+                }
+                $db->disconnect();
+            }
+        }
+        return $retval;
+    }
+
+    /**
+     * isACCESSNamedConfiguration
+     *
+     * This function assists with CIL-1369. Given a client_id, this function
+     * returns true if the client_id has been configured with an ACCESS
+     * Named Configuration. It does this by reading the COmanage database
+     * directly.
+     *
+     * @param string $client_id The client_id to check for an ACCESS
+     *               Named Configuration.
+     * @return bool  True if client_id has an ACCESS Named Configuration
+     *               set. False otherwise.
+     */
+    public static function isACCESSNamedConfiguration($client_id)
+    {
+        $retval = false;
+        // Check if ACCESS database has been configured,
+        // and make sure $client_id is not empty
+        if (
+            (strlen($client_id) > 0) &&
+            (defined('ACCESS_MYSQLI_DATABASE')) &&
+            (!empty(ACCESS_MYSQLI_DATABASE))
+        ) {
+            $dsn = array(
+                'phptype'  => 'mysqli',
+                'username' => ACCESS_MYSQLI_USERNAME,
+                'password' => ACCESS_MYSQLI_PASSWORD,
+                'database' => ACCESS_MYSQLI_DATABASE,
+                'hostspec' => ACCESS_MYSQLI_HOSTSPEC
+            );
+
+            $opts = array(
+                'persistent'  => true,
+                'portability' => DB_PORTABILITY_ALL
+            );
+
+            $db = DB::connect($dsn, $opts);
+            if (!PEAR::isError($db)) {
+                $data = $db->getRow(
+                    "SELECT cm_oa4mp_client_co_oidc_clients.oa4mp_identifier " .
+                    "FROM cm_oa4mp_client_co_oidc_clients " .
+                    "JOIN cm_oa4mp_client_co_named_configs ON " .
+                    "cm_oa4mp_client_co_oidc_clients.named_config_id = " .
+                    "cm_oa4mp_client_co_named_configs.id " .
+                    "WHERE cm_oa4mp_client_co_named_configs.config_name " .
+                    "LIKE 'ACCESS OIDC client configuration%' AND " .
+                    "oa4mp_identifier = ?",
+                    array($client_id),
+                    DB_FETCHMODE_ASSOC
+                );
+                if ((!DB::isError($data)) && (!empty($data))) {
+                    $retval = true;
                 }
                 $db->disconnect();
             }

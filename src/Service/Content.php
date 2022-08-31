@@ -2182,6 +2182,7 @@ class Content
         $redirect_uri = '';
         $client_id = '';
         $callbackuri = Util::getSessionVar('callbackuri');
+        $idp = Util::getSessionVar('idp');
         $readidpcookies = true;  // Assume config options are not set
         $skin = Util::getSkin();
         $forceinitialidp = (int)$skin->getConfigOption('forceinitialidp');
@@ -2239,6 +2240,18 @@ class Content
                 }
             }
 
+            // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
+            // OIDC clients. If the $client_id has been configured with
+            // an ACCESS Named Configuration, save the current IdP for
+            // checking the next time the user attempts to use an
+            // ACCESS OIDC client.
+            $lastanc = Util::getSessionVar('access_named_config');
+            $isanc = false;
+            if (Util::isACCESSNamedConfiguration($client_id)) {
+                $isanc = true;
+                Util::setSessionVar('access_named_config', $idp);
+            }
+
             if (!empty($bypassidp)) { // Match found!
                 $providerId = $bypassidp;
                 $keepidp = 'checked';
@@ -2248,28 +2261,17 @@ class Content
                 $readidpcookies = false;  // Don't read in the IdP cookies
             } else {
                 // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
-                // OIDC clients. Check if the $client_id has been configured
-                // with an ACCESS Named Configuration. If so, then use the
-                // currently authenticated IdP to bypass the "Select an
-                // Identity Provider" page.
-                $idp = Util::getSessionVar('idp');
-                if (
-                    (strlen($idp) > 0) &&
-                    (Util::isACCESSNamedConfiguration($client_id))
-                ) {
-                    $anc = Util::getSessionVar('access_named_config');
-                    Util::setSessionVar('access_named_config', $idp);
-                    if (
-                        (strlen($anc) > 0) &&
-                        ($anc == $idp)
-                    ) {
-                        $providerId = $idp;
-                        $keepidp = 'checked';
-                        // To skip the next code blocks, unset a few variables.
-                        $forceinitialidp = 0;     // Skip checking this option
-                        $selected_idp = '';       // Skip any passed-in option
-                        $readidpcookies = false;  // Don't read in the IdP cookies
-                    }
+                // OIDC clients. If the $client_id uses an ACCESS Named
+                // Configuration, and the session IdP matches the IdP
+                // previously used with an ACCESS OIDC client, then bypass
+                // the "Select an Identity Provider" page.
+                if (($isanc) && (strlen($lastanc) > 0) && ($lastanc == $idp)) {
+                    $providerId = $idp;
+                    $keepidp = 'checked';
+                    // To skip the next code blocks, unset a few variables.
+                    $forceinitialidp = 0;     // Skip checking this option
+                    $selected_idp = '';       // Skip any passed-in option
+                    $readidpcookies = false;  // Don't read in the IdP cookies
                 }
             }
         }

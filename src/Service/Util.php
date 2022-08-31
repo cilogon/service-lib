@@ -1303,14 +1303,12 @@ Remote Address= ' . $remoteaddr . '
                     array($clientparams['client_id']),
                     DB_FETCHMODE_ASSOC
                 );
-                if (!DB::isError($data)) {
-                    if (!empty($data)) {
-                        foreach ($data as $key => $value) {
-                            $clientparams['client_' . $key] = $value;
-                        }
-                        $clientparams['clientstatus'] = DBService::$STATUS['STATUS_OK'];
-                        $retval = true;
+                if ((!DB::isError($data)) && (!empty($data))) {
+                    foreach ($data as $key => $value) {
+                        $clientparams['client_' . $key] = $value;
                     }
+                    $clientparams['clientstatus'] = DBService::$STATUS['STATUS_OK'];
+                    $retval = true;
                 }
                 $db->disconnect();
             }
@@ -1319,34 +1317,26 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
-     * isACCESSNamedConfiguration
+     * isACCESSClient
      *
      * This function assists with CIL-1369. Given a client_id, this function
-     * returns true if the client_id has been configured with an ACCESS
-     * Named Configuration. It does this by reading the COmanage database
-     * directly.
+     * returns true if the client_id was created by an ACCESS admin client.
      *
-     * @param string $client_id The client_id to check for an ACCESS
-     *               Named Configuration.
-     * @return bool  True if client_id has an ACCESS Named Configuration
-     *               set. False otherwise.
+     * @param string $client_id The client_id to check.
+     * @return bool  True if client_id is an ACCESS OIDC client.
+     *               False otherwise.
      */
-    public static function isACCESSNamedConfiguration($client_id)
+    public static function isACCESSClient($client_id)
     {
         $retval = false;
-        // Check if ACCESS database has been configured,
-        // and make sure $client_id is not empty
-        if (
-            (strlen($client_id) > 0) &&
-            (defined('ACCESS_MYSQLI_DATABASE')) &&
-            (!empty(ACCESS_MYSQLI_DATABASE))
-        ) {
+
+        if (strlen($client_id) > 0) {
             $dsn = array(
                 'phptype'  => 'mysqli',
-                'username' => ACCESS_MYSQLI_USERNAME,
-                'password' => ACCESS_MYSQLI_PASSWORD,
-                'database' => ACCESS_MYSQLI_DATABASE,
-                'hostspec' => ACCESS_MYSQLI_HOSTSPEC
+                'username' => MYSQLI_USERNAME,
+                'password' => MYSQLI_PASSWORD,
+                'database' => MYSQLI_DATABASE,
+                'hostspec' => MYSQLI_HOSTSPEC
             );
 
             $opts = array(
@@ -1357,19 +1347,18 @@ Remote Address= ' . $remoteaddr . '
             $db = DB::connect($dsn, $opts);
             if (!PEAR::isError($db)) {
                 $data = $db->getRow(
-                    "SELECT cm_oa4mp_client_co_oidc_clients.oa4mp_identifier " .
-                    "FROM cm_oa4mp_client_co_oidc_clients " .
-                    "JOIN cm_oa4mp_client_co_named_configs ON " .
-                    "cm_oa4mp_client_co_oidc_clients.named_config_id = " .
-                    "cm_oa4mp_client_co_named_configs.id " .
-                    "WHERE cm_oa4mp_client_co_named_configs.config_name " .
-                    "LIKE 'ACCESS OIDC client configuration%' AND " .
-                    "oa4mp_identifier = ?",
+                    "SELECT name FROM adminClients WHERE admin_id IN " .
+                    "(SELECT admin_id FROM permissions WHERE client_id = ?)",
                     array($client_id),
                     DB_FETCHMODE_ASSOC
                 );
                 if ((!DB::isError($data)) && (!empty($data))) {
-                    $retval = true;
+                    if (
+                        (strlen(@$data['name']) > 0) &&
+                        (preg_match('/^ACCESS /', $data['name']))
+                    ) {
+                        $retval = true;
+                    }
                 }
                 $db->disconnect();
             }

@@ -2247,7 +2247,7 @@ class Content
             // ACCESS OIDC client.
             $lastanc = Util::getSessionVar('access_named_config');
             $isanc = false;
-            if (Util::isACCESSNamedConfiguration($client_id)) {
+            if (Util::isACCESSClient($client_id)) {
                 $isanc = true;
                 Util::setSessionVar('access_named_config', $idp);
             }

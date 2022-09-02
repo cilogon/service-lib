@@ -2,8 +2,7 @@
 
 namespace CILogon\Service;
 
-require_once 'DB.php';
-
+use CILogon\Service\DBProps;
 use CILogon\Service\Util;
 use tubalmartin\CssMin\Minifier as CSSmin;
 use PEAR;
@@ -263,21 +262,9 @@ class Skin
         $readin = false; // Make sure we read in either XML or CSS (or both)
 
         if (strlen($skinvar) > 0) {
-            $dsn = array(
-                'phptype'  => 'mysqli',
-                'username' => MYSQLI_USERNAME,
-                'password' => MYSQLI_PASSWORD,
-                'database' => MYSQLI_DATABASE,
-                'hostspec' => MYSQLI_HOSTSPEC
-            );
-
-            $opts = array(
-                'persistent'  => true,
-                'portability' => DB_PORTABILITY_ALL
-            );
-
-            $db = DB::connect($dsn, $opts);
-            if (!PEAR::isError($db)) {
+            $dbprops = new DBProps('mysqli');
+            $db = $dbprops->getDBConnect();
+            if (!is_null($db)) {
                 $data = $db->getRow(
                     'SELECT * from skins WHERE name = ?',
                     array($skinvar),

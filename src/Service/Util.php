@@ -2,12 +2,11 @@
 
 namespace CILogon\Service;
 
-require_once 'DB.php';
-
 use CILogon\Service\CSRF;
 use CILogon\Service\Loggit;
 use CILogon\Service\IdpList;
 use CILogon\Service\DBService;
+use CILogon\Service\DBProps;
 use CILogon\Service\SessionMgr;
 use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
@@ -1283,21 +1282,9 @@ Remote Address= ' . $remoteaddr . '
     {
         $retval = false;
         if (strlen(@$clientparams['client_id']) > 0) {
-            $dsn = array(
-                'phptype'  => 'mysqli',
-                'username' => MYSQLI_USERNAME,
-                'password' => MYSQLI_PASSWORD,
-                'database' => MYSQLI_DATABASE,
-                'hostspec' => MYSQLI_HOSTSPEC
-            );
-
-            $opts = array(
-                'persistent'  => true,
-                'portability' => DB_PORTABILITY_ALL
-            );
-
-            $db = DB::connect($dsn, $opts);
-            if (!PEAR::isError($db)) {
+            $dbprops = new DBProps('mysqli');
+            $db = $dbprops->getDBConnect();
+            if (!is_null($db)) {
                 $data = $db->getRow(
                     'SELECT name,home_url,callback_uri,scopes from clients WHERE client_id = ?',
                     array($clientparams['client_id']),
@@ -1331,21 +1318,9 @@ Remote Address= ' . $remoteaddr . '
         $retval = false;
 
         if (strlen($client_id) > 0) {
-            $dsn = array(
-                'phptype'  => 'mysqli',
-                'username' => MYSQLI_USERNAME,
-                'password' => MYSQLI_PASSWORD,
-                'database' => MYSQLI_DATABASE,
-                'hostspec' => MYSQLI_HOSTSPEC
-            );
-
-            $opts = array(
-                'persistent'  => true,
-                'portability' => DB_PORTABILITY_ALL
-            );
-
-            $db = DB::connect($dsn, $opts);
-            if (!PEAR::isError($db)) {
+            $dbprops = new DBProps('mysqli');
+            $db = $dbprops->getDBConnect();
+            if (!is_null($db)) {
                 $data = $db->getRow(
                     "SELECT name FROM adminClients WHERE admin_id IN " .
                     "(SELECT admin_id FROM permissions WHERE client_id = ?)",

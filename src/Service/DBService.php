@@ -1112,7 +1112,7 @@ class DBService
         $retstr = '';
 
         if (!is_null($this->status)) {
-            $retstr = statusToStatusText($this->status);
+            $retstr = static::statusToStatusText($this->status);
         }
 
         return $retstr;

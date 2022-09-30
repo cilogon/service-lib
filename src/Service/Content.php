@@ -3333,7 +3333,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 <div class="col-auto">
                   <a class="btn btn-primary"
                   href="https://accounts.google.com/Logout">(Optional)
-                  Logout from Google</a>
+                  Log out from Google</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
@@ -3345,7 +3345,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  href="https://github.com/logout">(Optional) Logout from GitHub</a>
+                  href="https://github.com/logout">(Optional) Log out from GitHub</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
@@ -3360,7 +3360,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  href="https://orcid.org/signout">(Optional) Logout from ORCID</a>
+                  href="https://orcid.org/signout">(Optional) Log out from ORCID</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
@@ -3375,7 +3375,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 <div class="col-auto">
                   <a class="btn btn-primary"
                   href="https://login.microsoftonline.com/common/oauth2/v2.0/logout">(Optional)
-                  Logout from Microsoft</a>
+                  Log out from Microsoft</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
@@ -3406,7 +3406,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  href="' , $logout , '">(Optional) Logout from ' , $idp_display_name , '</a>
+                  href="' , $logout , '">(Optional) Log out from ' , $idp_display_name , '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
               ';

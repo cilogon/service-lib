@@ -636,8 +636,8 @@ class Skin
             if (
                 ($key === $uri) ||
                 ($key === Util::getAdminForClient($uri)) ||
-                (preg_match($key, $uri)) ||
-                (preg_match($key, Util::getAdminForClient($uri)))
+                (@preg_match($key, $uri)) ||
+                (@preg_match($key, Util::getAdminForClient($uri)))
             ) {
                 $retval = $value;
                 break;

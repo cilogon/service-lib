@@ -1342,6 +1342,57 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
+     * getAdminForClient
+     *
+     * Given a client_id, return the admin_id of the admin client which
+     * created the client. If client_id was not created by an admin client,
+     * return empty string.
+     *
+     * @param string $client_id The client_id to check.
+     * @return string The admin_id of the admin client which created the
+     *         client, or empty string if no such admin_id was found.
+     */
+    public static function getAdminForClient($client_id)
+    {
+        $retval = '';
+        // Keep track of the client_ids (and their corresponding admin_ids)
+        // already searched for; limits the number of database calls.
+        static $clienttoadminmap = array();
+
+        if (strlen($client_id) > 0) {
+            // If we already did a database search for $client_id,
+            // return the previously matched admin_id (or empty string if
+            // the client_id didn't have a matching admin_id)
+            if (array_key_exists($client_id, $clienttoadminmap)) {
+                $retval = $clienttoadminmap[$client_id];
+            } else { // Search the database for the client_id's admin_id
+                $dbprops = new DBProps('mysqli');
+                $db = $dbprops->getDBConnect();
+                if (!is_null($db)) {
+                    $data = $db->getRow(
+                        "SELECT admin_id FROM permissions WHERE client_id = ?",
+                        array($client_id),
+                        DB_FETCHMODE_ASSOC
+                    );
+                    if (
+                        (!DB::isError($data)) &&
+                        (!empty($data)) &&
+                        (strlen(@$data['admin_id']) > 0)
+                    ) {
+                        $retval = $data['admin_id'];
+                        $clienttoadminmap[$client_id] = $retval;
+                    } else {
+                        $clienttoadminmap[$client_id] = '';
+                    }
+                    $db->disconnect();
+                }
+            }
+        }
+
+        return $retval;
+    }
+
+    /**
      * getMinMaxLifetimes
      *
      * This function checks the skin's configuration to see if either or

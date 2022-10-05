@@ -633,7 +633,12 @@ class Skin
         $retval = '';  // Assume uri is not in $forcearray
 
         foreach ($this->forcearray as $key => $value) {
-            if (preg_match($key, $uri)) {
+            if (
+                ($key === $uri) ||
+                ($key === Util::getAdminForClient($uri)) ||
+                (preg_match($key, $uri)) ||
+                (preg_match($key, Util::getAdminForClient($uri)))
+            ) {
                 $retval = $value;
                 break;
             }

@@ -150,20 +150,23 @@ class Skin
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $uristocheck = array(
             Util::getGetVar('redirect_uri'),
-            Util::getGetVar('client_id'),
-            @$clientparams['client_id'],
+            Util::getGetVar('client_id'),       // $idx == 1
+            @$clientparams['client_id'],        // $idx == 2
             Util::getSessionVar('callbackuri'),
             Util::getSessionVar('idp'),
         );
 
+        $idx = 0;
         foreach ($uristocheck as $value) {
             if (strlen($value) > 0) {
-                $skin = $this->getForceSkin($value);
+                // For 'client_id', check if there is a matching admin client
+                $skin = $this->getForceSkin($value, (($idx == 1) || ($idx == 2)));
                 if (strlen($skin) > 0) {
                     $skinvar = $skin;
                     break;
                 }
             }
+            $idx++;
         }
 
         // If no force skin found, check GET and POST parameters, as well as
@@ -625,19 +628,23 @@ class Skin
      * string is returned.
      *
      * @param string $uri A URI to search for in the $forcearray.
+     * @param bool $checkadmin If true, see if the $uri matches an admin
+     *        client. Defaults to false. Use when the $uri is a 'client_id'.
      * @return string The skin name for the URI, or empty string if not
      *         found.
      */
-    protected function getForceSkin($uri)
+    protected function getForceSkin($uri, $checkadmin = false)
     {
         $retval = '';  // Assume uri is not in $forcearray
 
         foreach ($this->forcearray as $key => $value) {
             if (
                 ($key === $uri) ||
-                ($key === Util::getAdminForClient($uri)) ||
                 (@preg_match($key, $uri)) ||
-                (@preg_match($key, Util::getAdminForClient($uri)))
+                ($checkadmin &&
+                    (($key === (Util::getAdminForClient($uri))['admin_id']) ||
+                    (@preg_match($key, (Util::getAdminForClient($uri))['admin_id'])))
+                )
             ) {
                 $retval = $value;
                 break;

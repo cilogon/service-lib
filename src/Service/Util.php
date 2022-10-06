@@ -1318,24 +1318,10 @@ Remote Address= ' . $remoteaddr . '
         $retval = false;
 
         if (strlen($client_id) > 0) {
-            $dbprops = new DBProps('mysqli');
-            $db = $dbprops->getDBConnect();
-            if (!is_null($db)) {
-                $data = $db->getRow(
-                    "SELECT name FROM adminClients WHERE admin_id IN " .
-                    "(SELECT admin_id FROM permissions WHERE client_id = ?)",
-                    array($client_id),
-                    DB_FETCHMODE_ASSOC
-                );
-                if ((!DB::isError($data)) && (!empty($data))) {
-                    if (
-                        (strlen(@$data['name']) > 0) &&
-                        (preg_match('/^ACCESS /', $data['name']))
-                    ) {
-                        $retval = true;
-                    }
-                }
-                $db->disconnect();
+            $admin = static::getAdminForClient($client_id);
+
+            if ((!empty($admin)) && (preg_match('/^ACCESS /', $admin['name']))) {
+                $retval = true;
             }
         }
         return $retval;
@@ -1349,28 +1335,30 @@ Remote Address= ' . $remoteaddr . '
      * return empty string.
      *
      * @param string $client_id The client_id to check.
-     * @return string The admin_id of the admin client which created the
-     *         client, or empty string if no such admin_id was found.
+     * @return array An associative array containing the 'admin_id' and
+     *         'name' of the admin client which created the client,
+     *         or an empty array if no matching admin client was found.
      */
     public static function getAdminForClient($client_id)
     {
-        $retval = '';
-        // Keep track of the client_ids (and their corresponding admin_ids)
+        $retval = array();
+        // Keep track of the client_ids (and their admin_ids/admin names)
         // already searched for; limits the number of database calls.
         static $clienttoadminmap = array();
 
         if (strlen($client_id) > 0) {
             // If we already did a database search for $client_id,
-            // return the previously matched admin_id (or empty string if
+            // return the previously matched admin (or empty array if
             // the client_id didn't have a matching admin_id)
             if (array_key_exists($client_id, $clienttoadminmap)) {
                 $retval = $clienttoadminmap[$client_id];
-            } else { // Search the database for the client_id's admin_id
+            } else { // Search the database for the client_id's admin_id+name
                 $dbprops = new DBProps('mysqli');
                 $db = $dbprops->getDBConnect();
                 if (!is_null($db)) {
                     $data = $db->getRow(
-                        "SELECT admin_id FROM permissions WHERE client_id = ?",
+                        "SELECT admin_id,name FROM adminClients WHERE admin_id IN " .
+                        "(SELECT admin_id FROM permissions WHERE client_id = ?)",
                         array($client_id),
                         DB_FETCHMODE_ASSOC
                     );
@@ -1379,12 +1367,12 @@ Remote Address= ' . $remoteaddr . '
                         (!empty($data)) &&
                         (strlen(@$data['admin_id']) > 0)
                     ) {
-                        $retval = $data['admin_id'];
-                        $clienttoadminmap[$client_id] = $retval;
-                    } else {
-                        $clienttoadminmap[$client_id] = '';
+                        $retval['admin_id'] = (string)(@$data['admin_id']);
+                        $retval['name'] = (string)(@$data['name']);
                     }
                     $db->disconnect();
+                    // Save this client_id's query results for next time
+                    $clienttoadminmap[$client_id] = $retval;
                 }
             }
         }

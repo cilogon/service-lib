@@ -2239,10 +2239,10 @@ class Content
                 if (
                     ($key === $redirect_uri) ||
                     ($key === $client_id) ||
-                    ($key === (Util::getAdminForClient($client_id))['admin_id']) ||
+                    ($key === (@Util::getAdminForClient($client_id))['admin_id']) ||
                     (@preg_match($key, $redirect_uri)) ||
                     (@preg_match($key, $client_id)) ||
-                    (@preg_match($key, (Util::getAdminForClient($client_id))['admin_id']))
+                    (@preg_match($key, (@Util::getAdminForClient($client_id))['admin_id']))
                 ) {
                     $bypassidp = $value;
                     // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
@@ -2259,78 +2259,15 @@ class Content
                     if (
                         ($key === $redirect_uri) ||
                         ($key === $client_id) ||
-                        ($key === (Util::getAdminForClient($client_id))['admin_id']) ||
+                        ($key === (@Util::getAdminForClient($client_id))['admin_id']) ||
                         (@preg_match($key, $redirect_uri)) ||
                         (@preg_match($key, $client_id)) ||
-                        (@preg_match($key, (Util::getAdminForClient($client_id))['admin_id']))
+                        (@preg_match($key, (@Util::getAdminForClient($client_id))['admin_id']))
                     ) {
                         $bypassidp = $selected_idp;
                         break;
                     }
                 }
-            }
-
-            // CIL-1369 Special Single Sign-On (SSO) handling for
-            // OIDC clients. If the $client_id has an associated
-            // admin client, save the current IdP for checking the
-            // next time the user attempts to use an OIDC client
-            // from the same CO/VO.
-
-            // Search for an admin client corresponding to this $client_id
-            $admin = Util::getAdminForClient($client_id);
-            $admin_id = '';
-            $admin_name = '';
-            if (!empty($admin)) {
-                $admin_id = @$admin['admin_id'];
-                $admin_name = @$admin['name'];
-            }
-
-            // Read in the SSO_ADMIN_ARRAY from config.php or the bypass
-            // table (where type='sso'). This array has entries like:
-            //    admin_id => CO_name
-            // Then search the array for a matching $admin_id to get
-            // the corresponding CO_name.
-            $sso_admin_array = Util::getBypass()->getSSOAdminArray();
-            $co_name = '';
-            if (
-                (strlen($admin_id) > 0) &&
-                (array_key_exists($admin_id, $sso_admin_array))
-            ) {
-                $co_name = $sso_admin_array[$admin_id];
-            }
-
-            // Get the sso_idp_array session value. This array has
-            // entries like:
-            //     CO_name => idp_entity_id
-            // Then search the array for a matching $co_name to get
-            // the corresponding IdP. If this transaction is one worthy
-            // of SSO, we will later update the $sso_idp_array with
-            // the new entry and save it back to the sso_idp_array session
-            // variable.
-            $sso_idp_array = Util::getSessionVar('sso_idp_array');
-            if (!is_array($sso_idp_array)) {
-                $sso_idp_array = array();
-            }
-            $last_sso_idp = '';
-            if (
-                (strlen($co_name) > 0) &&
-                (!empty($sso_idp_array)) &&
-                (array_key_exists($co_name, $sso_idp_array))
-            ) {
-                $last_sso_idp = $sso_idp_array[$co_name];
-            }
-
-            // Finally, make the decision if this transaction should use
-            // SSO. If the $co_name matches the name of the current
-            // $client_id's admin client, then allow SSO for this CO/VO,
-            // and update the $sso_idp_array with the current $idp.
-            if (
-                (strlen($co_name) > 0) &&
-                (preg_match("/^$co_name/", $admin_name))
-            ) {
-                $is_sso = true;
-                $sso_idp_array[$co_name] = $idp;
-                $_SESSION['sso_idp_array'] = $sso_idp_array;
             }
 
             if (!empty($bypassidp)) { // Match found!
@@ -2340,18 +2277,21 @@ class Content
                 $forceinitialidp = 0;     // Skip checking this option
                 $selected_idp = '';       // Skip any passed-in option
                 $readidpcookies = false;  // Don't read in the IdP cookies
-            } elseif (($is_sso) && (strlen($last_sso_idp) > 0) && ($last_sso_idp == $idp)) {
-                // CIL-1369 Special Single Sign-On (SSO) handling for
-                // OIDC clients. If the $client_id has an associated
-                // admin client, and the session IdP matches the IdP
-                // previously used with a CO's OIDC client, then bypass
-                // the "Select an Identity Provider" page.
-                $providerId = $idp;
-                $keepidp = 'checked';
-                // To skip the next code blocks, unset a few variables.
-                $forceinitialidp = 0;     // Skip checking this option
-                $selected_idp = '';       // Skip any passed-in option
-                $readidpcookies = false;  // Don't read in the IdP cookies
+            } else {
+                $last_sso_idp = Util::getLastSSOIdP();
+                if ((strlen($last_sso_idp) > 0) && ($last_sso_idp == $idp)) {
+                    // CIL-1369 Special Single Sign-On (SSO) handling for
+                    // OIDC clients. If the $client_id has an associated
+                    // admin client, and the session IdP matches the IdP
+                    // previously used with a CO's OIDC client, then bypass
+                    // the "Select an Identity Provider" page.
+                    $providerId = $idp;
+                    $keepidp = 'checked';
+                    // To skip the next code blocks, unset a few variables.
+                    $forceinitialidp = 0;     // Skip checking this option
+                    $selected_idp = '';       // Skip any passed-in option
+                    $readidpcookies = false;  // Don't read in the IdP cookies
+                }
             }
         }
 
@@ -2829,6 +2769,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 Util::unsetUserSessionVars();
                 printLogonPage();
             } else { // Got user successfully
+                Util::getLastSSOIdP(); // Save current IdP for SSO
                 static::gotUserSuccess();
             }
         }

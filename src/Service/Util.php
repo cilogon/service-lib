@@ -2007,4 +2007,96 @@ Remote Address= ' . $remoteaddr . '
 
         return $needtowait;
     }
+
+    /**
+     * getLastSSOIdP
+     *
+     * CIL-1369 Special Single Sign-On (SSO) handling for OIDC clients.
+     * This function checks if the current OIDC transaction $client_id
+     * has an associated admin client, and that admin client is configured
+     * to support SSO. If so, return the previously used IdP which can
+     * be compared against the current IdP. If they are equal, then bypass
+     * the "Select an Identity Provider" page. As a side effect, this
+     * function also saves the current IdP for checking the next time
+     * the user attempts to use an OIDC client from the same CO.
+     *
+     * This function should be called twice:
+     * (1) before the IdP list is shown, to determine if we should use
+     * the current session info and bypass IdP selection, and
+     * (2) after the user has successfully logged on so the successful
+     * IdP used can be saved to the session for next SSO calculation.
+     *
+     * @return string The previously used SSO IdP, or empty string if
+     *         the transaction is not eligible for SSO.
+     */
+    public static function getLastSSOIdP()
+    {
+        $last_sso_idp = '';
+        $client_id = '';
+        $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
+        if (isset($clientparams['client_id'])) {
+            $client_id = $clientparams['client_id'];
+        }
+
+        if (strlen($client_id) > 0) {
+            // Search for an admin client corresponding to the $client_id
+            $admin = static::getAdminForClient($client_id);
+            $admin_id = '';
+            $admin_name = '';
+            if (!empty($admin)) {
+                $admin_id = @$admin['admin_id'];
+                $admin_name = @$admin['name'];
+            }
+
+            // Read in the SSO_ADMIN_ARRAY from config.php or the bypass
+            // table (where type='sso'). This array has entries like:
+            //    admin_id => CO_name
+            // Then search the array for a matching $admin_id to get
+            // the corresponding CO_name.
+            $sso_admin_array = static::getBypass()->getSSOAdminArray();
+            $co_name = '';
+            if (
+                (strlen($admin_id) > 0) &&
+                (array_key_exists($admin_id, $sso_admin_array))
+            ) {
+                $co_name = $sso_admin_array[$admin_id];
+            }
+
+            // Get the sso_idp_array session value. This array has
+            // entries like:
+            //     CO_name => idp_entity_id
+            // Then search the array for a matching $co_name to get
+            // the corresponding IdP. If this transaction is one worthy
+            // of SSO, we will later update the $sso_idp_array with
+            // the new entry and save it back to the sso_idp_array session
+            // variable.
+            $sso_idp_array = static::getSessionVar('sso_idp_array');
+            if (!is_array($sso_idp_array)) { // Doesn't exist yet!
+                $sso_idp_array = array();
+            }
+            if (
+                (strlen($co_name) > 0) &&
+                (!empty($sso_idp_array)) &&
+                (array_key_exists($co_name, $sso_idp_array))
+            ) {
+                $last_sso_idp = $sso_idp_array[$co_name];
+            }
+
+            // Finally, make the decision if this transaction should use
+            // SSO. If the $co_name matches the name of the current
+            // $client_id's admin client, then allow SSO for this CO/VO,
+            // and update the $sso_idp_array with the current session IdP.
+            if (
+                (strlen($co_name) > 0) &&
+                (preg_match("/^$co_name/", $admin_name))
+            ) {
+                $sso_idp_array[$co_name] = Util::getSessionVar('idp');
+                $_SESSION['sso_idp_array'] = $sso_idp_array;
+            } else {
+                $last_sso_idp = ''; // Reset the return value
+            }
+        }
+
+        return $last_sso_idp;
+    }
 }

@@ -2249,15 +2249,15 @@ class Content
             }
 
             // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
-            // OIDC clients. If the $client_id has been configured with
-            // an ACCESS Named Configuration, save the current IdP for
+            // OIDC clients. If the $client_id has an associated 
+            // ACCESS admin client, save the current IdP for
             // checking the next time the user attempts to use an
             // ACCESS OIDC client.
-            $lastanc = Util::getSessionVar('access_named_config');
-            $isanc = false;
+            $last_sso_idp = Util::getSessionVar('sso_idp');
+            $is_sso = false;
             if (Util::isACCESSClient($client_id)) {
-                $isanc = true;
-                Util::setSessionVar('access_named_config', $idp);
+                $is_sso = true;
+                Util::setSessionVar('sso_idp', $idp);
             }
 
             if (!empty($bypassidp)) { // Match found!
@@ -2267,20 +2267,18 @@ class Content
                 $forceinitialidp = 0;     // Skip checking this option
                 $selected_idp = '';       // Skip any passed-in option
                 $readidpcookies = false;  // Don't read in the IdP cookies
-            } else {
+            } elseif (($is_sso) && (strlen($last_sso_idp) > 0) && ($last_sso_idp == $idp)) {
                 // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
-                // OIDC clients. If the $client_id uses an ACCESS Named
-                // Configuration, and the session IdP matches the IdP
+                // OIDC clients. If the $client_id has an associated
+                // ACCESS admin client, and the session IdP matches the IdP
                 // previously used with an ACCESS OIDC client, then bypass
                 // the "Select an Identity Provider" page.
-                if (($isanc) && (strlen($lastanc) > 0) && ($lastanc == $idp)) {
-                    $providerId = $idp;
-                    $keepidp = 'checked';
-                    // To skip the next code blocks, unset a few variables.
-                    $forceinitialidp = 0;     // Skip checking this option
-                    $selected_idp = '';       // Skip any passed-in option
-                    $readidpcookies = false;  // Don't read in the IdP cookies
-                }
+                $providerId = $idp;
+                $keepidp = 'checked';
+                // To skip the next code blocks, unset a few variables.
+                $forceinitialidp = 0;     // Skip checking this option
+                $selected_idp = '';       // Skip any passed-in option
+                $readidpcookies = false;  // Don't read in the IdP cookies
             }
         }
 

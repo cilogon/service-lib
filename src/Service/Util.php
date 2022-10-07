@@ -1096,7 +1096,7 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('distinguished_name');
         static::unsetSessionVar('authntime');
         static::unsetSessionVar('cilogon_skin');
-        static::unsetSessionVar('sso_idp');
+        static::unsetSessionVar('sso_idp_array');
     }
 
     /**
@@ -1298,30 +1298,6 @@ Remote Address= ' . $remoteaddr . '
                     $retval = true;
                 }
                 $db->disconnect();
-            }
-        }
-        return $retval;
-    }
-
-    /**
-     * isACCESSClient
-     *
-     * This function assists with CIL-1369. Given a client_id, this function
-     * returns true if the client_id was created by an ACCESS admin client.
-     *
-     * @param string $client_id The client_id to check.
-     * @return bool  True if client_id is an ACCESS OIDC client.
-     *               False otherwise.
-     */
-    public static function isACCESSClient($client_id)
-    {
-        $retval = false;
-
-        if (strlen($client_id) > 0) {
-            $admin = static::getAdminForClient($client_id);
-
-            if ((!empty($admin)) && (preg_match('/^ACCESS /', $admin['name']))) {
-                $retval = true;
             }
         }
         return $retval;

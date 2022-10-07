@@ -32,15 +32,29 @@ class Content
             $csrf->setTheCookie();
         }
 
-        // Find the 'Powered By CILogon' image if specified by the skin
-        $poweredbyimg = "/images/poweredbycilogon.png";
+        // Get the 'Powered By CILogon' image attributes specified by the skin
+        $poweredbyimg = '/images/poweredbycilogon.png';
+        $poweredbyurl = 'https://www.cilogon.org/faq';
+        $poweredbyalt = 'CILogon';
+        $poweredbytitle = 'CILogon Service';
+
         $skin = Util::getSkin();
-        $skinpoweredbyimg = (string)$skin->getConfigOption('poweredbyimg');
-        if (
-            (strlen($skinpoweredbyimg) > 0) &&
-            (is_readable('/var/www/html' . $skinpoweredbyimg))
-        ) {
-            $poweredbyimg = $skinpoweredbyimg;
+        $pbimg = (string)$skin->getConfigOption('poweredbyimg');
+        if ((strlen($pbimg) > 0) && (is_readable('/var/www/html' . $pbimg))) {
+            $poweredbyimg = $pbimg;
+        }
+
+        $pburl = $skin->getConfigOption('poweredbyurl');
+        if (!is_null($pburl)) {
+            $poweredbyurl = (string)$pburl;
+        }
+        $pbalt = $skin->getConfigOption('poweredbyalt');
+        if (!is_null($pbalt)) {
+            $poweredbyalt = (string)$pbalt;
+        }
+        $pbtitle = $skin->getConfigOption('poweredbytitle');
+        if (!is_null($pbtitle)) {
+            $poweredbytitle = (string)$pbtitle;
         }
 
         echo '<!doctype html>
@@ -92,8 +106,9 @@ class Content
 
   <body>
     <div class="skincilogonlogo">
-      <a target="_blank" href="http://www.cilogon.org/faq/"><img
-      src="', $poweredbyimg , '" alt="CILogon" title="CILogon Service" /></a>
+      <a target="_blank" href="', $poweredbyurl,
+        '"><img src="', $poweredbyimg, '" alt="', $poweredbyalt,
+        '" title="', $poweredbytitle, '" /></a>
     </div>
 
     <div class="logoheader">
@@ -110,7 +125,7 @@ class Content
         if (strlen($skinbanner) > 0) {
             echo '
       <div class="alert alert-secondary alert-dismissible fade show" role="alert">
-      ', $skinbanner , '
+      ', $skinbanner, '
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -121,7 +136,7 @@ class Content
         if ((defined('BANNER_TEXT')) && (!empty(BANNER_TEXT))) {
             echo '
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      ', BANNER_TEXT , '
+      ', BANNER_TEXT, '
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -211,7 +226,7 @@ class Content
         }
 
         echo '
-          <form action="', $action , '" method="', $method , '"
+          <form action="', $action, '" method="', $method, '"
           autocomplete="off" id="form', sprintf("%02d", ++$formnum), '"
           class="needs-validation" novalidate="novalidate">
         ';
@@ -345,6 +360,11 @@ class Content
             and we will try to add your school in the future.
         </p>
         ';
+        // CIL-1526 Allow skin to set selecthelp text
+        $skinselecthelp = $skin->getConfigOption('selecthelp');
+        if (!is_null($skinselecthelp)) {
+            $selecthelp = (string)$skinselecthelp;
+        }
 
         // Count number of OAuth2 providers for commas/"or" in help text
         $count = 0;
@@ -418,8 +438,8 @@ class Content
                 data-live-search-placeholder="Type to search"
                 data-live-search-normalize="true">
 
-                <option data-tokens="', $providerId , '" value="',
-                $providerId , '" selected="selected">',
+                <option data-tokens="', $providerId, '" value="',
+                $providerId, '" selected="selected">',
                 Util::htmlent($idps[$providerId]['Display_Name']), '</option>
 
             </select>
@@ -480,7 +500,7 @@ class Content
                 <div class="col-auto">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
-                  value="', $lobtext , '" id="wayflogonbutton" />
+                  value="', $lobtext, '" id="wayflogonbutton" />
                 </div> <!-- end col-auto -->
         ';
 
@@ -510,11 +530,13 @@ class Content
             echo '<div class="alert alert-danger" role="alert">', $logonerror, '</div>';
         }
 
+        $ppurl = Util::getSkin()->getConfigOption('privacypolicyurl');
         echo '
         <p class="privacypolicy">
-        By selecting "', $lobtext , '", you agree to <a target="_blank"
-        href="https://www.cilogon.org/privacy">CILogon\'s privacy
-        policy</a>.
+        By selecting "', $lobtext, '", you agree to the
+        <a target="_blank" href="',
+        (is_null($ppurl) ? 'https://www.cilogon.org/privacy' : (string)$ppurl),
+        '">privacy policy</a>.
         </p>
 
           </form>
@@ -907,7 +929,7 @@ class Content
                 echo '
                   <tr>
                     <th class="w-50">Email Address:</th>
-                    <td>' , ((strlen($email) == 0) ? 'MISSING' : 'INVALID') , '</td>
+                    <td>', ((strlen($email) == 0) ? 'MISSING' : 'INVALID'), '</td>
                   </tr>';
             }
             $idp     = Util::getSessionVar('idp');
@@ -1036,7 +1058,7 @@ class Content
         echo '
               <tr>
                 <th>Identity Provider (entityID):</th>
-                <td>', $attr_arr['idp'] , '</td>
+                <td>', $attr_arr['idp'], '</td>
                 <td>';
 
         if (@$errors['no_entityID']) {
@@ -1360,7 +1382,7 @@ class Content
             <tbody>
               <tr>
                 <th>Organization Name:</th>
-                <td>', @$shibarray['Organization Name'] , '</td>
+                <td>', @$shibarray['Organization Name'], '</td>
                 <td>';
 
         if (empty(@$shibarray['Organization Name'])) {
@@ -1377,8 +1399,8 @@ class Content
               </tr>
               <tr>
                 <th>Home Page:</th>
-                <td><a target="_blank" href="', @$shibarray['Home Page'] , '">',
-                @$shibarray['Home Page'] , '</a></td>
+                <td><a target="_blank" href="', @$shibarray['Home Page'], '">',
+                @$shibarray['Home Page'], '</a></td>
                 <td> </td>
               </tr>
 
@@ -1389,7 +1411,7 @@ class Content
             (!empty(@$shibarray['Support Address']))
         ) {
             echo '
-                <td>', @$shibarray['Support Name'] , ' &lt;',
+                <td>', @$shibarray['Support Name'], ' &lt;',
                         preg_replace('/^mailto:/', '', @$shibarray['Support Address']), '&gt;</td>
                 <td> </td>';
         }
@@ -1407,7 +1429,7 @@ class Content
                 (!empty(@$shibarray['Technical Address']))
             ) {
                 echo '
-                <td>', @$shibarray['Technical Name'] , ' &lt;',
+                <td>', @$shibarray['Technical Name'], ' &lt;',
                         preg_replace('/^mailto:/', '', @$shibarray['Technical Address']), '&gt;</td>
                 <td> </td>';
             }
@@ -1421,7 +1443,7 @@ class Content
                 (!empty(@$shibarray['Administrative Address']))
             ) {
                 echo '
-                <td>', @$shibarray['Administrative Name'] , ' &lt;',
+                <td>', @$shibarray['Administrative Name'], ' &lt;',
                         preg_replace('/^mailto:/', '', @$shibarray['Administrative Address']), '&gt;</td>
                 <td> </td>';
             }
@@ -1555,7 +1577,7 @@ class Content
         </h5>
         <div id="collapse-',$name, '" class="collapse',
         ($collapsed ? '' : ' show'),
-        '" aria-labelledby="heading-', $name , '">';
+        '" aria-labelledby="heading-', $name, '">';
     }
 
     /**
@@ -1590,7 +1612,7 @@ class Content
             ', static::getIcon('fa-exclamation-circle fa-2x', 'red'),'
             </div>
             <div class="col">
-            ', $errortext , '
+            ', $errortext, '
             </div>
           </div>
         </div>
@@ -1642,7 +1664,7 @@ class Content
         } else {
             echo '  <input type="submit" name="submit"
                 class="btn btn-primary submit"
-                title="', $logofftext , '" value="Log Off" />';
+                title="', $logofftext, '" value="Log Off" />';
         }
 
         echo '
@@ -1906,10 +1928,10 @@ class Content
                 $name = $addr;
             }
             echo '
-                  <li> Support Contact: ' ,
-                  $name , ' <a class="btn btn-primary" href="mailto:' ,
-                  $addr , $emailmsg , '">' ,
-                  $addr , '</a>
+                  <li> Support Contact: ',
+                  $name, ' <a class="btn btn-primary" href="mailto:',
+                  $addr, $emailmsg, '">',
+                  $addr, '</a>
                   </li>';
         }
 
@@ -1923,10 +1945,10 @@ class Content
                     $name = $addr;
                 }
                 echo '
-                      <li> Technical Contact: ' ,
-                      $name , ' <a class="btn btn-primary" href="mailto:' ,
-                      $addr , $emailmsg , '">' ,
-                      $addr , '</a>
+                      <li> Technical Contact: ',
+                      $name, ' <a class="btn btn-primary" href="mailto:',
+                      $addr, $emailmsg, '">',
+                      $addr, '</a>
                       </li>';
             }
         }
@@ -1940,10 +1962,10 @@ class Content
                     $name = $addr;
                 }
                 echo '
-                      <li>Administrative Contact: ' ,
-                      $name , ' <a class="btn btn-primary" href="mailto:' ,
-                      $addr , $emailmsg , '">' ,
-                      $addr , '</a>
+                      <li>Administrative Contact: ',
+                      $name, ' <a class="btn btn-primary" href="mailto:',
+                      $addr, $emailmsg, '">',
+                      $addr, '</a>
                       </li>';
             }
         }
@@ -2097,8 +2119,8 @@ class Content
                   justify-content-center">
                     <div class="col-auto">
                       <input type="hidden" name="providerId"
-                      value="' ,
-                      Util::getOAuth2Url($idp_display_name) , '" />
+                      value="',
+                      Util::getOAuth2Url($idp_display_name), '" />
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
@@ -2248,16 +2270,67 @@ class Content
                 }
             }
 
-            // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
-            // OIDC clients. If the $client_id has an associated 
-            // ACCESS admin client, save the current IdP for
-            // checking the next time the user attempts to use an
-            // ACCESS OIDC client.
-            $last_sso_idp = Util::getSessionVar('sso_idp');
-            $is_sso = false;
-            if (Util::isACCESSClient($client_id)) {
+            // CIL-1369 Special Single Sign-On (SSO) handling for
+            // OIDC clients. If the $client_id has an associated
+            // admin client, save the current IdP for checking the
+            // next time the user attempts to use an OIDC client
+            // from the same CO/VO.
+
+            // Search for an admin client corresponding to this $client_id
+            $admin = Util::getAdminForClient($client_id);
+            $admin_id = '';
+            $admin_name = '';
+            if (!empty($admin)) {
+                $admin_id = @$admin['admin_id'];
+                $admin_name = @$admin['name'];
+            }
+
+            // Read in the SSO_ADMIN_ARRAY from config.php or the bypass
+            // table (where type='sso'). This array has entries like:
+            //    admin_id => CO_name
+            // Then search the array for a matching $admin_id to get
+            // the corresponding CO_name.
+            $sso_admin_array = Util::getBypass()->getSSOAdminArray();
+            $co_name = '';
+            if (
+                (strlen($admin_id) > 0) &&
+                (array_key_exists($admin_id, $sso_admin_array))
+            ) {
+                $co_name = $sso_admin_array[$admin_id];
+            }
+
+            // Get the sso_idp_array session value. This array has
+            // entries like:
+            //     CO_name => idp_entity_id
+            // Then search the array for a matching $co_name to get
+            // the corresponding IdP. If this transaction is one worthy
+            // of SSO, we will later update the $sso_idp_array with
+            // the new entry and save it back to the sso_idp_array session
+            // variable.
+            $sso_idp_array = Util::getSessionVar('sso_idp_array');
+            if (!is_array($sso_idp_array)) {
+                $sso_idp_array = array();
+            }
+            $last_sso_idp = '';
+            if (
+                (strlen($co_name) > 0) &&
+                (!empty($sso_idp_array)) &&
+                (array_key_exists($co_name, $sso_idp_array))
+            ) {
+                $last_sso_idp = $sso_idp_array[$co_name];
+            }
+
+            // Finally, make the decision if this transaction should use
+            // SSO. If the $co_name matches the name of the current
+            // $client_id's admin client, then allow SSO for this CO/VO,
+            // and update the $sso_idp_array with the current $idp.
+            if (
+                (strlen($co_name) > 0) &&
+                (preg_match("/^$co_name/", $admin_name))
+            ) {
                 $is_sso = true;
-                Util::setSessionVar('sso_idp', $idp);
+                $sso_idp_array[$co_name] = $idp;
+                $_SESSION['sso_idp_array'] = $sso_idp_array;
             }
 
             if (!empty($bypassidp)) { // Match found!
@@ -2268,10 +2341,10 @@ class Content
                 $selected_idp = '';       // Skip any passed-in option
                 $readidpcookies = false;  // Don't read in the IdP cookies
             } elseif (($is_sso) && (strlen($last_sso_idp) > 0) && ($last_sso_idp == $idp)) {
-                // CIL-1369 Special Single Sign-On (SSO) handling for ACCESS
+                // CIL-1369 Special Single Sign-On (SSO) handling for
                 // OIDC clients. If the $client_id has an associated
-                // ACCESS admin client, and the session IdP matches the IdP
-                // previously used with an ACCESS OIDC client, then bypass
+                // admin client, and the session IdP matches the IdP
+                // previously used with a CO's OIDC client, then bypass
                 // the "Select an Identity Provider" page.
                 $providerId = $idp;
                 $keepidp = 'checked';
@@ -3242,9 +3315,9 @@ in "handleGotUser()" for valid IdPs for the skin.'
         echo '
             <div class="card-body px-5">
               <div class="card-text my-2">
-                <a target="_blank" href="' ,
-                htmlspecialchars($clientparams['client_home_url']) , '">',
-                htmlspecialchars($clientparams['client_name']) , '</a>' ,
+                <a target="_blank" href="',
+                htmlspecialchars($clientparams['client_home_url']), '">',
+                htmlspecialchars($clientparams['client_name']), '</a>',
                 ' requests access to the following information.
                 If you do not approve this request, do not proceed.
               </div> <!-- end row -->
@@ -3278,14 +3351,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
             $scopes = array_diff($scopes, ['org.cilogon.userinfo']);
         }
         if (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes)) {
-            echo '<li>A certificate that allows "' ,
-            htmlspecialchars($clientparams['client_name']) ,
+            echo '<li>A certificate that allows "',
+            htmlspecialchars($clientparams['client_name']),
             '" to act on your behalf</li>';
             $scopes = array_diff($scopes, ['edu.uiuc.ncsa.myproxy.getcert']);
         }
         // Output any remaining scopes as-is
         foreach ($scopes as $value) {
-            echo '<li>', $value , '</li>';
+            echo '<li>', $value, '</li>';
         }
         echo '</ul>
             </div> <!-- end card-body -->
@@ -3394,7 +3467,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             if (empty($logout)) {
                 echo '
               <div class="card-text my-2">
-                You may still be logged in to ', $idp_display_name , '.
+                You may still be logged in to ', $idp_display_name, '.
                 Close your web browser or <a target="_blank"
                 href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear
                 your cookies</a> to clear your authentication session.
@@ -3403,7 +3476,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             } else {
                 echo '
               <div class="card-text my-2">
-                You can optionally click the link below to log out of ' , $idp_display_name , '.
+                You can optionally click the link below to log out of ', $idp_display_name, '.
                 Note that some Identity Providers do not support log out. If you
                 receive an error, close your web browser or <a target="_blank"
                 href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear
@@ -3412,7 +3485,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  href="' , $logout , '">(Optional) Log out from ' , $idp_display_name , '</a>
+                  href="', $logout, '">(Optional) Log out from ', $idp_display_name, '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
               ';

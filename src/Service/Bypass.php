@@ -204,4 +204,33 @@ class Bypass
 
         return $retarr;
     }
+
+    /**
+     * getSSOAdminArray
+     *
+     * This function returns an array of admin_ids which should
+     * allow Single Sign On (SSO). If the current session IdP matches
+     * the previously used IdP, then bypass the 'Select an
+     * Identity Provider' page and use the current session IdP.
+     * This function first checks for a SSO_ADMIN_ARRAY defined in
+     * the top-level config.php file. If not defined, then entries
+     * from the 'bypass' database table (where type='sso') is returned
+     * instead. If neither are defined, then an empty array is returned.
+     *
+     * @return array An array where keys are admin_ids, and values are
+     *         CO (VO) names (e.g., 'ACCESS').
+     */
+    public function getSSOAdminArray()
+    {
+        $retarr = array();
+
+        if (defined('SSO_ADMIN_ARRAY')) {
+            $retarr = SSO_ADMIN_ARRAY;
+        } elseif (!empty($this->bypassarray)) {
+            $retarr = $this->bypassarray['sso'];
+        }
+
+        return $retarr;
+    }
+
 }

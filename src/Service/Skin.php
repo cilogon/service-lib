@@ -642,8 +642,8 @@ class Skin
                 ($key === $uri) ||
                 (@preg_match($key, $uri)) ||
                 ($checkadmin &&
-                    (($key === (Util::getAdminForClient($uri))['admin_id']) ||
-                    (@preg_match($key, (Util::getAdminForClient($uri))['admin_id'])))
+                    (($key === (@Util::getAdminForClient($uri))['admin_id']) ||
+                    (@preg_match($key, (@Util::getAdminForClient($uri))['admin_id'])))
                 )
             ) {
                 $retval = $value;

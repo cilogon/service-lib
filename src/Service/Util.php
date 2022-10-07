@@ -1096,7 +1096,6 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('distinguished_name');
         static::unsetSessionVar('authntime');
         static::unsetSessionVar('cilogon_skin');
-        static::unsetSessionVar('sso_idp_array');
     }
 
     /**

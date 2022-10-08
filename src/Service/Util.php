@@ -2025,10 +2025,13 @@ Remote Address= ' . $remoteaddr . '
      * (2) after the user has successfully logged on so the successful
      * IdP used can be saved to the session for next SSO calculation.
      *
+     * @param bool $saveidp If true, save the current IdP to the session
+     *        sso_idp_array for the next time. This is typically done after
+     *        the user has chosen an IdP. Defaults to false.
      * @return string The previously used SSO IdP, or empty string if
      *         the transaction is not eligible for SSO.
      */
-    public static function getLastSSOIdP()
+    public static function getLastSSOIdP($saveidp = false)
     {
         $last_sso_idp = '';
         $client_id = '';
@@ -2052,13 +2055,12 @@ Remote Address= ' . $remoteaddr . '
             //    admin_id => CO_name
             // Then search the array for a matching $admin_id to get
             // the corresponding CO_name.
-            $sso_admin_array = static::getBypass()->getSSOAdminArray();
             $co_name = '';
-            if (
-                (strlen($admin_id) > 0) &&
-                (array_key_exists($admin_id, $sso_admin_array))
-            ) {
-                $co_name = $sso_admin_array[$admin_id];
+            if (strlen($admin_id) > 0) {
+                $sso_admin_array = static::getBypass()->getSSOAdminArray();
+                if (array_key_exists($admin_id, $sso_admin_array)) {
+                    $co_name = $sso_admin_array[$admin_id];
+                }
             }
 
             // Get the sso_idp_array session value. This array has
@@ -2069,30 +2071,31 @@ Remote Address= ' . $remoteaddr . '
             // of SSO, we will later update the $sso_idp_array with
             // the new entry and save it back to the sso_idp_array session
             // variable.
-            $sso_idp_array = static::getSessionVar('sso_idp_array');
-            if (!is_array($sso_idp_array)) { // Doesn't exist yet!
-                $sso_idp_array = array();
-            }
-            if (
-                (strlen($co_name) > 0) &&
-                (!empty($sso_idp_array)) &&
-                (array_key_exists($co_name, $sso_idp_array))
-            ) {
-                $last_sso_idp = $sso_idp_array[$co_name];
-            }
+            if (strlen($co_name) > 0) {
+                $sso_idp_array = static::getSessionVar('sso_idp_array');
+                if (!is_array($sso_idp_array)) { // Doesn't exist yet!
+                    $sso_idp_array = array();
+                }
+                if (
+                    (!empty($sso_idp_array)) &&
+                    (array_key_exists($co_name, $sso_idp_array))
+                ) {
+                    $last_sso_idp = $sso_idp_array[$co_name];
+                }
 
-            // Finally, make the decision if this transaction should use
-            // SSO. If the $co_name matches the name of the current
-            // $client_id's admin client, then allow SSO for this CO/VO,
-            // and update the $sso_idp_array with the current session IdP.
-            if (
-                (strlen($co_name) > 0) &&
-                (preg_match("/^$co_name/", $admin_name))
-            ) {
-                $sso_idp_array[$co_name] = Util::getSessionVar('idp');
-                $_SESSION['sso_idp_array'] = $sso_idp_array;
-            } else {
-                $last_sso_idp = ''; // Reset the return value
+                // Finally, make the decision if this transaction should use
+                // SSO. If the $co_name matches the name of the current
+                // $client_id's admin client, then allow SSO for this CO/VO,
+                // Update the $sso_idp_array with the current session IdP if
+                // the passed in $saveidp is true.
+                if (preg_match("/^$co_name/", $admin_name)) {
+                    if ($saveidp) {
+                        $sso_idp_array[$co_name] = Util::getSessionVar('idp');
+                        $_SESSION['sso_idp_array'] = $sso_idp_array;
+                    }
+                } else {
+                    $last_sso_idp = ''; // No match - reset the return value
+                }
             }
         }
 

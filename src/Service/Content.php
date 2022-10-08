@@ -2769,7 +2769,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 Util::unsetUserSessionVars();
                 printLogonPage();
             } else { // Got user successfully
-                Util::getLastSSOIdP(); // Save current IdP for SSO
+                Util::getLastSSOIdP(true); // Save current IdP for SSO
                 static::gotUserSuccess();
             }
         }

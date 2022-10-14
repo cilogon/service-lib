@@ -2101,4 +2101,62 @@ Remote Address= ' . $remoteaddr . '
 
         return $last_sso_idp;
     }
+
+    /**
+     * getRecentIdPs
+     *
+     * This function returns the IdPs in the 'recentidps' cookie formatted
+     * as an array. If the incoming $entityID parameter is not emtpy, this
+     * function also pushes the $entityID onto the front of the array and
+     * saves the array to the 'recentidps' cookie formatted as a
+     * comma-separated string of IdPs.
+     *
+     * @param string $entityID If not empty, save this IdP to the
+     *        'recentidps' cookie. This is typically done after
+     *        the user has selected an IdP and successfully logged on.
+     *        If empty, simply return the 'recentidps' cookie as an array.
+     * @return array An array of recently used IdPs.
+     */
+    public static function getRecentIdPs($entityID = '')
+    {
+        $idparray = array(); // Assume the cookie is empty/unset
+
+        $idps = static::getCookieVar('recentidps');
+        // Transform the cookie into an array
+        if (strlen($idps) > 0) {
+            $idparray = explode(',', $idps);
+            // Make sure the user didn't mess with the cookie's IdPs
+            filter_var_array($idparray, FILTER_SANITIZE_URL);
+        }
+
+        if (strlen($entityID) > 0) {
+            // If entityID is in the array, delete it
+            $idparray = array_values(array_filter($idparray, fn ($m) => $m != $entityID));
+            // Push the entityID onto the front of the array
+            array_unshift($idparray, $entityID);
+            // Keep only 10 IdPs
+            while (count($idparray) > 10) {
+                array_pop($idparray);
+            }
+            // Special check: If the resulting cookie string length is
+            // more than 4000 bytes, chop off IdPs from the end until
+            // the length is short enough
+            $shortenough = false;
+            while (!$shortenough) {
+                $totallength = 0;
+                foreach ($idparray as $value) {
+                    $totallength += strlen($value) + 1;  // Add 1 for comma
+                }
+                if ($totallength > 4000) {
+                    array_pop($idparray);
+                } else {
+                    $shortenough = true;
+                }
+            }
+            // Transform the array back to a string and save the cookie
+            static::setCookieVar('recentidps', implode(',', $idparray));
+        }
+
+        return $idparray;
+    }
 }

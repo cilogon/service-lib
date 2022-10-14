@@ -2173,6 +2173,7 @@ class Content
             true
         );
         if ($providerIdValid) {
+            Util::getRecentIdPs($providerId);
             $providerName = Util::getOAuth2IdP($providerId);
             if (array_key_exists($providerName, Util::$oauth2idps)) {
                 // Log in with an OAuth2 IdP
@@ -2361,7 +2362,6 @@ class Content
             // then show the Logon page and uncheck the keepidp checkbox.
             if ((strlen($selected_idp) == 0) || ($selected_idp == $providerId)) {
                 Util::setPortalOrCookieVar($pc, 'providerId', $providerId, true);
-                Util::getRecentIdPs($providerId);
                 $providerName = Util::getOAuth2IdP($providerId);
                 if (array_key_exists($providerName, Util::$oauth2idps)) {
                     // Log in with an OAuth2 IdP

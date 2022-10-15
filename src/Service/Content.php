@@ -345,6 +345,28 @@ class Content
             }
         }
 
+        // CIL-1515 Get the list of recently used IdPs, limited to
+        // currently available IdPs.
+        $recentidps = Util::getRecentIdPs();
+        $recentidps = array_values(array_filter(
+            Util::getRecentIdPs(),
+            fn ($m) => array_key_exists($m, $idps)
+        ));
+        // Push the "default" IdP onto the front, making sure  it
+        // does't already exist in the list.
+        $recentidps = array_values(array_filter(
+            $recentidps,
+            fn ($m) => $m != $providerId
+        ));
+        array_unshift($recentidps, $providerId);
+        // Keep a max of 5 IdPs in the recent list
+        while (count($recentidps) > 5) {
+            array_pop($recentidps);
+        }
+        // The $recentidp list now contains at most 5 recently used IdPs
+        // which are also available (according to skin / idphint parameter)
+        // with the "default" IdP at the front of the list.
+
         $selecthelp = '<p>
             CILogon facilitates secure access to CyberInfrastructure (CI).
             In order to use the CILogon Service, you must first select
@@ -437,11 +459,26 @@ class Content
                 data-live-search="true"
                 data-live-search-placeholder="Type to search"
                 data-live-search-normalize="true">
+                ';
 
-                <option data-tokens="', $providerId, '" value="',
-                $providerId, '" selected="selected">',
-                Util::htmlent($idps[$providerId]['Display_Name']), '</option>
+        // CIL-15151 Show recent IdPs at the top of the list
+        $idpcount = 0;
+        foreach ($recentidps as $value) {
+            $idpcount++;
+            echo '
+                <option data-tokens="', $value, '" value="', $value,
+                ($idpcount == 1) ? '" selected="selected' : '',
+                '">',
+                Util::htmlent($idps[$value]['Display_Name']), '</option>
+                ';
+        }
+        if ($idpcount > 1) {
+            echo '
+                <option data-divider="true"></option>
+            ';
+        }
 
+        echo '
             </select>
             <a href="#" tabindex="0" data-trigger="hover click"
             class="helpcursor"

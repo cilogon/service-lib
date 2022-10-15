@@ -346,26 +346,37 @@ class Content
         }
 
         // CIL-1515 Get the list of recently used IdPs, limited to
-        // currently available IdPs.
+        // the currently available IdPs.
         $recentidps = Util::getRecentIdPs();
         $recentidps = array_values(array_filter(
             Util::getRecentIdPs(),
             fn ($m) => array_key_exists($m, $idps)
         ));
         // Push the "default" IdP onto the front, making sure  it
-        // does't already exist in the list.
+        // doesn't already exist in the list.
         $recentidps = array_values(array_filter(
             $recentidps,
             fn ($m) => $m != $providerId
         ));
         array_unshift($recentidps, $providerId);
-        // Keep a max of 5 IdPs in the recent list
-        while (count($recentidps) > 5) {
+        // Show a max number of IdPs in the recent list; defaults to 5.
+        $maxrecentidps = 5;
+        $maxopt = Util::getSkin()->getConfigOption('maxrecentidps');
+        if (!is_null($maxopt)) {
+            $maxrecentidps = (int)$maxopt;
+            // Ensure $maxrecentidps is in the range [1..10]
+            if ($maxrecentidps < 1) {
+                $maxrecentidps = 1;
+            } elseif ($maxrecentidps > 10) {
+                $maxrecentidps = 10;
+            }
+        }
+        while (count($recentidps) > $maxrecentidps) {
             array_pop($recentidps);
         }
-        // The $recentidp list now contains at most 5 recently used IdPs
-        // which are also available (according to skin / idphint parameter)
-        // with the "default" IdP at the front of the list.
+        // The $recentidp list now contains at most $maxrecentidps recently
+        // used IdPs which are also available (according to skin / idphint
+        // parameter) with the "default" IdP at the front of the list.
 
         $selecthelp = '<p>
             CILogon facilitates secure access to CyberInfrastructure (CI).

@@ -271,7 +271,14 @@ class Util
         if ($exp > 0) {
             $exp += time();
         }
-        setcookie($cookie, $value, $exp, '/', '.' . static::getDN(), true);
+        setcookie($cookie, $value, array(
+            'expires' => $exp,
+            'path' => '/',
+            'domain' => '.' . static::getDN(),
+            'secure' => true,
+            'httponly' => false,
+            'samesite' => 'None'
+        ));
         $_COOKIE[$cookie] = $value;
         static::dedupeCookies();
     }
@@ -287,7 +294,14 @@ class Util
      */
     public static function unsetCookieVar($cookie)
     {
-        setcookie($cookie, '', 1, '/', '.' . static::getDN(), true);
+        setcookie($cookie, '', array(
+            'expires' => 1,
+            'path' => '/',
+            'domain' => '.' . static::getDN(),
+            'secure' => true,
+            'httponly' => false,
+            'samesite' => 'None'
+        ));
         unset($_COOKIE[$cookie]);
         static::dedupeCookies();
     }
@@ -337,6 +351,7 @@ class Util
                     $domain = '';
                     $secure = false;
                     $httponly = false;
+                    $samesite = 'None';
                     foreach ($params as $param) {
                         if (preg_match('/^\s*Expires=(.*)/i', $param, $matches)) {
                             try {
@@ -354,10 +369,19 @@ class Util
                             $secure = true;
                         } elseif (preg_match('/^\s*HttpOnly$/i', $param, $matches)) {
                             $httponly = true;
+                        } elseif (preg_match('/^\s*SameSite$/i', $param, $matches)) {
+                            $samesite = $matches[1];
                         }
                     }
 
-                    setrawcookie($name, $value, $expires, $path, $domain, $secure, $httponly);
+                    setrawcookie($name, $value, array(
+                        'expires' => $expires,
+                        'path' => $path,
+                        'domain' => $domain,
+                        'secure' => $secure,
+                        'httponly' => $httponly,
+                        'samesite' => $samesite
+                    ));
                 }
             }
         }

@@ -2137,8 +2137,8 @@ Remote Address= ' . $remoteaddr . '
      *
      * @param string $entityID If not empty, save this IdP to the
      *        'recentidps' cookie. This is typically done after
-     *        the user has selected an IdP and successfully logged on.
-     *        If empty, simply return the 'recentidps' cookie as an array.
+     *        the user has selected an IdP. If $entityID is empty,
+     *        simply return the 'recentidps' cookie as an array.
      * @return array An array of recently used IdPs.
      */
     public static function getRecentIdPs($entityID = '')

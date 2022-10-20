@@ -347,12 +347,11 @@ class Content
 
         // CIL-1515 Get the list of recently used IdPs, limited to
         // the currently available IdPs.
-        $recentidps = Util::getRecentIdPs();
         $recentidps = array_values(array_filter(
             Util::getRecentIdPs(),
             fn ($m) => array_key_exists($m, $idps)
         ));
-        // Push the "default" IdP onto the front, making sure  it
+        // Push the "default" IdP onto the front, making sure it
         // doesn't already exist in the list.
         $recentidps = array_values(array_filter(
             $recentidps,

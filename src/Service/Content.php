@@ -2287,10 +2287,10 @@ class Content
                 if (
                     ($key === $redirect_uri) ||
                     ($key === $client_id) ||
-                    ($key === (@Util::getAdminForClient($client_id))['admin_id']) ||
+                    ($key === @(Util::getAdminForClient($client_id))['admin_id']) ||
                     (@preg_match($key, $redirect_uri)) ||
                     (@preg_match($key, $client_id)) ||
-                    (@preg_match($key, (@Util::getAdminForClient($client_id))['admin_id']))
+                    (@preg_match($key, @(Util::getAdminForClient($client_id))['admin_id']))
                 ) {
                     $bypassidp = $value;
                     // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
@@ -2307,10 +2307,10 @@ class Content
                     if (
                         ($key === $redirect_uri) ||
                         ($key === $client_id) ||
-                        ($key === (@Util::getAdminForClient($client_id))['admin_id']) ||
+                        ($key === @(Util::getAdminForClient($client_id))['admin_id']) ||
                         (@preg_match($key, $redirect_uri)) ||
                         (@preg_match($key, $client_id)) ||
-                        (@preg_match($key, (@Util::getAdminForClient($client_id))['admin_id']))
+                        (@preg_match($key, @(Util::getAdminForClient($client_id))['admin_id']))
                     ) {
                         $bypassidp = $selected_idp;
                         break;

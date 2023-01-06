@@ -3198,6 +3198,18 @@ in "handleGotUser()" for valid IdPs for the skin.'
             );
         });
 
+        // CIL-1595 Show "preferred" IdPs at the top of the list
+        $idppreferred = $skin->getConfigOption('idppreferred');
+        if ((!is_null($idppreferred)) && (!empty($idppreferred->idp))) {
+            $prefidparray = array();
+            foreach ($idppreferred->idp as $prefidp) {
+                $prefidp = Util::normalizeOAuth2IdP($prefidp);
+                $prefidparray[(string)$prefidp] = $retarray[(string)$prefidp];
+                unset($retarray[(string)$prefidp]);
+            }
+            $retarray = array_merge($prefidparray, $retarray);
+        }
+
         return $retarray;
     }
 

@@ -1304,6 +1304,10 @@ Remote Address= ' . $remoteaddr . '
     public static function getOIDCClientParams(&$clientparams)
     {
         $retval = false;
+
+        // CIL-1591 Log errors
+        $log = new Loggit();
+
         if (strlen(@$clientparams['client_id']) > 0) {
             $dbprops = new DBProps('mysqli');
             $db = $dbprops->getDBConnect();
@@ -1319,9 +1323,16 @@ Remote Address= ' . $remoteaddr . '
                     }
                     $clientparams['clientstatus'] = DBService::$STATUS['STATUS_OK'];
                     $retval = true;
+                } else {
+                    $log->error('getOIDCClientParams: error reading data; ' .
+                        $db->getMessage());
                 }
                 $db->disconnect();
+            } else {
+                $log->error('getOIDCClientParams: $db connect is null');
             }
+        } else {
+            $log->error('getOIDCClientParams: missing client_id');
         }
         return $retval;
     }

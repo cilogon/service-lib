@@ -158,13 +158,38 @@ class ShibError
     {
         $errorstr1 = '';  // For logging - one line
         $errorstr2 = '';  // For HTML and email - multi-line
+        $contactemail = '';
+        $emailmsg = '';
         foreach ($this->errorarray as $key => $value) {
             $errorstr1 .= Util::htmlent($key . '="' . $value . '" ');
             $errorstr2 .= Util::htmlent(sprintf("%-14s= %s\n", $key, $value));
+            if ($key == 'contactEmail') {
+                $contactemail = $key;
+            }
         }
 
         $log = new Loggit();
         $log->error('Shibboleth error: ' . $errorstr1);
+
+        // CIL-1576 Enable user to email IdP Help on Shib errors
+        if (strlen($contactemail) > 0) {
+            $contactemail = preg_replace('/^mailto:/', '', $contactemail);
+            $idp_display_name = Util::getSessionVar('idp_display_name');
+            // Attempt to get the OAuth1/OIDC client name
+            $portalname = Util::getSessionVar('portalname');
+            if (strlen($portalname) == 0) {
+                $portalname = @$clientparams['client_name'];
+            }
+            $emailmsg = 'mailto:' . $contactemail .
+                '?subject=Problem Logging On To CILogon' .
+                '&cc=' . EMAIL_HELP .
+                '&body=Hello, I am having trouble logging on to https://' . DEFAULT_HOSTNAME . '/ ' .
+                ((strlen($idp_display_name) > 0) ? "using the $idp_display_name Identity Provider (IdP) " : '') .
+                ((strlen($portalname) > 0) ? 'for ' . strip_tags($portalname) . ' ' : '') .
+                'due to a Shibboleth / SAML error:%0D%0A%0D%0A' .
+                $errorstr2 .
+                '%0D%0A%0D%0AThank you for any help you can provide.';
+        }
 
         Content::printHeader('Shiboleth Error');
         Content::printCollapseBegin('shiberror', 'Shibboleth Error', false);
@@ -205,12 +230,23 @@ class ShibError
               <div class="card-text my-2">
                 <div class="form-group">
                   <div class="form-row align-items-center
-                  justify-content-center">
+                  justify-content-center">';
+
+        // CIL-1576 Add "Request Help" button for Shib errors
+        if (strlen($emailmsg) > 0) {
+            echo '
+                    <div class="col-auto">
+                      <a class="btn btn-primary" href="',
+                      $emailmsg, '">Request Help</a>
+                    </div> <!-- end col-auto -->';
+        }
+
+        echo '
                     <div class="col-auto">
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
                       value="Proceed" />
-                    </div>
+                    </div> <!-- end col-auto -->
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
               </div> <!-- end card-text -->

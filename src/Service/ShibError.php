@@ -164,7 +164,7 @@ class ShibError
             $errorstr1 .= Util::htmlent($key . '="' . $value . '" ');
             $errorstr2 .= Util::htmlent(sprintf("%-14s= %s\n", $key, $value));
             if ($key == 'contactEmail') {
-                $contactemail = $key;
+                $contactemail = $value;
             }
         }
 

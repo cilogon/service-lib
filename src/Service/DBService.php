@@ -1130,7 +1130,7 @@ class DBService
      * @return string A human-readable version of the $status, or empty
      *         string if no such $status is empty.
      */
-    public static function statusTostatusText($status)
+    public static function statusToStatusText($status)
     {
         $retstr = '';
 

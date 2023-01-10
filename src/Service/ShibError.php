@@ -187,8 +187,8 @@ class ShibError
                 ((strlen($idp_display_name) > 0) ? "using the $idp_display_name Identity Provider (IdP) " : '') .
                 ((strlen($portalname) > 0) ? 'for ' . strip_tags($portalname) . ' ' : '') .
                 'due to a Shibboleth / SAML error:%0D%0A%0D%0A' .
-                $errorstr2 .
-                '%0D%0A%0D%0AThank you for any help you can provide.';
+                preg_replace('/\n/', '%0D%0A', $errorstr2) .
+                '%0D%0AThank you for any help you can provide.';
         }
 
         Content::printHeader('Shiboleth Error');

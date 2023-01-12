@@ -34,7 +34,7 @@ use DB;
  * 'type' is one of 'allow', 'idp', or 'skin'.
  *
  * 'regex' is a Perl Compatible Regular Expression (PCRE) (see
- * http://www.php.net/manual/en/pcre.pattern.php for details). It should
+ * https://www.php.net/manual/en/pcre.pattern.php for details). It should
  * match a client_id or a redirect_uri. '%' (percent) is a good choice for
  * delimiter so that slashes do not need to be escaped. Note that period '.'
  * matches any character, so if you want to match a dot, prefix with a
@@ -80,7 +80,7 @@ class Bypass
      * force a re-read of the database. It attempts to read the bypass table
      * which has three columns: type, regex, value. Type is one of 'allow',
      * 'idp', or 'skin'. Regex is a Perl Compatible Regular Expression
-     * (http://www.php.net/manual/en/pcre.pattern.php) which matches either
+     * (https://www.php.net/manual/en/pcre.pattern.php) which matches either
      * a client_id or a redirect_uri. Value is one of (1) NULL (for 'allow'
      * since we just need to know that the regex client_id/redirect_uri
      * honors the 'idphint' parameter to auto-select that IdP), (2) entityId

@@ -156,13 +156,13 @@ class Content
     {
         $footertext = '
       <p>For questions about this site, please see the <a target="_blank"
-        href="http://www.cilogon.org/faq">FAQs</a> or send email to <a
+        href="https://www.cilogon.org/faq">FAQs</a> or send email to <a
         href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
       <p>Know <a target="_blank"
-        href="http://ca.cilogon.org/responsibilities">your responsibilities</a>
+        href="https://ca.cilogon.org/responsibilities">your responsibilities</a>
         for using the CILogon Service.</p>
       <p>See <a target="_blank"
-        href="http://ca.cilogon.org/acknowledgements">acknowledgements</a> of
+        href="https://ca.cilogon.org/acknowledgements">acknowledgements</a> of
         support for this site.</p>';
 
         // CIL-767 Allow skin to set footer text
@@ -910,18 +910,18 @@ class Content
                   </tr>
                   <tr>
                     <th><a target="_blank"
-                      href="http://ca.cilogon.org/loa">Level of Assurance:</a></th>
+                      href="https://ca.cilogon.org/loa">Level of Assurance:</a></th>
                       <td>
             ';
 
             if (Util::getSessionVar('loa') == 'openid') {
-                echo '<a href="http://ca.cilogon.org/policy/openid"
+                echo '<a href="https://ca.cilogon.org/policy/openid"
                       target="_blank">OpenID</a>';
             } elseif (Util::isLOASilver()) {
-                echo '<a href="http://ca.cilogon.org/policy/silver"
+                echo '<a href="https://ca.cilogon.org/policy/silver"
                       target="_blank">Silver</a>';
             } else {
-                echo '<a href="http://ca.cilogon.org/policy/basic"
+                echo '<a href="https://ca.cilogon.org/policy/basic"
                       target="_blank">Basic</a>';
             }
 
@@ -1910,7 +1910,7 @@ class Content
                     <dt class="col-sm-3"><a target="_blank"
                     href="https://refeds.org/sirtfi">SIRTFI</a>:</dt>
                     <dd class="col-sm-9">MISSING</dd>';
-                $missingattrs .= '%0D%0A    http://refeds.org/sirtfi';
+                $missingattrs .= '%0D%0A    https://refeds.org/sirtfi';
             }
         }
         $student = false;
@@ -1954,7 +1954,7 @@ class Content
             'to be released.';
         }
         $emailmsg .= '%0D%0A%0D%0APlease see ' .
-            'http://www.cilogon.org/service/addidp for more ' .
+            'https://www.cilogon.org/service/addidp for more ' .
             'details. Thank you for any help you can provide.';
         echo '
                 <div class="card-text my-2">

@@ -12,8 +12,8 @@ use DB;
  * This class is an implementation of a PHP Session
  * handler using MySQL as the storage mechanism. There are
  * several required functions implemented as documented at
- * http://us3.php.net/manual/en/function.session-set-save-handler.php
- * and http://us3.php.net/manual/en/class.sessionhandlerinterface.php.
+ * https://php.net/manual/en/function.session-set-save-handler.php
+ * and https://php.net/manual/en/class.sessionhandlerinterface.php.
  * Implementation details were gleaned from several
  * web pages, in particular:
  * http://www.devshed.com/c/a/PHP/Storing-PHP-Sessions-in-a-Database/

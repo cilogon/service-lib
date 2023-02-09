@@ -653,6 +653,35 @@ class Skin
         return $retval;
     }
 
+    /**
+     * getHiddenIdPs
+     *
+     * CIL-1632 - Green light IdPs, but do not show them, but still allow
+     * admin access using "idphint=entityId" query parameter.
+     *
+     * This is a convenience function to return the list of "hidden" IdPs
+     * for the skin. In this case "hidden" means that the IdP should have
+     * the 'hidden="hidden"' attribute set on the <option> tag when
+     * generating the "Select an Identity Provider" list. This means that
+     * the hidden IdP is technically still in the list of IdPs (so it
+     * passes "greenlit" checks to see if the IdP is allowed), but the
+     * <option> does not get displayed to the user. A skin can be configured
+     * to "green light" an IdP, but hide it from most users, allowing it
+     * to be selected by specifying the "idphint=entityId" query parameter.
+     */
+    public function getHiddenIdPs()
+    {
+        $hiddenidps = array();
+        $idphidden = $this->getConfigOption('idphidden');
+        if ((!is_null($idphidden)) && (!empty($idphidden->idp))) {
+            foreach ($idphidden->idp as $hiddenidp) {
+                $hiddenidp = Util::normalizeOAuth2IdP($hiddenidp);
+                $hiddenidps[] = $hiddenidp;
+            }
+        }
+        return $hiddenidps;
+    }
+
    /**
      * hiddenFormElement
      *

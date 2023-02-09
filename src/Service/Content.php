@@ -330,10 +330,10 @@ class Content
 
         // If no previous providerId, get from skin, or default
         // to ORCID, Google, or the first IdP in the list.
+        $initialidp = Util::normalizeOAuth2IdP(
+            (string)$skin->getConfigOption('initialidp')
+        );
         if (strlen($providerId) == 0) {
-            $initialidp = Util::normalizeOAuth2IdP(
-                (string)$skin->getConfigOption('initialidp')
-            );
             if ((strlen($initialidp) > 0) && (isset($idps[$initialidp]))) {
                 $providerId = $initialidp;
             } elseif (isset($idps[$orcidoauth2])) {
@@ -351,6 +351,7 @@ class Content
             Util::getRecentIdPs(),
             fn ($m) => array_key_exists($m, $idps)
         ));
+
         // Push the "default" IdP onto the front, making sure it
         // doesn't already exist in the list.
         $recentidps = array_values(array_filter(
@@ -358,6 +359,20 @@ class Content
             fn ($m) => $m != $providerId
         ));
         array_unshift($recentidps, $providerId);
+
+        // CIL-1632 Remove "hidden" IdPs from the recently used IdPs
+        $hiddenidps = $skin->getHiddenIdPs();
+        $recentidps = array_diff($recentidps, $hiddenidps);
+        // Sanity Check: is recentidps array now empty due to hiddenidps?
+        // If so, set to the initialidp.
+        if (
+            (empty($recentidps)) &&
+            (strlen($initialidp) > 0) &&
+            (isset($idps[$initialidp]))
+        ) {
+            array_unshift($recentidps, $initialidp);
+        }
+
         // Show a max number of IdPs in the recent list; defaults to 5.
         $maxrecentidps = 5;
         $maxopt = Util::getSkin()->getConfigOption('maxrecentidps');

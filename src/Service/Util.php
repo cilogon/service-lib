@@ -2194,4 +2194,46 @@ Remote Address= ' . $remoteaddr . '
 
         return $idparray;
     }
+
+    /**
+     * isOutputExtra
+     *
+     * Used for CIL-1643 to determine if we should output additional HTML
+     * and JavaScript on certain pages, e.g., for the ACCESS navigation bar.
+     *
+     * This is a convenience function which checks the skin's <extrapage>
+     * config option. If <extrapage> is set and the current page matches
+     * one of the configured (space-separated) values, then return true.
+     * This means that the calling function can check the <extrahtml> and
+     * <extrascript> config options as well. If the current page does not
+     * match one of the configured <extrapage> values, then there's no need
+     * to check <extrahtml> and <extrascript> since we shouldn't output
+     * anytyhing extra. Note that a blank/unconfigured <extrapage> option
+     * means that the extra HTML and JavaScript should appear on ALL pages.
+     *
+     * @return bool True if current page matches a value in the skin's
+     *         <extrapage> config option. False otherwise.
+     */
+    public static function isOutputExtra()
+    {
+        $retval = true; // True when <extrapage> is blank/not configured
+        $skin = static::getSkin();
+        $skinextrapage = $skin->getConfigOption('extrapage');
+        if (!is_null($skinextrapage)) {
+            $extrapages = explode(' ', ((string)$skinextrapage));
+            $request_uri = Util::getServerVar('REQUEST_URI');
+            // Remove leading slash
+            $request_uri = ltrim($request_uri, '/');
+            // Strip anything after a trailing /, ?, or #
+            $request_uri = preg_replace('%[/?#].*$%', '', $request_uri);
+            // If request_uri is empty, then we're on the main landing page
+            if (strlen($request_uri) == 0) {
+                $request_uri = 'main';
+            }
+            if (!in_array($request_uri, $extrapages)) {
+                $retval = false;
+            }
+        }
+        return $retval;
+    }
 }

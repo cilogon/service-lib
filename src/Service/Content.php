@@ -103,8 +103,17 @@ class Content
 
         echo '
   </head>
+  <body>';
 
-  <body>
+        // CIL-1643 Additional HTML for use by e.g., a naviation bar.
+        if (Util::isOutputExtra()) {
+            $skinextrahtml = (string)$skin->getConfigOption('extrahtml');
+            if (strlen($skinextrahtml) > 0) {
+                echo $skinextrahtml;
+            }
+        }
+
+        echo '
     <div class="skincilogonlogo">
       <a target="_blank" href="', $poweredbyurl,
         '"><img src="', $poweredbyimg, '" alt="', $poweredbyalt,
@@ -195,7 +204,17 @@ class Content
             integrity="sha256-qo0Cam4XJ0QQ06XnCiCFYBh3GDXU45j3lpUp+em2yBU="
             crossorigin="anonymous"></script>
     <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
-    <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>
+    <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>';
+
+        // CIL-1643 Additional JavaScript for use by e.g., a naviation bar.
+        if (Util::isOutputExtra()) {
+            $skinextrascript = (string)$skin->getConfigOption('extrascript');
+            if (strlen($skinextrascript) > 0) {
+                echo $skinextrascript;
+            }
+        }
+
+        echo '
     <script src="/include/cilogon.js"></script>
   </body>
 </html>';
@@ -494,13 +513,11 @@ class Content
                 <option data-tokens="', $value, '" value="', $value,
                 ($idpcount == 1) ? '" selected="selected' : '',
                 '">',
-                Util::htmlent($idps[$value]['Display_Name']), '</option>
-                ';
+                Util::htmlent($idps[$value]['Display_Name']), '</option>';
         }
         if ($idpcount > 1) {
             echo '
-                <option data-divider="true"></option>
-            ';
+                <option data-divider="true"></option>';
         }
 
         echo '

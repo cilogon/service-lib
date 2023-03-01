@@ -105,7 +105,7 @@ class Content
   </head>
   <body>';
 
-        // CIL-1643 Additional HTML for use by e.g., a naviation bar.
+        // CIL-1643 Additional HTML for use by e.g., a navigation bar.
         if (Util::isOutputExtra()) {
             $skinextrahtml = (string)$skin->getConfigOption('extrahtml');
             if (strlen($skinextrahtml) > 0) {
@@ -206,7 +206,7 @@ class Content
     <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
     <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>';
 
-        // CIL-1643 Additional JavaScript for use by e.g., a naviation bar.
+        // CIL-1643 Additional JavaScript for use by e.g., a navigation bar.
         if (Util::isOutputExtra()) {
             $skinextrascript = (string)$skin->getConfigOption('extrascript');
             if (strlen($skinextrascript) > 0) {

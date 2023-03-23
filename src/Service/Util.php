@@ -884,6 +884,7 @@ Remote Address= ' . $remoteaddr . '
      */
     public static function saveUserToDataStore(...$args)
     {
+        $try_without_eptid = false; // Used in case of STATUS_EPTID_MISMATCH
         $dbs = new DBService();
         $log = new Loggit();
 
@@ -899,46 +900,63 @@ Remote Address= ' . $remoteaddr . '
         }
 
         // Call the dbService to get the user using IdP attributes.
-        $result = $dbs->getUser(
-            $remote_user,
-            $idp,
-            $idp_display_name,
-            $first_name,
-            $last_name,
-            $display_name,
-            $email,
-            $loa,
-            $eppn,
-            $eptid,
-            $open_id,
-            $oidc,
-            $subject_id,
-            $pairwise_id,
-            $affiliation,
-            $ou,
-            $member_of,
-            $acr,
-            $amr,
-            $preferred_username,
-            $entitlement,
-            $itrustuin,
-            $eduPersonOrcid
-        );
-        if ($result) {
-            static::setSessionVar('user_uid', $dbs->user_uid);
-            static::setSessionVar('distinguished_name', $dbs->distinguished_name);
-            static::setSessionVar('status', $dbs->status);
-        } else {
-            $log->error('Error in Util::saveUserToDataStore(): Error calling dbservice action "getUser".');
-            static::sendErrorAlert(
-                'dbService Error',
-                'Error calling dbservice action "getUser" in ' .
-                'saveUserToDatastore() method.'
+        do {
+            $try_without_eptid = false;
+            $result = $dbs->getUser(
+                $remote_user,
+                $idp,
+                $idp_display_name,
+                $first_name,
+                $last_name,
+                $display_name,
+                $email,
+                $loa,
+                $eppn,
+                $eptid,
+                $open_id,
+                $oidc,
+                $subject_id,
+                $pairwise_id,
+                $affiliation,
+                $ou,
+                $member_of,
+                $acr,
+                $amr,
+                $preferred_username,
+                $entitlement,
+                $itrustuin,
+                $eduPersonOrcid
             );
-            static::unsetSessionVar('user_uid');
-            static::unsetSessionVar('distinguished_name');
-            static::setSessionVar('status', DBService::$STATUS['STATUS_INTERNAL_ERROR']);
-        }
+            if ($result) {
+                // CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid
+                if ($dbs->status == DBService::$STATUS['STATUS_EPTID_MISMATCH']) {
+                    $eptid = '';
+                    $try_without_eptid = true;
+                    $log->warn(
+                        'Warning in Util::saveUserToDataStore(): ' .
+                        'DBService returned STATUS_EPTID_MISMATCH. ' .
+                        'Trying again without eptid.'
+                    );
+                } else {
+                    static::setSessionVar('user_uid', $dbs->user_uid);
+                    static::setSessionVar('distinguished_name', $dbs->distinguished_name);
+                    static::setSessionVar('status', $dbs->status);
+                }
+            } else {
+                $log->error(
+                    'Error in Util::saveUserToDataStore(): ' .
+                    'Error calling dbservice action "getUser".'
+                );
+                static::sendErrorAlert(
+                    'dbService Error',
+                    'Error calling dbservice action "getUser" in ' .
+                    'saveUserToDatastore() method.'
+                );
+                static::unsetSessionVar('user_uid');
+                static::unsetSessionVar('distinguished_name');
+                static::setSessionVar('status', DBService::$STATUS['STATUS_INTERNAL_ERROR']);
+            }
+        } while ($try_without_eptid);
 
         // If 'status' is not STATUS_OK*, then send an error email
         $status = static::getSessionVar('status');

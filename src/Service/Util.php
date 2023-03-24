@@ -928,8 +928,17 @@ Remote Address= ' . $remoteaddr . '
                 $eduPersonOrcid
             );
             if ($result) {
-                // CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid
-                if ($dbs->status == DBService::$STATUS['STATUS_EPTID_MISMATCH']) {
+                // CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid.
+                // To revert to old behavior of treating STATUS_EPTID_MISMATCH
+                // as an error, define EPTID_MISMATCH_IS_WARNING as false in
+                // the top-level config.php file.
+                if (
+                    ($dbs->status == DBService::$STATUS['STATUS_EPTID_MISMATCH']) &&
+                    (
+                        (!defined('EPTID_MISMATCH_IS_WARNING')) ||
+                        (EPTID_MISMATCH_IS_WARNING)
+                    )
+                ) {
                     $eptid = '';
                     $try_without_eptid = true;
                     $log->warn(

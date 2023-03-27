@@ -1,3 +1,64 @@
+2ccbb92 2023-03-24 CIL-1674 STATUS_EPTID_MISMATCH can be WARNING or ERROR.
+d261cfc 2023-03-23 CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid.
+5d0d517 2023-03-01 Fix typo in comment
+5827e3a 2023-02-28 CIL-1643 Allow extra HTML/JavaScript to be added
+a03f3fc 2023-02-09 CIL-1632 - Skin option for "Hidden" IdPs.
+2682c5f 2023-01-12 CIL-1602 Change http:// to https:// where possible
+09a86bc 2023-01-10 CIL-1576 Better formatting of error email
+51e4043 2023-01-09 Fix Typo in function name
+d4e4e54 2023-01-09 Bug fix: statusToStatusText() must be "static"
+38ca972 2023-01-06 CIL-1591 Add error logging for getOIDCClientParams
+0a05475 2023-01-06 Bug fix
+8c9dc78 2023-01-06 CIL-1595 Show 'preferred' IdP at top of list
+a380dd9 2023-01-06 CIL1576 Add 'Get Help' button to Shib IdP error page
+e017161 2022-11-02 Bug fix: move PHP error suppression '@'
+10866ff 2022-10-20 CIL-1515 Remove extraneous line
+372454a 2022-10-18 CIL-1518 Don't send error email on QDL_ERRORs
+016b169 2022-10-17 Update comment
+bf54bab 2022-10-15 CIL-1531 setcookie() needs 'SameSite=None'
+cd5c7b5 2022-10-14 CIL-1515 Add skin option <maxrecentidps>
+015e3ad 2022-10-14 CIL-1515 Display 5 recent IdPs at the top.
+4d0e8c2 2022-10-14 CIL-1515 Move the function call to save recent IdPs
+38a5f05 2022-10-14 CIL-1515 Save recently used IdP to a cookie
+47c3d91 2022-10-08 CIL-1369 Bug fix: Save the SSO IdP only after choosing an IdP.
+1e71ae8 2022-10-07 Don't unset SSO session variable on logout
+5e72810 2022-10-07 CIL-1369 Move SSO code to a Util function.
+7b0a5ae 2022-10-07 Rewrite code for ACCESS SSO. Add skin options for front page.
+d91a3a4 2022-10-06 Rename cookie used for ACCESS SSO
+f7b84e0 2022-10-06 CIL-1510 Allow admin_id in bypass table
+2fa832b 2022-10-05 Bug fix for CIL-1510.
+4e9f1ea 2022-10-05 CIL-1510 Allow admin_ids for bypass table
+c2d49e9 2022-09-30 Change 'logout' (noun) to 'log out' (verb)
+497365d 2022-09-21 Bugfix: function call missing 'static::'
+dde162e 2022-09-02 Looks like require_once('DB.php') isn't needed anymore
+7c7b3de 2022-09-02 Clean up DB connections by using DBProps
+1f7c9c6 2022-08-31 CIL-1369 Don't query the COmanage database for ACCESS
+0905105 2022-08-31 CIL-1369 Rework logic for ACCESS SSO
+5ab55c8 2022-08-30 CIL-1369 SSO for ACCESS clients
+a35e33e 2022-08-29 CIL-1413 Better error logging for "Failed to getuser"
+151a9b9 2022-08-08 Update oauth2-orcid to v2.0.0
+bbdc030 2022-08-08 Explicitly require pear/db dev-trunk
+6a55071 2022-08-08 Try prefer-stable:true instead of inline alias
+9ed8c10 2022-08-08 Try inline alias for php/db
+0e21e23 2022-08-08 Require pear/db dev-trunk
+7183d52 2022-08-08 Change minimum-stability from dev to stable
+8cbc217 2022-07-22 Remove unused function dump()
+1c38764 2022-07-20 CIL-1342 Redirect to custom error uri on QDL error.
+fa83d3e 2022-07-18 Bug: need to normalize OAuth2 IdPs in more places.
+057dbbe 2022-07-07 CIL-1332 New STATUS_ error codes for QDL errors.
+a14d387 2022-07-07 CIL-1331 Also log the paramters to the dbService call() function.
+9e3e77d 2022-07-07 CIL-1331 Log response from setTransactionState
+7bf0850 2022-06-10 CIL-1311 Change Google IdP URL.
+85608f5 2022-05-19 CIL-1294 Use PHP openssl functions to convert X509 to PKCS12
+9517fa1 2022-05-18 Use /usr/bin/env (Debian) instead of /bin/env
+0d8c438 2022-05-18 Use /usr/bin/env (Debian) instead of /bin/env
+1b9b0cc 2022-05-12 CIL-1287 Don't display empty user attributes
+a6789dc 2022-05-12 Remove extra 'eduPersonOrcid' in output
+6f34c60 2022-05-12 CIL-1285 Assert eduPersonOrcid for ORCID logins
+ee9c979 2022-05-11 Suppress warnings for chmod
+0a17260 2022-05-11 CIL-1283 Set XSEDE upload stats CSV files as world-writable
+3167e1d 2022-04-25 CIL-1271 Check for entityID differences in /updateidplist/
+6c551fb 2022-04-18 Update ChangeLog
 bfef176 2022-04-16 Catch potential Exception from DateTime()
 420bc6d 2022-04-16 Bug: need to 'use DateTime'
 9114351 2022-04-15 CIL-1247 De-duplicate Set-Cookie headers
@@ -217,14 +278,17 @@ f3214b1 2018-08-28 Use "machinehostname" for all parts of Shibboleth redirect.
 c14e118 2018-08-24 Fix PSR2-related errors.
 1c1079e 2018-08-24 CIL-377 Use mdui:DisplayName for "Select Identity Provider" listing.  Otherwise use OrganizationDisplayName so that X509 cert Subject DNs don't get updated.
 d95b29e 2018-08-24 Add 'ssl' to DBProps connection configuration.
+c152b21 2018-08-22 Merge branches 'master', 'master', 'master', 'master', 'master', 'master' and 'master' of github.com:cilogon/service-lib
 65501b7 2018-08-22 CIL-384 Allow IdPs in testidplist.xml to override those in the InCommon-metadata.xml file.
 1baffe0 2018-08-22 CIL-377 Add DisplayName to idplist.xml output. Still need to modify how this new data is used in the PHP code.
 41fdadf 2018-07-19 Revert dbService to /oauth/dbService since /oauth2/dbService is broken for Fermi Lab. Note that /oauth/dbService is broken for robots from fnal (which uses ecp), so DNS has been updated to use polob (OA4MP3.6) for now.
 960fab9 2018-07-19 Use /oauth2/dbService instead of oauth/dbService.
 89bf4f0 2018-06-22 Add missing '*' to comment.
+dad2a4a 2018-06-20 Merge branches 'master', 'master', 'master' and 'master' of github.com:cilogon/service-lib
 2307df5 2018-06-20 CIL-481 When a user cancels login at an IdP (e.g., Duo), the resulting is a Shibboleth error authnFailed. In the Shib error handler, check for either OAuth 2.0 or OAuth 1.0a transaction (i.e., redirect url or failure url) and redirect appropriately.
 dcc33b8 2018-05-23 CIL-471 If no name given for support contact, simply use the email address as display string.
 6281cee 2018-03-27 CIL-462 Send 'acr' (Authentication Context Class Ref) from Shibboleth session to Java dbService API in the attr_json parameter.
+abe9eb6 2018-03-19 Merge branches 'master' and 'master' of github.com:cilogon/service-lib
 7412e9e 2018-03-19 CIL-452 Pass 'attr_json=...' query parameter to the dbService Java API.  This new parameter contains a JSON object populated by new user attributes such as 'member_of'.
 fa06645 2018-01-25 Allow endroid/qr-code 2.0 for PHP 5.6.
 c293cd5 2018-01-25 Use REMOTE_USER instead of HTTP_REMOTE_USER, which is discouraged.

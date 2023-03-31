@@ -612,6 +612,22 @@ EOT;
                         }
                     }
 
+                    // CIL-1685 Check for registrationAuthority
+                    $RA = 'UNKNOWN'; // If no registrationAuthority found
+                    $xp = $sxe->xpath(
+                        "Extensions/mdrpi:RegistrationInfo" .
+                        "[@registrationAuthority]"
+                    );
+                    if (($xp !== false) && (count($xp) > 0)) {
+                        foreach ($xp[0]->attributes() as $key => $value) {
+                            if ($key == 'registrationAuthority') {
+                                $RA = $value;
+                                break;
+                            }
+                        }
+                    }
+                    $this->addNode($dom, $idp, 'RegAuth', $RA);
+
                     // Check for registered-by-incommon
                     $xp = $sxe->xpath(
                         "Extensions/mdattr:EntityAttributes/" .
@@ -679,7 +695,7 @@ EOT;
                             $Logout = (string)($xp[0]->attributes())['Location'];
                         }
                     }
-                    // Finally, a hack for Shibboleth-based IdPs.
+                    // A hack for Shibboleth-based IdPs:
                     // Check for <SingleSignOnService> HTTP-Redirect
                     // and regex for the built-in Simple Logout URL.
                     if (empty($Logout)) {
@@ -895,6 +911,28 @@ EOT;
             (isset($this->idparray[$entityID]['Logout']))
         ) {
             $retval = $this->idparray[$entityID]['Logout'];
+        }
+        return $retval;
+    }
+
+    /**
+     * getRegAuth
+     *
+     * This function returns the Registration Authority for the
+     * selected $entityID.
+     *
+     * @param string $entityID The entityID to search for
+     * @return string The RegAuth value for the $entityID. Return
+     *         string is empty if no matching $entityID found.
+     */
+    public function getRegAuth($entityID)
+    {
+        $retval = '';
+        if (
+            ($this->exists($entityID)) &&
+            (isset($this->idparray[$entityID]['RegAuth']))
+        ) {
+            $retval = $this->idparray[$entityID]['RegAuth'];
         }
         return $retval;
     }

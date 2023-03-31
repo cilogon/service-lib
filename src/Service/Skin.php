@@ -129,7 +129,7 @@ class Skin
      * callbackURL, (2) in a URL parameter (can be '?skin=',
      * '?cilogon_skin=', '?vo='), (3) cilogon_vo form input variable
      * (POST for ECP case), or (4) 'cilogon_skin' PHP session
-     * variable.  If it finds the skin name in any of these, it then
+     * variable. If it finds the skin name in any of these, it then
      * checks to see if such a named skin exists, either on the filesystem
      * or in the database. If found, the class variable $skinname AND the
      * 'cilogon_skin' PHP session variable (for use on future page
@@ -334,9 +334,9 @@ class Skin
      * getConfigOption
      *
      * This method returns a SimpleXMLElement block corresponding to
-     * the passed in arguments.  For example, to get the redlit list of
+     * the passed in arguments. For example, to get the redlit list of
      * idps, call $idps = getConfigOption('idpredlit') and then
-     * iterate over $idps with foreach($idps as $idp) { ... }.  To get
+     * iterate over $idps with foreach($idps as $idp) { ... }. To get
      * a single subblock value such as the initial lifetime number for
      * the PKCS12 download option, call $life =
      * (int)getConfigOption('pkcs12','initiallifetime','number'). Note
@@ -390,7 +390,7 @@ class Skin
      * hasGreenlitIdps
      *
      * This function checks for the presence of a <idpgreenlit> block
-     * in the skin's config file.  There must be at least one <idp>
+     * in the skin's config file. There must be at least one <idp>
      * in the <idpgreenlit>.
      *
      * @return bool True if skin has a non-empty <idpgreenlit>.
@@ -409,7 +409,7 @@ class Skin
      * hasRedlitIdps
      *
      * This function checks for the presence of a <idpredlit> block
-     * in the skin's config file.  There must be at least one <idp>
+     * in the skin's config file. There must be at least one <idp>
      * in the <idpredlit>.
      *
      * @return bool True if skin has a non-empty <idpredlit>.
@@ -425,13 +425,51 @@ class Skin
     }
 
     /**
+     * hasGreenlitRegAuths
+     *
+     * This function checks for the presence of a <regauthgreenlit> block
+     * in the skin's config file. There must be at least one <regauth>
+     * in the <regauthgreenlit>.
+     *
+     * @return bool True if skin has a non-empty <regauthgreenlit>.
+     */
+    public function hasGreenlitRegAuths()
+    {
+        $retval = false;  // Assume no <regauthgreenlit> configured
+        $regauthgreenlit = $this->getConfigOption('regauthgreenlit');
+        if ((!is_null($regauthgreenlit)) && (!empty($regauthgreenlit->regauth))) {
+            $retval = true;
+        }
+        return $retval;
+    }
+
+    /**
+     * hasRedlitRegAuths
+     *
+     * This function checks for the presence of a <regauthredlit> block
+     * in the skin's config file. There must be at least one <regauth>
+     * in the <regauthredlit>.
+     *
+     * @return bool True if skin has a non-empty <regauthredlit>.
+     */
+    public function hasRedlitRegAuths()
+    {
+        $retval = false;  // Assume no <regauthredlit> configured
+        $regauthredlit = $this->getConfigOption('regauthredlit');
+        if ((!is_null($regauthredlit)) && (!empty($regauthredlit->regauth))) {
+            $retval = true;
+        }
+        return $retval;
+    }
+
+    /**
      * idpGreenlit
      *
      * This method checks to see if a given entityId of an IdP
      * is greenlit. 'Greenlit' in this case means either (a) the
      * entityId is in the skin's <idpgreenlit> list or (b) the skin
-     * doesn't have a <idpgreenlit> at all.  In the second case, all
-     * IdPs are by default 'greenlit'.  If you want to find if an
+     * doesn't have a <idpgreenlit> at all. In the second case, all
+     * IdPs are by default 'greenlit'. If you want to find if an
      * IdP should be listed in the WAYF, use 'idpAvailable' which
      * checks the greenlit AND the redlit lists.
      *
@@ -488,13 +526,80 @@ class Skin
     }
 
     /**
+     * regAuthGreenlit
+     *
+     * This method checks to see if a given entityId has a RegAuth which is
+     * greenlit. 'Greenlit' in this case means either (a) the entityId has a
+     * RegAuth (Registration Authority) in the skin's <regauthgreenlit> list
+     * or (b) the skin doesn't have a <regauthgreenlit> config option. In
+     * the second case, all IdPs are by default 'greenlit' as far as RegAuth
+     * is concerned.
+     *
+     * @param string $entityId The entityId of an IdP to check for a
+     *        greenlit RegAuth.
+     * @return bool True if the given IdP entityId has a RegAuth which is in
+     *         the skin's <regauthgreenlit> list (or if the skin doesn't
+     *         have a <regauthgreenlit> list). False otherwise.
+     */
+    public function regAuthGreenlit($entityId)
+    {
+        $retval = true;  // Assume the entityId has a 'greenlit' RegAuth
+        if ($this->hasGreenlitRegAuths()) {
+            $regauthgreenlit = $this->getConfigOption('regauthgreenlit');
+            $found = false;
+            $idplist = Util::getIdpList();
+            $entityIdRegAuth = $idplist->getRegAuth($entityId);
+            foreach ($regauthgreenlit->regauth as $greenregauth) {
+                if ($entityIdRegAuth == ((string)$greenregauth)) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $retval = false;
+            }
+        }
+        return $retval;
+    }
+
+    /**
+     * regAuthRedlit
+     *
+     * This method checks to see if a given entityId has a RegAuth
+     * (Registration Authority) which appears in the skin's <regauthredlit>
+     * list.
+     *
+     * @param string $entityId The entityId of an IdP to check for a
+     *        redlit RegAuth.
+     * @return bool True if the given IdP entityId has a RegAuth which is in
+     *         the skin's <regauthredlit> list. False otherwise, or if the
+     *         skin doesn't have a <regauthredlit> list.
+     */
+    public function regAuthRedlit($entityId)
+    {
+        $retval = false;  // Assume entityId does NOT have a 'redlit' RegAuth
+        if ($this->hasRedlitRegAuths()) {
+            $regauthredlit = $this->getConfigOption('regauthredlit');
+            $idplist = Util::getIdpList();
+            $entityIdRegAuth = $idplist->getRegAuth($entityId);
+            foreach ($regauthredlit->regauth as $redregauth) {
+                if ($entityIdRegAuth == ((string)$redregauth)) {
+                    $retval = true;
+                    break;
+                }
+            }
+        }
+        return $retval;
+    }
+
+    /**
      * idpAvailable
      *
      * This method combines idpGreenlit and idpRedlit to return
      * a 'yes/no' for if a given IdP should be made available for
-     * selection in the WAYF.  It first checks to see if the IdP is
-     * greenlit.  If not, it returns false. Otherwise, it then
-     * checks if the IdP is redlit.  If not, it returns true.
+     * selection in the WAYF. It first checks to see if the IdP is
+     * greenlit. If not, it returns false. Otherwise, it then
+     * checks if the IdP is redlit. If not, it returns true.
      *
      * @param string $entityId The entityId of an IdP to check to see if it
      *        should be available in the WAYF.
@@ -516,13 +621,13 @@ class Skin
     /**
      * setMyProxyInfo
      *
-     * This method sets the 'myproxyinfo' PHP session variable.  The
+     * This method sets the 'myproxyinfo' PHP session variable. The
      * variable has the form 'info:key1=value1,key2=value2,...' and is
      * passed to the 'myproxy-logon' command as part of the username
-     * when fetching a credential.  The MyProxy server will do extra
-     * processing based on the content of this 'info:...' tag.  If the
-     * skinname is not empty, that is added to the info tag.  Also,
-     * the apache REMOTE_ADDR is added.  For other key=value pairs that
+     * when fetching a credential. The MyProxy server will do extra
+     * processing based on the content of this 'info:...' tag. If the
+     * skinname is not empty, that is added to the info tag. Also,
+     * the apache REMOTE_ADDR is added. For other key=value pairs that
      * get added, see the code below.
      */
     public function setMyProxyInfo()
@@ -572,7 +677,7 @@ class Skin
      * hasPortalList
      *
      * This function checks for the presence of a <portallist> block in
-     * the skin's config file.  There must be at least one <portal> in
+     * the skin's config file. There must be at least one <portal> in
      * the <portallist>.
      *
      * @return bool True if skin has a non-empty <portallist>.
@@ -591,8 +696,8 @@ class Skin
      * inPortalList
      *
      * This function takes in a 'callback' URL of a portal passed to
-     * the CILogon Delegate service.  It then looks through the list
-     * of <portal> patterns in the skin's <portallist>.  If the
+     * the CILogon Delegate service. It then looks through the list
+     * of <portal> patterns in the skin's <portallist>. If the
      * callback URL matches any of these patterns, true is returned.
      * This is used to hide the 'Site Name / Site URL / Service URL'
      * box on the delegation WAYF page, for example.
@@ -600,7 +705,7 @@ class Skin
      * @param string $portalurl A 'callback' URL of a portal accessing the
      *        delegate service.
      * @return bool True if the callback URL matches one of the patterns
-     *         in the skin's <portallist>.  False otherwise.
+     *         in the skin's <portallist>. False otherwise.
      */
     public function inPortalList($portalurl)
     {
@@ -697,7 +802,7 @@ class Skin
         $retval = '';
         if (strlen($this->skinname) > 0) {
             $retval = '<input type="hidden" name="skinname" id="skinname" ' .
-                'value="' . $this->skinname .  '" />';
+                'value="' . $this->skinname . '" />';
         }
         return $retval;
     }

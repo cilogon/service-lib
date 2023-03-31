@@ -3188,22 +3188,50 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
         }
 
+        // CIL-1685 Filter IdP list based on Registration Authorities
+        // Check if the skin's config.xml has a greenlit list of RegAuths
+        // (Registration Authorities). If so, keep only those IdPs with
+        // greenlit RegAuths.
+        if ($skin->hasGreenlitRegAuths()) {
+            foreach ($retarray as $entityId => $names) {
+                // Skip the OAuth2 IdPs
+                if ($idplist->isOAuth2($entityId)) {
+                    continue;
+                }
+                if (!$skin->regAuthGreenlit($entityId)) {
+                    unset($retarray[$entityId]);
+                }
+            }
+        }
+        // Check if the skin's config.xml has a redlit list of RegAuths
+        // (Registration Authorities). If so, cull down the master IdP list
+        // removing 'bad' IdPs.
+        if ($skin->hasRedlitRegAuths()) {
+            foreach ($retarray as $entityId => $names) {
+                // Skip the OAuth2 IdPs
+                if ($idplist->isOAuth2($entityId)) {
+                    continue;
+                }
+                if ($skin->regAuthRedlit($entityId)) {
+                    unset($retarray[$entityId]);
+                }
+            }
+        }
+
         // Check to see if the skin's config.xml has a greenlit list of IDPs.
         // If so, go thru master IdP list and keep only those IdPs.
         if ($skin->hasGreenlitIdps()) {
             foreach ($retarray as $entityId => $names) {
-                $entityId = Util::normalizeOAuth2IdP($entityId);
                 if (!$skin->idpGreenlit($entityId)) {
                     unset($retarray[$entityId]);
                 }
             }
         }
-        // Next, check to see if the skin's config.xml has a redlit list of
-        // IdPs. If so, cull down the master IdP list removing 'bad' IdPs.
+        // Check to see if the skin's config.xml has a redlit list of IdPs.
+        // If so, cull down the master IdP list removing 'bad' IdPs.
         if ($skin->hasRedlitIdps()) {
             $idpredlit = $skin->getConfigOption('idpredlit');
             foreach ($idpredlit->idp as $redidp) {
-                $redidp = Util::normalizeOAuth2IdP($redidp);
                 unset($retarray[(string)$redidp]);
             }
         }

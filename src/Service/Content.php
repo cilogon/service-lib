@@ -3188,58 +3188,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
         }
 
-        // CIL-1685 Filter IdP list based on Registration Authorities
-        // Check if the skin's config.xml has a greenlit list of RegAuths
-        // (Registration Authorities). If so, keep only those IdPs with
-        // greenlit RegAuths.
-        if ($skin->hasGreenlitRegAuths()) {
-            foreach ($retarray as $entityId => $names) {
-                // Skip the OAuth2 IdPs
-                if ($idplist->isOAuth2($entityId)) {
-                    continue;
-                }
-                if (!$skin->regAuthGreenlit($entityId)) {
-                    unset($retarray[$entityId]);
-                }
-            }
-        }
-        // Check if the skin's config.xml has a redlit list of RegAuths
-        // (Registration Authorities). If so, cull down the master IdP list
-        // removing 'bad' IdPs.
-        if ($skin->hasRedlitRegAuths()) {
-            foreach ($retarray as $entityId => $names) {
-                // Skip the OAuth2 IdPs
-                if ($idplist->isOAuth2($entityId)) {
-                    continue;
-                }
-                if ($skin->regAuthRedlit($entityId)) {
-                    unset($retarray[$entityId]);
-                }
-            }
-        }
-
-        // Check to see if the skin's config.xml has a greenlit list of IDPs.
-        // If so, go thru master IdP list and keep only those IdPs.
-        if ($skin->hasGreenlitIdps()) {
-            foreach ($retarray as $entityId => $names) {
-                if (!$skin->idpGreenlit($entityId)) {
-                    unset($retarray[$entityId]);
-                }
-            }
-        }
-        // Check to see if the skin's config.xml has a redlit list of IdPs.
-        // If so, cull down the master IdP list removing 'bad' IdPs.
-        if ($skin->hasRedlitIdps()) {
-            $idpredlit = $skin->getConfigOption('idpredlit');
-            foreach ($idpredlit->idp as $redidp) {
-                unset($retarray[(string)$redidp]);
-            }
-        }
-
-        // Fix for CIL-174 - As suggested by Keith Hazelton, replace commas and
-        // hyphens with just commas.
+        // Loop through the list of IdPs and check for the following.
+        // CIL-174 As suggested by Keith Hazelton, replace commas and
+        // hyphens with just commas. for University of California schools.
+        // CIL-1685 Filter IdPs based on Registration Authorities.
+        // Also filter IdPs based on IdP greenlit/redlit lists.
         $regex = '/(University of California)\s*[,-]\s*/';
         foreach ($retarray as $entityId => $names) {
+            // CIL-174 For UC schools, replace hyphens with commas
             if (preg_match($regex, $names['Organization_Name'])) {
                 $retarray[$entityId]['Organization_Name'] =
                     preg_replace($regex, '$1, ', $names['Organization_Name']);
@@ -3247,6 +3203,16 @@ in "handleGotUser()" for valid IdPs for the skin.'
             if (preg_match($regex, $names['Display_Name'])) {
                 $retarray[$entityId]['Display_Name'] =
                     preg_replace($regex, '$1, ', $names['Display_Name']);
+            }
+            // CIL-1685 Filter IdP list based on Registration Authorities.
+            // Also filter based on IdP greenlit/redlit lists.
+            if (
+                (!$skin->regAuthGreenlit($entityId)) ||
+                ($skin->regAuthRedlit($entityId)) ||
+                (!$skin->idpGreenlit($entityId)) ||
+                ($skin->idpRedlit($entityId))
+            ) {
+                unset($retarray[$entityId]);
             }
         }
 

@@ -676,6 +676,10 @@ EOT;
                                 $addedrands = true;
                                 $this->addNode($dom, $idp, 'RandS', '1');
                             }
+                            // CIL-1693 Also check for personalized
+                            if ($value == 'https://refeds.org/category/personalized') {
+                                $this->addNode($dom, $idp, 'Personalized', '1');
+                            }
                         }
                     }
 
@@ -1056,6 +1060,21 @@ EOT;
     public function isREFEDSRandS($entityID)
     {
         return $this->isAttributeSet($entityID, 'REFEDS_RandS');
+    }
+
+    /**
+     * isPersonalized
+     *
+     * This method searches for the given entityID and checks if the
+     *'Personalized' entry has been set to '1'.
+     *
+     * @param string $entityID The enityID to search for
+     * @return bool True if the given entityID is listed as
+     *         'Personalized'. False otherwise.
+     */
+    public function isPersonalized($entityID)
+    {
+        return $this->isAttributeSet($entityID, 'Personalized');
     }
 
     /**

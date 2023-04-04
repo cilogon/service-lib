@@ -516,6 +516,7 @@ class Skin
             $entityId = Util::normalizeOAuth2IdP($entityId);
             $idpredlit = $this->getConfigOption('idpredlit');
             foreach ($idpredlit->idp as $redidp) {
+                $redidp = Util::normalizeOAuth2IdP($redidp);
                 if ($entityId == ((string)$redidp)) {
                     $retval = true;
                     break;
@@ -548,9 +549,9 @@ class Skin
             $regauthgreenlit = $this->getConfigOption('regauthgreenlit');
             $found = false;
             $idplist = Util::getIdpList();
-            $entityIdRegAuth = $idplist->getRegAuth($entityId);
+            $regAuthForEntityId = $idplist->getRegAuth($entityId);
             foreach ($regauthgreenlit->regauth as $greenregauth) {
-                if ($entityIdRegAuth == ((string)$greenregauth)) {
+                if ($regAuthForEntityId == ((string)$greenregauth)) {
                     $found = true;
                     break;
                 }
@@ -581,9 +582,9 @@ class Skin
         if ($this->hasRedlitRegAuths()) {
             $regauthredlit = $this->getConfigOption('regauthredlit');
             $idplist = Util::getIdpList();
-            $entityIdRegAuth = $idplist->getRegAuth($entityId);
+            $regAuthForEntityId = $idplist->getRegAuth($entityId);
             foreach ($regauthredlit->regauth as $redregauth) {
-                if ($entityIdRegAuth == ((string)$redregauth)) {
+                if ($regAuthForEntityId == ((string)$redregauth)) {
                     $retval = true;
                     break;
                 }

@@ -118,6 +118,7 @@ class Skin
         $this->forcearray = Util::getBypass()->getForceSkinArray();
         $this->readSkinConfig();
         $this->setMyProxyInfo();
+        $this->checkShowHidden();
     }
 
     /**
@@ -763,7 +764,8 @@ class Skin
      * getHiddenIdPs
      *
      * CIL-1632 - Green light IdPs, but do not show them, but still allow
-     * admin access using "idphint=entityId" query parameter.
+     * admin access using "idphint=entityId" query parameter or
+     * "showhidden" query parameter.
      *
      * This is a convenience function to return the list of "hidden" IdPs
      * for the skin. In this case "hidden" means that the IdP should have
@@ -773,37 +775,81 @@ class Skin
      * passes "greenlit" checks to see if the IdP is allowed), but the
      * <option> does not get displayed to the user. A skin can be configured
      * to "green light" an IdP, but hide it from most users, allowing it
-     * to be selected by specifying the "idphint=entityId" query parameter.
+     * to be selected by specifying the "idphint=entityId" query parameter
+     * or the "showhidden" query parameter.
      */
     public function getHiddenIdPs()
     {
         $hiddenidps = array();
-        $idphidden = $this->getConfigOption('idphidden');
-        if ((!is_null($idphidden)) && (!empty($idphidden->idp))) {
-            foreach ($idphidden->idp as $hiddenidp) {
-                $hiddenidp = Util::normalizeOAuth2IdP($hiddenidp);
-                $hiddenidps[] = $hiddenidp;
+        // If 'showhidden' session var is set, then no hidden IdPs
+        if (strlen(Util::getSessionVar('showhidden')) == 0) {
+            $idphidden = $this->getConfigOption('idphidden');
+            if ((!is_null($idphidden)) && (!empty($idphidden->idp))) {
+                foreach ($idphidden->idp as $hiddenidp) {
+                    $hiddenidp = Util::normalizeOAuth2IdP($hiddenidp);
+                    $hiddenidps[] = $hiddenidp;
+                }
             }
         }
         return $hiddenidps;
+    }
+
+    /**
+     * checkShowHidden
+     *
+     * CIL-1632 - For <idphidden> IdPs, allow a query parameter 'showhidden'
+     * to always show these IdPs.
+     *
+     * Check for a query parameter 'showhidden' (or 'showhiddenidps') when
+     * checking for the skin.  If the query parameter is present, check its
+     * value. If the value is 'false' or '0', then UNset the PHP session
+     * variable 'showhidden' in order to hide the hidden IdPs as per usual.
+     * Otherwise, it doesn't matter what value is passed for 'showhidden'
+     * (i.e., the query parameter can be specified with or without a value)
+     * to set the PHP session variable 'showhidden' = '1' to always show any
+     * hidden IdPs.
+     */
+    public function checkShowHidden()
+    {
+        if (
+            (isset($_GET['showhidden'])) ||
+            (isset($_GET['showhiddenidps']))
+        ) {
+            // Allow either 'showhidden' or 'showhiddenidps' as parameter
+            $showhidden = $_GET['showhidden'];
+            if (strlen($showhidden) == 0) {
+                $showhidden = $_GET['showhiddenidps'];
+            }
+            if (($showhidden == 'false') || ($showhidden == '0')) {
+                Util::unsetSessionVar('showhidden');
+            } else {
+                Util::setSessionVar('showhidden', '1');
+            }
+        }
     }
 
    /**
      * hiddenFormElement
      *
      * Returns an <input ...> form element of type 'hidden' with the
-     * name of the skin. If there is no current skinname, return
-     * empty string.
+     * name of the skin and the 'showhidden' parameter. If there is no
+     * current skinname and showhidden, return empty string. This is used
+     * by cilogon.js when calling the /idplist/ endpoint since there is
+     * no PHP session available to the JavaScript.
      *
      * @return string The string of an <input> HTML element, or
-     *         empty string if skinname is blank.
+     *         empty string if skinname and showhidden are not set.
      */
     public function hiddenFormElement()
     {
         $retval = '';
         if (strlen($this->skinname) > 0) {
-            $retval = '<input type="hidden" name="skinname" id="skinname" ' .
+            $retval .= '<input type="hidden" name="skinname" id="skinname" ' .
                 'value="' . $this->skinname . '" />';
+        }
+        if (strlen(Util::getSessionVar('showhidden')) > 0) {
+            $retval .= '<input type="hidden" name="showhidden" ' .
+                'id="showhidden" value="1" />';
         }
         return $retval;
     }

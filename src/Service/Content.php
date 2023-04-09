@@ -560,15 +560,7 @@ class Content
         // since it is needed by Ajax 'GET' of the /idplist endpoint.
         if (!empty($idphintlist)) {
             echo '<input type="hidden" name="idphintlist" id="idphintlist"',
-                 ' value="';
-            $numhints = count($idphintlist);
-            for ($i = 0; $i < $numhints; $i++) {
-                echo urlencode($idphintlist[$i]);
-                if ($i < ($numhints - 1)) {
-                    echo ',';
-                }
-            }
-            echo '" />';
+                 ' value="' . implode(',', $idphintlist) . '" />';;
         }
         echo '<input type="hidden" name="previouspage" value="WAYF" />';
         $lobtext = static::getLogOnButtonText();
@@ -3308,6 +3300,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 }
             }
         }
+        $hintarray = array_values($hintarray); // Re-index array after unset
         return $hintarray;
     }
 

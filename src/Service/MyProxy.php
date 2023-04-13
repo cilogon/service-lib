@@ -48,6 +48,7 @@ class MyProxy
         $certreq = '',
         $env = ''
     ) {
+        $retstr = '';
         $log = new Loggit();
         // Verify the myproxy-logon binary has been configured
         if ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON))) {
@@ -99,7 +100,6 @@ class MyProxy
         // Continue until successfully fetched a certificate, or no more
         // MyProxy servers to try.
         $success = false;
-        $retstr = '';
         foreach ((explode(',', $server)) as $mpserver) {
             $mpserver = trim($mpserver);
             $mpdn = '';
@@ -131,9 +131,7 @@ class MyProxy
             exec($cmd, $output, $return_val);
             $retstr = implode("\n", $output);
 
-            if ($return_val > 0) { // Failure!
-                $retstr = '';
-            } else {
+            if ($return_val == 0) {
                 $success = true;
                 break;
             }
@@ -146,6 +144,7 @@ class MyProxy
                 'getMyProxyCredential Error',
                 "MyProxy Error = $return_val\nMyProxy Output = $retstr"
             );
+            $retstr = ''; // Clear out retstr on errors
         }
 
         return $retstr;

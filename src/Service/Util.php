@@ -6,7 +6,6 @@ use CILogon\Service\CSRF;
 use CILogon\Service\Loggit;
 use CILogon\Service\IdpList;
 use CILogon\Service\DBService;
-use CILogon\Service\DBProps;
 use CILogon\Service\SessionMgr;
 use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
@@ -60,6 +59,11 @@ class Util
      * @var Skin $skin A 'global' Skin object for skin configuration.
      */
     public static $skin = null;
+
+    /**
+     * @var DB $db A 'global' PEAR DB connection object.
+     */
+    public static $db = null;
 
     /**
      * @var array $oauth2idps An array of OAuth2 Identity Providers and
@@ -146,6 +150,42 @@ class Util
             static::$skin = new Skin();
         }
         return static::$skin;
+    }
+
+    /**
+     * getDB
+     *
+     * This function initializes the class $db object (if not yet
+     * created) and returns it. This is a PEAR DB connection object
+     * returned by DB::connect() suitable for future DB calls. If
+     * there is a problem, the class $db object is set to null.
+     *
+     * @return DB A PEAR DB object connected to a database, or null
+     *         on error connecting to database.
+     */
+    public static function getDB()
+    {
+        if (is_null(static::$db)) {
+            $db_const = new DB(); // So constants defined in DB.php get read in
+            $dsn = array(
+                'phptype'  => DB_TYPE,
+                'username' => DB_USERNAME,
+                'password' => DB_PASSWORD,
+                'hostspec' => DB_HOSTSPEC,
+                'database' => DB_DATABASE
+            );
+
+            $opts = array(
+                'persistent'  => true,
+                'portability' => DB_PORTABILITY_ALL
+            );
+
+            static::$db = DB::connect($dsn, $opts);
+            if (PEAR::isError(static::$db)) {
+                static::$db = null;
+            }
+        }
+        return static::$db;
     }
 
     /**
@@ -508,41 +548,26 @@ class Util
      * startPHPSession
      *
      * This function starts a secure PHP session and should be called
-     * at the beginning of each script before any HTML is output.  It
+     * at the beginning of each script before any HTML is output. It
      * does a trick of setting a 'lastaccess' time so that the
      * $_SESSION variable does not expire without warning.
-     *
-     * @param string $storetype (Optional) Storage location of the PHP
-     *        session data, one of 'file' or 'mysql'. Defaults to null,
-     *        which means use the value of STORAGE_PHPSESSIONS from the
-     *        config.php file, or 'file' if no such parameter configured.
      */
-    public static function startPHPSession($storetype = null)
+    public static function startPHPSession()
     {
-        // No parameter given? Use the value read in from cilogon.ini file.
-        if (is_null($storetype)) {
-            if (defined('STORAGE_PHPSESSIONS')) {
-                $storetype = STORAGE_PHPSESSIONS;
-            } else {
-                $storetype = 'file';
-            }
-        }
-
-        if (preg_match('/^mysql/', $storetype)) {
-            // If STORAGE_PHPSESSIONS == 'mysqli', create a sessionmgr().
-            $sessionmgr = new SessionMgr();
-        } elseif ($storetype == 'file') {
+        if ((defined('PHPSESSIONS_USE_FILE')) && (PHPSESSIONS_USE_FILE === true)) {
             // If storing PHP sessions to file, check if an optional directory
             // for storage has been set. If so, create it if necessary.
-            if ((defined('STORAGE_PHPSESSIONS_DIR')) && (!empty(STORAGE_PHPSESSIONS_DIR))) {
-                if (!is_dir(STORAGE_PHPSESSIONS_DIR)) {
-                    mkdir(STORAGE_PHPSESSIONS_DIR, 0770, true);
+            if ((defined('PHPSESSIONS_DIR')) && (!empty(PHPSESSIONS_DIR))) {
+                if (!is_dir(PHPSESSIONS_DIR)) {
+                    mkdir(PHPSESSIONS_DIR, 0770, true);
                 }
 
-                if (is_dir(STORAGE_PHPSESSIONS_DIR)) {
-                    ini_set('session.save_path', STORAGE_PHPSESSIONS_DIR);
+                if (is_dir(PHPSESSIONS_DIR)) {
+                    ini_set('session.save_path', PHPSESSIONS_DIR);
                 }
             }
+        } else { // Store PHP sessions to the database
+            $sessionmgr = new SessionMgr();
         }
 
         ini_set('session.cookie_secure', true);
@@ -1336,8 +1361,7 @@ Remote Address= ' . $remoteaddr . '
         $log = new Loggit();
 
         if (strlen(@$clientparams['client_id']) > 0) {
-            $dbprops = new DBProps('mysqli');
-            $db = $dbprops->getDBConnect();
+            $db = static::getDB();
             if (!is_null($db)) {
                 $data = $db->getRow(
                     'SELECT name,home_url,callback_uri,scopes from clients WHERE client_id = ?',
@@ -1390,8 +1414,7 @@ Remote Address= ' . $remoteaddr . '
             if (array_key_exists($client_id, $clienttoadminmap)) {
                 $retval = $clienttoadminmap[$client_id];
             } else { // Search the database for the client_id's admin_id+name
-                $dbprops = new DBProps('mysqli');
-                $db = $dbprops->getDBConnect();
+                $db = static::getDB();
                 if (!is_null($db)) {
                     $data = $db->getRow(
                         "SELECT admin_id,name FROM adminClients WHERE admin_id IN " .

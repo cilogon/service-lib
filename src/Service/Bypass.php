@@ -2,7 +2,6 @@
 
 namespace CILogon\Service;
 
-use CILogon\Service\DBProps;
 use CILogon\Service\Util;
 use PEAR;
 use DB;
@@ -99,8 +98,7 @@ class Bypass
         $readin = false; // Did we read the 'bypass' table from the database?
         $this->bypassarray = []; // Reset the class bypassarray to empty
 
-        $dbprops = new DBProps('mysqli');
-        $db = $dbprops->getDBConnect();
+        $db = Util::getDB();
         if (!is_null($db)) {
             $data = $db->getAssoc(
                 'SELECT * FROM bypass',

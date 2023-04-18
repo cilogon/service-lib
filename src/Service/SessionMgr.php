@@ -2,7 +2,6 @@
 
 namespace CILogon\Service;
 
-use CILogon\Service\DBProps;
 use CILogon\Service\Util;
 use DB;
 
@@ -27,10 +26,10 @@ use DB;
  * # mysql -u root -p
  * ### password is found in /var/www/config/cilogon.xml
  * mysql> use oauth;
- * mysql> GRANT ALL PRIVILEGES ON oauth.phpsessions
+ * mysql> GRANT ALL PRIVILEGES ON ciloa2.phpsessions
  *     ->  TO 'cilogon'@'localhost' WITH GRANT OPTION;
  * mysql> COMMIT;
- * mysql> CREATE TABLE oauth.phpsessions (
+ * mysql> CREATE TABLE ciloa2.phpsessions (
  *     ->  id VARCHAR(32) NOT NULL,
  *     ->  data BLOB NOT NULL,
  *     ->  expires INTEGER NOT NULL,
@@ -89,7 +88,7 @@ class SessionMgr
      * This method opens the database connection.
      *
      * @param string $save_path The path where PHP session files are to be
-     *        saved. (Ignored in the MySQL case.)
+     *        saved. (Ignored in the database case.)
      * @param string $session_id The PHP session identifier.
      * @return bool True if database connection opened successfully,
      *         false otherwise.
@@ -98,12 +97,12 @@ class SessionMgr
     {
         $retval = true;  // Assume connect to database succeeded
 
-        $storetype = 'file';
-        if (defined('STORAGE_PHPSESSIONS')) {
-            $storetype = STORAGE_PHPSESSIONS;
+        if (
+            (!defined('PHPSESSIONS_USE_FILE')) ||
+            (PHPSESSIONS_USE_FILE === false)
+        ) {
+            $this->db = Util::getDB();
         }
-        $dbprops = new DBProps($storetype);
-        $this->db = $dbprops->getDBConnect();
 
         if (is_null($this->db)) {
             $retval = false;

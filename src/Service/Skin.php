@@ -2,7 +2,6 @@
 
 namespace CILogon\Service;
 
-use CILogon\Service\DBProps;
 use CILogon\Service\Util;
 use tubalmartin\CssMin\Minifier as CSSmin;
 use PEAR;
@@ -266,8 +265,7 @@ class Skin
         $readin = false; // Make sure we read in either XML or CSS (or both)
 
         if (strlen($skinvar) > 0) {
-            $dbprops = new DBProps('mysqli');
-            $db = $dbprops->getDBConnect();
+            $db = Util::getDB();
             if (!is_null($db)) {
                 $data = $db->getRow(
                     'SELECT * from skins WHERE name = ?',

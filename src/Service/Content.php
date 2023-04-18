@@ -560,7 +560,7 @@ class Content
         // since it is needed by Ajax 'GET' of the /idplist endpoint.
         if (!empty($idphintlist)) {
             echo '<input type="hidden" name="idphintlist" id="idphintlist"',
-                 ' value="' . implode(',', $idphintlist) . '" />';;
+                 ' value="', implode(',', $idphintlist), '" />';
         }
         echo '<input type="hidden" name="previouspage" value="WAYF" />';
         $lobtext = static::getLogOnButtonText();

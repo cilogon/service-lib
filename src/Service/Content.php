@@ -490,7 +490,7 @@ class Content
 
         echo '
       <div class="card text-center col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 mt-3">
-        <h4 class="card-header">',
+        <h4 class="card-header" id="heading-selectanidp">',
         ($useselectedidp ? 'Selected' : 'Select an'),
         ' Identity Provider</h4>
         <div class="card-body">

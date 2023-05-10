@@ -1879,14 +1879,18 @@ class Content
 
         $missingattrs = '';
         // Show user which attributes are missing
-        if ((strlen($eppn) == 0) && (strlen($eptid) == 0)) {
+        if (
+            (strlen($eppn) == 0) &&
+            (strlen($eptid) == 0) &&
+            (strlen($subject_id) == 0)
+        ) {
             $errorboxstr .= '
-                <dt class="col-sm-3">ePTID:</dt>
+                <dt class="col-sm-3">subject-id:</dt>
                 <dd class="col-sm-9">MISSING</dd>
                 <dt class="col-sm-3">ePPN:</dt>
                 <dd class="col-sm-9">MISSING</dd>';
-            $missingattrs .= '%0D%0A    eduPersonPrincipalName' .
-                             '%0D%0A    eduPersonTargetedID ';
+            $missingattrs .= '%0D%0A    subject-id   -OR-' .
+                             '%0D%0A    eduPersonPrincipalName';
         }
         if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '

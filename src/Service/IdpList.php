@@ -942,6 +942,31 @@ EOT;
     }
 
     /**
+     * getIdPsForRegAuth
+     *
+     * This function returns a list of IdP entityIDs for a given
+     * Registration Authority.
+     *
+     * @param string $regAuth The Registration Authority to search for
+     * @return array An array of IdPs in the given $regAuth. The array is
+     *         empty if no mathing $regAuth is found.
+     */
+    public function getIdPsForRegAuth($regAuth)
+    {
+        $retval = array();
+        foreach ($this->idparray as $entityID => $value) {
+            if (
+                (array_key_exists('RegAuth', $this->idparray[$entityID])) &&
+                ($this->idparray[$entityID]['RegAuth'] == $regAuth)
+               ) {
+                $retval[] = $entityID;
+            }
+        }
+
+        return $retval;
+    }
+
+    /**
      * entityIDExists
      *
      * This function searchs for the given idp entityID.
@@ -1153,27 +1178,21 @@ EOT;
     {
         $retarr = array();
 
-        foreach ($this->idparray as $key => $value) {
+        foreach ($this->idparray as $entityID => $value) {
             if (
                 (!is_null($filter)) &&
                 (($filter === 2) &&
-                 (!$this->isRandS($key))) ||
+                 (!$this->isRandS($entityID))) ||
                 (($filter === 3) &&
-                 (!$this->isRegisteredByInCommon($key)))
+                 (!$this->isRegisteredByInCommon($entityID)))
             ) {
                 continue;
             }
-            if (
-                ($this->exists($key)) &&
-                (isset($this->idparray[$key]['Organization_Name']))
-            ) {
-                $retarr[$key]['Organization_Name'] = $this->idparray[$key]['Organization_Name'];
+            if (isset($this->idparray[$entityID]['Organization_Name'])) {
+                $retarr[$entityID]['Organization_Name'] = $this->idparray[$entityID]['Organization_Name'];
             }
-            if (
-                ($this->exists($key)) &&
-                (isset($this->idparray[$key]['Display_Name']))
-            ) {
-                $retarr[$key]['Display_Name'] = $this->idparray[$key]['Display_Name'];
+            if (isset($this->idparray[$entityID]['Display_Name'])) {
+                $retarr[$entityID]['Display_Name'] = $this->idparray[$entityID]['Display_Name'];
             }
         }
 

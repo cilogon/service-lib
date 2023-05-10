@@ -3180,6 +3180,30 @@ in "handleGotUser()" for valid IdPs for the skin.'
             }
         }
 
+        // CIL-1739 Combine the <regauthgreenlit> and <idpgreenlit> lists
+        // into a single list of green-lit IdPs.
+        $combinedGreenList = array();
+        // First, put any green-lit IdPs into the combined list.
+        if ($skin->hasGreenlitIdps()) {
+            $idpgreenlit = $skin->getConfigOption('idpgreenlit');
+            foreach ($idpgreenlit->idp as $greenidp) {
+                $greenidp = Util::normalizeOAuth2IdP($greenidp);
+                $combinedGreenList[] = (string)$greenidp;
+            }
+        }
+        // Next, for each green-lit regauth, put the corresponding
+        // list of IdPs into the compbined list.
+        if ($skin->hasGreenlitRegAuths()) {
+            $regauthgreenlit = $skin->getConfigOption('regauthgreenlit');
+            $idplist = Util::getIdpList();
+            foreach ($regauthgreenlit->regauth as $greenregauth) {
+                $greenidplist = $idplist->getIdPsForRegAuth((string)$greenregauth);
+                if (!empty($greenidplist)) {
+                    $combinedGreenList = array_merge($combinedGreenList, $greenidplist);
+                }
+            }
+        }
+
         // Loop through the list of IdPs and check for the following.
         // CIL-174 As suggested by Keith Hazelton, replace commas and
         // hyphens with just commas. for University of California schools.
@@ -3199,9 +3223,8 @@ in "handleGotUser()" for valid IdPs for the skin.'
             // CIL-1685 Filter IdP list based on Registration Authorities.
             // Also filter based on IdP greenlit/redlit lists.
             if (
-                (!$skin->regAuthGreenlit($entityId)) ||
+                (!empty($combinedGreenList) && !in_array($entityId, $combinedGreenList)) ||
                 ($skin->regAuthRedlit($entityId)) ||
-                (!$skin->idpGreenlit($entityId)) ||
                 ($skin->idpRedlit($entityId))
             ) {
                 unset($retarray[$entityId]);

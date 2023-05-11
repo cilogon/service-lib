@@ -61,11 +61,6 @@ class Util
     public static $skin = null;
 
     /**
-     * @var DB $db A 'global' PEAR DB connection object.
-     */
-    public static $db = null;
-
-    /**
      * @var array $oauth2idps An array of OAuth2 Identity Providers and
      * their associated "authorization URLs" stored in the database. Notice
      * that these URLs are all "http://" without any leading "www.". This
@@ -155,37 +150,36 @@ class Util
     /**
      * getDB
      *
-     * This function initializes the class $db object (if not yet
-     * created) and returns it. This is a PEAR DB connection object
-     * returned by DB::connect() suitable for future DB calls. If
-     * there is a problem, the class $db object is set to null.
+     * This function initializes a PEAR DB connection object returned
+     * by DB::connect() suitable for future DB calls. If there is a 
+     * problem, the returned object is null.
      *
      * @return DB A PEAR DB object connected to a database, or null
      *         on error connecting to database.
      */
     public static function getDB()
     {
-        if (is_null(static::$db)) {
-            $db_const = new DB(); // So constants defined in DB.php get read in
-            $dsn = array(
-                'phptype'  => DB_TYPE,
-                'username' => DB_USERNAME,
-                'password' => DB_PASSWORD,
-                'hostspec' => DB_HOSTSPEC,
-                'database' => DB_DATABASE
-            );
+        $retval = null;
 
-            $opts = array(
-                'persistent'  => true,
-                'portability' => DB_PORTABILITY_ALL
-            );
+        $db_const = new DB(); // So constants defined in DB.php are read in
+        $dsn = array(
+            'phptype'  => DB_TYPE,
+            'username' => DB_USERNAME,
+            'password' => DB_PASSWORD,
+            'hostspec' => DB_HOSTSPEC,
+            'database' => DB_DATABASE
+        );
 
-            static::$db = DB::connect($dsn, $opts);
-            if (PEAR::isError(static::$db)) {
-                static::$db = null;
-            }
+        $opts = array(
+            'persistent'  => true,
+            'portability' => DB_PORTABILITY_ALL
+        );
+
+        $retval = DB::connect($dsn, $opts);
+        if (PEAR::isError($retval)) {
+            $retval = null;
         }
-        return static::$db;
+        return $retval;
     }
 
     /**

@@ -619,7 +619,7 @@ class DBService
                 $loa = $args[$loa_pos];
             }
             if ((strlen($loa) > 0) && ($loa != 'openid')) {
-                $attr_arr['eduPersonAssurance'] = $args[$loa_pos];
+                $attr_arr['eduPersonAssurance'] = $loa;
             }
             // If any elements in $attr_arr, append converted JSON object
             if (count($attr_arr) > 0) {

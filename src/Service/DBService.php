@@ -584,14 +584,8 @@ class DBService
      *
      * @param mixed $args Variable number of parameters: 1, or more.
      *        For 1 parameter : $uid (database user identifier)
-     *        For more than 1 parameter, parameters can include:
-     *            $remote_user, $idp, $idp_display_name,
-     *            $first_name, $last_name, $display_name, $email,
-     *            $eppn, $eptid, $openid, $oidc,
-     *            $subject_id, $pairwise_id, $affiliation,
-     *            $ou, $member_of, $acr, $amr, $preferred_username,
-     *            $entitlement, $itrustuin, $eduPersonOrcid
-     *
+     *        For more than 1 parameter, parameters can include
+     *        any/all of the values in the $user_attrs class array.
      * @return bool True if the servlet returned correctly. Else false.
      */
     public function getUser(...$args)
@@ -617,6 +611,15 @@ class DBService
                         $cmd .= '&' . static::$user_attrs[$i] . '=' . urlencode($arg);
                     }
                 }
+            }
+            // CIL-1738 Put $loa in database as eduPersonAssurance
+            $loa = '';
+            $loa_pos = array_search('loa', static::$user_attrs);
+            if ($numargs > $loa_pos) {
+                $loa = $args[$loa_pos];
+            }
+            if ((strlen($loa) > 0) && ($loa != 'openid')) {
+                $attr_arr['eduPersonAssurance'] = $args[$loa_pos];
             }
             // If any elements in $attr_arr, append converted JSON object
             if (count($attr_arr) > 0) {

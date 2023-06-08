@@ -168,10 +168,10 @@ class Content
         href="https://www.cilogon.org/faq">FAQs</a> or send email to <a
         href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
       <p>Know <a target="_blank"
-        href="https://ca.cilogon.org/responsibilities">your responsibilities</a>
+        href="https://www.cilogon.org/aup">your responsibilities</a>
         for using the CILogon Service.</p>
       <p>See <a target="_blank"
-        href="https://ca.cilogon.org/acknowledgements">acknowledgements</a> of
+        href="https://www.cilogon.org/acknowledgements">acknowledgements</a> of
         support for this site.</p>';
 
         // CIL-767 Allow skin to set footer text

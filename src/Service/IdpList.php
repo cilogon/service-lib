@@ -152,7 +152,7 @@ class IdpList
         $doc = new DOMDocument();
         if (
             (is_readable($filename)) &&
-            (filesize($filename))
+            (filesize($filename)) &&
             (($doc->load($filename, LIBXML_NOBLANKS)) !== false)
         ) {
             $this->idpdom = $doc;

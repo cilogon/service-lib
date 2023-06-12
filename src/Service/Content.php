@@ -3350,12 +3350,25 @@ in "handleGotUser()" for valid IdPs for the skin.'
         $scopes = preg_split("/[\s\+]+/", $clientparams['scope']);
         $scopes = array_unique($scopes); // Remove any duplicates
 
+        // CIL-1765 - Find any non-standard scopes to be shown to the user
+        $standard_scopes = [
+            'openid',
+            'email',
+            'profile',
+            'org.cilogon.userinfo',
+            'edu.uiuc.ncsa.myproxy.getcert'
+        ];
+        $nonstandard_scopes = array_diff($scopes, $standard_scopes);
+
         // CIL-779 Show only those scopes which have been registered, i.e.,
         // compute the set intersection of requested and registered scopes.
         $client_scopes = json_decode($clientparams['client_scopes'], true);
         if (!is_null($client_scopes)) {
             $scopes = array_intersect($scopes, $client_scopes);
         }
+
+        // Add back in any non-standard scopes
+        $scopes = array_merge($scopes, $nonstandard_scopes);
 
         static::printCollapseBegin('oidcconsent', 'Consent to Attribute Release', false);
 

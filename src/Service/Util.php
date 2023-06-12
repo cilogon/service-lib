@@ -154,19 +154,27 @@ class Util
      * by DB::connect() suitable for future DB calls. If there is a
      * problem, the returned object is null.
      *
+     * @param $readonly Should we use the read-only database endpoint
+     *        (if configured)? Defaults to false.
      * @return DB A PEAR DB object connected to a database, or null
      *         on error connecting to database.
      */
-    public static function getDB()
+    public static function getDB($readonly = false)
     {
         $retval = null;
+
+        // CIL-1769 Enable selection of read-only database endpoint
+        $hostspec = DB_HOSTSPEC;
+        if (($readonly) && defined('DB_HOSTSPEC_RO')) {
+            $hostspec = DB_HOSTSPEC_RO;
+        }
 
         $db_const = new DB(); // So constants defined in DB.php are read in
         $dsn = array(
             'phptype'  => DB_TYPE,
             'username' => DB_USERNAME,
             'password' => DB_PASSWORD,
-            'hostspec' => DB_HOSTSPEC,
+            'hostspec' => $hostspec,
             'database' => DB_DATABASE
         );
 
@@ -1355,7 +1363,7 @@ Remote Address= ' . $remoteaddr . '
         $log = new Loggit();
 
         if (strlen(@$clientparams['client_id']) > 0) {
-            $db = static::getDB();
+            $db = static::getDB(true);
             if (!is_null($db)) {
                 $data = $db->getRow(
                     'SELECT name,home_url,callback_uri,scopes from clients WHERE client_id = ?',
@@ -1408,7 +1416,7 @@ Remote Address= ' . $remoteaddr . '
             if (array_key_exists($client_id, $clienttoadminmap)) {
                 $retval = $clienttoadminmap[$client_id];
             } else { // Search the database for the client_id's admin_id+name
-                $db = static::getDB();
+                $db = static::getDB(true);
                 if (!is_null($db)) {
                     $data = $db->getRow(
                         "SELECT admin_id,name FROM adminClients WHERE admin_id IN " .

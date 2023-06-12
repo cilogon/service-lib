@@ -265,7 +265,7 @@ class Skin
         $readin = false; // Make sure we read in either XML or CSS (or both)
 
         if (strlen($skinvar) > 0) {
-            $db = Util::getDB();
+            $db = Util::getDB(true);
             if (!is_null($db)) {
                 $data = $db->getRow(
                     'SELECT * from skins WHERE name = ?',

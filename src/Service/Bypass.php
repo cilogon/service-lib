@@ -98,7 +98,7 @@ class Bypass
         $readin = false; // Did we read the 'bypass' table from the database?
         $this->bypassarray = []; // Reset the class bypassarray to empty
 
-        $db = Util::getDB();
+        $db = Util::getDB(true);
         if (!is_null($db)) {
             $data = $db->getAssoc(
                 'SELECT * FROM bypass',

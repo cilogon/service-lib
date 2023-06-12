@@ -151,7 +151,7 @@ class Util
      * getDB
      *
      * This function initializes a PEAR DB connection object returned
-     * by DB::connect() suitable for future DB calls. If there is a 
+     * by DB::connect() suitable for future DB calls. If there is a
      * problem, the returned object is null.
      *
      * @return DB A PEAR DB object connected to a database, or null
@@ -1735,7 +1735,12 @@ Remote Address= ' . $remoteaddr . '
      */
     public static function updateIdPList()
     {
-        // Use a semaphore to prevent processes running at the same time.
+        // Make sure there is at least one Metadata URL defined
+        if ((!defined('DEFAULT_METADATA_URLS')) || (empty(DEFAULT_METADATA_URLS))) {
+            return;
+        }
+
+        // Use a semaphore to prevent processes running at the same time
         $idplist_dir = dirname(DEFAULT_IDP_JSON);
         $check_filename = $idplist_dir . '/.last_checked';
         $key = ftok($check_filename, '1');
@@ -1756,60 +1761,72 @@ Remote Address= ' . $remoteaddr . '
             'X-Mailer: PHP/' . phpversion();
         $httphost = static::getHN();
 
-        // Get the HEAD of the InCommon Metadata and check Last-Modified.
-        $incommon_url = 'https://mdq.incommon.org/entities/idps/all';
-        $head = get_headers($incommon_url, true);
-        if (($head === false) || (!array_key_exists('Last-Modified', $head))) {
-            $errmsg = "Error: Unable to download InCommon-metadata.xml headers.";
-            echo "<p>$errmsg</p>\n";
-            mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
-            http_response_code(500);
-            return;
+        // Get the HEAD of the metadata URLs and check Last-Modified
+        $max_last_modified = 0;
+        foreach (DEFAULT_METADATA_URLS as $url) {
+            $head = get_headers($url, true);
+            if (($head === false) || (!array_key_exists('Last-Modified', $head))) {
+                $errmsg = "Error: Unable to fetch headers for $url ";
+                echo "<p>$errmsg</p>\n";
+                mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+                http_response_code(500);
+                return;
+            }
+
+            // Convert last-modified header to Unix time
+            $last_modified = strtotime($head['Last-Modified']);
+            // Keep the most recently modified time
+            if ($last_modified > $max_last_modified) {
+                $max_last_modified = $last_modified;
+            }
         }
 
-        // Compare the HEAD Last-Modified with the previously saved timestamp.
-        $last_modified = $head['Last-Modified'];
+        // Compare the most recent HEAD Last-Modified with the
+        // previously saved timestamp
         $saved_modified = file_get_contents($check_filename);
         if (
             ($saved_modified !== false) &&
-            (strcmp($last_modified, $saved_modified) == 0)
+            (strcmp($max_last_modified, $saved_modified) == 0)
         ) {
-            echo "<p>No change detected in InCommon metadata.</p>\n";
+            echo "<p>No change detected in metadata.</p>\n";
             return;
         }
         // Save the Last-Modified timestamp.
-        file_put_contents($check_filename, $last_modified);
+        file_put_contents($check_filename, $max_last_modified);
 
-        // Download InCommon metadata to a new temporary directory.
+        // Download metadata to a new temporary directory.
         // Delete the temporary directory when the script exits.
         $tmpdir = static::tempDir(sys_get_temp_dir());
         register_shutdown_function(['CILogon\Service\Util','deleteDir'], $tmpdir);
-        $tmpincommon = $tmpdir . '/InCommon-metadata.xml';
-        $incommondownloaded = false;
-        if (($ch = curl_init()) !== false) {
-            if (($fp = fopen($tmpincommon, 'w')) !== false) {
-                curl_setopt($ch, CURLOPT_URL, $incommon_url);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-                curl_setopt($ch, CURLOPT_FILE, $fp);
-                $incommondownloaded = curl_exec($ch);
-                fflush($fp);
-                fclose($fp);
+        $tmpmetadata = array();
+        foreach (DEFAULT_METADATA_URLS as $idx => $url) {
+            $tmpmetadata[$idx] = "$tmpdir/$idx.xml";
+            $xmldownloaded = false;
+            if (($ch = curl_init()) !== false) {
+                if (($fp = fopen($tmpmetadata[$idx], 'w')) !== false) {
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                    curl_setopt($ch, CURLOPT_FILE, $fp);
+                    $xmldownloaded = curl_exec($ch);
+                    fflush($fp);
+                    fclose($fp);
+                }
+                curl_close($ch);
             }
-            curl_close($ch);
-        }
 
-        if (!$incommondownloaded) {
-            $errmsg = "Error: Unable to save InCommon-metadata.xml to temporary directory.";
-            echo "<p>$errmsg</p>\n";
-            mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
-            http_response_code(500);
-            return;
+            if (!$xmldownloaded) {
+                $errmsg = "Error: Unable to save metadata for $url to temporary directory.";
+                echo "<p>$errmsg</p>\n";
+                mail($mailto, "/updateidplist/ failed on $httphost", $errmsg, $mailfrom);
+                http_response_code(500);
+                return;
+            }
         }
 
         // Now, create new idplist.xml and idplist.json files from the
-        // InCommon Metadata.
+        // downloaded metadata files
         $tmpxml = $tmpdir . '/idplist.xml';
-        $newidplist = new IdpList($tmpxml, $tmpincommon, false, 'xml');
+        $newidplist = new IdpList($tmpxml, $tmpmetadata, false, 'xml');
         $newidplist->create();
         if (!$newidplist->write('xml')) {
             $errmsg = "Error: Unable to create temporary idplist.xml file.";

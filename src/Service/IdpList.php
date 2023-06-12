@@ -71,10 +71,10 @@ class IdpList
     protected $idpfilename;
 
     /**
-     * @var string $incommonfilename The name of the InCommon metadata XML
-     *      file. Defaults to DEFAULT_INCOMMON_XML.
+     * @var array $metadatafiles An array of local metadata XML files.
+     *      Defaults to  DEFAULT_METADATA_FILES.
      */
-    protected $incommonfilename;
+    protected $metadatafiles;
 
     /**
      * __construct
@@ -87,21 +87,26 @@ class IdpList
      *
      * @param string $idpfilename (Optional) The name of the idplist file to
      *        read/write. Defaults to DEFAULT_IDP_JSON.
-     * @param string $incommonfilename (Optional) The name of the InCommon
-     *        metadata file to read. Defaults to DEFAULT_INCOMMON_XML.
+     * @param string|array $metadatafiles (Optional) The name of the
+     *        default metadata file(s) to read. If this is a string, it will
+     *        be converted to an array for use by other functions. Defaults
+     *        to DEFAULT_METADATA_FILES.
      * @param bool $createfile (Optional) Create idplist file if it doesn't
-     *         exist? Defaults to true.
+     *        exist? Defaults to true.
      * @param string $filetype (Optional) The type of file to read/write,
      *        one of 'xml' or 'json'. Defaults to 'json'.
      */
     public function __construct(
         $idpfilename = DEFAULT_IDP_JSON,
-        $incommonfilename = DEFAULT_INCOMMON_XML,
+        $metadatafiles = DEFAULT_METADATA_FILES,
         $createfile = true,
         $filetype = 'json'
     ) {
         $this->setFilename($idpfilename);
-        $this->setInCommonFilename($incommonfilename);
+        if (!is_array($metadatafiles)) {
+            $metadatafiles = array($metadatafiles);
+        }
+        $this->metadatafiles = $metadatafiles;
         $result = $this->read($filetype);
         if (($result === false) && ($createfile)) {
             $this->create();
@@ -147,6 +152,7 @@ class IdpList
         $doc = new DOMDocument();
         if (
             (is_readable($filename)) &&
+            (filesize($filename))
             (($doc->load($filename, LIBXML_NOBLANKS)) !== false)
         ) {
             $this->idpdom = $doc;
@@ -365,424 +371,426 @@ EOT;
      */
     public function create()
     {
-        $retval = false; // Assume create failed
-        if (is_readable($this->getInCommonFilename())) {
-            // Read in the InCommon metadata file
-            $xmlstr = @file_get_contents($this->getInCommonFilename());
-            if (strlen($xmlstr) > 0) {
-                // Need to fix the namespace for Xpath queries to work
-                $xmlstr = str_replace('xmlns=', 'ns=', $xmlstr);
-                $xml = new SimpleXMLElement($xmlstr);
-
-                // Select only IdPs from the InCommon metadata
-                $result = $xml->xpath(
-                    "//EntityDescriptor/IDPSSODescriptor" .
-                    "/ancestor::EntityDescriptor"
-                );
-
-                // Create a DOMDocument to build up the list of IdPs.
-                $domi = new DOMImplementation();
-                $dom = $domi->createDocument(null, 'idps');
-                $idps = $dom->documentElement; // Top level <idps> element
-
-                // Loop through the IdPs searching for desired attributes
-                foreach ($result as $idx) {
-                    // Need to set namespace prefixes for xpath queries to work
-                    $sxe = $idx[0];
-                    $sxe->registerXPathNamespace(
-                        'mdattr',
-                        'urn:oasis:names:tc:SAML:metadata:attribute'
-                    );
-                    $sxe->registerXPathNamespace(
-                        'saml',
-                        'urn:oasis:names:tc:SAML:2.0:assertion'
-                    );
-                    $sxe->registerXPathNamespace(
-                        'mdrpi',
-                        'urn:oasis:names:tc:SAML:metadata:rpi'
-                    );
-                    $sxe->registerXPathNamespace(
-                        'mdui',
-                        'urn:oasis:names:tc:SAML:metadata:ui'
-                    );
-
-                    // Skip any hide-from-discovery entries
-                    $xp = $sxe->xpath(
-                        "Extensions/mdattr:EntityAttributes/" .
-                        "saml:Attribute[@Name='" .
-                        "http://macedir.org/entity-category']/" .
-                        "saml:AttributeValue"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $hide = false;
-                        foreach ($xp as $value) {
-                            if ($value == 'http://refeds.org/category/hide-from-discovery') {
-                                $hide = true;
-                                break;
-                            }
-                        }
-                        if ($hide) {
-                            continue;
-                        }
-                    }
-
-                    // Get the entityID of the IdP. Save it for later.
-                    // The entityID will be the keys of the class idpdom.
-                    $entityID = '';
-                    $xp = $idx[0]->xpath('attribute::entityID');
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $entityID = (string)$xp[0]->entityID;
-                    } else { // No entityID is bad!
-                        continue;
-                    }
-
-                    // CIL-741 Omit IdPs in the global REDLIT_IDP_ARRAY
-                    if (
-                        (defined('REDLIT_IDP_ARRAY')) &&
-                        (in_array($entityID, REDLIT_IDP_ARRAY))
-                    ) {
-                        continue;
-                    }
-
-                    // Create an <idp> element to hold sub elements
-                    $idp = $dom->createElement('idp');
-                    $idp->setAttribute('entityID', $entityID);
-                    $idps->appendChild($idp);
-
-                    // Search for the desired <idp> attribute sub-blocks
-
-                    // Look for OrganizationDisplayName and mdui:DisplayName.
-                    $Organization_Name = '';
-                    $Display_Name = '';
-
-                    $xp = $idx[0]->xpath(
-                        "Organization/OrganizationDisplayName[starts-with(@xml:lang,'en')]"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $Organization_Name = (string)$xp[0];
-                    }
-
-                    $xp = $sxe->xpath(
-                        "IDPSSODescriptor/Extensions/mdui:UIInfo/mdui:DisplayName[starts-with(@xml:lang,'en')]"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $Display_Name = (string)$xp[0];
-                    }
-
-                    // If neither OrganizationDisplayName nor mdui:DisplayName
-                    // was found, then use the entityID as a last resort.
-                    if (
-                        (strlen($Organization_Name) == 0) &&
-                        (strlen($Display_Name) == 0)
-                    ) {
-                        $Organization_Name = $entityID;
-                        $Display_Name = $entityID;
-                    }
-
-                    // Add nodes for both Organization_Name and Display_Name,
-                    // using the value of the other if one is empty.
-                    $this->addNode(
-                        $dom,
-                        $idp,
-                        'Organization_Name',
-                        ((strlen($Organization_Name) > 0) ?
-                            $Organization_Name :
-                            $Display_Name)
-                    );
-                    $this->addNode(
-                        $dom,
-                        $idp,
-                        'Display_Name',
-                        ((strlen($Display_Name) > 0) ?
-                            $Display_Name :
-                            $Organization_Name)
-                    );
-
-                    $xp = $idx[0]->xpath('Organization/OrganizationURL');
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $this->addNode($dom, $idp, 'Home_Page', (string)$xp[0]);
-                    }
-
-                    $name = '';
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='support']/GivenName"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $name = (string)$xp[0];
-                    }
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='support']/SurName"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $name .= ((strlen($name) > 0) ? ' ' : '') .
-                            (string)($xp[0]);
-                    }
-                    if (strlen($name) > 0) {
-                        $this->addNode($dom, $idp, 'Support_Name', $name);
-                    }
-
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='support']/EmailAddress"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $this->addNode(
-                            $dom,
-                            $idp,
-                            'Support_Address',
-                            (string)$xp[0]
-                        );
-                    }
-
-                    $name = '';
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='technical']/GivenName"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $name = (string)$xp[0];
-                    }
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='technical']/SurName"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $name .= ((strlen($name) > 0) ? ' ' : '') .
-                            (string)($xp[0]);
-                    }
-                    if (strlen($name) > 0) {
-                        $this->addNode($dom, $idp, 'Technical_Name', $name);
-                    }
-
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='technical']/EmailAddress"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $this->addNode(
-                            $dom,
-                            $idp,
-                            'Technical_Address',
-                            (string)$xp[0]
-                        );
-                    }
-
-                    $name = '';
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='administrative']/GivenName"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $name = (string)$xp[0];
-                    }
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='administrative']/SurName"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $name .= ((strlen($name) > 0) ? ' ' : '') .
-                            (string)($xp[0]);
-                    }
-                    if (strlen($name) > 0) {
-                        $this->addNode($dom, $idp, 'Administrative_Name', $name);
-                    }
-
-                    $xp = $idx[0]->xpath(
-                        "ContactPerson[@contactType='administrative']/EmailAddress"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $this->addNode(
-                            $dom,
-                            $idp,
-                            'Administrative_Address',
-                            (string)$xp[0]
-                        );
-                    }
-
-                    // Check for assurance-certification = silver, bronze, or SIRTFI
-                    $xp = $sxe->xpath(
-                        "Extensions/mdattr:EntityAttributes/" .
-                        "saml:Attribute[@Name='" .
-                        "urn:oasis:names:tc:SAML:attribute:" .
-                        "assurance-certification']/saml:AttributeValue"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        foreach ($xp as $value) {
-                            if ($value == 'http://id.incommon.org/assurance/silver') {
-                                $this->addNode($dom, $idp, 'Silver', '1');
-                            } elseif ($value == 'http://id.incommon.org/assurance/bronze') {
-                                $this->addNode($dom, $idp, 'Bronze', '1');
-                            } elseif ($value == 'https://refeds.org/sirtfi') {
-                                $this->addNode($dom, $idp, 'SIRTFI', '1');
-                            }
-                        }
-                    }
-
-                    // CIL-1685 Check for registrationAuthority
-                    $RA = 'UNKNOWN'; // If no registrationAuthority found
-                    $xp = $sxe->xpath(
-                        "Extensions/mdrpi:RegistrationInfo" .
-                        "[@registrationAuthority]"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        foreach ($xp[0]->attributes() as $key => $value) {
-                            if ($key == 'registrationAuthority') {
-                                $RA = $value;
-                                break;
-                            }
-                        }
-                    }
-                    $this->addNode($dom, $idp, 'RegAuth', $RA);
-
-                    // Check for registered-by-incommon
-                    $xp = $sxe->xpath(
-                        "Extensions/mdattr:EntityAttributes/" .
-                        "saml:Attribute[@Name='" .
-                        "http://macedir.org/entity-category']/" .
-                        "saml:AttributeValue"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        foreach ($xp as $value) {
-                            if ($value == 'http://id.incommon.org/category/registered-by-incommon') {
-                                $this->addNode(
-                                    $dom,
-                                    $idp,
-                                    'Registered_By_InCommon',
-                                    '1'
-                                );
-                                break;
-                            }
-                        }
-                    }
-
-                    // Check for research-and-scholarship
-                    $xp = $sxe->xpath(
-                        "Extensions/mdattr:EntityAttributes/" .
-                        "saml:Attribute[@Name='" .
-                        "http://macedir.org/entity-category-support']/" .
-                        "saml:AttributeValue"
-                    );
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $addedrands = false;
-                        $incommonrands = false;
-                        $refedsrands = false;
-                        foreach ($xp as $value) {
-                            if ($value == 'http://id.incommon.org/category/research-and-scholarship') {
-                                $incommonrands = true;
-                                $this->addNode($dom, $idp, 'InCommon_RandS', '1');
-                            }
-                            if ($value == 'http://refeds.org/category/research-and-scholarship') {
-                                $refedsrands = true;
-                                $this->addNode($dom, $idp, 'REFEDS_RandS', '1');
-                            }
-                            if (
-                                (!$addedrands) &&
-                                ($incommonrands || $refedsrands)
-                            ) {
-                                $addedrands = true;
-                                $this->addNode($dom, $idp, 'RandS', '1');
-                            }
-                            // CIL-1693 Also check for personalized
-                            if ($value == 'https://refeds.org/category/personalized') {
-                                $this->addNode($dom, $idp, 'Personalized', '1');
-                            }
-                        }
-                    }
-
-                    // CIL-558 Check for <SingleLogoutService>
-                    $Logout = '';
-                    // First, check for HTTP-Redirect version
-                    $xp = $sxe->xpath("IDPSSODescriptor/SingleLogoutService" .
-                        "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']");
-                    if (($xp !== false) && (count($xp) > 0)) {
-                        $Logout = (string)($xp[0]->attributes())['Location'];
-                    }
-                    // If no HTTP-Redirect, check for HTTP-POST
-                    if (empty($Logout)) {
-                        $xp = $sxe->xpath("IDPSSODescriptor/SingleLogoutService" .
-                            "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']");
-                        if (($xp !== false) && (count($xp) > 0)) {
-                            $Logout = (string)($xp[0]->attributes())['Location'];
-                        }
-                    }
-                    // A hack for Shibboleth-based IdPs:
-                    // Check for <SingleSignOnService> HTTP-Redirect
-                    // and regex for the built-in Simple Logout URL.
-                    if (empty($Logout)) {
-                        $xp = $sxe->xpath("IDPSSODescriptor/SingleSignOnService" .
-                            "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']");
-                        if (($xp !== false) && (count($xp) > 0)) {
-                            $tmp = (string)($xp[0]->attributes())['Location'];
-                            if (preg_match('|^(.*)/profile/|', $tmp, $matches)) {
-                                $Logout = $matches[1] . '/profile/Logout';
-                            }
-                        }
-                    }
-                    if (!empty($Logout)) {
-                        // If Shib IdP, transform URL into Simple Logout URL
-                        // https://wiki.shibboleth.net/confluence/x/AAJSAQ
-                        if (preg_match('|^(.*)/profile/|', $Logout, $matches)) {
-                            $Logout = $matches[1] . '/profile/Logout';
-                        }
-                        $this->addNode($dom, $idp, 'Logout', $Logout);
-                    }
-                }
-
-                // Read in any test IdPs and add them to the list
-                $doc = new DOMDocument();
-                if (
-                    (defined('TEST_IDP_XML')) &&
-                    (!empty(TEST_IDP_XML)) &&
-                    (is_readable(TEST_IDP_XML)) &&
-                    ((@$doc->load(TEST_IDP_XML)) !== false)
-                ) {
-                    $idpnodes = $doc->getElementsByTagName('idp');
-                    foreach ($idpnodes as $idpnode) {
-                        // Check if the entityID already exists. If so,
-                        // delete it from both the idps DOM and the idparray
-                        // and instead add the one from the testidplist.
-                        $entityID = $idpnode->attributes->item(0)->value;
-                        if (array_key_exists($entityID, $this->idparray)) {
-                            // Easy - simply delete the array entry for the
-                            // existing entityID
-                            unset($this->idparray[$entityID]);
-
-                            // Hard - search through the current DOM for a
-                            // matching entityID to get the DOMNode, which
-                            // can then be removed from the DOM.
-                            $curridpnodes = $dom->getElementsByTagName('idp');
-                            foreach ($curridpnodes as $curridpnode) {
-                                $currEntityID =
-                                    $curridpnode->attributes->item(0)->value;
-                                if ($currEntityID == $entityID) {
-                                    $idps->removeChild($curridpnode);
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Add the new idp node to the DOM
-                        $node = $dom->importNode($idpnode, true);
-                        $idps->appendChild($node);
-
-                        // Add the testidplist nodes to the $idparray
-                        foreach ($node->childNodes as $child) {
-                            if ($child->nodeName != '#text') {
-                                $this->idparray[$entityID][$child->nodeName] =
-                                    $child->nodeValue;
-                            }
-                        }
-                    }
-                }
-
-                // Sort the DOMDocument and idparray by Display_Name
-                $this->idpdom = $this->sortDOM($dom);
-                uasort($this->idparray, function ($a, $b) {
-                    return strcasecmp(
-                        $a['Display_Name'],
-                        $b['Display_Name']
-                    );
-                });
-
-                $retval = true;
+        // Verify that the metadata files are readable and not empty
+        foreach ($this->metadatafiles as $xmlfile) {
+            if ((!is_readable($xmlfile)) || (!filesize($xmlfile))) {
+                return false;
             }
         }
 
-        return $retval;
+        // Create a DOMDocument to build up the list of IdPs.
+        $domi = new DOMImplementation();
+        $dom = $domi->createDocument(null, 'idps');
+        $idps = $dom->documentElement; // Top level <idps> element
+
+        foreach ($this->metadatafiles as $xmlfile) {
+            $xmlstr = @file_get_contents($xmlfile);
+
+            // Need to fix the namespace for Xpath queries to work
+            $xmlstr = str_replace('xmlns=', 'ns=', $xmlstr);
+            $xml = new SimpleXMLElement($xmlstr);
+
+            // Select only IdPs from the metadata
+            $result = $xml->xpath(
+                "//EntityDescriptor/IDPSSODescriptor" .
+                "/ancestor::EntityDescriptor"
+            );
+
+            // Loop through the IdPs searching for desired attributes
+            foreach ($result as $idx) {
+                // Need to set namespace prefixes for xpath queries to work
+                $sxe = $idx[0];
+                $sxe->registerXPathNamespace(
+                    'mdattr',
+                    'urn:oasis:names:tc:SAML:metadata:attribute'
+                );
+                $sxe->registerXPathNamespace(
+                    'saml',
+                    'urn:oasis:names:tc:SAML:2.0:assertion'
+                );
+                $sxe->registerXPathNamespace(
+                    'mdrpi',
+                    'urn:oasis:names:tc:SAML:metadata:rpi'
+                );
+                $sxe->registerXPathNamespace(
+                    'mdui',
+                    'urn:oasis:names:tc:SAML:metadata:ui'
+                );
+
+                // Skip any hide-from-discovery entries
+                $xp = $sxe->xpath(
+                    "Extensions/mdattr:EntityAttributes/" .
+                    "saml:Attribute[@Name='" .
+                    "http://macedir.org/entity-category']/" .
+                    "saml:AttributeValue"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $hide = false;
+                    foreach ($xp as $value) {
+                        if ($value == 'http://refeds.org/category/hide-from-discovery') {
+                            $hide = true;
+                            break;
+                        }
+                    }
+                    if ($hide) {
+                        continue;
+                    }
+                }
+
+                // Get the entityID of the IdP. Save it for later.
+                // The entityID will be the keys of the class idpdom.
+                $entityID = '';
+                $xp = $idx[0]->xpath('attribute::entityID');
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $entityID = (string)$xp[0]->entityID;
+                } else { // No entityID is bad!
+                    continue;
+                }
+
+                // CIL-741 Omit IdPs in the global REDLIT_IDP_ARRAY
+                if (
+                    (defined('REDLIT_IDP_ARRAY')) &&
+                    (in_array($entityID, REDLIT_IDP_ARRAY))
+                ) {
+                    continue;
+                }
+
+                // Create an <idp> element to hold sub elements
+                $idp = $dom->createElement('idp');
+                $idp->setAttribute('entityID', $entityID);
+                $idps->appendChild($idp);
+
+                // Search for the desired <idp> attribute sub-blocks
+
+                // Look for OrganizationDisplayName and mdui:DisplayName.
+                $Organization_Name = '';
+                $Display_Name = '';
+
+                $xp = $idx[0]->xpath(
+                    "Organization/OrganizationDisplayName[starts-with(@xml:lang,'en')]"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $Organization_Name = (string)$xp[0];
+                }
+
+                $xp = $sxe->xpath(
+                    "IDPSSODescriptor/Extensions/mdui:UIInfo/mdui:DisplayName[starts-with(@xml:lang,'en')]"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $Display_Name = (string)$xp[0];
+                }
+
+                // If neither OrganizationDisplayName nor mdui:DisplayName
+                // was found, then use the entityID as a last resort.
+                if (
+                    (strlen($Organization_Name) == 0) &&
+                    (strlen($Display_Name) == 0)
+                ) {
+                    $Organization_Name = $entityID;
+                    $Display_Name = $entityID;
+                }
+
+                // Add nodes for both Organization_Name and Display_Name,
+                // using the value of the other if one is empty.
+                $this->addNode(
+                    $dom,
+                    $idp,
+                    'Organization_Name',
+                    ((strlen($Organization_Name) > 0) ?
+                        $Organization_Name :
+                        $Display_Name)
+                );
+                $this->addNode(
+                    $dom,
+                    $idp,
+                    'Display_Name',
+                    ((strlen($Display_Name) > 0) ?
+                        $Display_Name :
+                        $Organization_Name)
+                );
+
+                $xp = $idx[0]->xpath('Organization/OrganizationURL');
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $this->addNode($dom, $idp, 'Home_Page', (string)$xp[0]);
+                }
+
+                $name = '';
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='support']/GivenName"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $name = (string)$xp[0];
+                }
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='support']/SurName"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $name .= ((strlen($name) > 0) ? ' ' : '') .
+                        (string)($xp[0]);
+                }
+                if (strlen($name) > 0) {
+                    $this->addNode($dom, $idp, 'Support_Name', $name);
+                }
+
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='support']/EmailAddress"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $this->addNode(
+                        $dom,
+                        $idp,
+                        'Support_Address',
+                        (string)$xp[0]
+                    );
+                }
+
+                $name = '';
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='technical']/GivenName"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $name = (string)$xp[0];
+                }
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='technical']/SurName"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $name .= ((strlen($name) > 0) ? ' ' : '') .
+                        (string)($xp[0]);
+                }
+                if (strlen($name) > 0) {
+                    $this->addNode($dom, $idp, 'Technical_Name', $name);
+                }
+
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='technical']/EmailAddress"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $this->addNode(
+                        $dom,
+                        $idp,
+                        'Technical_Address',
+                        (string)$xp[0]
+                    );
+                }
+
+                $name = '';
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='administrative']/GivenName"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $name = (string)$xp[0];
+                }
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='administrative']/SurName"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $name .= ((strlen($name) > 0) ? ' ' : '') .
+                        (string)($xp[0]);
+                }
+                if (strlen($name) > 0) {
+                    $this->addNode($dom, $idp, 'Administrative_Name', $name);
+                }
+
+                $xp = $idx[0]->xpath(
+                    "ContactPerson[@contactType='administrative']/EmailAddress"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $this->addNode(
+                        $dom,
+                        $idp,
+                        'Administrative_Address',
+                        (string)$xp[0]
+                    );
+                }
+
+                // Check for assurance-certification = silver, bronze, or SIRTFI
+                $xp = $sxe->xpath(
+                    "Extensions/mdattr:EntityAttributes/" .
+                    "saml:Attribute[@Name='" .
+                    "urn:oasis:names:tc:SAML:attribute:" .
+                    "assurance-certification']/saml:AttributeValue"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    foreach ($xp as $value) {
+                        if ($value == 'http://id.incommon.org/assurance/silver') {
+                            $this->addNode($dom, $idp, 'Silver', '1');
+                        } elseif ($value == 'http://id.incommon.org/assurance/bronze') {
+                            $this->addNode($dom, $idp, 'Bronze', '1');
+                        } elseif ($value == 'https://refeds.org/sirtfi') {
+                            $this->addNode($dom, $idp, 'SIRTFI', '1');
+                        }
+                    }
+                }
+
+                // CIL-1685 Check for registrationAuthority
+                $RA = 'UNKNOWN'; // If no registrationAuthority found
+                $xp = $sxe->xpath(
+                    "Extensions/mdrpi:RegistrationInfo" .
+                    "[@registrationAuthority]"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    foreach ($xp[0]->attributes() as $key => $value) {
+                        if ($key == 'registrationAuthority') {
+                            $RA = $value;
+                            break;
+                        }
+                    }
+                }
+                $this->addNode($dom, $idp, 'RegAuth', $RA);
+
+                // Check for registered-by-incommon
+                $xp = $sxe->xpath(
+                    "Extensions/mdattr:EntityAttributes/" .
+                    "saml:Attribute[@Name='" .
+                    "http://macedir.org/entity-category']/" .
+                    "saml:AttributeValue"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    foreach ($xp as $value) {
+                        if ($value == 'http://id.incommon.org/category/registered-by-incommon') {
+                            $this->addNode(
+                                $dom,
+                                $idp,
+                                'Registered_By_InCommon',
+                                '1'
+                            );
+                            break;
+                        }
+                    }
+                }
+
+                // Check for research-and-scholarship
+                $xp = $sxe->xpath(
+                    "Extensions/mdattr:EntityAttributes/" .
+                    "saml:Attribute[@Name='" .
+                    "http://macedir.org/entity-category-support']/" .
+                    "saml:AttributeValue"
+                );
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $addedrands = false;
+                    $incommonrands = false;
+                    $refedsrands = false;
+                    foreach ($xp as $value) {
+                        if ($value == 'http://id.incommon.org/category/research-and-scholarship') {
+                            $incommonrands = true;
+                            $this->addNode($dom, $idp, 'InCommon_RandS', '1');
+                        }
+                        if ($value == 'http://refeds.org/category/research-and-scholarship') {
+                            $refedsrands = true;
+                            $this->addNode($dom, $idp, 'REFEDS_RandS', '1');
+                        }
+                        if (
+                            (!$addedrands) &&
+                            ($incommonrands || $refedsrands)
+                        ) {
+                            $addedrands = true;
+                            $this->addNode($dom, $idp, 'RandS', '1');
+                        }
+                        // CIL-1693 Also check for personalized
+                        if ($value == 'https://refeds.org/category/personalized') {
+                            $this->addNode($dom, $idp, 'Personalized', '1');
+                        }
+                    }
+                }
+
+                // CIL-558 Check for <SingleLogoutService>
+                $Logout = '';
+                // First, check for HTTP-Redirect version
+                $xp = $sxe->xpath("IDPSSODescriptor/SingleLogoutService" .
+                    "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']");
+                if (($xp !== false) && (count($xp) > 0)) {
+                    $Logout = (string)($xp[0]->attributes())['Location'];
+                }
+                // If no HTTP-Redirect, check for HTTP-POST
+                if (empty($Logout)) {
+                    $xp = $sxe->xpath("IDPSSODescriptor/SingleLogoutService" .
+                        "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']");
+                    if (($xp !== false) && (count($xp) > 0)) {
+                        $Logout = (string)($xp[0]->attributes())['Location'];
+                    }
+                }
+                // A hack for Shibboleth-based IdPs:
+                // Check for <SingleSignOnService> HTTP-Redirect
+                // and regex for the built-in Simple Logout URL.
+                if (empty($Logout)) {
+                    $xp = $sxe->xpath("IDPSSODescriptor/SingleSignOnService" .
+                        "[@Binding='urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']");
+                    if (($xp !== false) && (count($xp) > 0)) {
+                        $tmp = (string)($xp[0]->attributes())['Location'];
+                        if (preg_match('|^(.*)/profile/|', $tmp, $matches)) {
+                            $Logout = $matches[1] . '/profile/Logout';
+                        }
+                    }
+                }
+                if (!empty($Logout)) {
+                    // If Shib IdP, transform URL into Simple Logout URL
+                    // https://wiki.shibboleth.net/confluence/x/AAJSAQ
+                    if (preg_match('|^(.*)/profile/|', $Logout, $matches)) {
+                        $Logout = $matches[1] . '/profile/Logout';
+                    }
+                    $this->addNode($dom, $idp, 'Logout', $Logout);
+                }
+            }
+        }
+
+        // Read in any test IdPs and add them to the list
+        $doc = new DOMDocument();
+        if (
+            (defined('TEST_IDP_XML')) &&
+            (!empty(TEST_IDP_XML)) &&
+            (is_readable(TEST_IDP_XML)) &&
+            ((@$doc->load(TEST_IDP_XML)) !== false)
+        ) {
+            $idpnodes = $doc->getElementsByTagName('idp');
+            foreach ($idpnodes as $idpnode) {
+                // Check if the entityID already exists. If so,
+                // delete it from both the idps DOM and the idparray
+                // and instead add the one from the testidplist.
+                $entityID = $idpnode->attributes->item(0)->value;
+                if (array_key_exists($entityID, $this->idparray)) {
+                    // Easy - simply delete the array entry for the
+                    // existing entityID
+                    unset($this->idparray[$entityID]);
+
+                    // Hard - search through the current DOM for a
+                    // matching entityID to get the DOMNode, which
+                    // can then be removed from the DOM.
+                    $curridpnodes = $dom->getElementsByTagName('idp');
+                    foreach ($curridpnodes as $curridpnode) {
+                        $currEntityID =
+                            $curridpnode->attributes->item(0)->value;
+                        if ($currEntityID == $entityID) {
+                            $idps->removeChild($curridpnode);
+                            break;
+                        }
+                    }
+                }
+
+                // Add the new idp node to the DOM
+                $node = $dom->importNode($idpnode, true);
+                $idps->appendChild($node);
+
+                // Add the testidplist nodes to the $idparray
+                foreach ($node->childNodes as $child) {
+                    if ($child->nodeName != '#text') {
+                        $this->idparray[$entityID][$child->nodeName] =
+                            $child->nodeValue;
+                    }
+                }
+            }
+        }
+
+        // Sort the DOMDocument and idparray by Display_Name
+        $this->idpdom = $this->sortDOM($dom);
+        uasort($this->idparray, function ($a, $b) {
+            return strcasecmp(
+                $a['Display_Name'],
+                $b['Display_Name']
+            );
+        });
+
+        return true;
     }
 
     /**
@@ -809,32 +817,6 @@ EOT;
     public function setFilename($filename)
     {
         $this->idpfilename = $filename;
-    }
-
-    /**
-     * getInCommonFilename
-     *
-     * This function returns a string of the full path of the InCommon
-     * metadata filename.  See also setInCommonFilename().
-     *
-     * @return string The InCommon metadata filename.
-     */
-    public function getInCommonFilename()
-    {
-        return $this->incommonfilename;
-    }
-
-    /**
-     * setInCommonFilename
-     *
-     * This function sets the string of the full path of the InCommon
-     * metadata filename.  See also getInCommonFilename().
-     *
-     * @param string $filename The new name of the InCommon metadata filename.
-     */
-    public function setInCommonFilename($filename)
-    {
-        $this->incommonfilename = $filename;
     }
 
     /**
@@ -954,12 +936,14 @@ EOT;
     public function getIdPsForRegAuth($regAuth)
     {
         $retval = array();
-        foreach ($this->idparray as $entityID => $value) {
-            if (
-                (array_key_exists('RegAuth', $this->idparray[$entityID])) &&
-                ($this->idparray[$entityID]['RegAuth'] == $regAuth)
-               ) {
-                $retval[] = $entityID;
+        if (!is_null($this->idparray)) {
+            foreach ($this->idparray as $entityID => $value) {
+                if (
+                    (array_key_exists('RegAuth', $this->idparray[$entityID])) &&
+                    ($this->idparray[$entityID]['RegAuth'] == $regAuth)
+                ) {
+                    $retval[] = $entityID;
+                }
             }
         }
 
@@ -1178,21 +1162,23 @@ EOT;
     {
         $retarr = array();
 
-        foreach ($this->idparray as $entityID => $value) {
-            if (
-                (!is_null($filter)) &&
-                (($filter === 2) &&
-                 (!$this->isRandS($entityID))) ||
-                (($filter === 3) &&
-                 (!$this->isRegisteredByInCommon($entityID)))
-            ) {
-                continue;
-            }
-            if (isset($this->idparray[$entityID]['Organization_Name'])) {
-                $retarr[$entityID]['Organization_Name'] = $this->idparray[$entityID]['Organization_Name'];
-            }
-            if (isset($this->idparray[$entityID]['Display_Name'])) {
-                $retarr[$entityID]['Display_Name'] = $this->idparray[$entityID]['Display_Name'];
+        if (!is_null($this->idparray)) {
+            foreach ($this->idparray as $entityID => $value) {
+                if (
+                    (!is_null($filter)) &&
+                    (($filter === 2) &&
+                     (!$this->isRandS($entityID))) ||
+                    (($filter === 3) &&
+                     (!$this->isRegisteredByInCommon($entityID)))
+                ) {
+                    continue;
+                }
+                if (isset($this->idparray[$entityID]['Organization_Name'])) {
+                    $retarr[$entityID]['Organization_Name'] = $this->idparray[$entityID]['Organization_Name'];
+                }
+                if (isset($this->idparray[$entityID]['Display_Name'])) {
+                    $retarr[$entityID]['Display_Name'] = $this->idparray[$entityID]['Display_Name'];
+                }
             }
         }
 

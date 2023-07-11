@@ -2162,7 +2162,10 @@ Remote Address= ' . $remoteaddr . '
             $co_name = '';
             if (strlen($admin_id) > 0) {
                 $sso_admin_array = static::getBypass()->getSSOAdminArray();
-                if (array_key_exists($admin_id, $sso_admin_array)) {
+                if (
+                    (!is_null($sso_admin_array)) &&
+                    (array_key_exists($admin_id, $sso_admin_array))
+                ) {
                     $co_name = $sso_admin_array[$admin_id];
                 }
             }

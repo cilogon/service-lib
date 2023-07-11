@@ -2311,19 +2311,22 @@ class Content
             // we should automatically redirect to a specific IdP. Used
             // mainly by campus gateways.
             $bypassidp = '';
-            foreach (Util::getBypass()->getBypassIdPArray() as $key => $value) {
-                if (
-                    ($key === $redirect_uri) ||
-                    ($key === $client_id) ||
-                    ($key === @(Util::getAdminForClient($client_id))['admin_id']) ||
-                    (@preg_match($key, $redirect_uri)) ||
-                    (@preg_match($key, $client_id)) ||
-                    (@preg_match($key, @(Util::getAdminForClient($client_id))['admin_id']))
-                ) {
-                    $bypassidp = $value;
-                    // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
-                    $skin->init(true);
-                    break;
+            $bypassidparray = Util::getBypass()->getBypassIdPArray();
+            if ((!is_null($bypassidparray)) && (!empty($bypassidparray))) {
+                foreach ($bypassidparray as $key => $value) {
+                    if (
+                        ($key === $redirect_uri) ||
+                        ($key === $client_id) ||
+                        ($key === @(Util::getAdminForClient($client_id))['admin_id']) ||
+                        (@preg_match($key, $redirect_uri)) ||
+                        (@preg_match($key, $client_id)) ||
+                        (@preg_match($key, @(Util::getAdminForClient($client_id))['admin_id']))
+                    ) {
+                        $bypassidp = $value;
+                        // CIL-837 Reset the 'skin' to unset green/red-lit IdPs
+                        $skin->init(true);
+                        break;
+                    }
                 }
             }
 

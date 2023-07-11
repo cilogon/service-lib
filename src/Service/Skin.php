@@ -742,17 +742,19 @@ class Skin
     {
         $retval = '';  // Assume uri is not in $forcearray
 
-        foreach ($this->forcearray as $key => $value) {
-            if (
-                ($key === $uri) ||
-                (@preg_match($key, $uri)) ||
-                ($checkadmin &&
-                    (($key === @(Util::getAdminForClient($uri))['admin_id']) ||
-                    (@preg_match($key, @(Util::getAdminForClient($uri))['admin_id'])))
-                )
-            ) {
-                $retval = $value;
-                break;
+        if ((!is_null($this->forcearray)) && (!empty($this->forcearray))) {
+            foreach ($this->forcearray as $key => $value) {
+                if (
+                    ($key === $uri) ||
+                    (@preg_match($key, $uri)) ||
+                    ($checkadmin &&
+                        (($key === @(Util::getAdminForClient($uri))['admin_id']) ||
+                        (@preg_match($key, @(Util::getAdminForClient($uri))['admin_id'])))
+                    )
+                ) {
+                    $retval = $value;
+                    break;
+                }
             }
         }
         return $retval;

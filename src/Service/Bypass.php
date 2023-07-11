@@ -143,7 +143,10 @@ class Bypass
 
         if (defined('ALLOW_BYPASS_ARRAY')) {
             $retarr = ALLOW_BYPASS_ARRAY;
-        } elseif (!empty($this->bypassarray)) {
+        } elseif (
+            (!empty($this->bypassarray)) &&
+            (array_key_exists('allow', $this->bypassarray))
+        ) {
             $retarr = $this->bypassarray['allow'];
         }
 
@@ -170,7 +173,10 @@ class Bypass
 
         if (defined('BYPASS_IDP_ARRAY')) {
             $retarr = BYPASS_IDP_ARRAY;
-        } elseif (!empty($this->bypassarray)) {
+        } elseif (
+            (!empty($this->bypassarray)) &&
+            (array_key_exists('idp', $this->bypassarray))
+        ) {
             $retarr = $this->bypassarray['idp'];
         }
 
@@ -196,7 +202,10 @@ class Bypass
 
         if (defined('FORCE_SKIN_ARRAY')) {
             $retarr = FORCE_SKIN_ARRAY;
-        } elseif (!empty($this->bypassarray)) {
+        } elseif (
+            (!empty($this->bypassarray)) &&
+            (array_key_exists('skin', $this->bypassarray))
+        ) {
             $retarr = $this->bypassarray['skin'];
         }
 
@@ -224,7 +233,10 @@ class Bypass
 
         if (defined('SSO_ADMIN_ARRAY')) {
             $retarr = SSO_ADMIN_ARRAY;
-        } elseif (!empty($this->bypassarray)) {
+        } elseif (
+            (!empty($this->bypassarray)) &&
+            (array_key_exists('sso', $this->bypassarray))
+        ) {
             $retarr = $this->bypassarray['sso'];
         }
 

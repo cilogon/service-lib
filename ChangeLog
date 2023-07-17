@@ -1,3 +1,28 @@
+36df135 2023-07-17 PHP support up to v8.1
+6b1a536 2023-07-11 CIL-1778 Add checks for undefined array key
+1bd1398 2023-06-12 CIL-1769 Enagle use of read-only database endpoint.
+f5a37ab 2023-06-12 Bugfix - add missing '&&'
+0aa1e22 2023-06-12 CIL-1751 Allow multiple Metadata XML source files.
+d08682d 2023-06-12 CIL-1765 Fix displayed scopes on Consent Screen
+c1ba941 2023-06-08 CIL-912 Update AUP links in footer
+319ed2e 2023-05-31 CIL-1738 Assert eduPersonAssurance as a JSON array
+d38eabc 2023-05-31 Code optimization
+828e575 2023-05-31 CIL-1738 Add eduPersonAssurance to database
+1be9e93 2023-05-11 CIL-1713 Don't use a static class variable for DB.
+e6661e4 2023-05-11 Require at least PHP 7
+148a7da 2023-05-10 CIL-1737 Show error about missing subject-id
+940509f 2023-05-10 CIL-1739 Combine <regauthgreenlit> and <idpgreenlit> lists
+2983b9f 2023-05-09 CIL-1742 Chnage "Select an IdP" text
+58e8382 2023-04-18 CIL-1713 Separate PHP DB code from PHP sessions code
+5a18021 2023-04-18 Remove extra semicolon.
+f91aef1 2023-04-13 Fixes #2 as reported in CIL-1709.
+8127943 2023-04-09 CIL-1632 For hidden IdPs, allow "showhidden" parameter.
+359606f 2023-04-04 Bug fix - need to normalize OAuth2 entityId.
+66e73d7 2023-04-03 CIL-1693 Scan InCommon metadata for "personalized"
+5bd0e6e 2023-04-01 Related to CIL-1685: Reduce number of IdP loops.
+94c653c 2023-03-31 CIL-1685 Restrict IdPs based on Registration Authorities
+9a78dab 2023-03-31 Remove extra line
+7a66126 2023-03-27 Update ChangeLog
 2ccbb92 2023-03-24 CIL-1674 STATUS_EPTID_MISMATCH can be WARNING or ERROR.
 d261cfc 2023-03-23 CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid.
 5d0d517 2023-03-01 Fix typo in comment

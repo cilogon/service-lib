@@ -1399,6 +1399,15 @@ class Content
               </tr>';
         }
 
+        if (!empty($attr_arr['uidNumber'])) {
+            echo '
+              <tr>
+                <th>uidNumber:</th>
+                <td>', $attr_arr['uidNumber'], '</td>
+                <td> </td>
+              </tr>';
+        }
+
         echo '
               </tbody>
             </table>
@@ -1825,6 +1834,7 @@ class Content
      * @param string $subject_id
      * @param string $pairwise_id
      * @param string $preferred_username
+     * @param string $uidNumber
      * @param string $clientparams
      * @param string $redirect The url for the <form> element
      * @param string $redirectform Additional hidden input fields for the
@@ -1852,6 +1862,7 @@ class Content
         $subject_id,
         $pairwise_id,
         $preferred_username,
+        $uidNumber,
         $clientparams,
         $redirect,
         $redirectform,
@@ -2805,6 +2816,7 @@ class Content
                     $subject_id,
                     $pairwise_id,
                     $preferred_username,
+                    $uidNumber,
                     $clientparams,
                     $redirect,
                     $redirectform,

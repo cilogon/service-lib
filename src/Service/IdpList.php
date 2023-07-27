@@ -1283,6 +1283,7 @@ EOT;
         $shibarray['iTrustUIN'] = Util::getServerVar('HTTP_ITRUSTUIN');
         $shibarray['Subject ID'] = Util::getServerVar('HTTP_SUBJECT_ID');
         $shibarray['Pairwise ID'] = Util::getServerVar('HTTP_PAIRWISE_ID');
+        $shibarray['uidNumber'] = Util::getServerVar('HTTP_UIDNUMBER');
 
         // Make sure to use only the first of multiple values.
         $attrs = array('ePPN','ePTID','First Name','Last Name',

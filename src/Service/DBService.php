@@ -196,7 +196,8 @@ class DBService
         'preferred_username',
         'entitlement',
         'itrustuin',
-        'eduPersonOrcid'
+        'eduPersonOrcid',
+        'uidNumber'
     ];
 
     /**
@@ -330,6 +331,11 @@ class DBService
      * @var string|null $eduPersonOrcid ORCID identifier
      */
     public $eduPersonOrcid;
+
+    /**
+     * @var string|null $uidNumber Person's user ID number
+     */
+    public $uidNumber;
 
     /**
      * @var string|null $subject_id Person's univeristy subject identifier
@@ -1097,6 +1103,9 @@ class DBService
                 }
                 if (isset($attr_arr['eduPersonOrcid'])) {
                     $this->eduPersonOrcid = $attr_arr['eduPersonOrcid'];
+                }
+                if (isset($attr_arr['uidNumber'])) {
+                    $this->uidNumber = $attr_arr['uidNumber'];
                 }
             }
         }

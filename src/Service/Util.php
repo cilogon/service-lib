@@ -747,6 +747,7 @@ class Util
             'entitlement'        => 'Entitlement',
             'itrustuin'          => 'iTrustUIN',
             'eduPersonOrcid'     => 'eduPersonOrcid',
+            'uidNumber'          => 'uidNumber',
             'cilogon_skin'       => 'Skin Name',
             'authntime'          => 'Authn Time'
         );
@@ -952,7 +953,8 @@ Remote Address= ' . $remoteaddr . '
                 $preferred_username,
                 $entitlement,
                 $itrustuin,
-                $eduPersonOrcid
+                $eduPersonOrcid,
+                $uidNumber
             );
             if ($result) {
                 // CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid.
@@ -1076,6 +1078,8 @@ Remote Address= ' . $remoteaddr . '
                         $itrustuin : '<MISSING>') . "\n" .
                     'eduPersonOrcid= ' . ((strlen($eduPersonOrcid) > 0) ?
                         $eduPersonOrcid : '<MISSING>') . "\n" .
+                    'uidNumber     = ' . ((strlen($uidNumber) > 0) ?
+                        $uidNumber : '<MISSING>') . "\n" .
                     'User UID      = ' . ((strlen(
                         $i = static::getSessionVar('user_uid')
                     ) > 0) ?  $i : '<MISSING>') . "\n" .

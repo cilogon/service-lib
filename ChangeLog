@@ -1,3 +1,6 @@
+aa7bf01 2023-07-27 CIL-1806 Consume uidNumber from UIUC IdP
+68de83f 2023-07-21 CIL-1800 Fix broken Microsoft OAuth2 login
+6122266 2023-07-17 Update ChangeLog
 36df135 2023-07-17 PHP support up to v8.1
 6b1a536 2023-07-11 CIL-1778 Add checks for undefined array key
 1bd1398 2023-06-12 CIL-1769 Enagle use of read-only database endpoint.

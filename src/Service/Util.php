@@ -1675,6 +1675,9 @@ Remote Address= ' . $remoteaddr . '
             (!empty(XSEDE_USAGE_DIR)) &&
             (is_writable(XSEDE_USAGE_DIR))
         ) {
+            $log = new Loggit();
+            $log->info("USAGE email=\"$email\" client=\"PKCS12\"");
+
             $error = ''; // Was there an error to be reported?
 
             // Get the date strings for filename and CSV line output.
@@ -1725,7 +1728,6 @@ Remote Address= ' . $remoteaddr . '
 
             // If got an error while opening/writing file, log it.
             if (strlen($error) > 0) {
-                $log = new Loggit();
                 $log->error("Error writing XSEDE USAGE file $filename: $error");
             }
         }

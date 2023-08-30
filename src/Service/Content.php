@@ -204,7 +204,9 @@ class Content
             integrity="sha256-qo0Cam4XJ0QQ06XnCiCFYBh3GDXU45j3lpUp+em2yBU="
             crossorigin="anonymous"></script>
     <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
-    <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>';
+    <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>
+    <script src="/include/cilogon.js"></script>
+';
 
         // CIL-1643 Additional JavaScript for use by e.g., a navigation bar.
         if (Util::isOutputExtra()) {
@@ -215,7 +217,6 @@ class Content
         }
 
         echo '
-    <script src="/include/cilogon.js"></script>
   </body>
 </html>';
 

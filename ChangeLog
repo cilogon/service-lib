@@ -1,3 +1,7 @@
+73cc9d2 2023-10-30 Update libraries for bugfixes.
+ba8c617 2023-08-30 Move cilogon.js BEFORE custom script
+260ce1a 2023-08-03 Log XSEDE USAGE message only if enabled
+14f2126 2023-08-03 Update ChangeLog for v2.1.0 release
 aa7bf01 2023-07-27 CIL-1806 Consume uidNumber from UIUC IdP
 68de83f 2023-07-21 CIL-1800 Fix broken Microsoft OAuth2 login
 6122266 2023-07-17 Update ChangeLog

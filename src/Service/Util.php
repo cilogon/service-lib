@@ -572,7 +572,10 @@ class Util
             $sessionmgr = new SessionMgr();
         }
 
-        ini_set('session.cookie_secure', true);
+        // CIL-1879 Set options for PHPSESSID cookie
+        ini_set('session.cookie_secure', '1');
+        ini_set('session.cookie_httponly', '1');
+        ini_set('session.cookie_samesite', 'Lax');
         ini_set('session.cookie_domain', '.' . static::getDN());
         session_start();
         if (

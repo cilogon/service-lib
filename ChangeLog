@@ -1,3 +1,7 @@
+0633810 2023-11-13 CIL-1812 Allow session vars NOT to be output
+a6d0e31 2023-11-09 CIL-1879 Set options for PHPSESSID cookie
+85cf33d 2023-10-30 Use firebase/php-jwt v6.7.0.
+3ebff05 2023-10-30 Update ChangeLog
 73cc9d2 2023-10-30 Update libraries for bugfixes.
 ba8c617 2023-08-30 Move cilogon.js BEFORE custom script
 260ce1a 2023-08-03 Log XSEDE USAGE message only if enabled

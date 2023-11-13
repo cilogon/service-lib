@@ -2281,7 +2281,7 @@ class Content
      * clicked, or if the submit session variable is not set. It checks
      * to see if either the <forceinitialidp> option is set, or if the
      * 'Remember this selection' checkbox was previously checked. If so,
-     * then rediret to the appropriate IdP. Otherwise, print the main
+     * then redirect to the appropriate IdP. Otherwise, print the main
      * Log On page.
      */
     public static function handleNoSubmitButtonClicked()
@@ -3452,7 +3452,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
     public static function printLogout()
     {
         $log = new Loggit();
-        $log->info('Logout page hit.');
+        $log->info('Logout page hit.', false, false);
 
         $idp              = Util::getSessionVar('idp');
         $idp_display_name = Util::getSessionVar('idp_display_name');

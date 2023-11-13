@@ -59,17 +59,23 @@ class Loggit
      * @param string $message The message string to be logged.
      * @param bool $missing (Optional) If true, print some missing user
      *        session variables. Defaults to false.
+     * @param bool $sess (Optional) If true, print out extra information
+     *        from session vars. Defaults to true.
      * @param int $level (Optional) The PHP Pear-Log level for the message.
      *        Defaults to PEAR_LOG_INFO.
      */
-    public function info($message, $missing = false, $level = PEAR_LOG_INFO)
-    {
-        // Don't log messages from monit/nagios hosts, the
-        // same ones configured in /etc/httpd/conf.httpd.conf
-        $dontlog = array('141.142.148.8',   // nagios-sec
+    public function info(
+        $message,
+        $missing = false,
+        $sess = true,
+        $level = PEAR_LOG_INFO
+    ) {
+        $message2 = '';
+
+        // Don't log messages from certain hosts
+        $dontlog = array('141.142.148.10',  // nagios
+                         '141.142.148.8',   // nagios-sec
                          '141.142.148.108', // nagios2-sec
-                         '141.142.234.38',  // falco
-                         '192.249.7.62'     // fozzie
                         );
         if (
             (isset($_SERVER['REMOTE_ADDR'])) &&
@@ -79,45 +85,50 @@ class Loggit
         }
 
         // Always print out certain HTTP headers, if available
-        $envs    = array('REMOTE_ADDR',
-                         'REMOTE_USER',
-                         'HTTP_SHIB_IDENTITY_PROVIDER',
-                         'HTTP_SHIB_SESSION_ID'
-                        );
-        // Always print out certain cookies, if available
-        $cookies = array('providerId',
-                        );
-
-        $envstr = ' ';
+        $envs = array('REMOTE_ADDR',
+                      'REMOTE_USER',
+                      'HTTP_SHIB_IDENTITY_PROVIDER',
+                      'HTTP_SHIB_SESSION_ID'
+                     );
         foreach ($envs as $value) {
-            if ((isset($_SERVER[$value])) && (strlen($_SERVER[$value]) > 0)) {
-                $envstr .= $value . '="' . $_SERVER[$value] . '" ';
+            if (
+                (isset($_SERVER[$value])) &&
+                (strlen($_SERVER[$value]) > 0)
+            ) {
+                $message2 .= $value . '="' . $_SERVER[$value] . '" ';
             }
         }
 
+        // Always print out certain cookies, if available
+        $cookies = array('providerId');
         foreach ($cookies as $value) {
-            if ((isset($_COOKIE[$value])) && (strlen($_COOKIE[$value]) > 0)) {
-                $envstr .= $value . '="' . $_COOKIE[$value] . '" ';
+            if (
+                (isset($_COOKIE[$value])) &&
+                (strlen($_COOKIE[$value]) > 0)
+            ) {
+                $message2 .= $value . '="' . $_COOKIE[$value] . '" ';
             }
         }
 
-        /* NEED TO CHANGE THIS WHEN USING HTTP_Session2 */
-        if (session_id() != '') {
-            foreach ($_SESSION as $key => $value) {
-                $envstr .= $key . '="' .
-                    (is_array($value) ? 'Array' : $value) . '" ';
+        // CIL-1812 Allow session variables NOT to be printed
+        if ($sess) {
+            if (session_id() != '') {
+                foreach ($_SESSION as $key => $value) {
+                    $message2 .= $key . '="' .
+                        (is_array($value) ? 'Array' : $value) . '" ';
+                }
             }
         }
 
         if ($missing) { // Output any important missing user session vars
             foreach (DBService::$user_attrs as $value) {
                 if (!isset($_SESSION[$value])) {
-                    $envstr .= $value . '="MISSING" ';
+                    $message2 .= $value . '="MISSING" ';
                 }
             }
         }
 
-        $this->logger->log($message . ' ' . $envstr, $level);
+        $this->logger->log($message . ' ' . $message2, $level);
     }
 
     /**
@@ -125,10 +136,15 @@ class Loggit
      *
      * This function writes a warning message message to the log.
      *
+     * @param string $message The message string to be logged.
+     * @param bool $missing (Optional) If true, print some missing user
+     *        session variables. Defaults to false.
+     * @param bool $sess (Optional) If true, print out extra information
+     *        from session vars. Defaults to true.
      */
-    public function warn($message, $missing = false)
+    public function warn($message, $missing = false, $sess = true)
     {
-        $this->info($message, $missing, PEAR_LOG_WARNING);
+        $this->info($message, $missing, $sess, PEAR_LOG_WARNING);
     }
 
     /**
@@ -139,10 +155,12 @@ class Loggit
      * @param string $message The message string to be logged.
      * @param bool $missing (Optional) If true, print some missing user
      *        session variables. Defaults to false.
+     * @param bool $sess (Optional) If true, print out extra information
+     *        from session vars. Defaults to true.
      */
-    public function error($message, $missing = false)
+    public function error($message, $missing = false, $sess = true)
     {
-        $this->info($message, $missing, PEAR_LOG_ERR);
+        $this->info($message, $missing, $sess, PEAR_LOG_ERR);
     }
 
     /**
@@ -153,9 +171,11 @@ class Loggit
      * @param string $message The message string to be logged.
      * @param bool $missing (Optional) If true, print some missing user
      *        session variables. Defaults to false.
+     * @param bool $sess (Optional) If true, print out extra information
+     *        from session vars. Defaults to true.
      */
-    public function alert($message, $missing = false)
+    public function alert($message, $missing = false, $sess = true)
     {
-        $this->info($message, $missing, PEAR_LOG_ALERT);
+        $this->info($message, $missing, $sess, PEAR_LOG_ALERT);
     }
 }

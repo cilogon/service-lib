@@ -339,7 +339,7 @@ class CSRF
             if (strlen($retval) == 0) {
                 $this->removeTheCookie();
                 $log = new Loggit();
-                $log->info('CSRF check failed.');
+                $log->info('CSRF check failed.', false, false);
             }
         }
         return $retval;

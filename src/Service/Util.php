@@ -1679,7 +1679,7 @@ Remote Address= ' . $remoteaddr . '
             (is_writable(XSEDE_USAGE_DIR))
         ) {
             $log = new Loggit();
-            $log->info("USAGE email=\"$email\" client=\"PKCS12\"");
+            $log->info("USAGE email=\"$email\" client=\"$client\"");
 
             $error = ''; // Was there an error to be reported?
 

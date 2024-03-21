@@ -1,3 +1,7 @@
+5f46f73 2024-03-21 Require pear/log package v1.14.x
+8f0a9a5 2024-01-05 Update oauth2-azure library to 2.2.2
+314a564 2024-01-05 Update LICENSE for 2024
+cbe2c0b 2023-11-13 Update ChangeLog
 0633810 2023-11-13 CIL-1812 Allow session vars NOT to be output
 a6d0e31 2023-11-09 CIL-1879 Set options for PHPSESSID cookie
 85cf33d 2023-10-30 Use firebase/php-jwt v6.7.0.

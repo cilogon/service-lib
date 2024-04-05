@@ -25,7 +25,8 @@
         "pear/log": "^1.14.0",
         "pear/db": "dev-trunk",
         "thenetworg/oauth2-azure": "^2.2.2",
-        "tubalmartin/cssmin": "^4.1.1"
+        "tubalmartin/cssmin": "^4.1.1",
+        "aws/aws-sdk-php": "^3.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.21",

@@ -97,13 +97,7 @@ class SessionMgr
     {
         $retval = true;  // Assume connect to database succeeded
 
-        if (
-            (!defined('PHPSESSIONS_USE_FILE')) ||
-            (PHPSESSIONS_USE_FILE === false)
-        ) {
-            $this->db = Util::getDB();
-        }
-
+        $this->db = Util::getDB();
         if (is_null($this->db)) {
             $retval = false;
         }

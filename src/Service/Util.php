@@ -10,6 +10,7 @@ use CILogon\Service\SessionMgr;
 use CILogon\Service\Skin;
 use CILogon\Service\TimeIt;
 use CILogon\Service\PortalCookie;
+use Aws\DynamoDb\SessionHandler;
 use PEAR;
 use DB;
 use DateTime;
@@ -556,7 +557,27 @@ class Util
      */
     public static function startPHPSession()
     {
-        if ((defined('PHPSESSIONS_USE_FILE')) && (PHPSESSIONS_USE_FILE === true)) {
+        // If PHPSESSIONS_STORAGE is not defined in config.php, default to
+        // saving PHP sessions to file.
+        if (!defined('PHPSESSIONS_STORAGE')) {
+            define('PHPSESSIONS_STORAGE', 'file');
+        }
+
+        if (PHPSESSIONS_STORAGE == 'database') {
+            $sessionmgr = new SessionMgr();
+        } elseif (PHPSESSIONS_STORAGE == 'dynamodb') {
+            $dynamoDb = new \Aws\DynamoDb\DynamoDbClient([
+                'region' => DYNAMODB_REGION,
+                'credentials' => [
+                    'key' => DYNAMODB_ACCESSKEY,
+                    'secret' => DYNAMODB_SECRETACCESSKEY,
+                ],
+            ]);
+            $sessionHandler = SessionHandler::fromClient($dynamoDb, [
+                'table_name' => DYNAMODB_TABLE,
+            ]);
+            $sessionHandler->register();
+        } else { // Default to saving PHP sessions to file.
             // If storing PHP sessions to file, check if an optional directory
             // for storage has been set. If so, create it if necessary.
             if ((defined('PHPSESSIONS_DIR')) && (!empty(PHPSESSIONS_DIR))) {
@@ -568,8 +589,6 @@ class Util
                     ini_set('session.save_path', PHPSESSIONS_DIR);
                 }
             }
-        } else { // Store PHP sessions to the database
-            $sessionmgr = new SessionMgr();
         }
 
         // CIL-1879 Set options for PHPSESSID cookie

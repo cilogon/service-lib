@@ -569,12 +569,12 @@ class Util
             $dynamoDb = new \Aws\DynamoDb\DynamoDbClient([
                 'region' => DYNAMODB_REGION,
                 'credentials' => [
-                    'key' => DYNAMODB_ACCESSKEY,
-                    'secret' => DYNAMODB_SECRETACCESSKEY,
+                    'key' => DYNAMODB_PHPSESSIONS_ACCESSKEY,
+                    'secret' => DYNAMODB_PHPSESSIONS_SECRETACCESSKEY,
                 ],
             ]);
             $sessionHandler = SessionHandler::fromClient($dynamoDb, [
-                'table_name' => DYNAMODB_TABLE,
+                'table_name' => DYNAMODB_PHPSESSIONS_TABLE,
             ]);
             $sessionHandler->register();
         } else { // Default to saving PHP sessions to file.

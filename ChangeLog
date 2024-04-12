@@ -1,3 +1,7 @@
+fd85e9a 2024-04-12 CIL-1967 Fix issues found during WCAG accessibility assessment
+7534db8 2024-04-08 Rename config to DYNAMODB_PHPSESSIONS_*
+a6104a6 2024-04-05 CIL-1963 Use DynamoDB for PHP sessions
+bec10c5 2024-03-21 Update ChangeLog
 5f46f73 2024-03-21 Require pear/log package v1.14.x
 8f0a9a5 2024-01-05 Update oauth2-azure library to 2.2.2
 314a564 2024-01-05 Update LICENSE for 2024

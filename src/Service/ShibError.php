@@ -224,7 +224,7 @@ class ShibError
             ';
         }
 
-        Content::printFormHead();
+        Content::printFormHead('Error');
 
         echo '
               <div class="card-text my-2">
@@ -236,8 +236,9 @@ class ShibError
         if (strlen($emailmsg) > 0) {
             echo '
                     <div class="col-auto">
-                      <a class="btn btn-primary" href="',
-                      $emailmsg, '">Request Help</a>
+                      <a class="btn btn-primary"
+                      title="Request Help"
+                      href="', $emailmsg, '">Request Help</a>
                     </div> <!-- end col-auto -->';
         }
 
@@ -245,6 +246,7 @@ class ShibError
                     <div class="col-auto">
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
+                      title="Proceed"
                       value="Proceed" />
                     </div> <!-- end col-auto -->
                   </div> <!-- end form-row align-items-center -->

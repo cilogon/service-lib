@@ -22,10 +22,11 @@ class Content
      * block for each web page.  This gives a consistent look to the site.
      * Any style changes should go in the cilogon.css file.
      *
-     * @param string $title The text in the window's titlebar
+     * @param string $title The text in the window's titlebar. Defaults to
+     *        "CILogon Service".
      * @param bool $csrfcookie Set the CSRF cookie. Defaults to true.
      */
-    public static function printHeader($title = '', $csrfcookie = true)
+    public static function printHeader($title = 'CILogon Service', $csrfcookie = true)
     {
         if ($csrfcookie) {
             $csrf = Util::getCsrf();
@@ -114,6 +115,7 @@ class Content
         }
 
         echo '
+    <header>
     <div class="skincilogonlogo">
       <a target="_blank" href="', $poweredbyurl,
         '"><img src="', $poweredbyimg, '" alt="', $poweredbyalt,
@@ -121,10 +123,11 @@ class Content
     </div>
 
     <div class="logoheader">
-       <h1><span>[CILogon Service]</span></h1>
+       <h1 aria-label="', $title, '"><span>[CILogon Service]</span></h1>
     </div>
+    </header>
 
-    <div class="mt-4 container-fluid"> <!-- Main Bootstrap Container -->
+    <div class="mt-4 container-fluid" role="main"> <!-- Main Bootstrap Container -->
     ';
 
         static::printNoScript();
@@ -232,12 +235,14 @@ class Content
      * location of the current script.  This function outputs a hidden csrf
      * field in the form block.
      *
+     * @param string $title (Optional) The value of the <form title="?">
+     *        attribute. Defaults to empty string (i.e., no title attribute).
      * @param string $action (Optional) The value of the form's 'action'
      *        parameter. Defaults to getScriptDir().
      * @param string $method (Optional) The <form> 'method', one of 'get' or
      *        'post'. Defaults to 'post'.
      */
-    public static function printFormHead($action = '', $method = 'post')
+    public static function printFormHead($title = '', $action = '', $method = 'post')
     {
         static $formnum = 0;
 
@@ -248,8 +253,11 @@ class Content
         echo '
           <form action="', $action, '" method="', $method, '"
           autocomplete="off" id="form', sprintf("%02d", ++$formnum), '"
-          class="needs-validation" novalidate="novalidate">
-        ';
+          class="needs-validation" novalidate="novalidate"';
+        if (!empty($title)) {
+            echo ' title="', $title, '"';
+        }
+        echo '>';
         $csrf = Util::getCsrf();
         echo $csrf->hiddenFormElement();
     }
@@ -498,6 +506,7 @@ class Content
           <form action="', Util::getScriptDir(), '" method="post">
             <div class="form-group">
             <select name="providerId" id="providerId"
+                aria-label="Select an Identity Provider"
                 autofocus="autofocus"
                 class="selectpicker mw-100"
                 data-size="20" data-width="fit"
@@ -518,13 +527,13 @@ class Content
         }
         if ($idpcount > 1) {
             echo '
-                <option data-divider="true"></option>';
+                <option data-divider="true" aria-label="divider"></option>';
         }
 
         echo '
             </select>
             <a href="#" tabindex="0" data-trigger="hover click"
-            class="helpcursor"
+            class="helpcursor" role="tooltip" aria-label="Selection"
             data-toggle="popover" data-html="true"
             title="Selecting an Identity Provider"
             data-content="', $selecthelp, '"><i class="fa
@@ -546,7 +555,7 @@ class Content
                 <label class="form-check-label"
                 for="keepidp">Remember this selection</label>
                 <a href="#" tabindex="0" data-trigger="hover click"
-                class="helpcursor"
+                class="helpcursor" role="tooltip" aria-label="Remember"
                 data-toggle="popover" data-html="true"
                 data-content="', $rememberhelp, '"><i class="fa
                 fa-question-circle"></i></a>
@@ -572,6 +581,7 @@ class Content
                 <div class="col-auto">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
+                  title="', $lobtext, '"
                   value="', $lobtext, '" id="wayflogonbutton" />
                 </div> <!-- end col-auto -->
         ';
@@ -585,7 +595,7 @@ class Content
                 <div class="col-auto">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
-                  title="Cancel authentication."
+                  title="Cancel authentication"
                   value="Cancel" id="wayfcancelbutton" />
                 </div>
             ';
@@ -772,7 +782,7 @@ class Content
             echo '
           <div class="card-body col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1">';
 
-            static::printFormHead();
+            static::printFormHead('Get Certificate');
 
             if (strlen($p12error) > 0) {
                 echo '<div class="alert alert-danger alert-dismissable fade show" role="alert">';
@@ -874,7 +884,9 @@ class Content
                 <div class="col text-center">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
-                  value="Get New Certificate" onclick="showHourglass(\'p12\')"/>
+                  title="Get New Certificate"
+                  value="Get New Certificate"
+                  onclick="showHourglass(\'p12\')"/>
                   <div class="spinner-border"
                   style="width: 32px; height: 32px;"
                   role="status" id="p12hourglass">
@@ -923,7 +935,8 @@ class Content
             $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
             echo '
               <div class="card-body">
-                <table class="table table-striped table-sm">
+                <table class="table table-striped table-sm"
+                aria-label="Certificate Information">
                 <tbody>
                   <tr>
                     <th>Certificate Subject:</th>
@@ -970,7 +983,8 @@ class Content
             $display_name = Util::getSessionVar('display_name');
             $email        = Util::getSessionVar('email');
             echo '
-                <table class="table table-striped table-sm">
+                <table class="table table-striped table-sm"
+                aria-label="Missing Attributes">
                 <tbody>';
             if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
@@ -1113,7 +1127,8 @@ class Content
 
         echo '
           <div class="card-body">
-            <table class="table table-striped table-sm">
+            <table class="table table-striped table-sm"
+            aria-label="User Attributes">
             <tbody>';
 
         // CIL-781 Show CILogon User Identifier (user_uid) when logged in
@@ -1459,7 +1474,8 @@ class Content
 
         echo'
           <div class="card-body">
-            <table class="table table-striped table-sm">
+            <table class="table table-striped table-sm"
+            aria-label="Identity Provider Attributes">
             <tbody>
               <tr>
                 <th>Organization Name:</th>
@@ -1643,6 +1659,7 @@ class Content
     public static function printCollapseBegin($name, $title, $collapsed = true)
     {
         echo '
+      <section title="', $title, '">
       <div class="card col-sm-10 offset-sm-1">
         <h5 class="card-header text-center">
           <a class="d-block',
@@ -1658,7 +1675,7 @@ class Content
         </h5>
         <div id="collapse-',$name, '" class="collapse',
         ($collapsed ? '' : ' show'),
-        '" aria-labelledby="heading-', $name, '">';
+        '" >';
     }
 
     /**
@@ -1672,6 +1689,7 @@ class Content
         echo '
         </div> <!-- end collapse-... -->
       </div> <!-- end card -->
+      </section>
         ';
     }
 
@@ -1731,7 +1749,7 @@ class Content
            'front page. Note that this will not log you out at ' .
             Util::getSessionVar('idp_display_name') . '.';
 
-        static::printFormHead();
+        static::printFormHead('Log Off');
         echo '
           <div class="form-group mt-3">
             <div class="form-row align-items-center">
@@ -1740,7 +1758,8 @@ class Content
 
         $logofftextbox = Util::getSkin()->getConfigOption('logofftextbox');
         if ((!is_null($logofftextbox)) && ((int)$logofftextbox == 1)) {
-            echo '  <div class="btn btn-primary">To log off,
+            echo '  <div class="btn btn-primary"
+                title="Exit your browser">To log off,
                 please quit your browser.</div>';
         } else {
             echo '  <input type="submit" name="submit"
@@ -1784,7 +1803,7 @@ class Content
             error. Please try again later, or contact us at the the email
             address at the bottom of the page.');
 
-        static::printFormHead($redirect, 'get');
+        static::printFormHead('General Error', $redirect, 'get');
 
         echo '
               <div class="card-text my-2">
@@ -1795,7 +1814,8 @@ class Content
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="Proceed" />
+                      value="Proceed"
+                      title="Proceed" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -2016,8 +2036,9 @@ class Content
             }
             echo '
                   <li> Support Contact: ',
-                  $name, ' <a class="btn btn-primary" href="mailto:',
-                  $addr, $emailmsg, '">',
+                  $name, ' <a class="btn btn-primary"
+                  title="Contact Support"
+                  href="mailto:', $addr, $emailmsg, '">',
                   $addr, '</a>
                   </li>';
         }
@@ -2033,8 +2054,9 @@ class Content
                 }
                 echo '
                       <li> Technical Contact: ',
-                      $name, ' <a class="btn btn-primary" href="mailto:',
-                      $addr, $emailmsg, '">',
+                      $name, ' <a class="btn btn-primary"
+                      title="Contact Support"
+                      href="mailto:', $addr, $emailmsg, '">',
                       $addr, '</a>
                       </li>';
             }
@@ -2050,8 +2072,9 @@ class Content
                 }
                 echo '
                       <li>Administrative Contact: ',
-                      $name, ' <a class="btn btn-primary" href="mailto:',
-                      $addr, $emailmsg, '">',
+                      $name, ' <a class="btn btn-primary"
+                      title="Contact Support"
+                      href="mailto:', $addr, $emailmsg, '">',
                       $addr, '</a>
                       </li>';
             }
@@ -2065,7 +2088,7 @@ class Content
                 </div> <!-- end card-text -->
             ';
 
-        static::printFormHead($redirect, 'get');
+        static::printFormHead('Attribute Release Error', $redirect, 'get');
 
         echo '
               <div class="card-text my-2">
@@ -2076,7 +2099,8 @@ class Content
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="Proceed" />
+                      value="Proceed"
+                      title="Proceed" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -2197,7 +2221,7 @@ class Content
               </div>';
         }
 
-        static::printFormHead($redirect, 'get');
+        static::printFormHead('Attribute Release Error', $redirect, 'get');
 
         echo '
               <div class="card-text my-2">
@@ -2211,7 +2235,8 @@ class Content
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="Proceed" />
+                      value="Proceed"
+                      title="Proceed" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -3486,6 +3511,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
+                  title="Log out from Identity Provider"
                   href="https://accounts.google.com/Logout">(Optional)
                   Log out from Google</a>
                 </div> <!-- end col-auto -->
@@ -3499,6 +3525,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
+                  title="Log out from Identity Provider"
                   href="https://github.com/logout">(Optional) Log out from GitHub</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
@@ -3514,6 +3541,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
+                  title="Log out from Identity Provider"
                   href="https://orcid.org/signout">(Optional) Log out from ORCID</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
@@ -3528,6 +3556,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
+                  title="Log out from Identity Provider"
                   href="https://login.microsoftonline.com/common/oauth2/v2.0/logout">(Optional)
                   Log out from Microsoft</a>
                 </div> <!-- end col-auto -->
@@ -3560,6 +3589,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
+                  title="Log out from Identity Provider"
                   href="', $logout, '">(Optional) Log out from ', $idp_display_name, '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->

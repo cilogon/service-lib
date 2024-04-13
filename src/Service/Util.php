@@ -952,6 +952,7 @@ Remote Address= ' . $remoteaddr . '
         // Call the dbService to get the user using IdP attributes.
         do {
             $try_without_eptid = false;
+            $remote_user = ''; // CIL-1968 Don't sent remote_user to dbService
             $result = $dbs->getUser(
                 $remote_user,
                 $idp,

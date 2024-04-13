@@ -1,3 +1,5 @@
+4c579b3 2024-04-13 CIL-1968 Don't sent remote_user to dbService
+546d804 2024-04-12 Update ChangeLog
 fd85e9a 2024-04-12 CIL-1967 Fix issues found during WCAG accessibility assessment
 7534db8 2024-04-08 Rename config to DYNAMODB_PHPSESSIONS_*
 a6104a6 2024-04-05 CIL-1963 Use DynamoDB for PHP sessions

@@ -1281,6 +1281,7 @@ EOT;
         $shibarray['Authn Context'] = $acr;
         $shibarray['Entitlement'] = Util::getServerVar('HTTP_ENTITLEMENT');
         $shibarray['iTrustUIN'] = Util::getServerVar('HTTP_ITRUSTUIN');
+        $shibarray['eduPersonOrcid'] = Util::getServerVar('HTTP_EDUPERSONORCID');
         $shibarray['Subject ID'] = Util::getServerVar('HTTP_SUBJECT_ID');
         $shibarray['Pairwise ID'] = Util::getServerVar('HTTP_PAIRWISE_ID');
         $shibarray['uidNumber'] = Util::getServerVar('HTTP_UIDNUMBER');

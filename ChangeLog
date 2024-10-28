@@ -1,3 +1,5 @@
+78184b1 2024-10-23 CIL-2114 Consume SAML eduPersonOrcid
+8a7dffc 2024-04-13 Update ChangeLog
 4c579b3 2024-04-13 CIL-1968 Don't sent remote_user to dbService
 546d804 2024-04-12 Update ChangeLog
 fd85e9a 2024-04-12 CIL-1967 Fix issues found during WCAG accessibility assessment

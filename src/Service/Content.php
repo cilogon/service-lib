@@ -782,6 +782,15 @@ class Content
             echo '
           <div class="card-body col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1">';
 
+            // CIL-2133 Add warning about X.509 certificate retirement
+            echo '
+            <div class="alert alert-danger alert-dismissable fade show" role="alert">
+               Certificate creation will be disabled June 1, 2025.
+               See the <a target="_blank"
+               href="https://ca.cilogon.org/retirement">CILogon X.509
+               Certificate Retirement Plan</a> for details.
+            </div>';
+
             static::printFormHead('Get Certificate');
 
             if (strlen($p12error) > 0) {

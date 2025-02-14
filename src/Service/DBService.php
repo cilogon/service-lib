@@ -604,6 +604,14 @@ class DBService
             $retval = $this->call('action=getUser&user_uid=' .
                 urlencode($args[0]));
         } elseif ($numargs > 1) {
+            // Find 'idp' and 'loa' and save them for later
+            $idp = $args[array_search('idp', static::$user_attrs)];
+            $loa_pos = array_search('loa', static::$user_attrs);
+            $loa = '';
+            if ($numargs > $loa_pos) {
+                $loa = $args[$loa_pos];
+            }
+
             $cmd = 'action=getUser';
             $attr_arr = array();
             $ou_pos = array_search('ou', static::$user_attrs);
@@ -614,16 +622,22 @@ class DBService
                         // Put params after $ou into JSON object
                         $attr_arr[static::$user_attrs[$i]] = $arg;
                     } else {
-                        $cmd .= '&' . static::$user_attrs[$i] . '=' . urlencode($arg);
+                        // CIL-2178 For SAML-based IdPs, if OMIT_IDP is true,
+                        // don't pass "idp" parameter to dbService
+                        if (
+                            (static::$user_attrs[$i] == 'idp') &&
+                            (defined('OMIT_IDP')) &&
+                            (OMIT_IDP === true) &&
+                            (!in_array($idp, Util::$oauth2idps, true))
+                        ) {
+                            // Omit IdP from the dbService call - no-op
+                        } else {
+                            $cmd .= '&' . static::$user_attrs[$i] . '=' . urlencode($arg);
+                        }
                     }
                 }
             }
             // CIL-1738 Put $loa in database as eduPersonAssurance
-            $loa = '';
-            $loa_pos = array_search('loa', static::$user_attrs);
-            if ($numargs > $loa_pos) {
-                $loa = $args[$loa_pos];
-            }
             if ((strlen($loa) > 0) && ($loa != 'openid')) {
                 $attr_arr['eduPersonAssurance'] = json_encode(
                     explode(';', $loa),
@@ -644,11 +658,9 @@ class DBService
             }
             // Add 'us_idp' parameter for InCommon/Google (1) or eduGAIN (0)
             $us_idp = 0;
-            $idp = $args[1];
-            $idp_display_name = $args[2];
             if (
                 (Util::getIdpList()->isRegisteredByInCommon($idp)) ||
-                (array_key_exists($idp_display_name, Util::$oauth2idps))
+                (in_array($idp, Util::$oauth2idps, true))
             ) {
                 $us_idp = 1;
             }

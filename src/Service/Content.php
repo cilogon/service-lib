@@ -639,7 +639,11 @@ class Content
     {
         // CIL-624 If DISABLE_X509 is true, then don't even print out the
         // Get New Certificate box.
-        if ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) {
+        // CIL-2190 Separate web certs from ECP certs
+        if (
+            ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) ||
+            ((defined('DISABLE_X509_WEB')) && (DISABLE_X509_WEB === true))
+        ) {
             return;
         }
 
@@ -935,7 +939,11 @@ class Content
     {
         // CIL-624 If DISABLE_X509 is true, then don't even print out the
         // Certificate Information box.
-        if ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) {
+        // CIL-2190 Separate web certs from ECP certs
+        if (
+            ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) ||
+            ((defined('DISABLE_X509_WEB')) && (DISABLE_X509_WEB === true))
+        ) {
             return;
         }
 

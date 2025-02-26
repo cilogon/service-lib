@@ -666,9 +666,11 @@ class Content
                         'with a different Identity Provider.';
                 }
             } elseif (strlen($dn) == 0) {
-                $disabledmsg = 'Unable to generate a certificate. ' .
-                    'Your identity provider has not provided CILogon ' .
-                    'with all required information.';
+                // CIL-2188 Show alternate message when missing user attributes
+                $disabledmsg = 'Certificate creation will be disabled ' .
+                    'June 1, 2025. See the <a target="_blank" ' .
+                    'href="https://ca.cilogon.org/retirement">CILogon' .
+                    'X.509 Certificate Retirement Plan</a> for details.';
             } elseif ($isEduGAINAndGetCert) {
                 $disabledmsg = 'Unable to generate a certificate. ' .
                     'Your identity provider has not asserted support ' .
@@ -1080,12 +1082,27 @@ class Content
         $warnings = array();
         $errors = array();
 
-        // CIL-416 Show warning for missing ePPN
-        if (($samlidp) && (empty($attr_arr['eppn']))) {
+        // CIL-416 Show warning for missing ePPN or Subject ID
+        if ($samlidp) {
+            if (empty($attr_arr['eppn'])) {
+                $errors['no_eppn'] = true;
+            }
             if (empty($attr_arr['eptid'])) {
-                $errors['no_eppn_or_eptid'] = true;
-            } else {
-                $warnings['no_eppn'] = true;
+                $errors['no_eptid'] = true;
+            }
+            if (empty($attr_arr['subject_id'])) {
+                $errors['no_subject_id'] = true;
+            }
+            if (empty($attr_arr['pairwise_id'])) {
+                $errors['no_pairwise_id'] = true;
+            }
+            if (
+                ($errors['no_eppn']) &&
+                ($errors['no_eptid']) &&
+                ($errors['no_subject_id']) &&
+                ($errors['no_pairwise_id'])
+            ) {
+                $errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id'] = true;
             }
         }
 
@@ -1122,11 +1139,7 @@ class Content
             'userattrs',
             'User Attributes ' .
             (
-                (!empty($errors)) ? static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'One or more missing attributes.'
-                ) : ((@$warnings['no_eppn']) ?  static::getIcon(
+                ((@$warnings['no_eppn']) ? static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
                     'Some CILogon clients (e.g., Globus) require ePPN.'
@@ -1177,11 +1190,11 @@ class Content
                 <td>', $attr_arr['eptid'], '</td>
                 <td>';
 
-            if (@$errors['no_eppn_or_eptid']) {
+            if (@$errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id']) {
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    'Must have either ePPN -OR- ePTID.'
+                    'Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.'
                 );
             }
 
@@ -1194,11 +1207,11 @@ class Content
                 <td>', $attr_arr['eppn'], '</td>
                 <td>';
 
-            if (@$errors['no_eppn_or_eptid']) {
+            if (@$errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id']) {
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    'Must have either ePPN -OR- ePTID.'
+                    'Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.'
                 );
             } elseif (@$warnings['no_eppn']) {
                 echo static::getIcon(
@@ -1212,6 +1225,24 @@ class Content
                 </td>
               </tr>
             ';
+
+            if (!empty($attr_arr['subject_id'])) {
+                echo '
+                  <tr>
+                    <th>Subject ID (subject-id):</th>
+                    <td>', $attr_arr['subject_id'], '</td>
+                    <td> </td>
+                  </tr>';
+            }
+
+            if (!empty($attr_arr['pairwise_id'])) {
+                echo '
+                  <tr>
+                    <th>Pairwise ID (pairwise-id):</th>
+                    <td>', $attr_arr['pairwise_id'], '</td>
+                    <td> </td>
+                  </tr>';
+            }
         }
 
         if ((!empty($attr_arr['idp'])) && (!$samlidp)) {
@@ -1242,6 +1273,10 @@ class Content
                 <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
+            /**
+             * CIL-2188 Don't show red-circle exclamation
+             * for missing name or email attributes
+             *
             if (@$errors['no_first_name']) {
                 echo static::getIcon(
                     'fa-exclamation-circle',
@@ -1249,6 +1284,7 @@ class Content
                     'Must have either givenName + sn -OR- displayName.'
                 );
             }
+             */
 
             echo '
                 </td>
@@ -1263,6 +1299,10 @@ class Content
                 <td>', $attr_arr['last_name'], '</td>
                 <td>';
 
+            /**
+             * CIL-2188 Don't show red-circle exclamation
+             * for missing name or email attributes
+             *
             if (@$errors['no_last_name']) {
                 echo static::getIcon(
                     'fa-exclamation-circle',
@@ -1270,6 +1310,7 @@ class Content
                     'Must have either givenName + sn -OR- displayName.'
                 );
             }
+             */
 
             echo '
                 </td>
@@ -1284,6 +1325,10 @@ class Content
                 <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
+            /**
+             * CIL-2188 Don't show red-circle exclamation
+             * for missing name or email attributes
+             *
             if (@$errors['no_display_name']) {
                 echo static::getIcon(
                     'fa-exclamation-circle',
@@ -1291,6 +1336,7 @@ class Content
                     'Must have either displayName -OR- givenName + sn.'
                 );
             }
+             */
 
             echo '
                 </td>
@@ -1304,6 +1350,10 @@ class Content
                 <td>', $attr_arr['email'], '</td>
                 <td>';
 
+        /**
+         * CIL-2188 Don't show red-circle exclamation
+         * for missing name or email attributes
+         *
         if (@$errors['no_valid_email']) {
             echo static::getIcon(
                 'fa-exclamation-circle',
@@ -1311,6 +1361,7 @@ class Content
                 'Missing valid email address.'
             );
         }
+         */
 
         echo '
                 </td>
@@ -1393,24 +1444,6 @@ class Content
               <tr>
                 <th>eduPersonOrcid:</th>
                 <td>', $attr_arr['eduPersonOrcid'], '</td>
-                <td> </td>
-              </tr>';
-        }
-
-        if (!empty($attr_arr['subject_id'])) {
-            echo '
-              <tr>
-                <th>Subject ID (subject-id):</th>
-                <td>', $attr_arr['subject_id'], '</td>
-                <td> </td>
-              </tr>';
-        }
-
-        if (!empty($attr_arr['pairwise_id'])) {
-            echo '
-              <tr>
-                <th>Pairwise ID (pairwise-id):</th>
-                <td>', $attr_arr['pairwise_id'], '</td>
                 <td> </td>
               </tr>';
         }
@@ -1576,9 +1609,9 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both ' .
-                    'REFEDS R&amp;S and SIRTFI. ' .
-                    'CILogon functionality may be limited.'
+                    'This IdP does not support both REFEDS' .
+                    'R&amp;S and SIRTFI. CILogon X.509 ' .
+                    'certificates may be unavailable.'
                 );
             }
 
@@ -1599,9 +1632,9 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both ' .
-                    'REFEDS R&amp;S and SIRTFI. ' .
-                    'CILogon functionality may be limited.'
+                    'This IdP does not support both REFEDS' .
+                    'R&amp;S and SIRTFI. CILogon X.509 ' .
+                    'certificates may be unavailable.'
                 );
             }
 

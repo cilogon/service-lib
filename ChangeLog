@@ -1,3 +1,10 @@
+7476fab 2025-02-27 CIL-2188 Don't show cert warnings with DISABLE_X509
+3eb39ec 2025-02-27 Revert REFEDS warning message
+b691f7e 2025-02-26 CIL-2190 Disable web certs and ECP certs separately
+4d4a086 2025-02-26 CIL-2188 Don't show warnings for missing name/email
+0f69120 2025-02-14 CIL-2178 If OMIT_IDP, don't send 'idp' to dbService
+d23b44e 2024-11-14 CIL-2133 Add warning about X.509 certificate retirement
+feed342 2024-10-28 Update ChangeLog
 78184b1 2024-10-23 CIL-2114 Consume SAML eduPersonOrcid
 8a7dffc 2024-04-13 Update ChangeLog
 4c579b3 2024-04-13 CIL-1968 Don't sent remote_user to dbService

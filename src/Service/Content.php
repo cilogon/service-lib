@@ -1511,7 +1511,10 @@ class Content
             'Identity Provider Attributes ' .
             (
                 // CIL-416 Show warning for missing ePPN
-                ($eduGainWithoutRandSandSIRTFI) ?
+                ($eduGainWithoutRandSandSIRTFI) &&
+                // CIL-2188 Don't show certificate related warnings
+                ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
+                ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) ?
                 static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
@@ -1612,6 +1615,9 @@ class Content
 
             if (
                 ($eduGainWithoutRandSandSIRTFI &&
+                // CIL-2188 Don't show certificate related warnings
+                ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
+                ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) &&
                 !$idplist->isREFEDSRandS($idp))
             ) {
                 echo static::getIcon(
@@ -1635,6 +1641,9 @@ class Content
 
             if (
                 ($eduGainWithoutRandSandSIRTFI &&
+                // CIL-2188 Don't show certificate related warnings
+                ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
+                ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) &&
                 !$idplist->isSIRTFI($idp))
             ) {
                 echo static::getIcon(

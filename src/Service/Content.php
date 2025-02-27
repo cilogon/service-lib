@@ -1617,9 +1617,9 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both REFEDS' .
-                    'R&amp;S and SIRTFI. CILogon X.509 ' .
-                    'certificates may be unavailable.'
+                    'This IdP does not support both ' .
+                    'REFEDS R&amp;S and SIRTFI. CILogon ' .
+                    'functionality may be limited.'
                 );
             }
 
@@ -1640,9 +1640,9 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both REFEDS' .
-                    'R&amp;S and SIRTFI. CILogon X.509 ' .
-                    'certificates may be unavailable.'
+                    'This IdP does not support both ' .
+                    'REFEDS R&amp;S and SIRTFI. CILogon ' .
+                    'functionality may be limited.'
                 );
             }
 

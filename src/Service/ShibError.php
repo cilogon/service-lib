@@ -197,7 +197,9 @@ class ShibError
         echo '
             <div class="card-body px-5">
               <div class="card-text my-2">
-                The CILogon Service has encountered a Shibboleth error.
+                ',
+                _('The CILogon Service has encountered a Shibboleth error.'), '
+
               </div> <!-- end card-text -->
         ';
 
@@ -205,8 +207,10 @@ class ShibError
 
         echo '
               <div class="card-text my-2">
-                This may be a temporary error. Please try again later, or
-                contact us at the email address at the bottom of the page.
+                ',
+                _('This may be a temporary error. Please try again later, ' .
+                ' or contact us at the email address at the bottom ' .
+                'of the page.'), '
               </div> <!-- end card-text -->
         ';
 
@@ -215,11 +219,12 @@ class ShibError
         if ((!is_null($forceauthn)) && ((int)$forceauthn == 1)) {
             echo '
               <div class="card-text my-2">
-                Note that this error may be due to your selected Identity
-                Provider (IdP) not fully supporting &quot;forced
-                reauthentication&quot;. This setting forces users to log
-                in at the IdP every time, thus bypassing Single Sign-On
-                (SSO).
+                ',
+                _('Note that this error may be due to your selected ' .
+                'Identity Provider (IdP) not fully supporting ' .
+                '&quot;forced reauthentication&quot;. This setting ' .
+                'forces users to log in at the IdP every time, thus ' .
+                'bypassing Single Sign-On (SSO).'), '
               </div> <!-- end card-text -->
             ';
         }
@@ -238,7 +243,9 @@ class ShibError
                     <div class="col-auto">
                       <a class="btn btn-primary"
                       title="Request Help"
-                      href="', $emailmsg, '">Request Help</a>
+                      href="', $emailmsg, '">',
+                      _('Request Help'),
+                      '</a>
                     </div> <!-- end col-auto -->';
         }
 
@@ -246,8 +253,8 @@ class ShibError
                     <div class="col-auto">
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      title="Proceed"
-                      value="Proceed" />
+                      title="', _('Proceed'), '"
+                      value="', _('Proceed'), '" />
                     </div> <!-- end col-auto -->
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->

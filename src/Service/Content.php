@@ -26,8 +26,12 @@ class Content
      *        "CILogon Service".
      * @param bool $csrfcookie Set the CSRF cookie. Defaults to true.
      */
-    public static function printHeader($title = 'CILogon Service', $csrfcookie = true)
+    public static function printHeader($title = '', $csrfcookie = true)
     {
+        if (strlen($title) == 0) {
+            $title = _('CILogon Service');
+        }
+
         if ($csrfcookie) {
             $csrf = Util::getCsrf();
             $csrf->setTheCookie();
@@ -167,15 +171,16 @@ class Content
     public static function printFooter()
     {
         $footertext = '
-      <p>For questions about this site, please see the <a target="_blank"
-        href="https://www.cilogon.org/faq">FAQs</a> or send email to <a
-        href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
-      <p>Know <a target="_blank"
-        href="https://www.cilogon.org/aup">your responsibilities</a>
-        for using the CILogon Service.</p>
-      <p>See <a target="_blank"
+        <p>' . _('For questions about this site, please see the <a target="_blank" ' .
+        'href="https://www.cilogon.org/faq">FAQs</a> or send email to') .
+        ' <a href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
+        <p>' . _('Know <a target="_blank"
+        href="https://www.cilogon.org/aup">your responsibilities</a> ' .
+        'for using the CILogon Service.') . '</p>
+        <p>' . _('See <a target="_blank"
         href="https://www.cilogon.org/acknowledgements">acknowledgements</a> of
-        support for this site.</p>';
+        support for this site.') . '
+        </p>';
 
         // CIL-767 Allow skin to set footer text
         $skin = Util::getSkin();
@@ -500,8 +505,8 @@ class Content
         echo '
       <div class="card text-center col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 mt-3">
         <h4 class="card-header" id="heading-selectanidp">',
-        ($useselectedidp ? 'Selected' : 'Select an'),
-        ' Identity Provider</h4>
+        ($useselectedidp ? _('Selected Identity Provider') : _('Select an Identity Provider')),
+        '</h4>
         <div class="card-body">
           <form action="', Util::getScriptDir(), '" method="post">
             <div class="form-group">
@@ -529,7 +534,7 @@ class Content
             echo '
                 <option data-divider="true" aria-label="divider"></option>';
         }
-
+// TODO: Stopped gettext stuff here
         echo '
             </select>
             <a href="#" tabindex="0" data-trigger="hover click"
@@ -595,8 +600,8 @@ class Content
                 <div class="col-auto">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
-                  title="Cancel authentication"
-                  value="Cancel" id="wayfcancelbutton" />
+                  title="', _('Cancel'), '"
+                  value="', _('Cancel'), '" id="wayfcancelbutton" />
                 </div>
             ';
         }
@@ -899,8 +904,8 @@ class Content
                 <div class="col text-center">
                   <input type="submit" name="submit"
                   class="btn btn-primary submit"
-                  title="Get New Certificate"
-                  value="Get New Certificate"
+                  title="', _('Get New Certificate'), '"
+                  value="', _('Get New Certificate'), '"
                   onclick="showHourglass(\'p12\')"/>
                   <div class="spinner-border"
                   style="width: 32px; height: 32px;"
@@ -1804,9 +1809,11 @@ class Content
      */
     public static function printLogOff()
     {
-        $logofftext = 'End your CILogon session and return to the ' .
-           'front page. Note that this will not log you out at ' .
-            Util::getSessionVar('idp_display_name') . '.';
+        $logofftext = _(
+            'End your CILogon session and return to the front ' .
+            'page. Note that this will not log you out from ' .
+            'your Identity Provider.'
+        );
 
         static::printFormHead('Log Off');
         echo '
@@ -1818,12 +1825,12 @@ class Content
         $logofftextbox = Util::getSkin()->getConfigOption('logofftextbox');
         if ((!is_null($logofftextbox)) && ((int)$logofftextbox == 1)) {
             echo '  <div class="btn btn-primary"
-                title="Exit your browser">To log off,
-                please quit your browser.</div>';
+                title="', _('Exit your browser'), '">',
+                _('To log off, please quit your browser.'), '</div>';
         } else {
             echo '  <input type="submit" name="submit"
                 class="btn btn-primary submit"
-                title="', $logofftext, '" value="Log Off" />';
+                title="', $logofftext, '" value="', _('Log Off'), '" />';
         }
 
         echo '
@@ -1873,8 +1880,8 @@ class Content
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="Proceed"
-                      title="Proceed" />
+                      value="', _('Proceed'), '"
+                      title="', _('Proceed') ,'" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -2158,8 +2165,8 @@ class Content
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="Proceed"
-                      title="Proceed" />
+                      value="', _('Proceed'), '"
+                      title="', _('Proceed'), '" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -2294,8 +2301,8 @@ class Content
                       ', $redirectform, '
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="Proceed"
-                      title="Proceed" />
+                      value="', _('Proceed'), '"
+                      title="', _('Proceed'), '" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -3157,7 +3164,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
      */
     public static function getLogOnButtonText()
     {
-        $retval = 'Log On';
+        $retval = _('Log On');
         $lobt = Util::getSkin()->getConfigOption('logonbuttontext');
         if (!is_null($lobt)) {
             $retval = (string)$lobt;

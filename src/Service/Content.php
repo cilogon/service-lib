@@ -41,7 +41,7 @@ class Content
         $poweredbyimg = '/images/poweredbycilogon.png';
         $poweredbyurl = 'https://www.cilogon.org/faq';
         $poweredbyalt = 'CILogon';
-        $poweredbytitle = 'CILogon Service';
+        $poweredbytitle = _('CILogon Service');
 
         $skin = Util::getSkin();
         $pbimg = (string)$skin->getConfigOption('poweredbyimg');
@@ -409,18 +409,21 @@ class Content
         // parameter) with the "default" IdP at the front of the list.
 
         $selecthelp = '<p>
-            CILogon facilitates secure access to CyberInfrastructure (CI).
-            In order to use the CILogon Service, you must first select
-            an identity provider. An identity provider (IdP) is an
-            organization where you have an account and can log on
-            to gain access to online services.
+            ' .
+            _('CILogon facilitates secure access to CyberInfrastructure ' .
+            '(CI). In order to use the CILogon Service, you must first ' .
+            'select an identity provider. An identity provider (IdP) ' .
+            'is an organization where you have an account and can log on ' .
+            'to gain access to online services.') . '
         </p>
         <p>
-            If you are a faculty, staff, or student member of a university
-            or college, please select it for your identity provider.
-            If your school is not listed, please contact <a
-            href=\'mailto:' . EMAIL_HELP . '\'>' . EMAIL_HELP . '</a>,
-            and we will try to add your school in the future.
+            ' .
+            _('If you are a faculty, staff, or student member of a ' .
+            'university or college, please select it for your identity ' .
+            'provider. If your school is not listed, please visit ' .
+            '<a target="blank" ' .
+            'href="https://www.cilogon.org/service/addidp">this site</a> ' .
+            'for information you can give to your local Help Desk.') . '
         </p>
         ';
         // CIL-1526 Allow skin to set selecthelp text
@@ -429,7 +432,7 @@ class Content
             $selecthelp = (string)$skinselecthelp;
         }
 
-        // Count number of OAuth2 providers for commas/"or" in help text
+        // Count number of OAuth2 providers
         $count = 0;
         if (isset($idps[$orcidoauth2])) {
             $count++;
@@ -445,44 +448,10 @@ class Content
         }
 
         if ($count > 0) {
-            $selecthelp .= '<p> If you have a ';
-
-            if (isset($idps[$orcidoauth2])) {
-                $selecthelp .= '<a target=\'_blank\' ' .
-                   'href=\'https://orcid.org/my-orcid\'>ORCID</a>';
-                if ($count > 2) {
-                    $selecthelp .= ', ';
-                } elseif ($count == 2) {
-                    $selecthelp .= ' or ';
-                }
-                $count--;
-            }
-            if (isset($idps[$googleoauth2])) {
-                $selecthelp .= '<a target=\'_blank\' ' .
-                    'href=\'https://myaccount.google.com\'>Google</a>';
-                if ($count > 2) {
-                    $selecthelp .= ', ';
-                } elseif ($count == 2) {
-                    $selecthelp .= ' or ';
-                }
-                $count--;
-            }
-            if (isset($idps[$githuboauth2])) {
-                $selecthelp .= '<a target=\'_blank\' ' .
-                    'href=\'https://github.com/settings/profile\'>GitHub</a>';
-                if ($count == 2) {
-                    $selecthelp .= ' or ';
-                }
-                $count--;
-            }
-            if (isset($idps[$microsoftoauth2])) {
-                $selecthelp .= '<a target=\'_blank\' ' .
-                    'href=\'https://account.microsoft.com\'>Microsoft</a>';
-            }
-
-            $selecthelp .= ' account, you can select it for ' .
-                'authenticating to the CILogon Service.</p>
-            ';
+            $selecthelp .= '<p>' .
+                _('If available, you can also try one of the ' .
+                '"social" identity providers such as ORCID or Google') .
+                '</p>';
         }
 
         echo '
@@ -517,7 +486,7 @@ class Content
             echo '
                 <option data-divider="true" aria-label="divider"></option>';
         }
-// TODO: Stopped gettext stuff here
+
         echo '
             </select>
             <a href="#" tabindex="0" data-trigger="hover click"
@@ -530,10 +499,10 @@ class Content
             ';
 
         if ($showremember) {
-            $rememberhelp = 'Check this box to bypass the welcome page on ' .
+            $rememberhelp = _('Check this box to bypass the welcome page on ' .
                 'subsequent visits and proceed directly to the selected ' .
                 'identity provider. You will need to clear your browser\'s ' .
-                'cookies to return here.';
+                'cookies to return here.');
             echo '
             <div class="form-group">
               <div class="form-check">
@@ -541,7 +510,7 @@ class Content
                 id="keepidp" name="keepidp" ',
                 ((strlen($keepidp) > 0) ? 'checked="checked" ' : ''), ' />
                 <label class="form-check-label"
-                for="keepidp">Remember this selection</label>
+                for="keepidp">' . _('Remember this selection') . '</label>
                 <a href="#" tabindex="0" data-trigger="hover click"
                 class="helpcursor" role="tooltip" aria-label="Remember"
                 data-toggle="popover" data-html="true"
@@ -603,10 +572,10 @@ class Content
         $ppurl = Util::getSkin()->getConfigOption('privacypolicyurl');
         echo '
         <p class="privacypolicy">
-        By selecting "', $lobtext, '", you agree to the
-        <a target="_blank" href="',
+        ', _('By logging on to this site, you agree to the'),
+        '<a target="_blank" href="',
         (is_null($ppurl) ? 'https://www.cilogon.org/privacy' : (string)$ppurl),
-        '">privacy policy</a>.
+        '">', _('privacy policy'), '</a>.
         </p>
 
           </form>
@@ -653,32 +622,32 @@ class Content
                     $disabledmsg = trim(html_entity_decode($disabledmsg));
                 }
                 if (strlen($disabledmsg) == 0) {
-                    $disabledmsg = 'Downloading PKCS12 certificates is ' .
+                    $disabledmsg = _('Downloading PKCS12 certificates is ' .
                         'restricted. Please try another method or log on ' .
-                        'with a different Identity Provider.';
+                        'with a different Identity Provider.');
                 }
             } elseif (strlen($dn) == 0) {
                 // CIL-2188 Show alternate message when missing user attributes
-                $disabledmsg = 'Certificate creation will be disabled ' .
+                $disabledmsg = _('Certificate creation will be disabled ' .
                     'June 1, 2025. See the <a target="_blank" ' .
                     'href="https://ca.cilogon.org/retirement">CILogon' .
-                    'X.509 Certificate Retirement Plan</a> for details.';
+                    'X.509 Certificate Retirement Plan</a> for details.');
             } elseif ($isEduGAINAndGetCert) {
-                $disabledmsg = 'Unable to generate a certificate. ' .
+                $disabledmsg = _('Unable to generate a certificate. ' .
                     'Your identity provider has not asserted support ' .
-                    'for "Research and Scholarship" and "SIRTFI".';
+                    'for "Research and Scholarship" and "SIRTFI".');
             }
 
             echo '<div class="alert alert-danger" role="alert">';
             echo $disabledmsg;
             echo '</div>';
         } else { // PKCS12 downloading is okay
-            $p12linktext = "Left-click this link to import the certificate " .
-                "into your broswer / operating system. (Firefox users see " .
-                "the FAQ.) Right-click this link and select 'Save As...' to " .
-                "save the certificate to your desktop.";
-            $passwordtext1 = 'Enter a password of at least 12 characters to protect your certificate.';
-            $passwordtext2 = 'Re-enter your password for verification.';
+            $p12linktext = _('Left-click this link to import the certificate ' .
+                'into your broswer / operating system. (Firefox users see ' .
+                'the FAQ.) Right-click this link and select "Save As..." to ' .
+                'save the certificate to your desktop.');
+            $passwordtext1 = _('Enter a password of at least 12 characters to protect your certificate.');
+            $passwordtext2 = _('Re-enter your password for verification.');
 
             // Get the 'p12' session variable, which contains the time until
             // the "Download Certificate" link expires concatenated with the
@@ -704,11 +673,11 @@ class Content
                 $expire = $p12expire - time();
                 $minutes = floor($expire % 3600 / 60);
                 $seconds = $expire % 60;
-                $p12expire = 'Link Expires: ' .
+                $p12expire = _('Link Expires') . ': ' .
                     sprintf("%02dm:%02ds", $minutes, $seconds);
                 $p12link = '<a class="btn btn-primary" title="' .
                     $p12linktext . '" href="' . $p12link .
-                    '">Download Your Certificate</a>';
+                    '">' . _('Download Your Certificate') . '</a>';
             } else {
                 $p12expire = '';
                 $p12link = '';
@@ -758,18 +727,15 @@ class Content
                 $p12multiplier = 1; // In hours
             }
 
-            $lifetimetext = "Certificate lifetime is between $minlifetime " .
-                "and $maxlifetime hours" .
-                (($maxlifetime > 732) ?
-                " ( = " . round(($maxlifetime / 732), 2) . " months)." : "."
-                );
+            $lifetimetext = _('Certificate lifetime range (in hours):') .
+                ' ' . $minlifetime . ' - ' . $maxlifetime;
 
             $p12error = Util::getSessionVar('p12error');
             $expandcreatecert = (int)$skin->getConfigOption('expandcreatecert');
 
             static::printCollapseBegin(
                 'gencert',
-                'Create Password-Protected Certificate',
+                _('Create Password-Protected Certificate'),
                 !($p12linkisactive || (strlen($p12error) > 0) || $expandcreatecert)
             );
 
@@ -778,14 +744,14 @@ class Content
 
             // CIL-2133 Add warning about X.509 certificate retirement
             echo '
-            <div class="alert alert-danger alert-dismissable fade show" role="alert">
-               Certificate creation will be disabled June 1, 2025.
-               See the <a target="_blank"
-               href="https://ca.cilogon.org/retirement">CILogon X.509
-               Certificate Retirement Plan</a> for details.
+            <div class="alert alert-danger alert-dismissable fade show" role="alert">',
+               _('Certificate creation will be disabled June 1, 2025. ' .
+               'See the <a target="_blank" ' .
+               'href="https://ca.cilogon.org/retirement">CILogon X.509 ' .
+               'Certificate Retirement Plan</a> for details.'), '
             </div>';
 
-            static::printFormHead('Get Certificate');
+            static::printFormHead(_('Get Certificate'));
 
             if (strlen($p12error) > 0) {
                 echo '<div class="alert alert-danger alert-dismissable fade show" role="alert">';
@@ -809,7 +775,8 @@ class Content
                   class="form-control" aria-describedby="password1help"
                   onkeyup="checkPassword()"/>
                   <div class="invalid-tooltip">
-                    Please enter a password of at least 12 characters.
+                    ',
+                    _('Please enter a password of at least 12 characters.'), '
                   </div>
                 </div>
                 <div class="col">
@@ -835,7 +802,8 @@ class Content
                   class="form-control" aria-describedby="password2help"
                   onkeyup="checkPassword()"/>
                   <div class="invalid-tooltip">
-                    Please ensure entered passwords match.
+                    ',
+                    _('Please ensure entered passwords match.'), '
                   </div>
                 </div>
                 <div class="col">
@@ -859,7 +827,8 @@ class Content
                 $maxlifetime, '" class="form-control" required="required"
                 aria-describedby="lifetime1help" />
                 <div class="invalid-tooltip">
-                  Please enter a valid lifetime for the certificate.
+                  ',
+                  _('Please enter a valid lifetime for the certificate.'), '
                 </div>
                 <small id="lifetime1help" class="form-text text-muted">',
                 $lifetimetext, '
@@ -893,7 +862,7 @@ class Content
                   <div class="spinner-border"
                   style="width: 32px; height: 32px;"
                   role="status" id="p12hourglass">
-                    <span class="sr-only">Generating...</span>
+                    <span class="sr-only">', _('Generating...'), '</span>
                   </div> <!-- spinner-border -->
                 </div>
               </div>
@@ -936,7 +905,7 @@ class Content
         }
 
         $dn = Util::getSessionVar('distinguished_name');
-        static::printCollapseBegin('certinfo', 'Certificate Information');
+        static::printCollapseBegin('certinfo', _('Certificate Information'));
         if (strlen($dn) > 0) {
             // Strip off the email address from the pseudo-DN.
             $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
@@ -946,16 +915,17 @@ class Content
                 aria-label="Certificate Information">
                 <tbody>
                   <tr>
-                    <th>Certificate Subject:</th>
+                    <th>', _('Certificate Subject:'), '</th>
                     <td>', Util::htmlent($dn), '</td>
                   </tr>
                   <tr>
-                    <th>Identity Provider:</th>
+                    <th>', _('Identity Provider:'), '</th>
                     <td>', Util::getSessionVar('idp_display_name'), '</td>
                   </tr>
                   <tr>
                     <th><a target="_blank"
-                      href="https://ca.cilogon.org/loa">Level of Assurance:</a></th>
+                      href="https://ca.cilogon.org/loa">',
+                      _('Level of Assurance:'), '</a></th>
                       <td>
             ';
 
@@ -981,14 +951,17 @@ class Content
             static::printErrorBox(
                 '
                 <div class="card-text my-2">
-                  Unable to generate a certificate. Your identity provider
-                  has not provided CILogon with all required information.
+                  ' .
+                  _('Unable to generate a certificate. Your identity ' .
+                  'provider has not provided CILogon with all required ' .
+                  'information.') . '
                 </div> <!-- end card-text -->'
             );
             $first_name   = Util::getSessionVar('first_name');
             $last_name    = Util::getSessionVar('last_name');
             $display_name = Util::getSessionVar('display_name');
             $email        = Util::getSessionVar('email');
+            $MISSING      = _('MISSING');
             echo '
                 <table class="table table-striped table-sm"
                 aria-label="Missing Attributes">
@@ -996,15 +969,15 @@ class Content
             if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
                   <tr>
-                    <th class="w-50">First Name:</th>
-                    <td>MISSING</td>
+                    <th class="w-50">', _('First Name:'), '</th>
+                    <td>', $MISSING, '</td>
                   </tr>';
             }
             if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
                   <tr>
-                    <th class="w-50">Last Name:</th>
-                    <td>MISSING</td>
+                    <th class="w-50">', _('Last Name:'), '</th>
+                    <td>', $MISSING, '</td>
                   </tr>';
             }
             if (
@@ -1013,16 +986,16 @@ class Content
             ) {
                 echo '
                   <tr>
-                    <th class="w-50">Display Name:</th>
-                    <td>MISSING</td>
+                    <th class="w-50">', _('Display Name:'), '</th>
+                    <td>', $MISSING, '</td>
                   </tr>';
             }
             $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
             if ((strlen($email) == 0) || (!$emailvalid)) {
                 echo '
                   <tr>
-                    <th class="w-50">Email Address:</th>
-                    <td>', ((strlen($email) == 0) ? 'MISSING' : 'INVALID'), '</td>
+                    <th class="w-50">', _('Email Address:'), '</th>
+                    <td>', ((strlen($email) == 0) ? $MISSING : _('INVALID')), '</td>
                   </tr>';
             }
             $idp     = Util::getSessionVar('idp');
@@ -1032,17 +1005,18 @@ class Content
                     echo '
                       <tr>
                         <th class="w-50"><a target="_blank"
-                        href="http://refeds.org/category/research-and-scholarship">Research
-                        and Scholarship</a>:</th>
-                        <td>MISSING</td>
+                        href="http://refeds.org/category/research-and-scholarship">',
+                        _('Research and Scholarship'), '</a>:</th>
+                        <td>', $MISSING, '</td>
                       </tr>';
                 }
                 if (!$idplist->isSIRTFI($idp)) {
                     echo '
                       <tr>
                         <th class="w-50"><a target="_blank"
-                        href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
-                        <td>MISSING</td>
+                        href="https://refeds.org/sirtfi">',
+                       'SIRTFI</a>:</th>
+                        <td>', $MISSING, '</td>
                       </tr>';
                 }
             }
@@ -1133,12 +1107,12 @@ class Content
 
         static::printCollapseBegin(
             'userattrs',
-            'User Attributes ' .
+            _('User Attributes') .
             (
                 ((@$warnings['no_eppn']) ? static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'Some CILogon clients (e.g., Globus) require ePPN.'
+                    ' ' . _('Some CILogon clients (e.g., Globus) require ePPN.')
                 ) : '')
             )
         );
@@ -1154,7 +1128,7 @@ class Content
         if (strlen($user_uid) > 0) {
             echo '
               <tr>
-                <th>CILogon User Identifier:</th>
+                <th>', _('CILogon User Identifier:'), '</th>
                 <td>', $user_uid, '</td>
                 <td> </td>
               </tr>';
@@ -1162,7 +1136,7 @@ class Content
 
         echo '
               <tr>
-                <th>Identity Provider (entityID):</th>
+                <th>', _('Identity Provider (entityID):'), '</th>
                 <td>', $attr_arr['idp'], '</td>
                 <td>';
 
@@ -1170,7 +1144,7 @@ class Content
             echo static::getIcon(
                 'fa-exclamation-circle',
                 'red',
-                'Missing the entityID of the IdP.'
+                _('Missing the entityID of the IdP.')
             );
         }
 
@@ -1190,7 +1164,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    'Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.'
+                    _('Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.')
                 );
             }
 
@@ -1207,13 +1181,13 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    'Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.'
+                    _('Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.')
                 );
             } elseif (@$warnings['no_eppn']) {
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'Some CILogon clients (e.g., Globus) require ePPN.'
+                    _('Some CILogon clients (e.g., Globus) require ePPN.')
                 );
             }
 
@@ -1225,7 +1199,7 @@ class Content
             if (!empty($attr_arr['subject_id'])) {
                 echo '
                   <tr>
-                    <th>Subject ID (subject-id):</th>
+                    <th>', _('Subject ID (subject-id):'), '</th>
                     <td>', $attr_arr['subject_id'], '</td>
                     <td> </td>
                   </tr>';
@@ -1234,7 +1208,7 @@ class Content
             if (!empty($attr_arr['pairwise_id'])) {
                 echo '
                   <tr>
-                    <th>Pairwise ID (pairwise-id):</th>
+                    <th>', _('Pairwise ID (pairwise-id):'), '</th>
                     <td>', $attr_arr['pairwise_id'], '</td>
                     <td> </td>
                   </tr>';
@@ -1252,7 +1226,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    'Missing the OpenID identifier.'
+                    _('Missing the OpenID identifier.')
                 );
             }
 
@@ -1265,7 +1239,7 @@ class Content
         if ((!empty($attr_arr['first_name'])) || (@$errors['no_first_name'])) {
             echo '
               <tr>
-                <th>First Name (givenName):</th>
+                <th>', _('First Name (givenName):'), '</th>
                 <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
@@ -1291,7 +1265,7 @@ class Content
         if ((!empty($attr_arr['last_name'])) || (@$errors['no_last_name'])) {
             echo '
               <tr>
-                <th>Last Name (sn):</th>
+                <th>', _('Last Name (sn):'), '</th>
                 <td>', $attr_arr['last_name'], '</td>
                 <td>';
 
@@ -1317,7 +1291,7 @@ class Content
         if ((!empty($attr_arr['display_name'])) || (@$errors['no_display_name'])) {
             echo '
               <tr>
-                <th>Display Name (displayName):</th>
+                <th>', _('Display Name (displayName):'), '</th>
                 <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
@@ -1342,7 +1316,7 @@ class Content
 
         echo '
               <tr>
-                <th>Email Address (email):</th>
+                <th>', _('Email Address (email):'), '</th>
                 <td>', $attr_arr['email'], '</td>
                 <td>';
 
@@ -1366,7 +1340,7 @@ class Content
         if (!empty($attr_arr['loa'])) {
             echo '
               <tr>
-                <th>Level of Assurance (assurance):</th>
+                <th>', _('Level of Assurance (assurance):'), '</th>
                 <td>', $attr_arr['loa'], '</td>
                 <td> </td>
               </tr>';
@@ -1393,7 +1367,7 @@ class Content
         if (!empty($attr_arr['affiliation'])) {
             echo '
               <tr>
-                <th>Affiliation (affiliation):</th>
+                <th>', _('Affiliation (affiliation):'), '</th>
                 <td>', $attr_arr['affiliation'], '</td>
                 <td> </td>
               </tr>';
@@ -1402,7 +1376,7 @@ class Content
         if (!empty($attr_arr['entitlement'])) {
             echo '
               <tr>
-                <th>Entitlement (entitlement):</th>
+                <th>', _('Entitlement (entitlement):'), '</th>
                 <td>', $attr_arr['entitlement'], '</td>
                 <td> </td>
               </tr>';
@@ -1411,7 +1385,7 @@ class Content
         if (!empty($attr_arr['ou'])) {
             echo '
               <tr>
-                <th>Organizational Unit (ou):</th>
+                <th>', _('Organizational Unit (ou):'), '</th>
                 <td>', $attr_arr['ou'], '</td>
                 <td> </td>
               </tr>';
@@ -1420,7 +1394,7 @@ class Content
         if (!empty($attr_arr['member_of'])) {
             echo '
               <tr>
-                <th>Member (member):</th>
+                <th>', _('Member (member):'), '</th>
                 <td>', $attr_arr['member_of'], '</td>
                 <td> </td>
               </tr>';
@@ -1447,7 +1421,7 @@ class Content
         if (!empty($attr_arr['preferred_username'])) {
             echo '
               <tr>
-                <th>Preferred Username:</th>
+                <th>', _('Preferred Username:'), '</th>
                 <td>', $attr_arr['preferred_username'], '</td>
                 <td> </td>
               </tr>';
@@ -1496,19 +1470,19 @@ class Content
 
         static::printCollapseBegin(
             'idpmeta',
-            'Identity Provider Attributes ' .
+            _('Identity Provider Attributes') .
             (
                 // CIL-416 Show warning for missing ePPN
                 ($eduGainWithoutRandSandSIRTFI) &&
                 // CIL-2188 Don't show certificate related warnings
                 ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
                 ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) ?
-                static::getIcon(
+                ' ' . static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both ' .
+                    _('This IdP does not support both ' .
                     'REFEDS R&amp;S and SIRTFI. CILogon ' .
-                    'functionality may be limited.'
+                    'functionality may be limited.')
                 ) : ''
             )
         );
@@ -1519,7 +1493,7 @@ class Content
             aria-label="Identity Provider Attributes">
             <tbody>
               <tr>
-                <th>Organization Name:</th>
+                <th>', _('Organization Name:'), '</th>
                 <td>', @$shibarray['Organization Name'], '</td>
                 <td>';
 
@@ -1527,8 +1501,8 @@ class Content
             echo static::getIcon(
                 'fa-exclamation-circle',
                 'red',
-                'Could not find ' .
-                '&lt;OrganizationDisplayName&gt; in metadata.'
+                _('Could not find ' .
+                '&lt;OrganizationDisplayName&gt; in metadata.')
             );
         }
 
@@ -1536,14 +1510,14 @@ class Content
                 </td>
               </tr>
               <tr>
-                <th>Home Page:</th>
+                <th>', _('Home Page:'), '</th>
                 <td><a target="_blank" href="', @$shibarray['Home Page'], '">',
                 @$shibarray['Home Page'], '</a></td>
                 <td> </td>
               </tr>
 
               <tr>
-                <th>Support Contact:</th>';
+                <th>', _('Support Contact:'), '</th>';
         if (
             (!empty(@$shibarray['Support Name'])) ||
             (!empty(@$shibarray['Support Address']))
@@ -1561,7 +1535,7 @@ class Content
         if ($samlidp) {
             echo '
               <tr>
-                <th>Technical Contact:</th>';
+                <th>', _('Technical Contact:'), '</th>';
             if (
                 (!empty(@$shibarray['Technical Name'])) ||
                 (!empty(@$shibarray['Technical Address']))
@@ -1575,7 +1549,7 @@ class Content
               </tr>
 
               <tr>
-                <th>Administrative Contact:</th>';
+                <th>', _('Administrative Contact:'), '</th>';
             if (
                 (!empty(@$shibarray['Administrative Name'])) ||
                 (!empty(@$shibarray['Administrative Address']))
@@ -1589,8 +1563,8 @@ class Content
               </tr>
 
               <tr>
-                <th>Registered by InCommon:</th>
-                <td>', ($idplist->isRegisteredByInCommon($idp) ? 'Yes' : 'No'), '</td>
+                <th>', _('Registered by InCommon:'), '</th>
+                <td>', ($idplist->isRegisteredByInCommon($idp) ? _('Yes') : _('No')), '</td>
                 <td> </td>
               </tr>
 
@@ -1598,7 +1572,7 @@ class Content
                 <th><a style="text-decoration:underline" target="_blank"
                 href="http://refeds.org/category/research-and-scholarship">REFEDS
                 R &amp; S</a>:</th>
-                <td>', ($idplist->isREFEDSRandS($idp) ? 'Yes' : 'No'), '</td>
+                <td>', ($idplist->isREFEDSRandS($idp) ? _('Yes') : _('No')), '</td>
                 <td>';
 
             if (
@@ -1611,9 +1585,9 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both ' .
+                    _('This IdP does not support both ' .
                     'REFEDS R&amp;S and SIRTFI. CILogon ' .
-                    'functionality may be limited.'
+                    'functionality may be limited.')
                 );
             }
 
@@ -1624,7 +1598,7 @@ class Content
               <tr>
                 <th><a style="text-decoration:underline" target="_blank"
                        href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
-                <td>', ($idplist->isSIRTFI($idp) ? 'Yes' : 'No'), '</td>
+                <td>', ($idplist->isSIRTFI($idp) ? _('Yes') : _('No')), '</td>
                 <td>';
 
             if (
@@ -1637,9 +1611,9 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-triangle',
                     'gold',
-                    'This IdP does not support both ' .
+                    _('This IdP does not support both ' .
                     'REFEDS R&amp;S and SIRTFI. CILogon ' .
-                    'functionality may be limited.'
+                    'functionality may be limited.')
                 );
             }
 
@@ -1648,7 +1622,7 @@ class Content
               </tr>
 
               <tr>
-                <th>Entity ID</th>
+                <th>', _('Entity ID:'), '</th>
                 <td><a style="text-decoration:underline" target="_blank"
                 href="https://met.refeds.org/met/entity/',
                 rawurlencode($idp),
@@ -1776,10 +1750,10 @@ class Content
         echo'
       <noscript>
         <div class="alert alert-danger alert-dismissible" role="alert">
-          <span><strong>Notice: </strong> JavaScript is not enabled.
-          The CILogon Service requires JavaScript for functionality.
-          <a target="_blank" href="https://enable-javascript.com/"
-          class="alert-link">Please Enable JavaScript</a>.</span>
+          <span>', _('<strong>Notice: </strong> JavaScript is not enabled. ' .
+          'The CILogon Service requires JavaScript for functionality. ' .
+          '<a target="_blank" href="https://enable-javascript.com/" ' .
+          'class="alert-link">Please Enable JavaScript</a>.'), '</span>
         </div>
       </noscript>
         ';
@@ -1798,7 +1772,7 @@ class Content
             'your Identity Provider.'
         );
 
-        static::printFormHead('Log Off');
+        static::printFormHead(_('Log Off'));
         echo '
           <div class="form-group mt-3">
             <div class="form-row align-items-center">
@@ -1838,21 +1812,21 @@ class Content
     {
         Util::unsetAllUserSessionVars();
 
-        static::printHeader('Error Logging On');
+        static::printHeader(_('Error Logging On'));
         static::printCollapseBegin(
             'attributeerror',
-            'General Error',
+            _('General Error'),
             false
         );
 
         echo '
               <div class="card-body px-5">';
 
-        static::printErrorBox('An error has occurred. This may be a temporary
-            error. Please try again later, or contact us at the the email
-            address at the bottom of the page.');
+        static::printErrorBox(_('An error has occurred. This may be a ' .
+            'temporary error. Please try again later, or contact us at ' .
+            'the the email address at the bottom of the page.'));
 
-        static::printFormHead('General Error', $redirect, 'get');
+        static::printFormHead(_('General Error'), $redirect, 'get');
 
         echo '
               <div class="card-text my-2">
@@ -1864,7 +1838,7 @@ class Content
                       <input type="submit" name="submit"
                       class="btn btn-primary submit form-control"
                       value="', _('Proceed'), '"
-                      title="', _('Proceed') ,'" />
+                      title="', _('Proceed'),'" />
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -1940,10 +1914,10 @@ class Content
     ) {
         Util::unsetAllUserSessionVars();
 
-        static::printHeader('Error Logging On');
+        static::printHeader(_('Error Logging On'));
         static::printCollapseBegin(
             'attributeerror',
-            'Attribute Release Error',
+            _('Attribute Release Error'),
             false
         );
 
@@ -1951,10 +1925,12 @@ class Content
               <div class="card-body px-5">
         ';
 
+        $MISSING = 'MISSING';
         $errorboxstr = '
                 <div class="card-text my-2">
-                  There was a problem logging on. Your identity provider
-                  has not provided CILogon with required information.
+                  ' .
+                  _('There was a problem logging on. Your identity provider ' .
+                  'has not provided CILogon with required information.') . '
                 </div> <!-- end card-text -->
                 <dl class="row">';
 
@@ -1967,22 +1943,22 @@ class Content
         ) {
             $errorboxstr .= '
                 <dt class="col-sm-3">subject-id:</dt>
-                <dd class="col-sm-9">MISSING</dd>
+                <dd class="col-sm-9">' . $MISSING . '</dd>
                 <dt class="col-sm-3">ePPN:</dt>
-                <dd class="col-sm-9">MISSING</dd>';
+                <dd class="col-sm-9">' . $MISSING . '</dd>';
             $missingattrs .= '%0D%0A    subject-id   -OR-' .
                              '%0D%0A    eduPersonPrincipalName';
         }
         if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
-                <dt class="col-sm-3">First Name:</dt>
-                <dd class="col-sm-9">MISSING</dd>';
+                <dt class="col-sm-3">' . _('First Name:') . '</dt>
+                <dd class="col-sm-9">' . $MISSING . '</dd>';
             $missingattrs .= '%0D%0A    givenName (first name)';
         }
         if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
-                <dt class="col-sm-3">Last Name:</dt>
-                <dd class="col-sm-9">MISSING</dd>';
+                <dt class="col-sm-3">' . _('Last Name:') . '</dt>
+                <dd class="col-sm-9">' . $MISSING . '</dd>';
             $missingattrs .= '%0D%0A    sn (last name)';
         }
         if (
@@ -1990,16 +1966,16 @@ class Content
             ((strlen($first_name) == 0) || (strlen($last_name) == 0))
         ) {
             $errorboxstr .= '
-                <dt class="col-sm-3">Display Name:</dt>
-                <dd class="col-sm-9">MISSING</dd>';
+                <dt class="col-sm-3">' . _('Display Name:') . '</dt>
+                <dd class="col-sm-9">' . $MISSING . '</dd>';
             $missingattrs .= '%0D%0A    displayName';
         }
         $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
         if ((strlen($email) == 0) || (!$emailvalid)) {
             $errorboxstr .= '
-                <dt class="col-sm-3">Email Address:</dt>
+                <dt class="col-sm-3">' . _('Email Address:') . '</dt>
                 <dd class="col-sm-9">' .
-            ((strlen($email) == 0) ? 'MISSING' : 'INVALID') . '</dd>';
+            ((strlen($email) == 0) ? '' . $MISSING . '' : _('INVALID')) . '</dd>';
             $missingattrs .= '%0D%0A    mail (email address)';
         }
         // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
@@ -2011,14 +1987,14 @@ class Content
                     <dt class="col-sm-3"><a target="_blank"
                     href="http://refeds.org/category/research-and-scholarship">Research
                     and Scholarship</a>:</dt>
-                    <dd class="col-sm-9">MISSING</dd>';
+                    <dd class="col-sm-9">' . $MISSING . '</dd>';
                 $missingattrs .= '%0D%0A    http://refeds.org/category/research-and-scholarship';
             }
             if (!$idplist->isSIRTFI($idp)) {
                 $errorboxstr .= '
                     <dt class="col-sm-3"><a target="_blank"
                     href="https://refeds.org/sirtfi">SIRTFI</a>:</dt>
-                    <dd class="col-sm-9">MISSING</dd>';
+                    <dd class="col-sm-9">' . $MISSING . '</dd>';
                 $missingattrs .= '%0D%0A    https://refeds.org/sirtfi';
             }
         }
@@ -2034,9 +2010,10 @@ class Content
             $student = true;
             echo '
                 <div class="card-text my-2">
-                  <strong>If you are a student</strong>
-                  you may need to ask your identity provider
-                  to release your email address.
+                  ',
+                  _('<strong>If you are a student</strong> ' .
+                  'you may need to ask your identity provider ' .
+                  'to release your email address.'), '
                 </div> <!-- end card-text -->
             ';
         }
@@ -2084,9 +2061,9 @@ class Content
                 $name = $addr;
             }
             echo '
-                  <li> Support Contact: ',
+                  <li> ', _('Support Contact:'), ' ',
                   $name, ' <a class="btn btn-primary"
-                  title="Contact Support"
+                  title="', _('Contact Support'), '"
                   href="mailto:', $addr, $emailmsg, '">',
                   $addr, '</a>
                   </li>';
@@ -2102,9 +2079,9 @@ class Content
                     $name = $addr;
                 }
                 echo '
-                      <li> Technical Contact: ',
+                      <li> ', _('Technical Contact:'), ' ',
                       $name, ' <a class="btn btn-primary"
-                      title="Contact Support"
+                      title="', _('Contact Support'), '"
                       href="mailto:', $addr, $emailmsg, '">',
                       $addr, '</a>
                       </li>';
@@ -2120,9 +2097,9 @@ class Content
                     $name = $addr;
                 }
                 echo '
-                      <li>Administrative Contact: ',
+                      <li> ', _('Administrative Contact:'), ' ',
                       $name, ' <a class="btn btn-primary"
-                      title="Contact Support"
+                      title="', _('Contact Support'), '"
                       href="mailto:', $addr, $emailmsg, '">',
                       $addr, '</a>
                       </li>';
@@ -2132,12 +2109,13 @@ class Content
         echo '
                 </ul>
                 <div class="card-text my-2">
-                  Alternatively, you can contact us at the email address
-                  at the bottom of the page.
+                  ',
+                  _('Alternatively, you can contact us at the email address ' .
+                  'at the bottom of the page.'), '
                 </div> <!-- end card-text -->
             ';
 
-        static::printFormHead('Attribute Release Error', $redirect, 'get');
+        static::printFormHead(_('Attribute Release Error'), $redirect, 'get');
 
         echo '
               <div class="card-text my-2">
@@ -2179,98 +2157,106 @@ class Content
     public static function printOAuth2AttributeReleaseErrorPage($idp_display_name, $redirect, $redirectform)
     {
         Util::unsetAllUserSessionVars();
-        static::printHeader('Error Logging On');
+        static::printHeader(_('Error Logging On'));
         static::printCollapseBegin(
             'oauth2attrerror',
-            'Error Logging On',
+            _('Error Logging On'),
             false
         );
 
         echo '
             <div class="card-body px-5">';
 
-        static::printErrorBox('There was a problem logging on.');
+        static::printErrorBox(_('There was a problem logging on.'));
 
         if ($idp_display_name == 'Google') {
             echo '
               <div class="card-text my-2">
-                There was a problem logging on. It appears that you have
-                attempted to use Google as your identity provider, but your
-                name or email address was missing. To rectify this problem,
-                go to the <a target="_blank"
-                href="https://myaccount.google.com/privacy#personalinfo">Google
-                Account Personal Information page</a>, and enter your first
-                name, last name, and email address. (All other Google
-                account information is not required by the CILogon Service.)
+                ',
+                _('There was a problem logging on. It appears that you have ' .
+                'attempted to use Google as your identity provider, but your ' .
+                'name or email address was missing. To rectify this problem, ' .
+                'go to the <a target="_blank" ' .
+                'href="https://myaccount.google.com/privacy#personalinfo">Google ' .
+                'Account Personal Information page</a>, and enter your first ' .
+                'name, last name, and email address. (All other Google ' .
+                'account information is not required by the CILogon Service.)'), '
               </div>
               <div class="card-text my-2">
-                After you have updated your Google account profile, click
-                the "Proceed" button below and attempt to log on
-                with your Google account again. If you have any questions,
-                please contact us at the email address at the bottom of the
-                page.
+                ',
+                _('After you have updated your Google account profile, click ' .
+                'the "Proceed" button below and attempt to log on ' .
+                'with your Google account again. If you have any questions, ' .
+                'please contact us at the email address at the bottom of the ' .
+                'page.'), '
               </div>';
         } elseif ($idp_display_name == 'GitHub') {
             echo '
               <div class="card-text my-2">
-                There was a problem logging on. It appears that you have
-                attempted to use GitHub as your identity provider, but your
-                name or email address was missing. To rectify this problem,
-                go to the <a target="_blank"
-                href="https://github.com/settings/profile">GitHub
-                Public Profile page</a>, and enter your name and email
-                address. (All other GitHub account information is not
-                required by the CILogon Service.)
+                ',
+                _('There was a problem logging on. It appears that you have ' .
+                'attempted to use GitHub as your identity provider, but your ' .
+                'name or email address was missing. To rectify this problem, ' .
+                'go to the <a target="_blank" ' .
+                'href="https://github.com/settings/profile">GitHub ' .
+                'Public Profile page</a>, and enter your name and email ' .
+                'address. (All other GitHub account information is not ' .
+                'required by the CILogon Service.)'), '
               </div>
               <div class="card-text my-2">
-                After you have updated your GitHub account profile, click
-                the "Proceed" button below and attempt to log on
-                with your GitHub account again. If you have any questions,
-                please contact us at the email address at the bottom of the
-                page.
+                ',
+                _('After you have updated your GitHub account profile, click ' .
+                'the "Proceed" button below and attempt to log on ' .
+                'with your GitHub account again. If you have any questions, ' .
+                'please contact us at the email address at the bottom of the ' .
+                'page.'), '
               </div>';
         } elseif ($idp_display_name == 'ORCID') {
             echo '
               <div class="card-text my-2">
-                There was a problem logging on. It appears that you have
-                attempted to use ORCID as your identity provider, but your
-                name or email address was missing. To rectify this problem,
-                go to your <a target="_blank"
-                href="https://orcid.org/my-orcid">ORCID
-                Profile page</a>, enter your name and email address, and
-                make sure they can be viewed by Everyone.
-                (All other ORCID account information is not required by
-                the CILogon Service.)
+                ',
+                _('There was a problem logging on. It appears that you have ' .
+                'attempted to use ORCID as your identity provider, but your ' .
+                'name or email address was missing. To rectify this problem, ' .
+                'go to your <a target="_blank" ' .
+                'href="https://orcid.org/my-orcid">ORCID ' .
+                'Profile page</a>, enter your name and email address, and ' .
+                'make sure they can be viewed by Everyone. ' .
+                '(All other ORCID account information is not required by ' .
+                'the CILogon Service.)'), '
               </div>
               <div class="card-text my-2">
-                After you have updated your ORCID account profile, click
-                the "Proceed" button below and attempt to log on
-                with your ORCID account again. If you have any questions,
-                please contact us at the email address at the bottom of the
-                page.
+                ',
+                _('After you have updated your ORCID account profile, click ' .
+                'the "Proceed" button below and attempt to log on ' .
+                'with your ORCID account again. If you have any questions, ' .
+                'please contact us at the email address at the bottom of the ' .
+                'page.'), '
               </div>';
         } elseif ($idp_display_name == 'Microsoft') {
             echo '
               <div class="card-text my-2">
-                There was a problem logging on. It appears that you have
-                attempted to use Microsoft as your identity provider, but your
-                name or email address was missing. To rectify this problem,
-                go to your <a target="_blank"
-                href="https://account.microsoft.com">Microsoft
-                Account page</a>, and enter your name and email address.
-                (All other Microsfot account information is not required by
-                the CILogon Service.)
+                ',
+                _('There was a problem logging on. It appears that you have ' .
+                'attempted to use Microsoft as your identity provider, but your ' .
+                'name or email address was missing. To rectify this problem, ' .
+                'go to your <a target="_blank" ' .
+                'href="https://account.microsoft.com">Microsoft ' .
+                'Account page</a>, and enter your name and email address. ' .
+                '(All other Microsfot account information is not required by ' .
+                'the CILogon Service.)'), '
               </div>
               <div class="card-text my-2">
-                After you have updated your Microsoft account profile, click
-                the "Proceed" button below and attempt to log on
-                with your Microsoft account again. If you have any questions,
-                please contact us at the email address at the bottom of the
-                page.
+                ',
+                _('After you have updated your Microsoft account profile, click ' .
+                'the "Proceed" button below and attempt to log on ' .
+                'with your Microsoft account again. If you have any questions, ' .
+                'please contact us at the email address at the bottom of the ' .
+                'page.'), '
               </div>';
         }
 
-        static::printFormHead('Attribute Release Error', $redirect, 'get');
+        static::printFormHead(_('Attribute Release Error'), $redirect, 'get');
 
         echo '
               <div class="card-text my-2">
@@ -2343,7 +2329,7 @@ class Content
                 static::redirectToGetShibUser($providerId);
             }
         } else { // IdP not in list, or no IdP selected
-            Util::setSessionVar('logonerror', 'Please select a valid IdP.');
+            Util::setSessionVar('logonerror', _('Please select a valid IdP.'));
             printLogonPage();
         }
     }
@@ -2758,7 +2744,7 @@ class Content
             // Get the authz URL and redirect
             $oauth2 = new OAuth2Provider($providerName);
             if (is_null($oauth2->provider)) {
-                Util::setSessionVar('logonerror', 'Invalid Identity Provider.');
+                Util::setSessionVar('logonerror', _('Invalid Identity Provider.'));
                 printLogonPage();
             } else {
                 $authUrl = $oauth2->provider->getAuthorizationUrl(
@@ -2917,7 +2903,7 @@ class Content
             if ((strlen($providerId) > 0) && (!isset($idps[$providerId]))) {
                 Util::setSessionVar(
                     'logonerror',
-                    'Invalid IdP selected. Please try again.'
+                    _('Invalid IdP selected. Please try again.')
                 );
                 $log->warn('Authentication attempt using non-greenlit IdP');
                 // CIL-1098 Don't send email alerts for IdP-generated errors
@@ -3043,14 +3029,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
         if (strlen($password1) < 12) {
             Util::setSessionVar(
                 'p12error',
-                'Password must have at least 12 characters.'
+                _('Password must have at least 12 characters.')
             );
             return; // SHORT PASSWORD - NO FURTHER PROCESSING NEEDED!
         }
 
         // Verify that the two password entry fields matched
         if ($password1 != $password2) {
-            Util::setSessionVar('p12error', 'Passwords did not match.');
+            Util::setSessionVar('p12error', _('Passwords did not match.'));
             return; // MISMATCHED PASSWORDS - NO FURTHER PROCESSING NEEDED!
         }
 
@@ -3114,7 +3100,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 } else { // Empty or missing usercred.p12 file - shouldn't happen!
                     Util::setSessionVar(
                         'p12error',
-                        'Error creating certificate. Please try again.'
+                        _('Error creating certificate. Please try again.')
                     );
                     Util::deleteDir($tdir); // Remove the temporary directory
                     $log->error('Error creating certificate - missing usercred.p12');
@@ -3122,14 +3108,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
             } else { // The myproxy-logon command failed - shouldn't happen!
                 Util::setSessionVar(
                     'p12error',
-                    'Error! MyProxy unable to create certificate.'
+                    _('Error! MyProxy unable to create certificate.')
                 );
                 $log->error('Error creating certificate - myproxy-logon failed');
             }
         } else { // Couldn't find the 'distinguished_name' PHP session value
             Util::setSessionVar(
                 'p12error',
-                'Cannot create certificate due to missing attributes.'
+                _('Cannot create certificate due to missing attributes.')
             );
             $log->error('Error creating certificate - missing dn session variable');
         }
@@ -3459,7 +3445,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         // Add back in any non-standard scopes
         $scopes = array_merge($scopes, $nonstandard_scopes);
 
-        static::printCollapseBegin('oidcconsent', 'Consent to Attribute Release', false);
+        static::printCollapseBegin('oidcconsent', _('Consent to Attribute Release'), false);
 
         echo '
             <div class="card-body px-5">
@@ -3467,42 +3453,43 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 <a target="_blank" href="',
                 htmlspecialchars($clientparams['client_home_url']), '">',
                 htmlspecialchars($clientparams['client_name']), '</a>',
-                ' requests access to the following information.
-                If you do not approve this request, do not proceed.
+                _(' requests access to the following information. ' .
+                'If you do not approve this request, do not proceed.'), '
               </div> <!-- end row -->
               <ul>
         ';
 
         if (array_key_exists('user_code', $clientparams)) {
-            echo '<li>User Code: <tt>' . $clientparams['user_code'] .
+            echo '<li>', _('User Code:'), ' <tt>' . $clientparams['user_code'] .
                 '</tt></li>';
         }
         if (in_array('openid', $scopes)) {
-            echo '<li>Your CILogon user identifier</li>';
+            echo '<li>', _('Your CILogon user identifier'), '</li>';
             $scopes = array_diff($scopes, ['openid']);
         }
         if (
             (in_array('profile', $scopes)) ||
             (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes))
         ) {
-            echo '<li>Your name</li>';
+            echo '<li>', _('Your name'), '</li>';
             $scopes = array_diff($scopes, ['profile']);
         }
         if (
             (in_array('email', $scopes)) ||
             (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes))
         ) {
-            echo '<li>Your email address</li>';
+            echo '<li>', _('Your email address'), '</li>';
             $scopes = array_diff($scopes, ['email']);
         }
         if (in_array('org.cilogon.userinfo', $scopes)) {
-            echo '<li>Your username and affiliation from your identity provider</li>';
+            echo '<li>', _('Your username and affiliation from your ' .
+                'identity provider'), '</li>';
             $scopes = array_diff($scopes, ['org.cilogon.userinfo']);
         }
         if (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes)) {
-            echo '<li>A certificate that allows "',
+            echo '<li>', _('A certificate that allows'), ' "',
             htmlspecialchars($clientparams['client_name']),
-            '" to act on your behalf</li>';
+            '" ', _('to act on your behalf'), '</li>';
             $scopes = array_diff($scopes, ['edu.uiuc.ncsa.myproxy.getcert']);
         }
         // Output any remaining scopes as-is
@@ -3537,109 +3524,123 @@ in "handleGotUser()" for valid IdPs for the skin.'
         Util::unsetP12SessionVars();
         Util::setSessionVar('cilogon_skin', $skin); // Re-apply the skin
 
-        static::printHeader('Logged Out of the CILogon Service');
+        static::printHeader(_('Logged Out of the CILogon Service'));
 
         Util::unsetSessionVar('cilogon_skin'); // Clear the skin
 
-        static::printCollapseBegin('logout', 'Logged Out of CILogon', false);
+        static::printCollapseBegin('logout', _('Logged Out of CILogon'), false);
 
         echo '
             <div class="card-body px-5">
               <div class="card-text my-2">
-                You have successfully logged out of CILogon.
+                ',
+                _('You have successfully logged out of CILogon.'), '
               </div> <!-- end card-text -->
         ';
+
+        $LogOutFromIdP = 'Log out from Identity Provider';
 
         if ($idp == Util::getOAuth2Url('Google')) {
             echo '
               <div class="card-text my-2">
-                You can optionally click the link below to log out of Google.
-                However, this will log you out from ALL of your Google accounts.
-                Any current Google sessions in other tabs/windows may be invalidated.
+                ',
+                _('You can optionally click the link below to log out of Google. ' .
+                'However, this will log you out from ALL of your Google accounts. ' .
+                'Any current Google sessions in other tabs/windows may be invalidated.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="Log out from Identity Provider"
-                  href="https://accounts.google.com/Logout">(Optional)
-                  Log out from Google</a>
+                  title="', $LogOutFromIdP, '"
+                  href="https://accounts.google.com/Logout">',
+                  _('(Optional) Log out from Google'), '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
         } elseif ($idp == Util::getOAuth2Url('GitHub')) {
             echo '
               <div class="card-text my-2">
-                You can optionally click the link below to log out of GitHub.
+                ',
+                _('You can optionally click the link below to log out of GitHub.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="Log out from Identity Provider"
-                  href="https://github.com/logout">(Optional) Log out from GitHub</a>
+                  title="', $LogOutFromIdP, '"
+                  href="https://github.com/logout">',
+                  _('(Optional) Log out from GitHub'), '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
         } elseif ($idp == Util::getOAuth2Url('ORCID')) {
             echo '
               <div class="card-text my-2">
-                You can optionally click the link below to log out of ORCID.
-                Note that ORCID will redirect you to the ORCID Sign In page.
-                You can ignore this as your authentication session with ORCID
-                will have been cleared first.
+                ',
+                _('You can optionally click the link below to log out of ORCID. ' .
+                'Note that ORCID will redirect you to the ORCID Sign In page. ' .
+                'You can ignore this as your authentication session with ORCID ' .
+                'will have been cleared first.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="Log out from Identity Provider"
-                  href="https://orcid.org/signout">(Optional) Log out from ORCID</a>
+                  title="', $LogOutFromIdP, '"
+                  href="https://orcid.org/signout">',
+                  _('(Optional) Log out from ORCID'), '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
         } elseif ($idp == Util::getOAuth2Url('Microsoft')) {
             echo '
               <div class="card-text my-2">
-                You can optionally click the link below to log out of Microsoft.
-                However, this will log you out from ALL of your Microsoft accounts.
-                Any current Microsoft sessions in other tabs/windows may be invalidated.
+                ',
+                _('You can optionally click the link below to log out of Microsoft.' .
+                'However, this will log you out from ALL of your Microsoft accounts.' .
+                'Any current Microsoft sessions in other tabs/windows may be ' .
+                'invalidated.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="Log out from Identity Provider"
-                  href="https://login.microsoftonline.com/common/oauth2/v2.0/logout">(Optional)
-                  Log out from Microsoft</a>
+                  title="', $LogOutFromIdP, '"
+                  href="https://login.microsoftonline.com/common/oauth2/v2.0/logout">',
+                  _('(Optional) Log out from Microsoft'), '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
             ';
         } elseif (!empty($idp)) {
             if (empty($idp_display_name)) {
-                $idp_display_name = 'your Identity Provider';
+                $idp_display_name = _('your Identity Provider');
             }
             $idplist = Util::getIdpList();
             $logout = $idplist->getLogout($idp);
             if (empty($logout)) {
                 echo '
               <div class="card-text my-2">
-                You may still be logged in to ', $idp_display_name, '.
-                Close your web browser or <a target="_blank"
+                ',
+                _('You may still be logged in to '), $idp_display_name,
+                '. ', _('Close your web browser or <a target="_blank"
                 href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear
-                your cookies</a> to clear your authentication session.
+                your cookies</a> to clear your authentication session.'), '
               </div>
               ';
             } else {
                 echo '
               <div class="card-text my-2">
-                You can optionally click the link below to log out of ', $idp_display_name, '.
-                Note that some Identity Providers do not support log out. If you
-                receive an error, close your web browser or <a target="_blank"
-                href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear
-                your cookies</a> to clear your authentication session.
+                ',
+                _('You can optionally click the link below to log out of'),
+                ' ', $idp_display_name, '. ',
+                _('Note that some Identity Providers do not support log out. If you ' .
+                'receive an error, close your web browser or <a target="_blank" ' .
+                'href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear ' .
+                'your cookies</a> to clear your authentication session.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="Log out from Identity Provider"
-                  href="', $logout, '">(Optional) Log out from ', $idp_display_name, '</a>
+                  title="', $LogOutFromIdP, '"
+                  href="', $logout, '">',
+                  _('(Optional) Log out from'), ' ', $idp_display_name, '</a>
                 </div> <!-- end col-auto -->
               </div> <!-- end row align-items-center -->
               ';

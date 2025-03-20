@@ -961,7 +961,6 @@ class Content
             $last_name    = Util::getSessionVar('last_name');
             $display_name = Util::getSessionVar('display_name');
             $email        = Util::getSessionVar('email');
-            $MISSING      = _('MISSING');
             echo '
                 <table class="table table-striped table-sm"
                 aria-label="Missing Attributes">
@@ -970,14 +969,14 @@ class Content
                 echo '
                   <tr>
                     <th class="w-50">', _('First Name:'), '</th>
-                    <td>', $MISSING, '</td>
+                    <td>', _('MISSING'), '</td>
                   </tr>';
             }
             if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
                   <tr>
                     <th class="w-50">', _('Last Name:'), '</th>
-                    <td>', $MISSING, '</td>
+                    <td>', _('MISSING'), '</td>
                   </tr>';
             }
             if (
@@ -987,7 +986,7 @@ class Content
                 echo '
                   <tr>
                     <th class="w-50">', _('Display Name:'), '</th>
-                    <td>', $MISSING, '</td>
+                    <td>', _('MISSING'), '</td>
                   </tr>';
             }
             $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -995,7 +994,7 @@ class Content
                 echo '
                   <tr>
                     <th class="w-50">', _('Email Address:'), '</th>
-                    <td>', ((strlen($email) == 0) ? $MISSING : _('INVALID')), '</td>
+                    <td>', ((strlen($email) == 0) ? _('MISSING') : _('INVALID')), '</td>
                   </tr>';
             }
             $idp     = Util::getSessionVar('idp');
@@ -1007,7 +1006,7 @@ class Content
                         <th class="w-50"><a target="_blank"
                         href="http://refeds.org/category/research-and-scholarship">',
                         _('Research and Scholarship'), '</a>:</th>
-                        <td>', $MISSING, '</td>
+                        <td>', _('MISSING'), '</td>
                       </tr>';
                 }
                 if (!$idplist->isSIRTFI($idp)) {
@@ -1016,7 +1015,7 @@ class Content
                         <th class="w-50"><a target="_blank"
                         href="https://refeds.org/sirtfi">',
                        'SIRTFI</a>:</th>
-                        <td>', $MISSING, '</td>
+                        <td>', _('MISSING'), '</td>
                       </tr>';
                 }
             }
@@ -1925,7 +1924,6 @@ class Content
               <div class="card-body px-5">
         ';
 
-        $MISSING = 'MISSING';
         $errorboxstr = '
                 <div class="card-text my-2">
                   ' .
@@ -1943,22 +1941,22 @@ class Content
         ) {
             $errorboxstr .= '
                 <dt class="col-sm-3">subject-id:</dt>
-                <dd class="col-sm-9">' . $MISSING . '</dd>
+                <dd class="col-sm-9">' . _('MISSING') . '</dd>
                 <dt class="col-sm-3">ePPN:</dt>
-                <dd class="col-sm-9">' . $MISSING . '</dd>';
+                <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    subject-id   -OR-' .
                              '%0D%0A    eduPersonPrincipalName';
         }
         if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
                 <dt class="col-sm-3">' . _('First Name:') . '</dt>
-                <dd class="col-sm-9">' . $MISSING . '</dd>';
+                <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    givenName (first name)';
         }
         if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
                 <dt class="col-sm-3">' . _('Last Name:') . '</dt>
-                <dd class="col-sm-9">' . $MISSING . '</dd>';
+                <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    sn (last name)';
         }
         if (
@@ -1967,7 +1965,7 @@ class Content
         ) {
             $errorboxstr .= '
                 <dt class="col-sm-3">' . _('Display Name:') . '</dt>
-                <dd class="col-sm-9">' . $MISSING . '</dd>';
+                <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    displayName';
         }
         $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -1975,7 +1973,7 @@ class Content
             $errorboxstr .= '
                 <dt class="col-sm-3">' . _('Email Address:') . '</dt>
                 <dd class="col-sm-9">' .
-            ((strlen($email) == 0) ? '' . $MISSING . '' : _('INVALID')) . '</dd>';
+            ((strlen($email) == 0) ? '' . _('MISSING') . '' : _('INVALID')) . '</dd>';
             $missingattrs .= '%0D%0A    mail (email address)';
         }
         // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
@@ -1987,14 +1985,14 @@ class Content
                     <dt class="col-sm-3"><a target="_blank"
                     href="http://refeds.org/category/research-and-scholarship">Research
                     and Scholarship</a>:</dt>
-                    <dd class="col-sm-9">' . $MISSING . '</dd>';
+                    <dd class="col-sm-9">' . _('MISSING') . '</dd>';
                 $missingattrs .= '%0D%0A    http://refeds.org/category/research-and-scholarship';
             }
             if (!$idplist->isSIRTFI($idp)) {
                 $errorboxstr .= '
                     <dt class="col-sm-3"><a target="_blank"
                     href="https://refeds.org/sirtfi">SIRTFI</a>:</dt>
-                    <dd class="col-sm-9">' . $MISSING . '</dd>';
+                    <dd class="col-sm-9">' . _('MISSING') . '</dd>';
                 $missingattrs .= '%0D%0A    https://refeds.org/sirtfi';
             }
         }
@@ -3538,8 +3536,6 @@ in "handleGotUser()" for valid IdPs for the skin.'
               </div> <!-- end card-text -->
         ';
 
-        $LogOutFromIdP = 'Log out from Identity Provider';
-
         if ($idp == Util::getOAuth2Url('Google')) {
             echo '
               <div class="card-text my-2">
@@ -3551,7 +3547,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="', $LogOutFromIdP, '"
+                  title="', _('Log out from Identity Provider'), '"
                   href="https://accounts.google.com/Logout">',
                   _('(Optional) Log out from Google'), '</a>
                 </div> <!-- end col-auto -->
@@ -3566,7 +3562,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="', $LogOutFromIdP, '"
+                  title="', _('Log out from Identity Provider'), '"
                   href="https://github.com/logout">',
                   _('(Optional) Log out from GitHub'), '</a>
                 </div> <!-- end col-auto -->
@@ -3584,7 +3580,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="', $LogOutFromIdP, '"
+                  title="', _('Log out from Identity Provider'), '"
                   href="https://orcid.org/signout">',
                   _('(Optional) Log out from ORCID'), '</a>
                 </div> <!-- end col-auto -->
@@ -3602,7 +3598,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="', $LogOutFromIdP, '"
+                  title="', _('Log out from Identity Provider'), '"
                   href="https://login.microsoftonline.com/common/oauth2/v2.0/logout">',
                   _('(Optional) Log out from Microsoft'), '</a>
                 </div> <!-- end col-auto -->
@@ -3638,7 +3634,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">
                   <a class="btn btn-primary"
-                  title="', $LogOutFromIdP, '"
+                  title="', _('Log out from Identity Provider'), '"
                   href="', $logout, '">',
                   _('(Optional) Log out from'), ' ', $idp_display_name, '</a>
                 </div> <!-- end col-auto -->

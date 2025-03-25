@@ -131,7 +131,8 @@ class Content
             echo '
       <div class="alert alert-secondary alert-dismissible fade show" role="alert">
       ', $skinbanner, '
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <button type="button" class="close" data-dismiss="alert"
+          aria-label="', _('Close') , '">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -142,7 +143,8 @@ class Content
             echo '
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
       ', BANNER_TEXT, '
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <button type="button" class="close" data-dismiss="alert"
+          aria-label="', _('Close') ,'">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -163,12 +165,12 @@ class Content
         <p>' . _('For questions about this site, please see the <a target="_blank" ' .
         'href="https://www.cilogon.org/faq">FAQs</a> or send email to') .
         ' <a href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
-        <p>' . _('Know <a target="_blank"
-        href="https://www.cilogon.org/aup">your responsibilities</a> ' .
+        <p>' . _('Know <a target="_blank" ' .
+        'href="https://www.cilogon.org/aup">your responsibilities</a> ' .
         'for using the CILogon Service.') . '</p>
-        <p>' . _('See <a target="_blank"
-        href="https://www.cilogon.org/acknowledgements">acknowledgements</a> of
-        support for this site.') . '
+        <p>' . _('See <a target="_blank" ' .
+        'href="https://www.cilogon.org/acknowledgements">acknowledgements</a> of ' .
+        'support for this site.') . '
         </p>';
 
         // CIL-767 Allow skin to set footer text
@@ -450,7 +452,7 @@ class Content
         if ($count > 0) {
             $selecthelp .= '<p>' .
                 _('If available, you can also try one of the ' .
-                '"social" identity providers such as ORCID or Google') .
+                '"social" identity providers such as ORCID or Google.') .
                 '</p>';
         }
 
@@ -463,7 +465,7 @@ class Content
           <form action="', Util::getScriptDir(), '" method="post">
             <div class="form-group">
             <select name="providerId" id="providerId"
-                aria-label="Select an Identity Provider"
+                aria-label="' , _('Select an Identity Provider'), '"
                 autofocus="autofocus"
                 class="selectpicker mw-100"
                 data-size="20" data-width="fit"
@@ -484,13 +486,13 @@ class Content
         }
         if ($idpcount > 1) {
             echo '
-                <option data-divider="true" aria-label="divider"></option>';
+                <option data-divider="true" aria-label="', _('divider'), '"></option>';
         }
 
         echo '
             </select>
             <a href="#" tabindex="0" data-trigger="hover click"
-            class="helpcursor" role="tooltip" aria-label="Selection"
+            class="helpcursor" role="tooltip" aria-label="', _('Selection') ,'"
             data-toggle="popover" data-html="true"
             title="Selecting an Identity Provider"
             data-content="', $selecthelp, '"><i class="fa
@@ -512,7 +514,7 @@ class Content
                 <label class="form-check-label"
                 for="keepidp">' . _('Remember this selection') . '</label>
                 <a href="#" tabindex="0" data-trigger="hover click"
-                class="helpcursor" role="tooltip" aria-label="Remember"
+                class="helpcursor" role="tooltip" aria-label="', _('Remember'), '"
                 data-toggle="popover" data-html="true"
                 data-content="', $rememberhelp, '"><i class="fa
                 fa-question-circle"></i></a>
@@ -758,7 +760,7 @@ class Content
                 echo $p12error;
                 echo '
                       <button type="button" class="close" data-dismiss="alert"
-                      aria-label="Close"><span aria-hidden="true">&times;</span>
+                      aria-label="', _('Close'), '"><span aria-hidden="true">&times;</span>
                       </button>
                   </div>';
                 Util::unsetSessionVar('p12error');
@@ -912,7 +914,7 @@ class Content
             echo '
               <div class="card-body">
                 <table class="table table-striped table-sm"
-                aria-label="Certificate Information">
+                aria-label="', _('Certificate Information'), '">
                 <tbody>
                   <tr>
                     <th>', _('Certificate Subject:'), '</th>
@@ -963,7 +965,7 @@ class Content
             $email        = Util::getSessionVar('email');
             echo '
                 <table class="table table-striped table-sm"
-                aria-label="Missing Attributes">
+                aria-label="', _('Missing Attributes'), '">
                 <tbody>';
             if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
                 echo '
@@ -1119,7 +1121,7 @@ class Content
         echo '
           <div class="card-body">
             <table class="table table-striped table-sm"
-            aria-label="User Attributes">
+            aria-label="', _('User Attributes'), '">
             <tbody>';
 
         // CIL-781 Show CILogon User Identifier (user_uid) when logged in
@@ -1489,7 +1491,7 @@ class Content
         echo'
           <div class="card-body">
             <table class="table table-striped table-sm"
-            aria-label="Identity Provider Attributes">
+            aria-label="', _('Identity Provider Attributes'), '">
             <tbody>
               <tr>
                 <th>', _('Organization Name:'), '</th>
@@ -3615,9 +3617,9 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="card-text my-2">
                 ',
                 _('You may still be logged in to '), $idp_display_name,
-                '. ', _('Close your web browser or <a target="_blank"
-                href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear
-                your cookies</a> to clear your authentication session.'), '
+                '. ', _('Close your web browser or <a target="_blank" ' .
+                'href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear ' .
+                'your cookies</a> to clear your authentication session.'), '
               </div>
               ';
             } else {

@@ -2337,4 +2337,55 @@ Remote Address= ' . $remoteaddr . '
         }
         return $retval;
     }
+
+    public static function setLang()
+    {
+        // Check if skin option <languages> has been configured. If not, then
+        // there's no need to set a language since gettext calls such as
+        // _() will simply output the text in the function call when text
+        // domain is not set.
+        $skin = static::getSkin();
+        $languages = $skin->getConfigOption('languages');
+        if ((is_null($languages)) || (empty($languages->lang))) {
+            return; // No languages configured
+        }
+
+        // If we made it here, then we need to set a locale.
+        // Check if the 'lang' cookie has been set. If so, verify
+        // the cookie is one of the configured languages.
+        $langcookie = static::getCookieVar('lang');
+        $langcookieverified = false;
+        if (strlen($langcookie) > 0) {
+            foreach ($languages->lang as $availlang) {
+                if ($langcookie == ((string)$availlang)) {
+                    $langcookieverified = true;
+                    break;
+                }
+            }
+        }
+
+        // If langcookie not set or not one of the configured languages,
+        // set it to the default language, or the first configured language
+        // if default language was not configured.
+        if (!$langcookieverified) {
+            $defaultlanguage = $skin->getConfigOption('defaultlanguage');
+            if (is_null($defaultlanguage)) {
+                $languages->rewind();
+                $defaultlanguage = $languages->current();
+            }
+            $langcookie = (string)$defaultlanguage;
+            static::setCookie('lang', $langcookie);
+        }
+
+        // Set the language domain - Need to install locales in Docker image
+        if (setlocale(LC_ALL, $langcookie) !== false) {
+            putenv('LC_ALL=' . $langcookie);
+            bindtextdomain('cilogon', static::getServerVar('DOCUMENT_ROOT') . '/locale');
+            bind_textdomain_codeset('cilogon', 'UTF-8');
+            textdomain('cilogon');
+        }
+
+        // Maybe need to put all available languages in a cookie so that
+        // JavaScript can populate a pop-up menu.
+    }
 }

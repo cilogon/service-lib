@@ -162,16 +162,17 @@ class Content
     public static function printFooter()
     {
         $footertext = '
-        <p>' . _('For questions about this site, please see the <a target="_blank" ' .
-        'href="https://www.cilogon.org/faq">FAQs</a> or send email to') .
+        <p>' . _('For questions about this site, please see the') .
+        ' <a target="_blank" href="https://www.cilogon.org/faq">FAQs</a> ' .
+        _('or send email to') .
         ' <a href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
-        <p>' . _('Know <a target="_blank" ' .
-        'href="https://www.cilogon.org/aup">your responsibilities</a> ' .
-        'for using the CILogon Service.') . '</p>
-        <p>' . _('See <a target="_blank" ' .
-        'href="https://www.cilogon.org/acknowledgements">acknowledgements</a> of ' .
-        'support for this site.') . '
-        </p>';
+        <p>' . _('When using the CILogon Service, be aware of') . '
+        <a target="_blank" ' .
+        'href="https://www.cilogon.org/aup">' .
+        _('your responsibilities') .
+        '</a>.</p>
+        <p><a target="_blank" href="https://www.cilogon.org/acknowledgements">'  .
+        _('Acknowledgements of support') . '</a> for this site.</p>';
 
         // CIL-767 Allow skin to set footer text
         $skin = Util::getSkin();
@@ -422,10 +423,11 @@ class Content
             ' .
             _('If you are a faculty, staff, or student member of a ' .
             'university or college, please select it for your identity ' .
-            'provider. If your school is not listed, please visit ' .
-            '<a target="blank" ' .
-            'href="https://www.cilogon.org/service/addidp">this site</a> ' .
-            'for information you can give to your local Help Desk.') . '
+            'provider. If your school is not listed, please contact ' .
+            'your local Help Desk and ask them to') .
+            ' <a target="blank" href="https://www.cilogon.org/service/addidp">' .
+            _('add their Identity Provider') . '</a>.' .
+            '
         </p>
         ';
         // CIL-1526 Allow skin to set selecthelp text
@@ -631,9 +633,9 @@ class Content
             } elseif (strlen($dn) == 0) {
                 // CIL-2188 Show alternate message when missing user attributes
                 $disabledmsg = _('Certificate creation will be disabled ' .
-                    'June 1, 2025. See the <a target="_blank" ' .
-                    'href="https://ca.cilogon.org/retirement">CILogon' .
-                    'X.509 Certificate Retirement Plan</a> for details.');
+                    'June 1, 2025. For details, see') .
+                    ' <a target="_blank" href="https://ca.cilogon.org/retirement">' .
+                    _('CILogon X.509 Certificate Retirement Plan') . '</a>.';
             } elseif ($isEduGAINAndGetCert) {
                 $disabledmsg = _('Unable to generate a certificate. ' .
                     'Your identity provider has not asserted support ' .
@@ -747,10 +749,9 @@ class Content
             // CIL-2133 Add warning about X.509 certificate retirement
             echo '
             <div class="alert alert-danger alert-dismissable fade show" role="alert">',
-               _('Certificate creation will be disabled June 1, 2025. ' .
-               'See the <a target="_blank" ' .
-               'href="https://ca.cilogon.org/retirement">CILogon X.509 ' .
-               'Certificate Retirement Plan</a> for details.'), '
+               _('Certificate creation will be disabled June 1, 2025. For details, see'),
+               ' <a target="_blank" href="https://ca.cilogon.org/retirement">',
+               _('CILogon X.509 Certificate Retirement Plan'), '</a>.
             </div>';
 
             static::printFormHead(_('Get Certificate'));
@@ -1751,10 +1752,11 @@ class Content
         echo'
       <noscript>
         <div class="alert alert-danger alert-dismissible" role="alert">
-          <span>', _('<strong>Notice: </strong> JavaScript is not enabled. ' .
-          'The CILogon Service requires JavaScript for functionality. ' .
-          '<a target="_blank" href="https://enable-javascript.com/" ' .
-          'class="alert-link">Please Enable JavaScript</a>.'), '</span>
+          <span>', _('Notice: JavaScript is not enabled. ' .
+          'The CILogon Service requires JavaScript for functionality.'),
+          ' <a target="_blank" href="https://enable-javascript.com/" ',
+          'class="alert-link">', _('Please Enable JavaScript'), '</a>.
+          </span>
         </div>
       </noscript>
         ';
@@ -2011,7 +2013,7 @@ class Content
             echo '
                 <div class="card-text my-2">
                   ',
-                  _('<strong>If you are a student</strong> ' .
+                  _('If you are a student, ' .
                   'you may need to ask your identity provider ' .
                   'to release your email address.'), '
                 </div> <!-- end card-text -->
@@ -2176,11 +2178,12 @@ class Content
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use Google as your identity provider, but your ' .
                 'name or email address was missing. To rectify this problem, ' .
-                'go to the <a target="_blank" ' .
-                'href="https://myaccount.google.com/privacy#personalinfo">Google ' .
-                'Account Personal Information page</a>, and enter your first ' .
-                'name, last name, and email address. (All other Google ' .
-                'account information is not required by the CILogon Service.)'), '
+                'go to'),
+                ' <a target="_blank" href="https://myaccount.google.com/personal-info">',
+                _('Google\'s Personal Info page'), '</a> ',
+                _('and enter your first name, last name, and email address. ' .
+                ' (All other Google account information is not required by ' .
+                'the CILogon Service.)'), '
               </div>
               <div class="card-text my-2">
                 ',
@@ -2197,11 +2200,12 @@ class Content
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use GitHub as your identity provider, but your ' .
                 'name or email address was missing. To rectify this problem, ' .
-                'go to the <a target="_blank" ' .
-                'href="https://github.com/settings/profile">GitHub ' .
-                'Public Profile page</a>, and enter your name and email ' .
-                'address. (All other GitHub account information is not ' .
-                'required by the CILogon Service.)'), '
+                'go to'),
+                ' <a target="_blank" href="https://github.com/settings/profile">',
+                _('GitHub\'s Public Profile page') , '</a>, ',
+                _('and enter your name and email address. ' .
+                '(All other GitHub account information is not required by ' .
+                'the CILogon Service.)'), '
               </div>
               <div class="card-text my-2">
                 ',
@@ -2218,9 +2222,10 @@ class Content
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use ORCID as your identity provider, but your ' .
                 'name or email address was missing. To rectify this problem, ' .
-                'go to your <a target="_blank" ' .
-                'href="https://orcid.org/my-orcid">ORCID ' .
-                'Profile page</a>, enter your name and email address, and ' .
+                'go to'),
+                ' <a target="_blank" href="https://orcid.org/my-orcid">',
+                _('ORCID\'s Profile page'), '</a>, ',
+                _('enter your name and email address, and ' .
                 'make sure they can be viewed by Everyone. ' .
                 '(All other ORCID account information is not required by ' .
                 'the CILogon Service.)'), '
@@ -2240,9 +2245,10 @@ class Content
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use Microsoft as your identity provider, but your ' .
                 'name or email address was missing. To rectify this problem, ' .
-                'go to your <a target="_blank" ' .
-                'href="https://account.microsoft.com">Microsoft ' .
-                'Account page</a>, and enter your name and email address. ' .
+                'go to'),
+                ' <a target="_blank" href="https://account.microsoft.com">',
+                _('Microsoft\'s Account page'), '</a>, ',
+                _('and enter your name and email address. ' .
                 '(All other Microsfot account information is not required by ' .
                 'the CILogon Service.)'), '
               </div>
@@ -3617,9 +3623,11 @@ in "handleGotUser()" for valid IdPs for the skin.'
               <div class="card-text my-2">
                 ',
                 _('You may still be logged in to '), $idp_display_name,
-                '. ', _('Close your web browser or <a target="_blank" ' .
-                'href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear ' .
-                'your cookies</a> to clear your authentication session.'), '
+                '. ', _('Close your web browser or'),
+                ' <a target="_blank" ' .
+                'href="https://www.lifewire.com/how-to-delete-cookies-2617981">',
+                _('clear your cookies'), '</a> ',
+                _('to clear your authentication session.'), '
               </div>
               ';
             } else {
@@ -3629,9 +3637,11 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 _('You can optionally click the link below to log out of'),
                 ' ', $idp_display_name, '. ',
                 _('Note that some Identity Providers do not support log out. If you ' .
-                'receive an error, close your web browser or <a target="_blank" ' .
-                'href="https://www.lifewire.com/how-to-delete-cookies-2617981">clear ' .
-                'your cookies</a> to clear your authentication session.'), '
+                'receive an error, close your web browser or'),
+                ' <a target="_blank" ' .
+                'href="https://www.lifewire.com/how-to-delete-cookies-2617981">',
+                _('clear your cookies'), '</a> ',
+                _('to clear your authentication session.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">

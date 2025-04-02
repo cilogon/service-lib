@@ -1,9 +1,7 @@
 # Library for the CILogon Service
 
 [![License](https://img.shields.io/badge/license-NCSA-brightgreen.svg)](https://github.com/cilogon/service-lib/master/LICENSE)
-[![Travis](https://img.shields.io/travis/cilogon/service-lib/master.svg)](https://travis-ci.org/cilogon/service-lib)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/cilogon/service-lib/master.svg)](https://scrutinizer-ci.com/g/cilogon/service-lib/)
-[![Coveralls](https://img.shields.io/coveralls/cilogon/service-lib/master.svg)](https://coveralls.io/github/cilogon/service-lib?branch=master)
 
 This package contains the library used by the [CILogon Service](https://github.com/cilogon/service).
 
@@ -18,12 +16,10 @@ a patch via pull request.
 
 The following versions of PHP are supported.
 
-* PHP 7.1
-* PHP 7.2
-* PHP 7.3
-* PHP 7.4
 * PHP 8.0
 * PHP 8.1
+* PHP 8.2
+* PHP 8.3
 
 ## Installation
 

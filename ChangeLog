@@ -1,3 +1,6 @@
+7ce0dfd 2025-04-02 Update README and LICENSE files
+0a188d3 2025-03-19 CIL-2213 Host CSS/JavaScript files on cilogon.org
+fb8b80c 2025-02-27 Update ChangeLog
 7476fab 2025-02-27 CIL-2188 Don't show cert warnings with DISABLE_X509
 3eb39ec 2025-02-27 Revert REFEDS warning message
 b691f7e 2025-02-26 CIL-2190 Disable web certs and ECP certs separately

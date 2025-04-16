@@ -1269,6 +1269,13 @@ EOT;
         $shibarray['Identity Provider'] = $entityID;
         $shibarray['User Identifier'] = Util::getServerVar('REMOTE_USER');
         $shibarray['ePPN'] = Util::getServerVar('HTTP_EPPN');
+        // CIL-2222 - DoE OneID does not assert the EPPN SAML attribute.
+        // Instead, it asserts non-standard edu_person_principal_name.
+        // If present, use it as EPPN.
+        $edu_person_principal_name = Util::getServerVar('HTTP_EDU_PERSON_PRINCIPAL_NAME');
+        if (strlen($edu_person_principal_name) > 0) {
+            $shibarray['ePPN'] = $edu_person_principal_name;
+        }
         $shibarray['ePTID'] = Util::getServerVar('HTTP_PERSISTENT_ID');
         $shibarray['First Name'] = Util::getServerVar('HTTP_GIVENNAME');
         $shibarray['Last Name'] = Util::getServerVar('HTTP_SN');

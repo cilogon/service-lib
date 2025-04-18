@@ -77,6 +77,7 @@ class DBService
         'STATUS_USER_UPDATED'              => 0x4,
         'STATUS_USER_NOT_FOUND'            => 0x6,
         'STATUS_USER_EXISTS'               => 0x8,
+        'STATUS_IDP_UPDATED'               => 0xA,     //      10
         'STATUS_USER_EXISTS_ERROR'         => 0xFFFA1, // 1048481
         'STATUS_USER_NOT_FOUND_ERROR'      => 0xFFFA3, // 1048483
         'STATUS_TRANSACTION_NOT_FOUND'     => 0xFFFA5, // 1048485
@@ -119,6 +120,7 @@ class DBService
         'STATUS_USER_NOT_FOUND'            => 'User not found.',
         'STATUS_USER_EXISTS'               => 'User exists.',
         'STATUS_USER_EXISTS_ERROR'         => 'User already exists.',
+        'STATUS_IDP_UPDATED'               => 'User IdP entityID updated.',
         'STATUS_USER_NOT_FOUND_ERROR'      => 'User not found.',
         'STATUS_TRANSACTION_NOT_FOUND'     => 'Transaction not found.',
         'STATUS_IDP_SAVE_FAILED'           => 'Could not save IdPs.',

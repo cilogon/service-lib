@@ -2847,7 +2847,7 @@ class Content
             ($oauth1withoutdn)          // OAuth1.0a needs DN for cert
         ) {
             $log->error(
-                'Failed to getuser' .
+                '=DBS= Failed to getuser' .
                 ($isEduGAINAndGetCert ? ' due to eduGAIN IdP restriction.' : '.') .
                 ' status="' . DBService::statusToStatusText($status) . '"' .
                 ' user_uid="' .
@@ -2956,7 +2956,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         // Log new users with possibly empty distinguished_name values
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
             $dn = Util::getSessionVar('distinguished_name');
-            $log->info('New User' . ((strlen($dn) == 0) ? ' without a distinguished_name.' : '.'));
+            $log->info('=DBS= New user created' . ((strlen($dn) == 0) ? ' without a distinguished_name.' : '.'));
             // If HTML entities are in the distinguished_name, send an alert.
             if (
                 (strlen($dn) > 0) &&
@@ -2977,7 +2977,9 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 }
             }
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {
-            $log->info('User IdP attributes changed.');
+            $log->info('=DBS= User data updated.');
+        } elseif ($status == DBService::$STATUS['STATUS_IDP_UPDATED']) {
+            $log->info('=DBS= User IdP entityID updated.');
         }
         printMainPage();
     }

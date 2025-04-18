@@ -1,3 +1,7 @@
+5cba5e9 2025-04-18 CIL-2201 Log when user's entityID changes
+b97c0e9 2025-04-18 CIL-2222 OneID now asserts 'real' ePPN
+410d8aa 2025-04-16 CIL-2222 Federate DoE OneID IdP
+5127657 2025-04-03 Update Changelog
 7ce0dfd 2025-04-02 Update README and LICENSE files
 0a188d3 2025-03-19 CIL-2213 Host CSS/JavaScript files on cilogon.org
 fb8b80c 2025-02-27 Update ChangeLog

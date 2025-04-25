@@ -1818,6 +1818,18 @@ Remote Address= ' . $remoteaddr . '
             }
         }
 
+        // CIL-2233 Check the modification time of the TEST_IDP_XML file
+        $test_modified = 0;
+        if (
+            (defined('TEST_IDP_XML')) &&
+            (!empty(TEST_IDP_XML)) &&
+            (is_readable(TEST_IDP_XML)) &&
+            (($test_modified = filemtime(TEST_IDP_XML)) !== false) &&
+            ($test_modified > $max_last_modified)
+        ) {
+            $max_last_modified = $test_modified;
+        }
+
         // Compare the most recent HEAD Last-Modified with the
         // previously saved timestamp
         $saved_modified = file_get_contents($check_filename);

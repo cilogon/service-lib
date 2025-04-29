@@ -655,7 +655,7 @@ class Content
             } elseif (strlen($dn) == 0) {
                 // CIL-2188 Show alternate message when missing user attributes
                 $disabledmsg = 'Certificate creation will be disabled ' .
-                    'June 1, 2025. See the <a target="_blank" ' .
+                    'May 13, 2025. See the <a target="_blank" ' .
                     'href="https://ca.cilogon.org/retirement">CILogon' .
                     'X.509 Certificate Retirement Plan</a> for details.';
             } elseif ($isEduGAINAndGetCert) {

@@ -1,3 +1,6 @@
+edcfaa0 2025-04-29 CIL-2234 Disable X.509 certs on May 13, 2025
+f2210e2 2025-04-25 CIL-2233 Check modification time of testidplist.xml
+c6a231c 2025-04-18 Update ChangeLog
 5cba5e9 2025-04-18 CIL-2201 Log when user's entityID changes
 b97c0e9 2025-04-18 CIL-2222 OneID now asserts 'real' ePPN
 410d8aa 2025-04-16 CIL-2222 Federate DoE OneID IdP

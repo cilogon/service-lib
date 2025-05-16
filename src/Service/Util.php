@@ -934,7 +934,9 @@ Remote Address= ' . $remoteaddr . '
      */
     public static function saveUserToDataStore(...$args)
     {
-        $try_without_eptid = false; // Used in case of STATUS_EPTID_MISMATCH
+        // In case of STATUS_EPTID_MISMATCH or STATUS_PAIRWISE_ID_MISMATCH,
+        // call dbService again setting those parameters to empty strings
+        $try_without_eptid_or_pairwise_id = false;
         $dbs = new DBService();
         $log = new Loggit();
 
@@ -951,7 +953,7 @@ Remote Address= ' . $remoteaddr . '
 
         // Call the dbService to get the user using IdP attributes.
         do {
-            $try_without_eptid = false;
+            $try_without_eptid_or_pairwise_id = false;
             $remote_user = ''; // CIL-1968 Don't sent remote_user to dbService
             $result = $dbs->getUser(
                 $remote_user,
@@ -981,22 +983,30 @@ Remote Address= ' . $remoteaddr . '
             );
             if ($result) {
                 // CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid.
+                // CIL-2243 If STATUS_PAIRWISE_ID_MISMATCH, try again without
+                // pairwise_id.
                 // To revert to old behavior of treating STATUS_EPTID_MISMATCH
-                // as an error, define EPTID_MISMATCH_IS_WARNING as false in
-                // the top-level config.php file.
+                // or STATUS_PAIRWISE_ID_MISMATCH as an error, define
+                // EPTID_MISMATCH_IS_WARNING as false in the top-level
+                // config.php file.
                 if (
-                    ($dbs->status == DBService::$STATUS['STATUS_EPTID_MISMATCH']) &&
+                    (
+                        ($dbs->status == DBService::$STATUS['STATUS_EPTID_MISMATCH']) ||
+                        ($dbs->status == DBService::$STATUS['STATUS_PAIRWISE_ID_MISMATCH'])
+                    ) &&
                     (
                         (!defined('EPTID_MISMATCH_IS_WARNING')) ||
                         (EPTID_MISMATCH_IS_WARNING)
                     )
                 ) {
                     $eptid = '';
-                    $try_without_eptid = true;
+                    $pairwise_id = '';
+                    $try_without_eptid_or_pairwise_id = true;
                     $log->warn(
                         'Warning in Util::saveUserToDataStore(): ' .
-                        'DBService returned STATUS_EPTID_MISMATCH. ' .
-                        'Trying again without eptid.'
+                        'DBService returned "' .
+                        DBService::statusToStatusText($dbs->status) .
+                        '". Trying again without eptid or pairwise_id.'
                     );
                 } else {
                     static::setSessionVar('user_uid', $dbs->user_uid);
@@ -1017,7 +1027,7 @@ Remote Address= ' . $remoteaddr . '
                 static::unsetSessionVar('distinguished_name');
                 static::setSessionVar('status', DBService::$STATUS['STATUS_INTERNAL_ERROR']);
             }
-        } while ($try_without_eptid);
+        } while ($try_without_eptid_or_pairwise_id);
 
         // If 'status' is not STATUS_OK*, then send an error email
         $status = static::getSessionVar('status');

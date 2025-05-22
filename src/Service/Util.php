@@ -2038,7 +2038,11 @@ Remote Address= ' . $remoteaddr . '
         // Copy temporary idplist.{json,xml} files to production directory.
         if ($oldidplistempty || $oldidplistdiff) {
             $idpdiff = `diff -u $idpxml_filename $tmpxml 2>&1`;
-            if (copy($tmpxml, $idplist_dir . '/idplist.xml')) {
+            // CIL-2254 PHP 'copy' might not be atomic. Use OS 'cp' instead.
+            $output = null;
+            $result_code = null;
+            exec("cp $tmpxml $idplist_dir" . '/idplist.xml &>/dev/null', $output, $result_code);
+            if ($result_code === 0) {
                 @chmod($idpxml_filename, 0664);
                 @chgrp($idpxml_filename, 'apache');
             } else {
@@ -2048,7 +2052,11 @@ Remote Address= ' . $remoteaddr . '
                 http_response_code(500);
                 return;
             }
-            if (copy($tmpjson, $idplist_dir . '/idplist.json')) {
+            // CIL-2254 Use OS's 'cp' for atomic copy operation.
+            $output = null;
+            $result_code = null;
+            exec("cp $tmpjson $idplist_dir" . '/idplist.json &>/dev/null', $output, $result_code);
+            if ($result_code === 0) {
                 @chmod(DEFAULT_IDP_JSON, 0664);
                 @chgrp(DEFAULT_IDP_JSON, 'apache');
             } else {

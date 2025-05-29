@@ -842,16 +842,13 @@ class DBService
      * @param string $loa (Optional) The Level of Assurance: '' = basic,
      *        'openid' =  OpenID Connect (e.g., Google),
      *        'http://incommonfederation.org/assurance/silver' = silver
-     * @param string $myproxyinfo (Optional) the 'info:...' string to be
-     *        passed to MyProxy.
      * @return bool True if the servlet returned correctly. Else false.
      */
     public function setTransactionState(
         $code,
         $uid,
         $authntime,
-        $loa = '',
-        $myproxyinfo = ''
+        $loa = ''
     ) {
         $retval = false;
 
@@ -863,9 +860,7 @@ class DBService
                 '&code=' . urlencode($code) .
                 '&user_uid=' . urlencode($uid) .
                 '&auth_time=' . urlencode($authntime) .
-                '&loa=' . urlencode($loa) .
-                ((strlen($myproxyinfo) > 0) ?
-                    ('&cilogon_info=' . urlencode($myproxyinfo)) : '')
+                '&loa=' . urlencode($loa)
             );
         }
 

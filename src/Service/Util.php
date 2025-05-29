@@ -1189,8 +1189,6 @@ Remote Address= ' . $remoteaddr . '
 
         // Specific to OIDC flow
         static::unsetSessionVar('clientparams');
-
-        static::unsetP12SessionVars();
     }
 
     /**
@@ -1211,19 +1209,6 @@ Remote Address= ' . $remoteaddr . '
         static::unsetSessionVar('distinguished_name');
         static::unsetSessionVar('authntime');
         static::unsetSessionVar('cilogon_skin');
-    }
-
-    /**
-     * unsetP12SessionVars
-     *
-     * This function removes all of the PHP session variables related to
-     * the 'Download Certificate' page.
-     */
-    public static function unsetP12SessionVars()
-    {
-        static::unsetSessionVar('p12');
-        static::unsetSessionVar('p12lifetime');
-        static::unsetSessionVar('p12multiplier');
     }
 
     /**
@@ -1265,78 +1250,6 @@ Remote Address= ' . $remoteaddr . '
             call_user_func_array($func, $params);
         } else {
             printLogonPage(true); // Clear cookies and session vars too
-        }
-        return $retval;
-    }
-
-    /**
-     * isEduGAINAndGetCert
-     *
-     * This function checks to see if the current session IdP is an
-     * eduGAIN IdP (i.e., not Registered By InCommon) and the IdP does not
-     * have both the REFEDS R&S and SIRTFI extensions in metadata. If so,
-     * check to see if the transaction could be used to fetch a
-     * certificate. (The only time the transaction is not used to fetch
-     * a cert is during OIDC without the 'getcert' scope.) If all that is
-     * true, then return true. Otherwise return false.
-     *
-     * @param string $idp (optional) The IdP entityID. If empty, read value
-     *        from PHP session.
-     * @param string $idp_display_name (optional) The IdP display name. If empty,
-     *        read value from PHP session.
-     * @return bool True if the current IdP is an eduGAIN IdP without
-     *         both REFEDS R&S and SIRTFI, AND the session could be
-     *         used to get a certificate.
-     */
-    public static function isEduGAINAndGetCert($idp = '', $idp_display_name = '')
-    {
-        $retval = false; // Assume not eduGAIN IdP and getcert
-
-        // If $idp or $idp_display_name not passed in, get from current session.
-        if (strlen($idp) == 0) {
-            $idp = static::getSessionVar('idp');
-        }
-        if (strlen($idp_display_name) == 0) {
-            $idp_display_name = static::getSessionVar('idp_display_name');
-        }
-
-        // Check if this was an OIDC transaction, and if the
-        // 'getcert' scope was requested.
-        $oidcscopegetcert = false;
-        $oidctrans = false;
-        $clientparams = json_decode(static::getSessionVar('clientparams'), true);
-        if (isset($clientparams['scope'])) {
-            $oidctrans = true;
-            if (
-                preg_match(
-                    '/edu.uiuc.ncsa.myproxy.getcert/',
-                    $clientparams['scope']
-                )
-            ) {
-                $oidcscopegetcert = true;
-            }
-        }
-
-        // First, make sure $idp was set and is not an OAuth2 IdP.
-        $idplist = static::getIdpList();
-        if (
-            ((strlen($idp) > 0) &&
-            (strlen($idp_display_name) > 0) &&
-            (!array_key_exists($idp_display_name, static::$oauth2idps))) &&
-                (
-                // Next, check for eduGAIN without REFEDS R&S and SIRTFI
-                ((!$idplist->isRegisteredByInCommon($idp)) &&
-                       ((!$idplist->isREFEDSRandS($idp)) ||
-                        (!$idplist->isSIRTFI($idp))
-                       )
-                ) &&
-                // Next, check if user could get X509 cert,
-                // i.e., OIDC getcert scope, or a non-OIDC
-                // transaction such as PKCS12, JWS, or OAuth 1.0a
-                ($oidcscopegetcert || !$oidctrans)
-                )
-        ) {
-            $retval = true;
         }
         return $retval;
     }
@@ -1480,45 +1393,6 @@ Remote Address= ' . $remoteaddr . '
     }
 
     /**
-     * getMinMaxLifetimes
-     *
-     * This function checks the skin's configuration to see if either or
-     * both of minlifetime and maxlifetime in the specified config.xml
-     * block have been set. If not, default to minlifetime of 1 (hour) and
-     * the specified defaultmaxlifetime.
-     *
-     * @param string $section The XML section block from which to read the
-     *        minlifetime and maxlifetime values. Can be one of the
-     *        following: 'pkcs12' or 'delegate'.
-     * @param int $defaultmaxlifetime Default maxlifetime (in hours) for the
-     *        credential.
-     * @return array An array consisting of two entries: the minimum and
-     *         maximum lifetimes (in hours) for a credential.
-     */
-    public static function getMinMaxLifetimes($section, $defaultmaxlifetime)
-    {
-        $minlifetime = 1;    // Default minimum lifetime is 1 hour
-        $maxlifetime = $defaultmaxlifetime;
-        $skin = static::getSkin();
-        $skinminlifetime = $skin->getConfigOption($section, 'minlifetime');
-        // Read the skin's minlifetime value from the specified section
-        if ((!is_null($skinminlifetime)) && ((int)$skinminlifetime > 0)) {
-            $minlifetime = max($minlifetime, (int)$skinminlifetime);
-            // Make sure $minlifetime is less than $maxlifetime;
-            $minlifetime = min($minlifetime, $maxlifetime);
-        }
-        // Read the skin's maxlifetime value from the specified section
-        $skinmaxlifetime = $skin->getConfigOption($section, 'maxlifetime');
-        if ((!is_null($skinmaxlifetime)) && ((int)$skinmaxlifetime) > 0) {
-            $maxlifetime = min($maxlifetime, (int)$skinmaxlifetime);
-            // Make sure $maxlifetime is greater than $minlifetime
-            $maxlifetime = max($minlifetime, $maxlifetime);
-        }
-
-        return array($minlifetime, $maxlifetime);
-    }
-
-    /**
      * isLOASilver
      *
      * This function returns true if the 'loa' (level of assurance)
@@ -1571,29 +1445,6 @@ Remote Address= ' . $remoteaddr . '
             $retval = static::getSessionVar('loa');
         }
         return $retval;
-    }
-
-    /**
-     * getLOAPort
-     *
-     * This function returns the port to be used for MyProxy based on the
-     * level of assurance.
-     *     Basic  CA = 7512
-     *     Silver CA = 7514
-     *     OpenID CA = 7516
-     *
-     * @return int The MyProxy port number to be used based on the 'level
-     *         of assurance' (basic, silver, openid).
-     */
-    public static function getLOAPort()
-    {
-        $port = 7512; // Basic
-        if (static::isLOASilver()) {
-            $port = 7514;
-        } elseif (static::getSessionVar('loa') == 'openid') {
-            $port = 7516;
-        }
-        return $port;
     }
 
     /**
@@ -1650,120 +1501,6 @@ Remote Address= ' . $remoteaddr . '
 
         # Return both names as an array (i.e., use list($first,last)=...)
         return array($firstname,$lastname);
-    }
-
-    /**
-     * cleanupPKCS12
-     *
-     * This function scans the DEFAULT_PKCS12_DIR and removes any
-     * directories (and contained files) that are older than 10 minutes.
-     * This function is used by the /cleancerts/ endpoint which can
-     * be called by a cronjob.
-     *
-     * @return int The number of PKCS12 dirs/files removed.
-     */
-    public static function cleanupPKCS12()
-    {
-        $numdel = 0;
-
-        $pkcs12dir = DEFAULT_PKCS12_DIR;
-        if (is_dir($pkcs12dir)) {
-            $files = scandir($pkcs12dir);
-            foreach ($files as $f) {
-                if (($f != '.') && ($f != '..')) {
-                    $tempdir = $pkcs12dir . $f;
-                    if ((filetype($tempdir) == 'dir') && ($f != '.git')) {
-                        if (time() > (600 + filemtime($tempdir))) {
-                            static::deleteDir($tempdir, true);
-                            $numdel++;
-                        }
-                    }
-                }
-            }
-        }
-        return $numdel;
-    }
-
-    /**
-     * logXSEDEUsage
-     *
-     * This function writes the XSEDE USAGE message to a CSV file. See
-     * CIL-938 and CIL-507 for background. This function first checks if the
-     * XSEDE_USAGE_DIR config value is not empty and that the referenced
-     * directory exists on the filesystem. If so, a CSV file is created/
-     * appended using today's date. If the CSV file is new, a header
-     * line is written. Then the actual USAGE line is output in the
-     * following format:
-     *
-     *     cilogon,GMT_date,client_name,email_address
-     *
-     * @param string $client The name of the client. One of 'ECP', 'PKCS12',
-     *        or the name of the OAuth1/OAuth2/OIDC client/portal.
-     * @param string $email The email address of the user.
-     */
-    public static function logXSEDEUsage($client, $email)
-    {
-        if (
-            (defined('XSEDE_USAGE_DIR')) &&
-            (!empty(XSEDE_USAGE_DIR)) &&
-            (is_writable(XSEDE_USAGE_DIR))
-        ) {
-            $log = new Loggit();
-            $log->info("USAGE email=\"$email\" client=\"$client\"");
-
-            $error = ''; // Was there an error to be reported?
-
-            // Get the date strings for filename and CSV line output.
-            // Filename uses local time zone; log lines use GMT.
-            // Save the current default timezone and restore it later.
-            $deftz = date_default_timezone_get();
-            $now = time();
-            $datestr = gmdate('Y-m-d\TH:i:s\Z', $now);
-            if (defined('LOCAL_TIMEZONE')) {
-                date_default_timezone_set(LOCAL_TIMEZONE);
-            }
-            $filename = date('Ymd', $now) . '.upload.csv';
-            $fullname = XSEDE_USAGE_DIR . DIRECTORY_SEPARATOR . $filename;
-
-            // Open and lock the file
-            $fp = fopen($fullname, 'c');
-            if ($fp !== false) {
-                if (flock($fp, LOCK_EX)) {
-                    // Move file pointer to the end of the file.
-                    if (fseek($fp, 0, SEEK_END) == 0) { // Note 0 = success
-                        $endpos = ftell($fp);
-                        // If the position is at the beginning of the file (0),
-                        // then the file is new, so output the HEADER line.
-                        if (($endpos !== false) && ($endpos == 0)) {
-                            fwrite($fp, "USED_COMPONENT,USE_TIMESTAMP,USE_CLIENT,USE_USER\n");
-                        }
-                        // Write the actual USAGE data line
-                        fwrite($fp, "cilogon,$datestr,$client,$email\n");
-                        fflush($fp);
-                    } else {
-                        $error = 'Unable to seek to end of file.';
-                    }
-                    flock($fp, LOCK_UN);
-                } else { // Problem writing file
-                    $error = 'Unable to lock file.';
-                }
-                fclose($fp);
-                if (empty($error)) {
-                    // CIL-1283 Set upload.csv files as world-writable
-                    @chmod($fullname, 0666);
-                }
-            } else {
-                $error = 'Unable to open file.';
-            }
-
-            // Restore previous default timezone
-            date_default_timezone_set($deftz);
-
-            // If got an error while opening/writing file, log it.
-            if (strlen($error) > 0) {
-                $log->error("Error writing XSEDE USAGE file $filename: $error");
-            }
-        }
     }
 
     /**
@@ -2042,7 +1779,7 @@ Remote Address= ' . $remoteaddr . '
             $output = null;
             $result_code = null;
             exec("cp $tmpxml $idplist_dir" . '/idplist.xml &>/dev/null', $output, $result_code);
-            if ($result_code === 0) {
+            if ($result_code == 0) {
                 @chmod($idpxml_filename, 0664);
                 @chgrp($idpxml_filename, 'apache');
             } else {
@@ -2056,7 +1793,7 @@ Remote Address= ' . $remoteaddr . '
             $output = null;
             $result_code = null;
             exec("cp $tmpjson $idplist_dir" . '/idplist.json &>/dev/null', $output, $result_code);
-            if ($result_code === 0) {
+            if ($result_code == 0) {
                 @chmod(DEFAULT_IDP_JSON, 0664);
                 @chgrp(DEFAULT_IDP_JSON, 'apache');
             } else {
@@ -2113,61 +1850,6 @@ Remote Address= ' . $remoteaddr . '
         }
 
         @sem_release($semaphore);
-    }
-
-    /**
-     * cleanCerts()
-     *
-     * This function is called by the '/cleancerts/' endpoint. It scans the
-     * DEFAULT_PKCS12_DIR for certificates/directories that are older than
-     * 10 minutes and removes them. There is a 5 minute timeout so that
-     * this function doesn't run too frequently.
-     */
-    public static function cleanCerts()
-    {
-        $check_filename = DEFAULT_PKCS12_DIR . '.last_checked';
-
-        $needtowait = static::checkFileWait($check_filename);
-        if ($needtowait > 0) {
-            echo "<p>Please wait $needtowait seconds.</p>\n";
-            return;
-        }
-
-        $numdel = static::cleanupPKCS12();
-        echo "<p>$numdel certificate(s) cleaned up.</p>\n";
-
-        // Write the current time to .last_checked
-        file_put_contents($check_filename, time());
-    }
-
-    /**
-     * checkFileWait
-     *
-     * This function assumes the existence of a file containing a Unix Epoch
-     * timestamp. The function returns the difference of a $timeout (defaults
-     * to 300 seconds / 5 minutes) and the "age" of the timestamp (i.e.,
-     * current time - file time). For example, if the file timestamp is
-     * 4 minutes ago, and the $timeout is 5 minutes, then 1 minute is returned.
-     * Negative differences are returned as 0 letting the calling function
-     * know that the file timestamp is older than the timeout.
-     *
-     * @param string $filename The full path name of the file to be checked.
-     * @param int $timeout The time in seconds of how old the $filename must
-     *        be before the file should be written again. Defaults to 300
-     *        seconds.
-     * @return int The number of seconds the calling function should wait
-     *         before the $filename's timestamp 'expires', or 0 if the
-     *         timestamp is older than the $timeout.
-     */
-    public static function checkFileWait($filename, $timeout = 300)
-    {
-        $lastcheck = (int)(file_get_contents($filename) ?: 0);
-        $needtowait = $timeout - abs(time() - $lastcheck);
-        if ($needtowait < 0) {
-            $needtowait = 0;
-        }
-
-        return $needtowait;
     }
 
     /**

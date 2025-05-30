@@ -632,11 +632,27 @@ class Content
         $errors = array();
 
         // CIL-416 Show warning for missing ePPN or Subject ID
+
+        if ($samlidp) {
+            $errors['no_eppn'] = (empty($attr_arr['eppn']));
+            $errors['no_eptid'] = (empty($attr_arr['eptid']));
+            $errors['no_subject_id'] = (empty($attr_arr['subject_id']));
+            $errors['no_pairwise_id'] = (empty($attr_arr['pairwise_id']));
+            $errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id'] = (
+                ($errors['no_eppn']) &&
+                ($errors['no_eptid']) &&
+                ($errors['no_subject_id']) &&
+                ($errors['no_pairwise_id'])
+            );
+        }
+
         $errors['no_entityID'] = (empty($attr_arr['idp']));
 
-        if (!$errors['no_entityID']) {
-            $errors['no_oidc'] = ((!$samlidp) && (empty($attr_arr['oidc'])));
-        }
+        $errors['no_oidc'] = (
+            (!$errors['no_entityID']) &&
+            (!$samlidp) &&
+            (empty($attr_arr['oidc']))
+        );
 
         $errors['no_first_name'] = (
             (empty($attr_arr['first_name'])) &&

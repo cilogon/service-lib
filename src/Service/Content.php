@@ -632,57 +632,30 @@ class Content
         $errors = array();
 
         // CIL-416 Show warning for missing ePPN or Subject ID
-        if ($samlidp) {
-            if (empty($attr_arr['eppn'])) {
-                $errors['no_eppn'] = true;
-            }
-            if (empty($attr_arr['eptid'])) {
-                $errors['no_eptid'] = true;
-            }
-            if (empty($attr_arr['subject_id'])) {
-                $errors['no_subject_id'] = true;
-            }
-            if (empty($attr_arr['pairwise_id'])) {
-                $errors['no_pairwise_id'] = true;
-            }
-            if (
-                ($errors['no_eppn']) &&
-                ($errors['no_eptid']) &&
-                ($errors['no_subject_id']) &&
-                ($errors['no_pairwise_id'])
-            ) {
-                $errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id'] = true;
-            }
+        $errors['no_entityID'] = (empty($attr_arr['idp']));
+
+        if (!$errors['no_entityID']) {
+            $errors['no_oidc'] = ((!$samlidp) && (empty($attr_arr['oidc'])));
         }
 
-        if (empty($attr_arr['idp'])) {
-            $errors['no_entityID'] = true;
-        } else {
-            if ((!$samlidp) && (empty($attr_arr['oidc']))) {
-                $errors['no_oidc'] = true;
-            }
-        }
+        $errors['no_first_name'] = (
+            (empty($attr_arr['first_name'])) &&
+            (empty($attr_arr['display_name']))
+        );
 
-        if ((empty($attr_arr['first_name'])) && (empty($attr_arr['display_name']))) {
-            $errors['no_first_name'] = true;
-        }
+        $errors['no_last_name'] = (
+            (empty($attr_arr['last_name'])) &&
+            (empty($attr_arr['display_name']))
+        );
 
-        if ((empty($attr_arr['last_name'])) && (empty($attr_arr['display_name']))) {
-            $errors['no_last_name'] = true;
-        }
-
-        if (
+        $errors['no_display_name'] =  (
             (empty($attr_arr['display_name'])) &&
             ((empty($attr_arr['first_name'])) ||
             (empty($attr_arr['last_name'])))
-        ) {
-            $errors['no_display_name'] = true;
-        }
+        );
 
         $emailvalid = filter_var($attr_arr['email'], FILTER_VALIDATE_EMAIL);
-        if ((empty($attr_arr['email'])) || (!$emailvalid)) {
-            $errors['no_valid_email'] = true;
-        }
+        $errors['no_valid_email'] = ((empty($attr_arr['email'])) || (!$emailvalid));
 
         static::printCollapseBegin(
             'userattrs',
@@ -2403,7 +2376,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $callbackuri = Util::getSessionVar('callbackuri');
 
-        // Log new users with possibly empty distinguished_name values
+        // Log users with interesting statuses
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
             $log->info('=DBS= New user created.');
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {

@@ -2405,8 +2405,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
 
         // Log new users with possibly empty distinguished_name values
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
-            $dn = Util::getSessionVar('distinguished_name');
-            $log->info('=DBS= New user created.'));
+            $log->info('=DBS= New user created.');
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {
             $log->info('=DBS= User data updated.');
         } elseif ($status == DBService::$STATUS['STATUS_IDP_UPDATED']) {

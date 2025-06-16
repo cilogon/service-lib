@@ -21,7 +21,6 @@
         "league/oauth2-google": "^4.0.0",
         "league/oauth2-github": "^3.0.0",
         "cilogon/oauth2-orcid": "^2.0.0",
-        "pear/net_ldap2": "^2.2.0",
         "pear/log": "^1.14.0",
         "pear/db": "dev-trunk",
         "thenetworg/oauth2-azure": "^2.2.2",

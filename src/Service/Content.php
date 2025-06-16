@@ -811,19 +811,6 @@ class Content
                 <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
-            /**
-             * CIL-2188 Don't show red-circle exclamation
-             * for missing name or email attributes
-             *
-            if (@$errors['no_first_name']) {
-                echo static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'Must have either givenName + sn -OR- displayName.'
-                );
-            }
-             */
-
             echo '
                 </td>
               </tr>
@@ -836,19 +823,6 @@ class Content
                 <th>Last Name (sn):</th>
                 <td>', $attr_arr['last_name'], '</td>
                 <td>';
-
-            /**
-             * CIL-2188 Don't show red-circle exclamation
-             * for missing name or email attributes
-             *
-            if (@$errors['no_last_name']) {
-                echo static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'Must have either givenName + sn -OR- displayName.'
-                );
-            }
-             */
 
             echo '
                 </td>
@@ -863,19 +837,6 @@ class Content
                 <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
-            /**
-             * CIL-2188 Don't show red-circle exclamation
-             * for missing name or email attributes
-             *
-            if (@$errors['no_display_name']) {
-                echo static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'Must have either displayName -OR- givenName + sn.'
-                );
-            }
-             */
-
             echo '
                 </td>
               </tr>
@@ -887,19 +848,6 @@ class Content
                 <th>Email Address (email):</th>
                 <td>', $attr_arr['email'], '</td>
                 <td>';
-
-        /**
-         * CIL-2188 Don't show red-circle exclamation
-         * for missing name or email attributes
-         *
-        if (@$errors['no_valid_email']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Missing valid email address.'
-            );
-        }
-         */
 
         echo '
                 </td>
@@ -2730,7 +2678,10 @@ in "handleGotUser()" for valid IdPs for the skin.'
         }
         // Output any remaining scopes as-is
         foreach ($scopes as $value) {
-            echo '<li>', $value, '</li>';
+            // Skip printing out the 'getcert' scope
+            if ($value != 'edu.uiuc.ncsa.myproxy.getcert') {
+                echo '<li>', $value, '</li>';
+            }
         }
         echo '</ul>
             </div> <!-- end card-body -->

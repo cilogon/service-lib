@@ -36,25 +36,6 @@ use CILogon\Service\Util;
  *                          $dbservice->last_name  . "\n";
  *         echo 'DN = '   . $dbservice->distinguished_name . "\n";
  *     }
- *
- *     // For getting/setting the Shibboleth-based IdPs, use the
- *     // getIdps()/setIdps() methods.  These methods utilize the
- *     // class member array $idp_uids for reading/writing. Two
- *     // convenience methods (setIdpsFromKeys($array) and
- *     // setIdpsFromValues($array)) are provided to populate the
- *     // $idp_uids array from the passed-in $array.
- *     $dbservice->getIdps();
- *     foreach($dbservice->idp_uids as $value) {
- *         echo "$value\n";
- *     }
- *
- *     $idps = array('urn:mace:incommon:ucsd.edu',
- *                   'urn:mace:incommon:uiuc.edu');
- *     $dbservice->setIdpsFromValues($idps);
- *     //   --- OR ---
- *     $idps = array('urn:mace:incommon:ucsd.edu' => 1,
- *                   'urn:mace:incommon:uiuc.edu' => 1);
- *     $dbservice->setIdpsFromKeys($idps);
  */
 
 class DBService
@@ -409,11 +390,6 @@ class DBService
     public $grant;
 
     /**
-     * @var array $idp_uids IdPs stored in the 'values' of the array
-     */
-    public $idp_uids;
-
-    /**
      * @var string|null $error OAuth2/OIDC authentication error response
      *      code
      */
@@ -493,7 +469,6 @@ class DBService
         $this->clearUser();
         $this->clearPortal();
         $this->clearUserCode();
-        $this->clearIdps();
         $this->clearErrorResponse();
     }
 
@@ -550,19 +525,6 @@ class DBService
         $this->client_id = null;
         $this->scope = null;
         $this->grant = null;
-    }
-
-    /**
-     * clearIdps
-     *
-     * Set the class member variable $idp_uids to an empty array.
-     */
-    public function clearIdps()
-    {
-        $this->status = null;
-        $this->call_input = null;
-        $this->call_output = null;
-        $this->idp_uids = array();
     }
 
     /**
@@ -674,25 +636,6 @@ class DBService
     }
 
     /**
-     * removeUser
-     *
-     * This method calls the 'removeUser' action of the servlet and
-     * sets the class member variable $status appropriately.  If the
-     * servlet returns correctly (i.e. an HTTP status code of 200),
-     * this method returns true.
-     *
-     * @param string $uid The database user identifier
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function removeUser($uid)
-    {
-        $this->clearUser();
-        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
-        return $this->call('action=removeUser&user_uid=' .
-            urlencode($uid));
-    }
-
-    /**
      * getPortalParameters
      *
      * This method calls the 'getPortalParameter' action of the servlet
@@ -715,113 +658,6 @@ class DBService
         }
 
         return $retval;
-    }
-
-    /**
-     * getIdps
-     *
-     * This method calls the 'getAllIdps' action of the servlet and
-     * sets the class member array $idp_uris to contain all of the
-     * Idps in the database, stored in the 'values' of the array.  If
-     * the servlet returns correctly (i.e. an HTTP status code of 200),
-     * this method returns true.
-     *
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function getIdps()
-    {
-        $this->clearIdps();
-        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
-        return $this->call('action=getAllIdps');
-    }
-
-    /**
-     * setIdps
-     *
-     * This method calls the 'setAllIdps' action of the servlet using
-     * the class memeber array $idp_uris as the source for the Idps to
-     * be stored to the database.  Note that if this array is empty,
-     * an error code will be returned in the status since at least one
-     * IdP should be saved to the database.  If you want to pass an
-     * array of Idps to be saved, see the setIdpsFromKeys($array) and
-     * setIdpsFromValues($array) methods.  If the servlet returns
-     * correctly (i.e. an HTTP status code of 200), this method
-     * returns true.
-     *
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function setIdps()
-    {
-        $retval = false;
-        $this->setDBServiceURL(DEFAULT_DBSERVICE_URL);
-        $idpcount = count($this->idp_uids);
-        $idpidx = 0;
-        if ($idpcount > 0) {
-            // Loop through the idp_uids in chunks of 50 to deal
-            // with query parameter limit of http browsers/servers.
-            while ($idpidx < $idpcount) { // Loop through all IdPs
-                $fiftyidx = 0;
-                $idplist = '';
-                while (
-                    ($fiftyidx < 50) && // Send 50 IdPs at a time
-                       ($idpidx < $idpcount)
-                ) {
-                    $idplist .=  '&idp_uid=' .
-                                 urlencode($this->idp_uids[$idpidx]);
-                    $fiftyidx++;
-                    $idpidx++;
-                }
-                $cmd = 'action=setAllIdps' . $idplist;
-                $retval = $this->call($cmd);
-            }
-        }
-        return $retval;
-    }
-
-    /**
-     * setIdpsFromKeys
-     *
-     * This is a convenience method which calls setIdps using a
-     * passed-in array of IdPs stored as the keys of the array.  It
-     * first sets the class member array $idp_uids appropriately and
-     * then calls the setIdps() method. If the servlet returns
-     * correctly (i.e. an HTTP status code of 200), this method
-     * returns true.  See also setIdpsFromValues().
-     *
-     * @param array $idps An array of IdPs to be saved, stored in the
-     *       'keys' of the array.
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function setIdpsFromKeys($idps)
-    {
-        $this->clearIdps();
-        foreach ($idps as $key => $value) {
-            $this->idp_uids[] = $key;
-        }
-        return $this->setIdps();
-    }
-
-    /**
-     * setIdpsFromValues
-     *
-     * This is a convenience method which calls setIdps using a
-     * passed-in array of IdPs stored as the values of the array.  It
-     * first sets the class member array $idp_uids appropriately and
-     * then calls the setIdps() method. If the servlet returns
-     * correctly (i.e. an HTTP status code of 200), this method
-     * returns true.  See also setIdpsFromKeys().
-     *
-     * @param array $idps An array of IdPs to be saved, stored in the
-     *        'values' of the array.
-     * @return bool True if the servlet returned correctly. Else false.
-     */
-    public function setIdpsFromValues($idps)
-    {
-        $this->clearIdps();
-        foreach ($idps as $value) {
-            $this->idp_uids[] = $value;
-        }
-        return $this->setIdps();
     }
 
     /**
@@ -1065,11 +901,6 @@ class DBService
                     }
                     if (preg_match('/grant=([^\r\n]+)/', $output, $matches)) {
                         $this->grant = urldecode($matches[1]);
-                    }
-                    if (preg_match_all('/idp_uid=([^\r\n]+)/', $output, $matches)) {
-                        foreach ($matches[1] as $value) {
-                            $this->idp_uids[] = urldecode($value);
-                        }
                     }
                     if (preg_match('/error=([^\r\n]+)/', $output, $matches)) {
                         $this->error = urldecode($matches[1]);

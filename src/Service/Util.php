@@ -2285,15 +2285,21 @@ Remote Address= ' . $remoteaddr . '
      */
     public static function getRecentIdPs($entityID = '')
     {
-        $idparray = array(); // Assume the cookie is empty/unset
-
         $idps = static::getCookieVar('recentidps');
-        // Transform the cookie into an array
-        if (strlen($idps) > 0) {
-            $idparray = explode(',', $idps);
-            // Make sure the user didn't mess with the cookie's IdPs
-            filter_var_array($idparray, FILTER_SANITIZE_URL);
+
+        // CIL-2268 If no recent IdPs, then use ORCID, Google, Microsoft,
+        // and GitHub (in that order) as recent IdPs so they appear at top
+        if (strlen($idps) == 0) {
+            $idps = 'http://orcid.org/oauth/authorize,' .
+                'http://google.com/accounts/o8/id,' .
+                'http://login.microsoftonline.com/common/oauth2/v2.0/authorize,' .
+                'http://github.com/login/oauth/authorize';
         }
+
+        // Transform the cookie into an array
+        $idparray = explode(',', $idps);
+        // Make sure the user didn't mess with the cookie's IdPs
+        filter_var_array($idparray, FILTER_SANITIZE_URL);
 
         if (strlen($entityID) > 0) {
             // If entityID is in the array, delete it

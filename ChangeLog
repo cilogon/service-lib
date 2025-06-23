@@ -1,3 +1,5 @@
+edf48c1 2025-06-23 Use cilogon-1.1.0.{css,js}
+89e9136 2025-06-23 Update ChangeLog
 148ac11 2025-06-18 CIL-2268 Default to 'social' IdPs at top of list
 05cda08 2025-06-16 CIL-2248 No need for Net_LDAP2 PHP library for DN anymore
 77610e0 2025-06-16 CIL-2248 A few more tweaks after removing X509 certs

@@ -84,7 +84,7 @@ class Content
     <link rel="stylesheet" href="/include/font-awesome-4.7.0.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-4.6.2.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-select-1.13.18.min.css" />
-    <link rel="stylesheet" href="/include/cilogon-1.0.0.css" />
+    <link rel="stylesheet" href="/include/cilogon-1.1.0.css" />
     ';
 
         $skin->printSkinCSS();
@@ -188,7 +188,7 @@ class Content
     <script src="/include/bootstrap-4.6.2.bundle.min.js"></script>
     <script src="/include/bootstrap-select-1.13.18.min.js"></script>
     <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
-    <script src="/include/cilogon-1.0.0.js"></script>
+    <script src="/include/cilogon-1.1.0.js"></script>
 ';
 
         // CIL-1643 Additional JavaScript for use by e.g., a navigation bar.

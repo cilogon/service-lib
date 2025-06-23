@@ -1970,12 +1970,20 @@ Remote Address= ' . $remoteaddr . '
         $idps = static::getCookieVar('recentidps');
 
         // CIL-2268 If no recent IdPs, then use ORCID, Google, Microsoft,
-        // and GitHub (in that order) as recent IdPs so they appear at top
+        // and GitHub (in that order) as recent IdPs so they appear at top, or
+        // CIL-2272 get the list of initial recent IdPs from the skin config.
         if (strlen($idps) == 0) {
-            $idps = 'http://orcid.org/oauth/authorize,' .
-                'http://google.com/accounts/o8/id,' .
-                'http://login.microsoftonline.com/common/oauth2/v2.0/authorize,' .
-                'http://github.com/login/oauth/authorize';
+            // Check skin for initial recent IdP list
+            $skin = static::getSkin();
+            $skinrecentidps = $skin->getConfigOption('initialrecentidps');
+            if (!is_null($skinrecentidps)) {
+                $idps = (string)$skinrecentidps;
+            } else { // Default to ORCID, Google, Microsoft, and GitHub
+                $idps = 'http://orcid.org/oauth/authorize,' .
+                    'http://google.com/accounts/o8/id,' .
+                    'http://login.microsoftonline.com/common/oauth2/v2.0/authorize,' .
+                    'http://github.com/login/oauth/authorize';
+            }
         }
 
         // Transform the cookie into an array

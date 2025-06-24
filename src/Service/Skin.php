@@ -116,6 +116,7 @@ class Skin
         $this->css = '';
         $this->forcearray = Util::getBypass()->getForceSkinArray();
         $this->readSkinConfig();
+        $this->setMyProxyInfo();
         $this->checkShowHidden();
     }
 
@@ -615,6 +616,61 @@ class Skin
             $retval = true;
         }
         return $retval;
+    }
+
+    /**
+     * setMyProxyInfo
+     *
+     * This method sets the 'myproxyinfo' PHP session variable. The
+     * variable has the form 'info:key1=value1,key2=value2,...' and is
+     * passed to the 'myproxy-logon' command as part of the username
+     * when fetching a credential. The MyProxy server will do extra
+     * processing based on the content of this 'info:...' tag. If the
+     * skinname is not empty, that is added to the info tag. Also,
+     * the apache REMOTE_ADDR is added. For other key=value pairs that
+     * get added, see the code below.
+     */
+    public function setMyProxyInfo()
+    {
+        $infostr = '';
+
+        // Add the skinname if available
+        if (strlen($this->skinname) > 0) {
+            $infostr .= 'cilogon_skin=' . $this->skinname;
+        }
+
+        // Add the REMOTE_ADDR
+        $remoteaddr = Util::getServerVar('REMOTE_ADDR');
+        if (strlen($remoteaddr) > 0) {
+            $infostr .= (strlen($infostr) > 0 ? ',' : '') .
+                        "remote_addr=$remoteaddr";
+        }
+
+        // Add eppn, eptid, open_id, and oidc if available
+        // Note that these values are lowercase after an update to make
+        // them the same as those used by the dbService. BUT, MyProxy
+        // expects the old versions. So this array maps the new lowercase
+        // versions back into the old ones.
+        $mpid = array(
+            'eppn' => 'ePPN',
+            'eptid' => 'ePTID',
+            'open_id' => 'openidID',
+            'oidc' => 'oidcID'
+        );
+        foreach (array('eppn','eptid','open_id','oidc') as $id) {
+            $sessvar = Util::getSessionVar($id);
+            if (strlen($sessvar) > 0) {
+                $infostr .= (strlen($infostr) > 0 ? ',' : '') .
+                    $mpid[$id] . "=" . $sessvar;
+            }
+        }
+
+        // Finally, set the 'myproxyinfo' PHP session variable
+        if (strlen($infostr) > 0) {
+            Util::setSessionVar('myproxyinfo', 'info:' . $infostr);
+        } else {
+            Util::unsetSessionVar('myproxyinfo');
+        }
     }
 
     /**

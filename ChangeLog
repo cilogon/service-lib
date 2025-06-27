@@ -1,3 +1,25 @@
+edf48c1 2025-06-23 Use cilogon-1.1.0.{css,js}
+89e9136 2025-06-23 Update ChangeLog
+148ac11 2025-06-18 CIL-2268 Default to 'social' IdPs at top of list
+05cda08 2025-06-16 CIL-2248 No need for Net_LDAP2 PHP library for DN anymore
+77610e0 2025-06-16 CIL-2248 A few more tweaks after removing X509 certs
+379f070 2025-05-30 Add back some deleted lines
+fe91f54 2025-05-30 Shorten tests for empty attributes
+0b92f1c 2025-05-30 Fix typo
+1d2a5ed 2025-05-29 CIL-2248 Remove MyProxy from PHP code
+3ffbc82 2025-05-22 CIL-2254 idp_display_name is sometimes 'Unspecified'
+3c2c291 2025-05-16 CIL-2243 Handle STATUS_PAIRWISE_ID_MISMATCH error
+910f76a 2025-04-29 Update ChangeLog
+edcfaa0 2025-04-29 CIL-2234 Disable X.509 certs on May 13, 2025
+f2210e2 2025-04-25 CIL-2233 Check modification time of testidplist.xml
+c6a231c 2025-04-18 Update ChangeLog
+5cba5e9 2025-04-18 CIL-2201 Log when user's entityID changes
+b97c0e9 2025-04-18 CIL-2222 OneID now asserts 'real' ePPN
+410d8aa 2025-04-16 CIL-2222 Federate DoE OneID IdP
+5127657 2025-04-03 Update Changelog
+7ce0dfd 2025-04-02 Update README and LICENSE files
+0a188d3 2025-03-19 CIL-2213 Host CSS/JavaScript files on cilogon.org
+fb8b80c 2025-02-27 Update ChangeLog
 7476fab 2025-02-27 CIL-2188 Don't show cert warnings with DISABLE_X509
 3eb39ec 2025-02-27 Revert REFEDS warning message
 b691f7e 2025-02-26 CIL-2190 Disable web certs and ECP certs separately

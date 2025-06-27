@@ -361,7 +361,7 @@ EOT;
      * create
      *
      * This method is used to populate the class $idpdom DOMDocument
-     * using information from the InCommon metadata file. Note that
+     * using information from the InCommon metadata file. Note that this
      * method updates $idpdom and $idparray. If you want to save either
      * to a file, be sure to call write() afterwards.
      *

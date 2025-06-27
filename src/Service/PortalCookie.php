@@ -10,15 +10,13 @@ use CILogon\Service\Content;
  *
  * This class is used by the 'CILogon Delegate Service'
  * and the CILogon OIDC 'authorize' endpoint to keep track of
- * user-selected  attributes such as lifetime (in hours) of the
- * delegated certificate and if the user clicked the 'Always Allow'
+ * user-selected attributes such as if the user clicked the 'Always Allow'
  * button to remember the allowed delegation upon future accesses.
- * The information related to certificate 'lifetime' and 'remember' the
- * delegation settings is stored in a single cookie.  Since the data
- * is actually a two dimensional array (first element is the name of
- * the portal, the second element is an array of the various
+ * The information related to 'remember' the settings is stored in a single
+ * cookie. Since the data is actually a two dimensional array (first element
+ * is the name of the portal, the second element is an array of the various
  * attributes), the stored cookie is actually a base64-encoded
- * serialization of the 2D array.  This class provides methods to
+ * serialization of the 2D array. This class provides methods to
  * read/write the cookie, and to get/set the values for a given portal.
  *
  * Example usage:

@@ -3,12 +3,10 @@
 namespace CILogon\Service;
 
 use CILogon\Service\Util;
-use CILogon\Service\MyProxy;
 use CILogon\Service\PortalCookie;
 use CILogon\Service\DBService;
 use CILogon\Service\OAuth2Provider;
 use CILogon\Service\Loggit;
-use Net_LDAP2_Util;
 
 /**
  * Content
@@ -90,7 +88,7 @@ class Content
     <link rel="stylesheet" href="/include/font-awesome-4.7.0.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-4.6.2.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-select-1.13.18.min.css" />
-    <link rel="stylesheet" href="/include/cilogon-1.0.0.css" />
+    <link rel="stylesheet" href="/include/cilogon-1.1.0.css" />
     ';
 
         $skin->printSkinCSS();
@@ -198,8 +196,7 @@ class Content
     <script src="/include/bootstrap-4.6.2.bundle.min.js"></script>
     <script src="/include/bootstrap-select-1.13.18.min.js"></script>
     <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
-    <script>$("#collapse-gencert").on(\'shown.bs.collapse\', function(){ $("#password1").focus() });</script>
-    <script src="/include/cilogon-1.0.0.js"></script>
+    <script src="/include/cilogon-1.1.0.js"></script>
 ';
 
         // CIL-1643 Additional JavaScript for use by e.g., a navigation bar.
@@ -590,448 +587,6 @@ class Content
     }
 
     /**
-     * printGetCertificate
-     *
-     * This function prints the 'Get New Certificate' box on the main page.
-     * If the 'p12' PHP session variable is valid, it is read and a link for
-     * the usercred.p12 file is presented to the user.
-     */
-    public static function printGetCertificate()
-    {
-        // CIL-624 If DISABLE_X509 is true, then don't even print out the
-        // Get New Certificate box.
-        // CIL-2190 Separate web certs from ECP certs
-        if (
-            ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) ||
-            ((defined('DISABLE_X509_WEB')) && (DISABLE_X509_WEB === true))
-        ) {
-            return;
-        }
-
-        // Check if PKCS12 downloading is disabled. If so, print out message.
-        $disabledmsg = '';
-        $disabledbyconf = ((!defined('MYPROXY_LOGON')) || (empty(MYPROXY_LOGON)));
-        $skin = Util::getSkin();
-        $pkcs12disabled = $skin->getConfigOption('pkcs12', 'disabled');
-        $disabledbyskin = ((!is_null($pkcs12disabled)) && ((int)$pkcs12disabled == 1));
-        $dn = Util::getSessionVar('distinguished_name'); // Did we get user attributes for certs?
-        $isEduGAINAndGetCert = Util::isEduGAINAndGetCert();
-
-        if ($disabledbyconf || $disabledbyskin || (strlen($dn) == 0) || $isEduGAINAndGetCert) {
-            if ($disabledbyconf) {
-                $disabledmsg = 'Downloading PKCS12 certificates is disabled.';
-            } elseif ($disabledbyskin) {
-                $disabledmsg = $skin->getConfigOption('pkcs12', 'disabledmessage');
-                if (!is_null($disabledmsg)) {
-                    $disabledmsg = trim(html_entity_decode($disabledmsg));
-                }
-                if (strlen($disabledmsg) == 0) {
-                    $disabledmsg = _('Downloading PKCS12 certificates is ' .
-                        'restricted. Please try another method or log on ' .
-                        'with a different Identity Provider.');
-                }
-            } elseif (strlen($dn) == 0) {
-                // CIL-2188 Show alternate message when missing user attributes
-                $disabledmsg = _('Certificate creation will be disabled ' .
-                    'June 1, 2025. For details, see') .
-                    ' <a target="_blank" href="https://ca.cilogon.org/retirement">' .
-                    _('CILogon X.509 Certificate Retirement Plan') . '</a>.';
-            } elseif ($isEduGAINAndGetCert) {
-                $disabledmsg = _('Unable to generate a certificate. ' .
-                    'Your identity provider has not asserted support ' .
-                    'for "Research and Scholarship" and "SIRTFI".');
-            }
-
-            echo '<div class="alert alert-danger" role="alert">';
-            echo $disabledmsg;
-            echo '</div>';
-        } else { // PKCS12 downloading is okay
-            $p12linktext = _('Left-click this link to import the certificate ' .
-                'into your broswer / operating system. (Firefox users see ' .
-                'the FAQ.) Right-click this link and select "Save As..." to ' .
-                'save the certificate to your desktop.');
-            $passwordtext1 = _('Enter a password of at least 12 characters to protect your certificate.');
-            $passwordtext2 = _('Re-enter your password for verification.');
-
-            // Get the 'p12' session variable, which contains the time until
-            // the "Download Certificate" link expires concatenated with the
-            // download link (separated by a space). If either the time or
-            // the link is blank, or the time is 0:00, then do not show the
-            // link/time and unset the 'p12' session variable.
-            $p12expire = '';
-            $p12link = '';
-            $p12linkisactive = false;
-            $p12 = Util::getSessionVar('p12');
-            if (preg_match('/([^\s]*)\s(.*)/', $p12, $matches)) {
-                $p12expire = $matches[1];
-                $p12link = $matches[2];
-            }
-
-            if (
-                (strlen($p12expire) > 0) &&
-                (strlen($p12link) > 0) &&
-                ($p12expire > 0) &&
-                ($p12expire >= time())
-            ) {
-                $p12linkisactive = true;
-                $expire = $p12expire - time();
-                $minutes = floor($expire % 3600 / 60);
-                $seconds = $expire % 60;
-                $p12expire = _('Link Expires') . ': ' .
-                    sprintf("%02dm:%02ds", $minutes, $seconds);
-                $p12link = '<a class="btn btn-primary" title="' .
-                    $p12linktext . '" href="' . $p12link .
-                    '">' . _('Download Your Certificate') . '</a>';
-            } else {
-                $p12expire = '';
-                $p12link = '';
-                Util::unsetSessionVar('p12');
-            }
-
-            $p12lifetime = Util::getSessionVar('p12lifetime');
-            if ((strlen($p12lifetime) == 0) || ($p12lifetime == 0)) {
-                $p12lifetime = Util::getCookieVar('p12lifetime');
-            }
-            $p12multiplier = Util::getSessionVar('p12multiplier');
-            if ((strlen($p12multiplier) == 0) || ($p12multiplier == 0)) {
-                $p12multiplier = Util::getCookieVar('p12multiplier');
-            }
-
-            // Try to read the skin's intiallifetime if not yet set
-            if ((strlen($p12lifetime) == 0) || ($p12lifetime <= 0)) {
-                // See if the skin specified an initial value
-                $skinlife = $skin->getConfigOption('pkcs12', 'initiallifetime', 'number');
-                $skinmult = $skin->getConfigOption('pkcs12', 'initiallifetime', 'multiplier');
-                if (
-                    (!is_null($skinlife)) && (!is_null($skinmult)) &&
-                    ((int)$skinlife > 0) && ((int)$skinmult > 0)
-                ) {
-                    $p12lifetime = (int)$skinlife;
-                    $p12multiplier = (int)$skinmult;
-                } else {
-                    $p12lifetime = 13;      // Default to 13 months
-                    $p12multiplier = 732;
-                }
-            }
-            if ((strlen($p12multiplier) == 0) || ($p12multiplier <= 0)) {
-                $p12multiplier = 732;   // Default to months
-                if ($p12lifetime > 13) {
-                    $p12lifetime = 13;
-                }
-            }
-
-            // Make sure lifetime is within [minlifetime,maxlifetime]
-            list($minlifetime, $maxlifetime) =
-                Util::getMinMaxLifetimes('pkcs12', 9516);
-            if (($p12lifetime * $p12multiplier) < $minlifetime) {
-                $p12lifetime = $minlifetime;
-                $p12multiplier = 1; // In hours
-            } elseif (($p12lifetime * $p12multiplier) > $maxlifetime) {
-                $p12lifetime = $maxlifetime;
-                $p12multiplier = 1; // In hours
-            }
-
-            $lifetimetext = _('Certificate lifetime range (in hours):') .
-                ' ' . $minlifetime . ' - ' . $maxlifetime;
-
-            $p12error = Util::getSessionVar('p12error');
-            $expandcreatecert = (int)$skin->getConfigOption('expandcreatecert');
-
-            static::printCollapseBegin(
-                'gencert',
-                _('Create Password-Protected Certificate'),
-                !($p12linkisactive || (strlen($p12error) > 0) || $expandcreatecert)
-            );
-
-            echo '
-          <div class="card-body col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1">';
-
-            // CIL-2133 Add warning about X.509 certificate retirement
-            echo '
-            <div class="alert alert-danger alert-dismissable fade show" role="alert">',
-               _('Certificate creation will be disabled June 1, 2025. For details, see'),
-               ' <a target="_blank" href="https://ca.cilogon.org/retirement">',
-               _('CILogon X.509 Certificate Retirement Plan'), '</a>.
-            </div>';
-
-            static::printFormHead(_('Get Certificate'));
-
-            if (strlen($p12error) > 0) {
-                echo '<div class="alert alert-danger alert-dismissable fade show" role="alert">';
-                echo $p12error;
-                echo '
-                      <button type="button" class="close" data-dismiss="alert"
-                      aria-label="', _('Close'), '"><span aria-hidden="true">&times;</span>
-                      </button>
-                  </div>';
-                Util::unsetSessionVar('p12error');
-            }
-
-            echo '
-            <div class="form-group">
-              <label for="password1">Enter Password</label>
-              <div class="form-row">
-                <div class="col-11">
-                  <input type="password" name="password1" id="password1"
-                  minlength="12" required="required"
-                  autocomplete="new-password"
-                  class="form-control" aria-describedby="password1help"
-                  onkeyup="checkPassword()"/>
-                  <div class="invalid-tooltip">
-                    ',
-                    _('Please enter a password of at least 12 characters.'), '
-                  </div>
-                </div>
-                <div class="col">
-                  <i id="pw1icon" class="fa fa-fw"></i>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col-11">
-                  <small id="password1help" class="form-text text-muted">',
-                  $passwordtext1, '
-                  </small>
-                </div>
-              </div>
-            </div> <!-- end form-group -->
-
-            <div class="form-group">
-              <label for="password2">Confirm Password</label>
-              <div class="form-row">
-                <div class="col-11">
-                  <input type="password" name="password2" id="password2"
-                  minlength="12" required="required"
-                  autocomplete="new-password"
-                  class="form-control" aria-describedby="password2help"
-                  onkeyup="checkPassword()"/>
-                  <div class="invalid-tooltip">
-                    ',
-                    _('Please ensure entered passwords match.'), '
-                  </div>
-                </div>
-                <div class="col">
-                  <i id="pw2icon" class="fa fa-fw"></i>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col-11">
-                  <small id="password2help" class="form-text text-muted">',
-                  $passwordtext2, '
-                  </small>
-                </div>
-              </div>
-            </div> <!-- end form-group -->
-
-            <div class="form-row p12certificatelifetime">
-              <div class="form-group col-8">
-              <label for="p12lifetime">Lifetime</label>
-                <input type="number" name="p12lifetime" id="p12lifetime" ',
-                'value="', $p12lifetime, '" min="', $minlifetime, '" max="',
-                $maxlifetime, '" class="form-control" required="required"
-                aria-describedby="lifetime1help" />
-                <div class="invalid-tooltip">
-                  ',
-                  _('Please enter a valid lifetime for the certificate.'), '
-                </div>
-                <small id="lifetime1help" class="form-text text-muted">',
-                $lifetimetext, '
-                </small>
-              </div>
-              <div class="form-group col-4">
-                <label for="p12multiplier">&nbsp;</label>
-                <select id="p12multiplier" name="p12multiplier"
-                class="form-control">
-                  <option value="1"',
-                    (($p12multiplier == 1) ? ' selected="selected"' : ''),
-                    '>hours</option>
-                  <option value="24"',
-                    (($p12multiplier == 24) ? ' selected="selected"' : ''),
-                    '>days</option>
-                  <option value="732"',
-                    (($p12multiplier == 732) ? ' selected="selected"' : ''),
-                    '>months</option>
-                </select>
-              </div>
-            </div> <!-- end form-row -->
-
-            <div class="form-group">
-              <div class="form-row align-items-center">
-                <div class="col text-center">
-                  <input type="submit" name="submit"
-                  class="btn btn-primary submit"
-                  title="', _('Get New Certificate'), '"
-                  value="', _('Get New Certificate'), '"
-                  onclick="showHourglass(\'p12\')"/>
-                  <div class="spinner-border"
-                  style="width: 32px; height: 32px;"
-                  role="status" id="p12hourglass">
-                    <span class="sr-only">', _('Generating...'), '</span>
-                  </div> <!-- spinner-border -->
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <div class="form-row align-items-center">
-                <div class="col text-center" id="p12value">
-                ', $p12link, '
-                </div>
-              </div>
-              <div class="form-row align-items-center">
-                <div class="col text-center" id="p12expire">
-                ', $p12expire, '
-                </div>
-              </div>
-            </div>
-            </form>
-          </div> <!-- end card-body -->';
-            static::printCollapseEnd();
-        }
-    }
-
-    /**
-     * printCertInfo
-     *
-     * This function prints information related to the X.509 certificate
-     * such as DN (distinguished name) and LOA (level of assurance).
-     */
-    public static function printCertInfo()
-    {
-        // CIL-624 If DISABLE_X509 is true, then don't even print out the
-        // Certificate Information box.
-        // CIL-2190 Separate web certs from ECP certs
-        if (
-            ((defined('DISABLE_X509')) && (DISABLE_X509 === true)) ||
-            ((defined('DISABLE_X509_WEB')) && (DISABLE_X509_WEB === true))
-        ) {
-            return;
-        }
-
-        $dn = Util::getSessionVar('distinguished_name');
-        static::printCollapseBegin('certinfo', _('Certificate Information'));
-        if (strlen($dn) > 0) {
-            // Strip off the email address from the pseudo-DN.
-            $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
-            echo '
-              <div class="card-body">
-                <table class="table table-striped table-sm"
-                aria-label="', _('Certificate Information'), '">
-                <tbody>
-                  <tr>
-                    <th>', _('Certificate Subject:'), '</th>
-                    <td>', Util::htmlent($dn), '</td>
-                  </tr>
-                  <tr>
-                    <th>', _('Identity Provider:'), '</th>
-                    <td>', Util::getSessionVar('idp_display_name'), '</td>
-                  </tr>
-                  <tr>
-                    <th><a target="_blank"
-                      href="https://ca.cilogon.org/loa">',
-                      _('Level of Assurance:'), '</a></th>
-                      <td>
-            ';
-
-            if (Util::getSessionVar('loa') == 'openid') {
-                echo '<a href="https://ca.cilogon.org/policy/openid"
-                      target="_blank">OpenID</a>';
-            } elseif (Util::isLOASilver()) {
-                echo '<a href="https://ca.cilogon.org/policy/silver"
-                      target="_blank">Silver</a>';
-            } else {
-                echo '<a href="https://ca.cilogon.org/policy/basic"
-                      target="_blank">Basic</a>';
-            }
-
-            echo '</td>
-                  </tr>
-                  </tbody>
-                </table>';
-        } else { // No DN? Show missing name(s) or email address.
-            echo '
-              <div class="card-body">
-            ';
-            static::printErrorBox(
-                '
-                <div class="card-text my-2">
-                  ' .
-                  _('Unable to generate a certificate. Your identity ' .
-                  'provider has not provided CILogon with all required ' .
-                  'information.') . '
-                </div> <!-- end card-text -->'
-            );
-            $first_name   = Util::getSessionVar('first_name');
-            $last_name    = Util::getSessionVar('last_name');
-            $display_name = Util::getSessionVar('display_name');
-            $email        = Util::getSessionVar('email');
-            echo '
-                <table class="table table-striped table-sm"
-                aria-label="', _('Missing Attributes'), '">
-                <tbody>';
-            if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
-                echo '
-                  <tr>
-                    <th class="w-50">', _('First Name:'), '</th>
-                    <td>', _('MISSING'), '</td>
-                  </tr>';
-            }
-            if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
-                echo '
-                  <tr>
-                    <th class="w-50">', _('Last Name:'), '</th>
-                    <td>', _('MISSING'), '</td>
-                  </tr>';
-            }
-            if (
-                (strlen($display_name) == 0) &&
-                ((strlen($first_name) == 0) || (strlen($last_name) == 0))
-            ) {
-                echo '
-                  <tr>
-                    <th class="w-50">', _('Display Name:'), '</th>
-                    <td>', _('MISSING'), '</td>
-                  </tr>';
-            }
-            $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
-            if ((strlen($email) == 0) || (!$emailvalid)) {
-                echo '
-                  <tr>
-                    <th class="w-50">', _('Email Address:'), '</th>
-                    <td>', ((strlen($email) == 0) ? _('MISSING') : _('INVALID')), '</td>
-                  </tr>';
-            }
-            $idp     = Util::getSessionVar('idp');
-            if (Util::isEduGAINAndGetCert()) {
-                $idplist = Util::getIdpList();
-                if (!$idplist->isREFEDSRandS($idp)) {
-                    echo '
-                      <tr>
-                        <th class="w-50"><a target="_blank"
-                        href="http://refeds.org/category/research-and-scholarship">',
-                        _('Research and Scholarship'), '</a>:</th>
-                        <td>', _('MISSING'), '</td>
-                      </tr>';
-                }
-                if (!$idplist->isSIRTFI($idp)) {
-                    echo '
-                      <tr>
-                        <th class="w-50"><a target="_blank"
-                        href="https://refeds.org/sirtfi">',
-                       'SIRTFI</a>:</th>
-                        <td>', _('MISSING'), '</td>
-                      </tr>';
-                }
-            }
-            echo '
-                  </tbody>
-                </table>';
-        }
-        echo '
-              </div> <!-- end card-body -->';
-        static::printCollapseEnd();
-    }
-
-    /**
      * printUserAttributes
      *
      * This function shows the user the attributes released by their
@@ -1055,57 +610,46 @@ class Content
         $errors = array();
 
         // CIL-416 Show warning for missing ePPN or Subject ID
+
         if ($samlidp) {
-            if (empty($attr_arr['eppn'])) {
-                $errors['no_eppn'] = true;
-            }
-            if (empty($attr_arr['eptid'])) {
-                $errors['no_eptid'] = true;
-            }
-            if (empty($attr_arr['subject_id'])) {
-                $errors['no_subject_id'] = true;
-            }
-            if (empty($attr_arr['pairwise_id'])) {
-                $errors['no_pairwise_id'] = true;
-            }
-            if (
+            $errors['no_eppn'] = (empty($attr_arr['eppn']));
+            $errors['no_eptid'] = (empty($attr_arr['eptid']));
+            $errors['no_subject_id'] = (empty($attr_arr['subject_id']));
+            $errors['no_pairwise_id'] = (empty($attr_arr['pairwise_id']));
+            $errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id'] = (
                 ($errors['no_eppn']) &&
                 ($errors['no_eptid']) &&
                 ($errors['no_subject_id']) &&
                 ($errors['no_pairwise_id'])
-            ) {
-                $errors['no_eppn_or_eptid_or_subject_id_or_pairwise_id'] = true;
-            }
+            );
         }
 
-        if (empty($attr_arr['idp'])) {
-            $errors['no_entityID'] = true;
-        } else {
-            if ((!$samlidp) && (empty($attr_arr['oidc']))) {
-                $errors['no_oidc'] = true;
-            }
-        }
+        $errors['no_entityID'] = (empty($attr_arr['idp']));
 
-        if ((empty($attr_arr['first_name'])) && (empty($attr_arr['display_name']))) {
-            $errors['no_first_name'] = true;
-        }
+        $errors['no_oidc'] = (
+            (!$errors['no_entityID']) &&
+            (!$samlidp) &&
+            (empty($attr_arr['oidc']))
+        );
 
-        if ((empty($attr_arr['last_name'])) && (empty($attr_arr['display_name']))) {
-            $errors['no_last_name'] = true;
-        }
+        $errors['no_first_name'] = (
+            (empty($attr_arr['first_name'])) &&
+            (empty($attr_arr['display_name']))
+        );
 
-        if (
+        $errors['no_last_name'] = (
+            (empty($attr_arr['last_name'])) &&
+            (empty($attr_arr['display_name']))
+        );
+
+        $errors['no_display_name'] =  (
             (empty($attr_arr['display_name'])) &&
             ((empty($attr_arr['first_name'])) ||
             (empty($attr_arr['last_name'])))
-        ) {
-            $errors['no_display_name'] = true;
-        }
+        );
 
         $emailvalid = filter_var($attr_arr['email'], FILTER_VALIDATE_EMAIL);
-        if ((empty($attr_arr['email'])) || (!$emailvalid)) {
-            $errors['no_valid_email'] = true;
-        }
+        $errors['no_valid_email'] = ((empty($attr_arr['email'])) || (!$emailvalid));
 
         static::printCollapseBegin(
             'userattrs',
@@ -1245,19 +789,6 @@ class Content
                 <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
-            /**
-             * CIL-2188 Don't show red-circle exclamation
-             * for missing name or email attributes
-             *
-            if (@$errors['no_first_name']) {
-                echo static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'Must have either givenName + sn -OR- displayName.'
-                );
-            }
-             */
-
             echo '
                 </td>
               </tr>
@@ -1270,19 +801,6 @@ class Content
                 <th>', _('Last Name (sn):'), '</th>
                 <td>', $attr_arr['last_name'], '</td>
                 <td>';
-
-            /**
-             * CIL-2188 Don't show red-circle exclamation
-             * for missing name or email attributes
-             *
-            if (@$errors['no_last_name']) {
-                echo static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'Must have either givenName + sn -OR- displayName.'
-                );
-            }
-             */
 
             echo '
                 </td>
@@ -1297,19 +815,6 @@ class Content
                 <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
-            /**
-             * CIL-2188 Don't show red-circle exclamation
-             * for missing name or email attributes
-             *
-            if (@$errors['no_display_name']) {
-                echo static::getIcon(
-                    'fa-exclamation-circle',
-                    'red',
-                    'Must have either displayName -OR- givenName + sn.'
-                );
-            }
-             */
-
             echo '
                 </td>
               </tr>
@@ -1321,19 +826,6 @@ class Content
                 <th>', _('Email Address (email):'), '</th>
                 <td>', $attr_arr['email'], '</td>
                 <td>';
-
-        /**
-         * CIL-2188 Don't show red-circle exclamation
-         * for missing name or email attributes
-         *
-        if (@$errors['no_valid_email']) {
-            echo static::getIcon(
-                'fa-exclamation-circle',
-                'red',
-                'Missing valid email address.'
-            );
-        }
-         */
 
         echo '
                 </td>
@@ -1458,36 +950,7 @@ class Content
         $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
         $shibarray = $idplist->getShibInfo($idp);
 
-        // CIL-416 Check for eduGAIN IdPs without both REFEDS R&S and SIRTFI
-        // since these IdPs are not allowed to get certificates.
-        $eduGainWithoutRandSandSIRTFI = 0;
-        if (
-            ($samlidp) &&
-            (!$idplist->isRegisteredByInCommon($idp)) &&
-            ((!$idplist->isREFEDSRandS($idp)) ||
-             (!$idplist->isSIRTFI($idp)))
-        ) {
-            $eduGainWithoutRandSandSIRTFI = 1;
-        }
-
-        static::printCollapseBegin(
-            'idpmeta',
-            _('Identity Provider Attributes') .
-            (
-                // CIL-416 Show warning for missing ePPN
-                ($eduGainWithoutRandSandSIRTFI) &&
-                // CIL-2188 Don't show certificate related warnings
-                ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
-                ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) ?
-                ' ' . static::getIcon(
-                    'fa-exclamation-triangle',
-                    'gold',
-                    _('This IdP does not support both ' .
-                    'REFEDS R&amp;S and SIRTFI. CILogon ' .
-                    'functionality may be limited.')
-                ) : ''
-            )
-        );
+        static::printCollapseBegin('idpmeta', 'Identity Provider Attributes');
 
         echo'
           <div class="card-body">
@@ -1577,22 +1040,6 @@ class Content
                 <td>', ($idplist->isREFEDSRandS($idp) ? _('Yes') : _('No')), '</td>
                 <td>';
 
-            if (
-                ($eduGainWithoutRandSandSIRTFI &&
-                // CIL-2188 Don't show certificate related warnings
-                ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
-                ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) &&
-                !$idplist->isREFEDSRandS($idp))
-            ) {
-                echo static::getIcon(
-                    'fa-exclamation-triangle',
-                    'gold',
-                    _('This IdP does not support both ' .
-                    'REFEDS R&amp;S and SIRTFI. CILogon ' .
-                    'functionality may be limited.')
-                );
-            }
-
             echo '
                 </td>
               </tr>
@@ -1602,22 +1049,6 @@ class Content
                        href="https://refeds.org/sirtfi">SIRTFI</a>:</th>
                 <td>', ($idplist->isSIRTFI($idp) ? _('Yes') : _('No')), '</td>
                 <td>';
-
-            if (
-                ($eduGainWithoutRandSandSIRTFI &&
-                // CIL-2188 Don't show certificate related warnings
-                ((!defined('DISABLE_X509')) || (DISABLE_X509 === false)) &&
-                ((!defined('DISABLE_X509_WEB')) || (DISABLE_X509_WEB === false)) &&
-                !$idplist->isSIRTFI($idp))
-            ) {
-                echo static::getIcon(
-                    'fa-exclamation-triangle',
-                    'gold',
-                    _('This IdP does not support both ' .
-                    'REFEDS R&amp;S and SIRTFI. CILogon ' .
-                    'functionality may be limited.')
-                );
-            }
 
             echo '
                 </td>
@@ -1858,9 +1289,7 @@ class Content
      *
      * This is a convenience method called by handleGotUser to print out
      * the attribute release error page for SAML IdPs. This can occur when
-     * not all attributes were released by the IdP, or when the IdP is an
-     * eduGAIN IdP without both R&S and SIRTFI, and the user was trying to
-     * get a certificate.
+     * not all attributes were released by the IdP.
      *
      * @param string $eppn
      * @param string $eptid
@@ -1886,8 +1315,6 @@ class Content
      * @param string $redirect The url for the <form> element
      * @param string $redirectform Additional hidden input fields for the
      *        <form>.
-     * @param bool   $edugainandgetcert Is the IdP in eduGAIN without both
-     *        R&S and SIRTIF, and the user could get a certificate?
      */
     public static function printSAMLAttributeReleaseErrorPage(
         $eppn,
@@ -1912,8 +1339,7 @@ class Content
         $uidNumber,
         $clientparams,
         $redirect,
-        $redirectform,
-        $edugainandgetcert
+        $redirectform
     ) {
         Util::unsetAllUserSessionVars();
 
@@ -1980,31 +1406,10 @@ class Content
             ((strlen($email) == 0) ? '' . _('MISSING') . '' : _('INVALID')) . '</dd>';
             $missingattrs .= '%0D%0A    mail (email address)';
         }
-        // CIL-326/CIL-539 - For eduGAIN IdPs attempting to get a cert,
-        // print out missing R&S and SIRTFI values
-        $idplist = Util::getIdpList();
-        if ($edugainandgetcert) {
-            if (!$idplist->isREFEDSRandS($idp)) {
-                $errorboxstr .= '
-                    <dt class="col-sm-3"><a target="_blank"
-                    href="http://refeds.org/category/research-and-scholarship">Research
-                    and Scholarship</a>:</dt>
-                    <dd class="col-sm-9">' . _('MISSING') . '</dd>';
-                $missingattrs .= '%0D%0A    http://refeds.org/category/research-and-scholarship';
-            }
-            if (!$idplist->isSIRTFI($idp)) {
-                $errorboxstr .= '
-                    <dt class="col-sm-3"><a target="_blank"
-                    href="https://refeds.org/sirtfi">SIRTFI</a>:</dt>
-                    <dd class="col-sm-9">' . _('MISSING') . '</dd>';
-                $missingattrs .= '%0D%0A    https://refeds.org/sirtfi';
-            }
-        }
-        $student = false;
         $errorboxstr .= '</dl>';
-
         static::printErrorBox($errorboxstr);
 
+        $student = false;
         if (
             (strlen($email) == 0) &&
             (preg_match('/student@/', $affiliation))
@@ -2027,6 +1432,7 @@ class Content
         }
 
         // Get contacts from metadata for email addresses
+        $idplist = Util::getIdpList();
         $shibarray = $idplist->getShibInfo($idp);
         $emailmsg = '?subject=Attribute Release Problem for CILogon' .
         '&cc=' . EMAIL_HELP .
@@ -2692,7 +2098,7 @@ class Content
      * This method redirects control flow to the getuser script for
      * when the user logs in via OAuth 2.0. It first checks to see
      * if we have a valid session. If so, we don't need to redirect and
-     * instead simply show the Get Certificate page. Otherwise, we start
+     * instead simply show the user attributes page. Otherwise, we start
      * an OAuth 2.0 logon by composing a parameterized GET URL using
      * the OAuth 2.0 endpoint.
      *
@@ -2716,7 +2122,7 @@ class Content
 
         // If the user has a valid 'user_uid' in the PHP session, and the
         // providerId matches the 'idp' in the PHP session, then
-        // simply go to the 'Download Certificate' button page.
+        // simply go to the user attributes page.
         if (static::verifyCurrentUserSession($providerId)) {
             printMainPage();
         } else { // Otherwise, redirect to the OAuth 2.0 endpoint
@@ -2820,34 +2226,14 @@ class Content
             $redirect = $failureuri . "?reason=missing_attributes";
         }
 
-        // For the 'Create Password-Protected Certificate' flow, we now
-        // allow users to log in even if not all attributes are given. So
-        // the check for isEduGAINandGetCert happens later for X509 certs.
-        // Here we just check for OAuth1/OAuth2/OIDC flow and
-        // eduGAIN getcert restriction.
-        $isEduGAINAndGetCert = false;
-        if (
-            (strlen($failureuri) > 0) ||                      // OAuth 1.0a
-            (strlen(Util::getSessionVar('clientparams')) > 0) // OIDC
-        ) {
-            $isEduGAINAndGetCert = Util::isEduGAINAndGetCert();
-        }
-
-        // Was this an OAuth 1.0a transaction but the distinguished_name
-        // could not be calculated? Set $missingparam below.
-        $oauth1withoutdn = ((strlen($failureuri) > 0) && (strlen($dn) == 0));
-
         // Check for various error conditions and print out appropriate page
         if (
             (strlen($user_uid) == 0) || // Empty user_uid
             (strlen($status) == 0) ||   // Empty status
-            ($status & 1) ||            // Odd-numbered status = error
-            ($isEduGAINAndGetCert) ||   // Not allowed
-            ($oauth1withoutdn)          // OAuth1.0a needs DN for cert
+            ($status & 1)               // Odd-numbered status = error
         ) {
             $log->error(
-                'Failed to getuser' .
-                ($isEduGAINAndGetCert ? ' due to eduGAIN IdP restriction.' : '.') .
+                '=DBS= Failed to getuser.' .
                 ' status="' . DBService::statusToStatusText($status) . '"' .
                 ' user_uid="' .
                 ((strlen($user_uid) > 0) ? $user_uid : '<MISSING>') . '"'
@@ -2858,11 +2244,10 @@ class Content
             $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
 
             // Was there a misssing parameter?
-            $missingparam = (($status ==
-                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']) ||
-                    $oauth1withoutdn);
+            $missingparam = ($status ==
+                DBService::$STATUS['STATUS_MISSING_PARAMETER_ERROR']);
 
-            if (($isEduGAINAndGetCert) || ($missingparam && $samlidp)) {
+            if ($missingparam && $samlidp) {
                 static::printSAMLAttributeReleaseErrorPage(
                     $eppn,
                     $eptid,
@@ -2886,8 +2271,7 @@ class Content
                     $uidNumber,
                     $clientparams,
                     $redirect,
-                    $redirectform,
-                    $isEduGAINAndGetCert
+                    $redirectform
                 );
             } elseif ($missingparam && (!$samlidp)) { // OAuth2 IdP
                 static::printOAuth2AttributeReleaseErrorPage(
@@ -2952,179 +2336,15 @@ in "handleGotUser()" for valid IdPs for the skin.'
         $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
         $callbackuri = Util::getSessionVar('callbackuri');
 
-        // Log new users with possibly empty distinguished_name values
+        // Log users with interesting statuses
         if ($status == DBService::$STATUS['STATUS_NEW_USER']) {
-            $dn = Util::getSessionVar('distinguished_name');
-            $log->info('New User' . ((strlen($dn) == 0) ? ' without a distinguished_name.' : '.'));
-            // If HTML entities are in the distinguished_name, send an alert.
-            if (
-                (strlen($dn) > 0) &&
-                ((strlen($callbackuri) > 0) ||
-                 (isset($clientparams['code'])))
-            ) {
-                $dn = static::reformatDN(preg_replace('/\s+email=.+$/', '', $dn));
-                $htmldn = Util::htmlent($dn);
-                if (strcmp($dn, $htmldn) != 0) {
-                    $log->warn('New user DN contains HTML entities: htmlentites(DN) = ' . $htmldn);
-                    // CIL-1098 Don't send email alerts for IdP-generated errors
-                    /*
-                    Util::sendErrorAlert(
-                        'New user DN contains HTML entities',
-                        "htmlentites(DN) = $htmldn\n"
-                    );
-                    */
-                }
-            }
+            $log->info('=DBS= New user created.');
         } elseif ($status == DBService::$STATUS['STATUS_USER_UPDATED']) {
-            $log->info('User IdP attributes changed.');
+            $log->info('=DBS= User data updated.');
+        } elseif ($status == DBService::$STATUS['STATUS_IDP_UPDATED']) {
+            $log->info('=DBS= User IdP entityID updated.');
         }
         printMainPage();
-    }
-
-    /**
-     * generateP12
-     *
-     * This function is called when the user clicks the 'Get New
-     * Certificate' button. It first reads in the password fields and
-     * verifies that they are valid (i.e. they are long enough and match).
-     * Then it gets a credential from the MyProxy server and converts that
-     * certificate into a PKCS12 which is written to disk.  If everything
-     * succeeds, the temporary pkcs12 directory and lifetime is saved to
-     * the 'p12' PHP session variable, which is read later when the Main
-     * Page HTML is shown.
-     */
-    public static function generateP12()
-    {
-        $log = new Loggit();
-
-        // Get the entered p12lifetime and p12multiplier and set the cookies
-        list($minlifetime, $maxlifetime) =
-            Util::getMinMaxLifetimes('pkcs12', 9516);
-        $p12lifetime   = Util::getPostVar('p12lifetime');
-        $p12multiplier = Util::getPostVar('p12multiplier');
-        if (strlen($p12multiplier) == 0) {
-            $p12multiplier = 1;  // For ECP, p12lifetime is in hours
-        }
-        $lifetime = $p12lifetime * $p12multiplier;
-        if ($lifetime <= 0) { // In case user entered negative number
-            $lifetime = $maxlifetime;
-            $p12lifetime = $maxlifetime;
-            $p12multiplier = 1;  // maxlifetime is in hours
-        } elseif ($lifetime < $minlifetime) {
-            $lifetime = $minlifetime;
-            $p12lifetime = $minlifetime;
-            $p12multiplier = 1;  // minlifetime is in hours
-        } elseif ($lifetime > $maxlifetime) {
-            $lifetime = $maxlifetime;
-            $p12lifetime = $maxlifetime;
-            $p12multiplier = 1;  // maxlifetime is in hours
-        }
-        Util::setCookieVar('p12lifetime', $p12lifetime);
-        Util::setCookieVar('p12multiplier', $p12multiplier);
-        Util::setSessionVar('p12lifetime', $p12lifetime);
-        Util::setSessionVar('p12multiplier', $p12multiplier);
-
-        // Verify that the password is at least 12 characters long
-        $password1 = Util::getPostVar('password1');
-        $password2 = Util::getPostVar('password2');
-        $p12password = Util::getPostVar('p12password');  // For ECP clients
-        if (strlen($p12password) > 0) {
-            $password1 = $p12password;
-            $password2 = $p12password;
-        }
-        if (strlen($password1) < 12) {
-            Util::setSessionVar(
-                'p12error',
-                _('Password must have at least 12 characters.')
-            );
-            return; // SHORT PASSWORD - NO FURTHER PROCESSING NEEDED!
-        }
-
-        // Verify that the two password entry fields matched
-        if ($password1 != $password2) {
-            Util::setSessionVar('p12error', _('Passwords did not match.'));
-            return; // MISMATCHED PASSWORDS - NO FURTHER PROCESSING NEEDED!
-        }
-
-        $dn = Util::getSessionVar('distinguished_name');
-        if (strlen($dn) > 0) {
-            // Append extra info, such as 'skin', to be processed by MyProxy
-            $myproxyinfo = Util::getSessionVar('myproxyinfo');
-            if (strlen($myproxyinfo) > 0) {
-                $dn .= " $myproxyinfo";
-            }
-            // Attempt to fetch a credential from the MyProxy server
-            $cert = MyProxy::getMyProxyCredential(
-                $dn,
-                '',
-                MYPROXY_HOST,
-                Util::getLOAPort(),
-                $lifetime,
-                MYPROXY_CLIENT_CRED,
-                ''
-            );
-
-            // Extract the public and private keys from the certificate
-            $pubkey = '';
-            $privkey = '';
-            if (
-                preg_match(
-                    '/(-----BEGIN CERTIFICATE-----[^-]+' .
-                    '-----END CERTIFICATE-----)[^-]*' .
-                    '(-----BEGIN RSA PRIVATE KEY-----[^-]+' .
-                    '-----END RSA PRIVATE KEY-----)/',
-                    $cert,
-                    $matches
-                )
-            ) {
-                $pubkey = $matches[1];
-                $privkey = $matches[2];
-            }
-
-            if (strlen($pubkey) > 0) { // Successfully got a certificate!
-                // Create a temporary directory in DEFAULT_PKCS12_DIR
-                $tdir = Util::tempDir(DEFAULT_PKCS12_DIR, '', 0770);
-                $p12dir = str_replace(DEFAULT_PKCS12_DIR, '', $tdir);
-                $p12file = $tdir . '/usercred.p12';
-
-                // CIL-1294 Convert the X.509 pub/priv keys to PKCS12 file
-                if (($x509 = openssl_x509_read($pubkey)) !== false) {
-                    openssl_pkcs12_export_to_file($x509, $p12file, $privkey, $password1);
-                }
-
-                // Verify the usercred.p12 file was actually created
-                $size = @filesize($p12file);
-                if (($size !== false) && ($size > 0)) {
-                    $p12link = 'https://' . static::getMachineHostname() .
-                               '/pkcs12/' . $p12dir . '/usercred.p12';
-                    $p12 = (time() + 300) . " " . $p12link;
-                    Util::setSessionVar('p12', $p12);
-                    $log->info('Generated New User Certificate="' . $p12link . '"');
-                    //CIL-507 Special Log Message For XSEDE
-                    $email = Util::getSessionVar('email');
-                    Util::logXSEDEUsage('PKCS12', $email);
-                } else { // Empty or missing usercred.p12 file - shouldn't happen!
-                    Util::setSessionVar(
-                        'p12error',
-                        _('Error creating certificate. Please try again.')
-                    );
-                    Util::deleteDir($tdir); // Remove the temporary directory
-                    $log->error('Error creating certificate - missing usercred.p12');
-                }
-            } else { // The myproxy-logon command failed - shouldn't happen!
-                Util::setSessionVar(
-                    'p12error',
-                    _('Error! MyProxy unable to create certificate.')
-                );
-                $log->error('Error creating certificate - myproxy-logon failed');
-            }
-        } else { // Couldn't find the 'distinguished_name' PHP session value
-            Util::setSessionVar(
-                'p12error',
-                _('Cannot create certificate due to missing attributes.')
-            );
-            $log->error('Error creating certificate - missing dn session variable');
-        }
     }
 
     /**
@@ -3148,50 +2368,14 @@ in "handleGotUser()" for valid IdPs for the skin.'
     }
 
     /**
-     * reformatDN
-     *
-     * This function takes in a certificate subject DN with the email=...
-     * part already removed. It checks the skin to see if <dnformat> has
-     * been set. If so, it reformats the DN appropriately.
-     *
-     * @param string $dn The certificate subject DN (without the email=... part)
-     * @return string The certificate subject DN transformed according to
-     *         the value of the <dnformat> skin config option.
-     */
-    public static function reformatDN($dn)
-    {
-        $newdn = $dn;
-        $dnformat = (string)Util::getSkin()->getConfigOption('dnformat');
-        if (strlen($dnformat) > 0) {
-            if (
-                ($dnformat == 'rfc2253') &&
-                (preg_match(
-                    '%/DC=(.*)/DC=(.*)/C=(.*)/O=(.*)/CN=(.*)%',
-                    $dn,
-                    $matches
-                ))
-            ) {
-                array_shift($matches);
-                $m = array_reverse(Net_LDAP2_Util::escape_dn_value($matches));
-                $newdn = "CN=$m[0],O=$m[1],C=$m[2],DC=$m[3],DC=$m[4]";
-            }
-        }
-        return $newdn;
-    }
-
-    /**
      * getMachineHostname
      *
      * This function is utilized in the formation of the URL for the
-     * PKCS12 credential download link and for the Shibboleth Single Sign-on
-     * session initiator URL. It returns a host-specific URL
+     * Shibboleth Single Sign-on session initiator URL. It returns
+     * a host-specific URL
      * hostname by mapping the local machine hostname (as returned
      * by 'uname -n') to an InCommon metadata cilogon.org hostname
-     * (e.g., polo2.cilogon.org). This function uses the HOSTNAME_ARRAY
-     * where the keys are the local machine hostname and
-     * the values are the external facing *.cilogon.org hostname.
-     * In case the local machine hostname cannot be found in the
-     * HOSTNAME_ARRAY, DEFAULT_HOSTNAME is returned.
+     * (e.g., cilogon.org). DEFAULT_HOSTNAME is returned by default.
      *
      * @param string $idp The entityID of the IdP used for potential
      *        special handling (e.g., for Syngenta).
@@ -3210,9 +2394,6 @@ in "handleGotUser()" for valid IdPs for the skin.'
             (!in_array($idp, ADFS_IDP_ARRAY))
         ) {
             $localhost = php_uname('n');
-            if (array_key_exists($localhost, HOSTNAME_ARRAY)) {
-                $retval = HOSTNAME_ARRAY[$localhost];
-            }
         }
         return $retval;
     }
@@ -3492,15 +2673,12 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 'identity provider'), '</li>';
             $scopes = array_diff($scopes, ['org.cilogon.userinfo']);
         }
-        if (in_array('edu.uiuc.ncsa.myproxy.getcert', $scopes)) {
-            echo '<li>', _('A certificate that allows'), ' "',
-            htmlspecialchars($clientparams['client_name']),
-            '" ', _('to act on your behalf'), '</li>';
-            $scopes = array_diff($scopes, ['edu.uiuc.ncsa.myproxy.getcert']);
-        }
         // Output any remaining scopes as-is
         foreach ($scopes as $value) {
-            echo '<li>', $value, '</li>';
+            // Skip printing out the 'getcert' scope
+            if ($value != 'edu.uiuc.ncsa.myproxy.getcert') {
+                echo '<li>', $value, '</li>';
+            }
         }
         echo '</ul>
             </div> <!-- end card-body -->
@@ -3527,7 +2705,6 @@ in "handleGotUser()" for valid IdPs for the skin.'
 
         Util::removeShibCookies();
         Util::unsetUserSessionVars();
-        Util::unsetP12SessionVars();
         Util::setSessionVar('cilogon_skin', $skin); // Re-apply the skin
 
         static::printHeader(_('Logged Out of the CILogon Service'));

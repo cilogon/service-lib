@@ -416,12 +416,11 @@ class Content
             'is an organization where you have an account and can log on ' .
             'to gain access to online services.') . '
         </p>
-        <p>
-            ' .
+        <p>' .
             _('If you are a faculty, staff, or student member of a ' .
             'university or college, please select it as your identity ' .
             'provider. If your school is not listed, please see') .
-            ' <a target="blank" href="https://www.cilogon.org/selectidp">' .
+            ' <a target=\'_blank\' href=\'https://www.cilogon.org/selectidp\'>' .
             _('How to Select an Identity Provider') . '</a>.' .
             '
         </p>
@@ -573,7 +572,7 @@ class Content
         echo '
         <p class="privacypolicy">
         ', _('By logging on to this site, you agree to the'),
-        '<a target="_blank" href="',
+        ' <a target="_blank" href="',
         (is_null($ppurl) ? 'https://www.cilogon.org/privacy' : (string)$ppurl),
         '">', _('privacy policy'), '</a>.
         </p>

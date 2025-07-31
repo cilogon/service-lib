@@ -170,7 +170,7 @@ class Content
         _('your responsibilities') .
         '</a>.</p>
         <p><a target="_blank" href="https://www.cilogon.org/acknowledgements">'  .
-        _('Acknowledgements of support') . '</a> for this site.</p>';
+        _('Acknowledgements of support') . '</a> ' . _('for this site.') . '</p>';
 
         // CIL-767 Allow skin to set footer text
         $skin = Util::getSkin();
@@ -419,11 +419,10 @@ class Content
         <p>
             ' .
             _('If you are a faculty, staff, or student member of a ' .
-            'university or college, please select it for your identity ' .
-            'provider. If your school is not listed, please contact ' .
-            'your local Help Desk and ask them to') .
-            ' <a target="blank" href="https://www.cilogon.org/service/addidp">' .
-            _('add their Identity Provider') . '</a>.' .
+            'university or college, please select it as your identity ' .
+            'provider. If your school is not listed, please see') .
+            ' <a target="blank" href="https://www.cilogon.org/selectidp">' .
+            _('How to Select an Identity Provider') . '</a>.' .
             '
         </p>
         ';
@@ -451,7 +450,7 @@ class Content
         if ($count > 0) {
             $selecthelp .= '<p>' .
                 _('If available, you can also try one of the ' .
-                '"social" identity providers such as ORCID or Google.') .
+                'social identity providers such as ORCID or Google.') .
                 '</p>';
         }
 
@@ -674,7 +673,7 @@ class Content
         if (strlen($user_uid) > 0) {
             echo '
               <tr>
-                <th>', _('CILogon User Identifier:'), '</th>
+                <th>', _('CILogon User Identifier'), ':</th>
                 <td>', $user_uid, '</td>
                 <td> </td>
               </tr>';
@@ -682,7 +681,7 @@ class Content
 
         echo '
               <tr>
-                <th>', _('Identity Provider (entityID):'), '</th>
+                <th>', _('Identity Provider (entityID)'), ':</th>
                 <td>', $attr_arr['idp'], '</td>
                 <td>';
 
@@ -745,7 +744,7 @@ class Content
             if (!empty($attr_arr['subject_id'])) {
                 echo '
                   <tr>
-                    <th>', _('Subject ID (subject-id):'), '</th>
+                    <th>', _('Subject ID (subject-id)'), ':</th>
                     <td>', $attr_arr['subject_id'], '</td>
                     <td> </td>
                   </tr>';
@@ -754,7 +753,7 @@ class Content
             if (!empty($attr_arr['pairwise_id'])) {
                 echo '
                   <tr>
-                    <th>', _('Pairwise ID (pairwise-id):'), '</th>
+                    <th>', _('Pairwise ID (pairwise-id)'), ':</th>
                     <td>', $attr_arr['pairwise_id'], '</td>
                     <td> </td>
                   </tr>';
@@ -785,7 +784,7 @@ class Content
         if ((!empty($attr_arr['first_name'])) || (@$errors['no_first_name'])) {
             echo '
               <tr>
-                <th>', _('First Name (givenName):'), '</th>
+                <th>', _('First Name (givenName)'), ':</th>
                 <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
@@ -798,7 +797,7 @@ class Content
         if ((!empty($attr_arr['last_name'])) || (@$errors['no_last_name'])) {
             echo '
               <tr>
-                <th>', _('Last Name (sn):'), '</th>
+                <th>', _('Last Name (sn)'), ':</th>
                 <td>', $attr_arr['last_name'], '</td>
                 <td>';
 
@@ -811,7 +810,7 @@ class Content
         if ((!empty($attr_arr['display_name'])) || (@$errors['no_display_name'])) {
             echo '
               <tr>
-                <th>', _('Display Name (displayName):'), '</th>
+                <th>', _('Display Name (displayName)'), ':</th>
                 <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
@@ -823,7 +822,7 @@ class Content
 
         echo '
               <tr>
-                <th>', _('Email Address (email):'), '</th>
+                <th>', _('Email Address (email)'), ':</th>
                 <td>', $attr_arr['email'], '</td>
                 <td>';
 
@@ -834,7 +833,7 @@ class Content
         if (!empty($attr_arr['loa'])) {
             echo '
               <tr>
-                <th>', _('Level of Assurance (assurance):'), '</th>
+                <th>', _('Level of Assurance (assurance)'), ':</th>
                 <td>', $attr_arr['loa'], '</td>
                 <td> </td>
               </tr>';
@@ -861,7 +860,7 @@ class Content
         if (!empty($attr_arr['affiliation'])) {
             echo '
               <tr>
-                <th>', _('Affiliation (affiliation):'), '</th>
+                <th>', _('Affiliation (affiliation)'), ':</th>
                 <td>', $attr_arr['affiliation'], '</td>
                 <td> </td>
               </tr>';
@@ -870,7 +869,7 @@ class Content
         if (!empty($attr_arr['entitlement'])) {
             echo '
               <tr>
-                <th>', _('Entitlement (entitlement):'), '</th>
+                <th>', _('Entitlement (entitlement)'), ':</th>
                 <td>', $attr_arr['entitlement'], '</td>
                 <td> </td>
               </tr>';
@@ -879,7 +878,7 @@ class Content
         if (!empty($attr_arr['ou'])) {
             echo '
               <tr>
-                <th>', _('Organizational Unit (ou):'), '</th>
+                <th>', _('Organizational Unit (ou)'), ':</th>
                 <td>', $attr_arr['ou'], '</td>
                 <td> </td>
               </tr>';
@@ -888,7 +887,7 @@ class Content
         if (!empty($attr_arr['member_of'])) {
             echo '
               <tr>
-                <th>', _('Member (member):'), '</th>
+                <th>', _('Member (member)'), ':</th>
                 <td>', $attr_arr['member_of'], '</td>
                 <td> </td>
               </tr>';
@@ -915,7 +914,7 @@ class Content
         if (!empty($attr_arr['preferred_username'])) {
             echo '
               <tr>
-                <th>', _('Preferred Username:'), '</th>
+                <th>', _('Preferred Username'), ':</th>
                 <td>', $attr_arr['preferred_username'], '</td>
                 <td> </td>
               </tr>';
@@ -958,7 +957,7 @@ class Content
             aria-label="', _('Identity Provider Attributes'), '">
             <tbody>
               <tr>
-                <th>', _('Organization Name:'), '</th>
+                <th>', _('Organization Name'), ':</th>
                 <td>', @$shibarray['Organization Name'], '</td>
                 <td>';
 
@@ -975,14 +974,14 @@ class Content
                 </td>
               </tr>
               <tr>
-                <th>', _('Home Page:'), '</th>
+                <th>', _('Home Page'), ':</th>
                 <td><a target="_blank" href="', @$shibarray['Home Page'], '">',
                 @$shibarray['Home Page'], '</a></td>
                 <td> </td>
               </tr>
 
               <tr>
-                <th>', _('Support Contact:'), '</th>';
+                <th>', _('Support Contact'), ':</th>';
         if (
             (!empty(@$shibarray['Support Name'])) ||
             (!empty(@$shibarray['Support Address']))
@@ -1000,7 +999,7 @@ class Content
         if ($samlidp) {
             echo '
               <tr>
-                <th>', _('Technical Contact:'), '</th>';
+                <th>', _('Technical Contact'), ':</th>';
             if (
                 (!empty(@$shibarray['Technical Name'])) ||
                 (!empty(@$shibarray['Technical Address']))
@@ -1014,7 +1013,7 @@ class Content
               </tr>
 
               <tr>
-                <th>', _('Administrative Contact:'), '</th>';
+                <th>', _('Administrative Contact'), ':</th>';
             if (
                 (!empty(@$shibarray['Administrative Name'])) ||
                 (!empty(@$shibarray['Administrative Address']))
@@ -1028,7 +1027,7 @@ class Content
               </tr>
 
               <tr>
-                <th>', _('Registered by InCommon:'), '</th>
+                <th>', _('Registered by InCommon'), ':</th>
                 <td>', ($idplist->isRegisteredByInCommon($idp) ? _('Yes') : _('No')), '</td>
                 <td> </td>
               </tr>
@@ -1055,7 +1054,7 @@ class Content
               </tr>
 
               <tr>
-                <th>', _('Entity ID:'), '</th>
+                <th>', _('Entity ID'), ':</th>
                 <td><a style="text-decoration:underline" target="_blank"
                 href="https://met.refeds.org/met/entity/',
                 rawurlencode($idp),
@@ -1379,13 +1378,13 @@ class Content
         }
         if ((strlen($first_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
-                <dt class="col-sm-3">' . _('First Name:') . '</dt>
+                <dt class="col-sm-3">' . _('First Name') . ':</dt>
                 <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    givenName (first name)';
         }
         if ((strlen($last_name) == 0) && (strlen($display_name) == 0)) {
             $errorboxstr .= '
-                <dt class="col-sm-3">' . _('Last Name:') . '</dt>
+                <dt class="col-sm-3">' . _('Last Name') . ':</dt>
                 <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    sn (last name)';
         }
@@ -1394,14 +1393,14 @@ class Content
             ((strlen($first_name) == 0) || (strlen($last_name) == 0))
         ) {
             $errorboxstr .= '
-                <dt class="col-sm-3">' . _('Display Name:') . '</dt>
+                <dt class="col-sm-3">' . _('Display Name') . ':</dt>
                 <dd class="col-sm-9">' . _('MISSING') . '</dd>';
             $missingattrs .= '%0D%0A    displayName';
         }
         $emailvalid = filter_var($email, FILTER_VALIDATE_EMAIL);
         if ((strlen($email) == 0) || (!$emailvalid)) {
             $errorboxstr .= '
-                <dt class="col-sm-3">' . _('Email Address:') . '</dt>
+                <dt class="col-sm-3">' . _('Email Address') . ':</dt>
                 <dd class="col-sm-9">' .
             ((strlen($email) == 0) ? '' . _('MISSING') . '' : _('INVALID')) . '</dd>';
             $missingattrs .= '%0D%0A    mail (email address)';
@@ -1469,7 +1468,7 @@ class Content
                 $name = $addr;
             }
             echo '
-                  <li> ', _('Support Contact:'), ' ',
+                  <li> ', _('Support Contact'), ': ',
                   $name, ' <a class="btn btn-primary"
                   title="', _('Contact Support'), '"
                   href="mailto:', $addr, $emailmsg, '">',
@@ -1487,7 +1486,7 @@ class Content
                     $name = $addr;
                 }
                 echo '
-                      <li> ', _('Technical Contact:'), ' ',
+                      <li> ', _('Technical Contact'), ': ',
                       $name, ' <a class="btn btn-primary"
                       title="', _('Contact Support'), '"
                       href="mailto:', $addr, $emailmsg, '">',
@@ -1505,7 +1504,7 @@ class Content
                     $name = $addr;
                 }
                 echo '
-                      <li> ', _('Administrative Contact:'), ' ',
+                      <li> ', _('Administrative Contact'), ': ',
                       $name, ' <a class="btn btn-primary"
                       title="', _('Contact Support'), '"
                       href="mailto:', $addr, $emailmsg, '">',
@@ -2647,7 +2646,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
         ';
 
         if (array_key_exists('user_code', $clientparams)) {
-            echo '<li>', _('User Code:'), ' <tt>' . $clientparams['user_code'] .
+            echo '<li>', _('User Code'), ': <tt>' . $clientparams['user_code'] .
                 '</tt></li>';
         }
         if (in_array('openid', $scopes)) {
@@ -2799,7 +2798,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 echo '
               <div class="card-text my-2">
                 ',
-                _('You may still be logged in to '), $idp_display_name,
+                _('You may still be logged in to'), ' ', $idp_display_name,
                 '. ', _('Close your web browser or'),
                 ' <a target="_blank" ' .
                 'href="https://www.lifewire.com/how-to-delete-cookies-2617981">',

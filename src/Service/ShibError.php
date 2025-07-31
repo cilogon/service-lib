@@ -196,7 +196,7 @@ class ShibError
 
         echo '
             <div class="card-body px-5">
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-shiberror-1">
                 ',
                 _('The CILogon Service has encountered a Shibboleth error.'), '
 
@@ -206,7 +206,7 @@ class ShibError
         Content::printErrorBox('<pre>' . $errorstr2 . '</pre>');
 
         echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-shiberror-2">
                 ',
                 _('This may be a temporary error. Please try again later, ' .
                 ' or contact us at the email address at the bottom ' .
@@ -218,7 +218,7 @@ class ShibError
         $forceauthn = $skin->getConfigOption('forceauthn');
         if ((!is_null($forceauthn)) && ((int)$forceauthn == 1)) {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-shiberror-3">
                 ',
                 _('Note that this error may be due to your selected ' .
                 'Identity Provider (IdP) not fully supporting ' .
@@ -232,7 +232,7 @@ class ShibError
         Content::printFormHead('Error');
 
         echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-shiberror-4">
                 <div class="form-group">
                   <div class="form-row align-items-center
                   justify-content-center">';

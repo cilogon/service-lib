@@ -118,7 +118,7 @@ class Content
     </div>
     </header>
 
-    <div class="mt-4 container-fluid" role="main"> <!-- Main Bootstrap Container -->
+    <div class="mt-4 container-fluid" role="main" id="mainbootstrap"> <!-- Main Bootstrap Container -->
     ';
 
         static::printNoScript();
@@ -127,8 +127,8 @@ class Content
         $skinbanner = (string)$skin->getConfigOption('banner');
         if (strlen($skinbanner) > 0) {
             echo '
-      <div class="alert alert-secondary alert-dismissible fade show" role="alert">
-      ', $skinbanner, '
+      <div class="alert alert-secondary alert-dismissible fade show" role="alert"
+           id="skinbanner">', $skinbanner, '
         <button type="button" class="close" data-dismiss="alert"
           aria-label="', _('Close') , '">
           <span aria-hidden="true">&times;</span>
@@ -139,8 +139,8 @@ class Content
 
         if ((defined('BANNER_TEXT')) && (!empty(BANNER_TEXT))) {
             echo '
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      ', BANNER_TEXT, '
+      <div class="alert alert-warning alert-dismissible fade show" role="alert"
+           id="defaultbanner>', BANNER_TEXT, '
         <button type="button" class="close" data-dismiss="alert"
           aria-label="', _('Close') ,'">
           <span aria-hidden="true">&times;</span>
@@ -491,7 +491,7 @@ class Content
             <a href="#" tabindex="0" data-trigger="hover click"
             class="helpcursor" role="tooltip" aria-label="', _('Selection') ,'"
             data-toggle="popover" data-html="true"
-            title="Selecting an Identity Provider"
+            title="Selecting an Identity Provider" id="id-a-select-help"
             data-content="', $selecthelp, '"><i class="fa
             fa-question-circle"></i></a>
             </div> <!-- end div form-group -->
@@ -508,11 +508,11 @@ class Content
                 <input class="form-check-input" type="checkbox"
                 id="keepidp" name="keepidp" ',
                 ((strlen($keepidp) > 0) ? 'checked="checked" ' : ''), ' />
-                <label class="form-check-label"
+                <label class="form-check-label" id="id-label-remember"
                 for="keepidp">' . _('Remember this selection') . '</label>
                 <a href="#" tabindex="0" data-trigger="hover click"
                 class="helpcursor" role="tooltip" aria-label="', _('Remember'), '"
-                data-toggle="popover" data-html="true"
+                data-toggle="popover" data-html="true" id="id-a-bypass-help"
                 data-content="', $rememberhelp, '"><i class="fa
                 fa-question-circle"></i></a>
               </div> <!-- end div form-check -->
@@ -1111,8 +1111,8 @@ class Content
     public static function printCollapseBegin($name, $title, $collapsed = true)
     {
         echo '
-      <section title="', $title, '">
-      <div class="card col-sm-10 offset-sm-1">
+      <section title="', $title, '" id="id-section-', $name, '">
+      <div class="card col-sm-10 offset-sm-1" id="id-div-', $name, '">
         <h5 class="card-header text-center">
           <a class="d-block',
             ($collapsed ? ' collapsed' : ''),
@@ -1252,7 +1252,7 @@ class Content
         );
 
         echo '
-              <div class="card-body px-5">';
+              <div class="card-body px-5" id="id-general-error">';
 
         static::printErrorBox(_('An error has occurred. This may be a ' .
             'temporary error. Please try again later, or contact us at ' .
@@ -1353,7 +1353,7 @@ class Content
         ';
 
         $errorboxstr = '
-                <div class="card-text my-2">
+                <div class="card-text my-2" id="id-problem-logging-on">
                   ' .
                   _('There was a problem logging on. Your identity provider ' .
                   'has not provided CILogon with required information.') . '
@@ -1414,7 +1414,7 @@ class Content
         ) {
             $student = true;
             echo '
-                <div class="card-text my-2">
+                <div class="card-text my-2" id="id-student-email">
                   ',
                   _('If you are a student, ' .
                   'you may need to ask your identity provider ' .
@@ -1449,9 +1449,10 @@ class Content
             'https://www.cilogon.org/service/addidp for more ' .
             'details. Thank you for any help you can provide.';
         echo '
-                <div class="card-text my-2">
-                  Contact your identity provider to let them know you are
-                  having having a problem logging on to CILogon.
+                <div class="card-text my-2" id="id-having-problems">
+                  ',
+                  _('Contact your identity provider to let them know you ' .
+                  'are having having a problem logging on to CILogon.'), '
                 </div> <!-- end card-text -->
                 <ul>
             ';
@@ -1514,7 +1515,7 @@ class Content
 
         echo '
                 </ul>
-                <div class="card-text my-2">
+                <div class="card-text my-2" id="id-alternatively">
                   ',
                   _('Alternatively, you can contact us at the email address ' .
                   'at the bottom of the page.'), '
@@ -1577,7 +1578,7 @@ class Content
 
         if ($idp_display_name == 'Google') {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-google-1">
                 ',
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use Google as your identity provider, but your ' .
@@ -1589,7 +1590,7 @@ class Content
                 ' (All other Google account information is not required by ' .
                 'the CILogon Service.)'), '
               </div>
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-google-2">
                 ',
                 _('After you have updated your Google account profile, click ' .
                 'the "Proceed" button below and attempt to log on ' .
@@ -1599,7 +1600,7 @@ class Content
               </div>';
         } elseif ($idp_display_name == 'GitHub') {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-github-1">
                 ',
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use GitHub as your identity provider, but your ' .
@@ -1611,7 +1612,7 @@ class Content
                 '(All other GitHub account information is not required by ' .
                 'the CILogon Service.)'), '
               </div>
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-github-2">
                 ',
                 _('After you have updated your GitHub account profile, click ' .
                 'the "Proceed" button below and attempt to log on ' .
@@ -1621,7 +1622,7 @@ class Content
               </div>';
         } elseif ($idp_display_name == 'ORCID') {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-orcid-1">
                 ',
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use ORCID as your identity provider, but your ' .
@@ -1634,7 +1635,7 @@ class Content
                 '(All other ORCID account information is not required by ' .
                 'the CILogon Service.)'), '
               </div>
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-orcid-2">
                 ',
                 _('After you have updated your ORCID account profile, click ' .
                 'the "Proceed" button below and attempt to log on ' .
@@ -1644,7 +1645,7 @@ class Content
               </div>';
         } elseif ($idp_display_name == 'Microsoft') {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-microsoft-1">
                 ',
                 _('There was a problem logging on. It appears that you have ' .
                 'attempted to use Microsoft as your identity provider, but your ' .
@@ -1656,7 +1657,7 @@ class Content
                 '(All other Microsfot account information is not required by ' .
                 'the CILogon Service.)'), '
               </div>
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-problem-microsoft-2">
                 ',
                 _('After you have updated your Microsoft account profile, click ' .
                 'the "Proceed" button below and attempt to log on ' .
@@ -2634,7 +2635,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
 
         echo '
             <div class="card-body px-5">
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-consent-attribute-release">
                 <a target="_blank" href="',
                 htmlspecialchars($clientparams['client_home_url']), '">',
                 htmlspecialchars($clientparams['client_name']), '</a>',
@@ -2713,7 +2714,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
 
         echo '
             <div class="card-body px-5">
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-1">
                 ',
                 _('You have successfully logged out of CILogon.'), '
               </div> <!-- end card-text -->
@@ -2721,7 +2722,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
 
         if ($idp == Util::getOAuth2Url('Google')) {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-2">
                 ',
                 _('You can optionally click the link below to log out of Google. ' .
                 'However, this will log you out from ALL of your Google accounts. ' .
@@ -2738,7 +2739,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             ';
         } elseif ($idp == Util::getOAuth2Url('GitHub')) {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-3">
                 ',
                 _('You can optionally click the link below to log out of GitHub.'), '
               </div>
@@ -2753,7 +2754,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             ';
         } elseif ($idp == Util::getOAuth2Url('ORCID')) {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-4">
                 ',
                 _('You can optionally click the link below to log out of ORCID. ' .
                 'Note that ORCID will redirect you to the ORCID Sign In page. ' .
@@ -2771,7 +2772,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             ';
         } elseif ($idp == Util::getOAuth2Url('Microsoft')) {
             echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-5">
                 ',
                 _('You can optionally click the link below to log out of Microsoft.' .
                 'However, this will log you out from ALL of your Microsoft accounts.' .
@@ -2795,7 +2796,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
             $logout = $idplist->getLogout($idp);
             if (empty($logout)) {
                 echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-6">
                 ',
                 _('You may still be logged in to'), ' ', $idp_display_name,
                 '. ', _('Close your web browser or'),
@@ -2807,7 +2808,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
               ';
             } else {
                 echo '
-              <div class="card-text my-2">
+              <div class="card-text my-2" id="id-successfully-logged-out-7">
                 ',
                 _('You can optionally click the link below to log out of'),
                 ' ', $idp_display_name, '. ',

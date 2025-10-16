@@ -742,6 +742,11 @@ class Skin
     {
         $retval = '';  // Assume uri is not in $forcearray
 
+        // CIL-2348 Always call getAdminForClient at least once
+        // This will set session variables for admin_id and admin_name
+        // for logging purposes
+        Util::getAdminForClient($uri);
+
         if ((!is_null($this->forcearray)) && (!empty($this->forcearray))) {
             foreach ($this->forcearray as $key => $value) {
                 if (

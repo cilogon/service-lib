@@ -1189,6 +1189,10 @@ Remote Address= ' . $remoteaddr . '
 
         // Specific to OIDC flow
         static::unsetSessionVar('clientparams');
+
+        // CIL-2348 Admin client ID and name
+        static::unsetSessionVar('admin_id');
+        static::unsetSessionVar('admin_name');
     }
 
     /**
@@ -1349,7 +1353,7 @@ Remote Address= ' . $remoteaddr . '
      *
      * @param string $client_id The client_id to check.
      * @return array An associative array containing the 'admin_id' and
-     *         'name' of the admin client which created the client,
+     *         'admin_name' of the admin client which created the client,
      *         or an empty array if no matching admin client was found.
      */
     public static function getAdminForClient($client_id)
@@ -1380,12 +1384,24 @@ Remote Address= ' . $remoteaddr . '
                         (strlen(@$data['admin_id']) > 0)
                     ) {
                         $retval['admin_id'] = (string)(@$data['admin_id']);
-                        $retval['name'] = (string)(@$data['name']);
+                        $retval['admin_name'] = (string)(@$data['name']);
                     }
                     $db->disconnect();
                     // Save this client_id's query results for next time
                     $clienttoadminmap[$client_id] = $retval;
                 }
+            }
+
+            // CIL-2348 Put admin ID and name in session for logging
+            if (array_key_exists('admin_id', $retval)) {
+                static::setSessionVar('admin_id', $retval['admin_id']);
+            } else {
+                static::unsetSessionVar('admin_id');
+            }
+            if (array_key_exists('admin_name', $retval)) {
+                static::setSessionVar('admin_name', $retval['admin_name']);
+            } else {
+                static::unsetSessionVar('admin_name');
             }
         }
 
@@ -1892,7 +1908,7 @@ Remote Address= ' . $remoteaddr . '
             $admin_name = '';
             if (!empty($admin)) {
                 $admin_id = @$admin['admin_id'];
-                $admin_name = @$admin['name'];
+                $admin_name = @$admin['admin_name'];
             }
 
             // Read in the SSO_ADMIN_ARRAY from config.php or the bypass

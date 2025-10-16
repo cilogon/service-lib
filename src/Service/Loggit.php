@@ -70,7 +70,8 @@ class Loggit
         $sess = true,
         $level = PEAR_LOG_INFO
     ) {
-        $message2 = '';
+        // Put info to be logged in associative array. Output as JSON object.
+        $logarray = array('log_message' => $message);
 
         // Don't log messages from certain hosts
         $dontlog = array('141.142.148.10',  // nagios
@@ -95,7 +96,7 @@ class Loggit
                 (isset($_SERVER[$value])) &&
                 (strlen($_SERVER[$value]) > 0)
             ) {
-                $message2 .= $value . '="' . $_SERVER[$value] . '" ';
+                $logarray[$value] = $_SERVER[$value];
             }
         }
 
@@ -106,7 +107,7 @@ class Loggit
                 (isset($_COOKIE[$value])) &&
                 (strlen($_COOKIE[$value]) > 0)
             ) {
-                $message2 .= $value . '="' . $_COOKIE[$value] . '" ';
+                $logarray[$value] = $_COOKIE[$value];
             }
         }
 
@@ -114,8 +115,8 @@ class Loggit
         if ($sess) {
             if (session_id() != '') {
                 foreach ($_SESSION as $key => $value) {
-                    $message2 .= $key . '="' .
-                        (is_array($value) ? 'Array' : $value) . '" ';
+                    $logarray[$key] =
+                        (is_array($value) ? 'Array' : $value);
                 }
             }
         }
@@ -123,12 +124,19 @@ class Loggit
         if ($missing) { // Output any important missing user session vars
             foreach (DBService::$user_attrs as $value) {
                 if (!isset($_SESSION[$value])) {
-                    $message2 .= $value . '="MISSING" ';
+                    $logarray[$value] = 'MISSING';
                 }
             }
         }
 
-        $this->logger->log($message . ' ' . $message2, $level);
+        // CIL-2347 Log messages as JSON object
+        $this->logger->log(
+            json_encode(
+                $logarray,
+                JSON_FORCE_OBJECT | JSON_UNESCAPED_SLASHES
+            ),
+            $level
+        );
     }
 
     /**

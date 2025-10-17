@@ -632,16 +632,23 @@ class Util
         $languages = $skin->getConfigOption('languages');
 
         if ((!is_null($languages)) && (!empty($languages->lang))) {
-            // One or more languages configured
+            // One or more languages configured.
+            // Save them to a cookie, separated by spaces.
+            $availlang = '';
+            foreach ($languages->lang as $lang) {
+                $availlang .= (string)$lang . ' ';
+            }
+            $availlang = trim($availlang);
+            static::setCookieVar('langsavailable', $availlang);
 
             $setlang = ''; // The language to set
 
             // Check if there is a "lang" cookie
             $cookielang = static::getCookieVar('lang');
             if (strlen($cookielang) > 0) {
-                foreach ($languages->lang as $lang) {
-                    if ((string)$lang == $cookielang) {
-                        $setlang = (string)$lang;
+                foreach (explode(' ', $availlang) as $lang) {
+                    if ($lang == $cookielang) {
+                        $setlang = $lang;
                     }
                 }
             } else { // No cookie? Check if skin has a default language

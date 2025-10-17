@@ -116,6 +116,9 @@ class Content
     <div class="logoheader">
        <h1 aria-label="', $title, '"><span>[CILogon Service]</span></h1>
     </div>
+
+    <div class="langmenu">
+    </div>
     </header>
 
     <div class="mt-4 container-fluid" role="main" id="mainbootstrap"> <!-- Main Bootstrap Container -->

@@ -632,27 +632,33 @@ class Util
         $languages = $skin->getConfigOption('languages');
 
         if ((!is_null($languages)) && (!empty($languages->lang))) {
-            // At least one language is configured.
+            // One or more languages configured
+
+            $setlang = ''; // The language to set
+
             // Check if there is a "lang" cookie
             $cookielang = static::getCookieVar('lang');
             if (strlen($cookielang) > 0) {
-                $matchlang = '';
                 foreach ($languages->lang as $lang) {
                     if ((string)$lang == $cookielang) {
-                        $matchlang = (string)$lang;
+                        $setlang = (string)$lang;
                     }
                 }
+            } else { // No cookie? Check if skin has a default language
+                $defaultlanguage = $skin->getConfigOptions('defaultlanguage');
+                if (!is_null($defaultlanguage)) {
+                    $setlang = (string)$defaultlanguage;
+                }
+            }
 
-                // If the "lang" cookie matches one of the skin's
-                // configured languages, then set that language
-                if (strlen($matchlang) > 0) {
-                    if (setlocale(LC_ALL, $matchlang) !== false) {
-                        putenv('LC_ALL=' . $matchlang);
-                        define('TEXT_DOMAIN', 'cilogon');
-                        bindtextdomain(TEXT_DOMAIN, $_SERVER['DOCUMENT_ROOT'] . '/locale');
-                        bind_textdomain_codeset(TEXT_DOMAIN, 'UTF-8');
-                        textdomain(TEXT_DOMAIN);
-                    }
+            // If we found a language to set, then try to set the locale
+            if (strlen($setlang) > 0) {
+                if (setlocale(LC_ALL, $setlang) !== false) {
+                    putenv('LC_ALL=' . $setlang);
+                    define('TEXT_DOMAIN', 'cilogon');
+                    bindtextdomain(TEXT_DOMAIN, $_SERVER['DOCUMENT_ROOT'] . '/locale');
+                    bind_textdomain_codeset(TEXT_DOMAIN, 'UTF-8');
+                    textdomain(TEXT_DOMAIN);
                 }
             }
         } else {

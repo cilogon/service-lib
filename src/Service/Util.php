@@ -548,6 +548,18 @@ class Util
     }
 
     /**
+     * cilogonInit
+     *
+     * This function calls any necessary start up functions, e.g.,
+     * starting the PHP session.
+     */
+    public static function cilogon_init()
+    {
+        static::startPHPSession();
+        static::setLanguage();
+    }
+
+    /**
      * startPHPSession
      *
      * This function starts a secure PHP session and should be called
@@ -602,6 +614,52 @@ class Util
             (time() - $_SESSION['lastaccess']) > 60)
         ) {
             $_SESSION['lastaccess'] = time();
+        }
+    }
+
+    /**
+     * setLanguage
+     *
+     * This function sets the language to be used for text output by
+     * gettext() (shorthand _() ). It checks if the skin has a
+     * 'languages' configuration with at least one 'lang'. Next, it
+     * checks for a 'lang' cookie. If the cookie matches one of the
+     * skin's langs, then it attempts to get the locale.
+     */
+    public static function setLanguage()
+    {
+        // Check if languages are enabled in the skin
+        $languages = $skin->getConfigOption('languages');
+
+        if ((!is_null($languages)) && (!empty($languages->lang))) {
+            // At least one language is configured.
+            // Check if there is a "lang" cookie
+            $cookielang = static::getCookieVar('lang');
+            if (strlen($cookielang) > 0) {
+                $matchlang = '';
+                foreach ($languages->lang as $lang) {
+                    if ((string)$lang == $cookielang) {
+                        $matchlang = (string)$lang;
+                    }
+                }
+
+                // If the "lang" cookie matches one of the skin's
+                // configured languages, then set that language
+                if (strlen($matchlang) > 0) {
+                    if (setlocale(LC_ALL, $matchlang) !== false) {
+                        putenv('LC_ALL=' . $matchlang);
+                        define('TEXT_DOMAIN', 'cilogon');
+                        bindtextdomain(TEXT_DOMAIN, $_SERVER['DOCUMENT_ROOT'] . '/locale');
+                        bind_textdomain_codeset(TEXT_DOMAIN, 'UTF-8');
+                        textdomain(TEXT_DOMAIN);
+                    }
+                }
+            }
+        } else {
+            // No languages configured in skin.
+            // Delete available languges cookie which would be read by
+            // JavaScript to create the languages pulldown menu.
+            static::unsetCookieVar('langsavailable');
         }
     }
 

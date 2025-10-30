@@ -268,7 +268,7 @@ class Skin
             $db = Util::getDB(true);
             if (!is_null($db)) {
                 $data = $db->getRow(
-                    'SELECT * from skins WHERE name = ?',
+                    'SELECT name,config,css from skins WHERE name = ?',
                     array($skinvar),
                     DB_FETCHMODE_ASSOC
                 );

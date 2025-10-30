@@ -101,7 +101,7 @@ class Bypass
         $db = Util::getDB(true);
         if (!is_null($db)) {
             $data = $db->getAssoc(
-                'SELECT * FROM bypass',
+                'SELECT type,regex,value FROM bypass',
                 true,
                 array(),
                 DB_FETCHMODE_ASSOC,

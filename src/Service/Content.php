@@ -88,7 +88,7 @@ class Content
     <link rel="stylesheet" href="/include/font-awesome-4.7.0.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-4.6.2.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-select-1.13.18.min.css" />
-    <link rel="stylesheet" href="/include/cilogon-1.1.0.css" />
+    <link rel="stylesheet" href="/include/cilogon-1.2.0.css" />
     ';
 
         $skin->printSkinCSS();
@@ -116,11 +116,43 @@ class Content
     <div class="logoheader">
        <h1 aria-label="', $title, '"><span>[CILogon Service]</span></h1>
     </div>
+    ';
 
-    <div class="langmenu">
+        $langsavailable = Util::getSessionVar('langsavailable');
+        Util::unsetSessionVar('langsavailable');
+        if (strlen($langsavailable) > 0) {
+            $setlang = Util::getSessionVar('lang');
+            Util::unsetSessionVar('lang');
+            echo '
+    <div class="langMenu" id="langMenu">
+        <div class="dropup" id="langMenuDropdown">
+            <button class="btn btn-secondary" type="button" id="langMenuDropdownButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expand="false">
+                <i class="fa fa-language fa-3x"></i>
+            </button>
+            <div class="dropdown-menu" id="langMenuDropdownContent">
+    ';
+            foreach (explode(' ', $langsavailable) as $lang) {
+                echo '<button  class="dropdown-item';
+
+                if ($lang == $setlang) {
+                    echo ' active';
+                }
+
+                echo '" type="button" onclick="setLang(\'' . $lang . '\')">' .
+                     strtoupper(substr($lang, 0, 2)) . '</button>
+                     ';
+            }
+
+            echo '
+            </div>
+        </div>
     </div>
-    </header>
+    ';
+        }
 
+            echo '
+    </header>
     <div class="mt-4 container-fluid" role="main" id="mainbootstrap"> <!-- Main Bootstrap Container -->
     ';
 
@@ -199,7 +231,7 @@ class Content
     <script src="/include/bootstrap-4.6.2.bundle.min.js"></script>
     <script src="/include/bootstrap-select-1.13.18.min.js"></script>
     <script>$(document).ready(function(){ $(\'[data-toggle="popover"]\').popover(); });</script>
-    <script src="/include/cilogon-1.1.0.js"></script>
+    <script src="/include/cilogon-1.2.0.js"></script>
 ';
 
         // CIL-1643 Additional JavaScript for use by e.g., a navigation bar.
@@ -538,10 +570,11 @@ class Content
             <div class="form-group">
               <div class="form-row align-items-center justify-content-center">
                 <div class="col-auto">
-                  <input type="submit" name="submit"
+                  <button type="submit" name="submit"
                   class="btn btn-primary submit"
                   title="', $lobtext, '"
-                  value="', $lobtext, '" id="wayflogonbutton" />
+                  value="Log On" id="wayflogonbutton">',
+                  $lobtext, '</button>
                 </div> <!-- end col-auto -->
         ';
 
@@ -552,10 +585,11 @@ class Content
         ) {
             echo '
                 <div class="col-auto">
-                  <input type="submit" name="submit"
+                  <button type="submit" name="submit"
                   class="btn btn-primary submit"
                   title="', _('Cancel'), '"
-                  value="', _('Cancel'), '" id="wayfcancelbutton" />
+                  value="Cancel" id="wayfcancelbutton">',
+                  _('Cancel'), '</button>
                 </div>
             ';
         }
@@ -951,7 +985,7 @@ class Content
         $samlidp = ((!empty($idp)) && (!$idplist->isOAuth2($idp)));
         $shibarray = $idplist->getShibInfo($idp);
 
-        static::printCollapseBegin('idpmeta', 'Identity Provider Attributes');
+        static::printCollapseBegin('idpmeta', _('Identity Provider Attributes'));
 
         echo'
           <div class="card-body">
@@ -1220,9 +1254,10 @@ class Content
                 title="', _('Exit your browser'), '">',
                 _('To log off, please quit your browser.'), '</div>';
         } else {
-            echo '  <input type="submit" name="submit"
+            echo '  <button type="submit" name="submit"
                 class="btn btn-primary submit"
-                title="', $logofftext, '" value="', _('Log Off'), '" />';
+                title="', $logofftext, '" value="Log Off">',
+                _('Log Off'), '</button>';
         }
 
         echo '
@@ -1270,10 +1305,11 @@ class Content
                   justify-content-center">
                     <div class="col-auto">
                       ', $redirectform, '
-                      <input type="submit" name="submit"
+                      <button type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="', _('Proceed'), '"
-                      title="', _('Proceed'),'" />
+                      value="Proceed"
+                      title="', _('Proceed'),'">', 
+                      _('Proceed'), '</button>
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -1534,10 +1570,11 @@ class Content
                   justify-content-center">
                     <div class="col-auto">
                       ', $redirectform, '
-                      <input type="submit" name="submit"
+                      <button type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="', _('Proceed'), '"
-                      title="', _('Proceed'), '" />
+                      value="Proceed"
+                      title="', _('Proceed'), '">',
+                      _('Proceed'), '</button>
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->
@@ -1682,10 +1719,11 @@ class Content
                       value="',
                       Util::getOAuth2Url($idp_display_name), '" />
                       ', $redirectform, '
-                      <input type="submit" name="submit"
+                      <button type="submit" name="submit"
                       class="btn btn-primary submit form-control"
-                      value="', _('Proceed'), '"
-                      title="', _('Proceed'), '" />
+                      value="Proceed"
+                      title="', _('Proceed'), '">',
+                      _('Proceed'), '</button>
                     </div>
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->

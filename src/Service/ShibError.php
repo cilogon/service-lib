@@ -251,10 +251,11 @@ class ShibError
 
         echo '
                     <div class="col-auto">
-                      <input type="submit" name="submit"
+                      <button type="submit" name="submit"
                       class="btn btn-primary submit form-control"
                       title="', _('Proceed'), '"
-                      value="', _('Proceed'), '" />
+                      value="Proceed">',
+                      _('Proceed'), '</button>
                     </div> <!-- end col-auto -->
                   </div> <!-- end form-row align-items-center -->
                 </div> <!-- end form-group -->

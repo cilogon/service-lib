@@ -553,7 +553,7 @@ class Util
      * This function calls any necessary start up functions, e.g.,
      * starting the PHP session.
      */
-    public static function cilogon_init()
+    public static function cilogonInit()
     {
         static::startPHPSession();
         static::setLanguage();
@@ -624,44 +624,53 @@ class Util
      * gettext() (shorthand _() ). It checks if the skin has a
      * 'languages' configuration with at least one 'lang'. Next, it
      * checks for a 'lang' cookie. If the cookie matches one of the
-     * skin's langs, then it attempts to get the locale.
+     * skin's langs, then it attempts to set the locale.
      */
     public static function setLanguage()
     {
-        // Check if languages are enabled in the skin
+        // Check if skin option <languages> has been configured. If not, then
+        // there's no need to set a language since gettext calls such as
+        // _() will simply output the text in the function call when text
+        // domain is not set.
+        $skin = static::getSkin();
         $languages = $skin->getConfigOption('languages');
 
         if ((!is_null($languages)) && (!empty($languages->lang))) {
             // One or more languages configured.
-            // Save them to a cookie, separated by spaces.
-            $availlang = '';
+            // Save them to the session for use by printHeader().
+            // 2 letter languages are separated by spaces.
+            $langsavailable = '';
             foreach ($languages->lang as $lang) {
-                $availlang .= (string)$lang . ' ';
+                $langsavailable .= (string)$lang . ' ';
             }
-            $availlang = trim($availlang);
-            static::setCookieVar('langsavailable', $availlang);
+            $langsavailable = trim($langsavailable);
+            static::setSessionVar('langsavailable', $langsavailable);
 
             $setlang = ''; // The language to set
 
-            // Check if there is a "lang" cookie
+            // Check if there is a 'lang' cookie. If so, verify the
+            // cookie is one of the available languages.
             $cookielang = static::getCookieVar('lang');
             if (strlen($cookielang) > 0) {
-                foreach (explode(' ', $availlang) as $lang) {
+                foreach (explode(' ', $langsavailable) as $lang) {
                     if ($lang == $cookielang) {
                         $setlang = $lang;
                     }
                 }
             } else { // No cookie? Check if skin has a default language
-                $defaultlanguage = $skin->getConfigOptions('defaultlanguage');
+                $defaultlanguage = $skin->getConfigOption('defaultlanguage');
                 if (!is_null($defaultlanguage)) {
                     $setlang = (string)$defaultlanguage;
                 }
             }
 
             // If we found a language to set, then try to set the locale
+            // and save the language to the 'lang' session variable for
+            // use by printHeader().
             if (strlen($setlang) > 0) {
                 if (setlocale(LC_ALL, $setlang) !== false) {
-                    putenv('LC_ALL=' . $setlang);
+                    static::setSessionVar('lang', $setlang);
+                    putenv('LANG=' . $setlang);
                     define('TEXT_DOMAIN', 'cilogon');
                     bindtextdomain(TEXT_DOMAIN, $_SERVER['DOCUMENT_ROOT'] . '/locale');
                     bind_textdomain_codeset(TEXT_DOMAIN, 'UTF-8');
@@ -670,9 +679,9 @@ class Util
             }
         } else {
             // No languages configured in skin.
-            // Delete available languges cookie which would be read by
-            // JavaScript to create the languages pulldown menu.
-            static::unsetCookieVar('langsavailable');
+            // Delete available languges session var which would be read by
+            // printHeader() to create the languages pulldown menu.
+            static::unsetSessionVar('langsavailable');
         }
     }
 
@@ -2149,56 +2158,5 @@ Remote Address= ' . $remoteaddr . '
             }
         }
         return $retval;
-    }
-
-    public static function setLang()
-    {
-        // Check if skin option <languages> has been configured. If not, then
-        // there's no need to set a language since gettext calls such as
-        // _() will simply output the text in the function call when text
-        // domain is not set.
-        $skin = static::getSkin();
-        $languages = $skin->getConfigOption('languages');
-        if ((is_null($languages)) || (empty($languages->lang))) {
-            return; // No languages configured
-        }
-
-        // If we made it here, then we need to set a locale.
-        // Check if the 'lang' cookie has been set. If so, verify
-        // the cookie is one of the configured languages.
-        $langcookie = static::getCookieVar('lang');
-        $langcookieverified = false;
-        if (strlen($langcookie) > 0) {
-            foreach ($languages->lang as $availlang) {
-                if ($langcookie == ((string)$availlang)) {
-                    $langcookieverified = true;
-                    break;
-                }
-            }
-        }
-
-        // If langcookie not set or not one of the configured languages,
-        // set it to the default language, or the first configured language
-        // if default language was not configured.
-        if (!$langcookieverified) {
-            $defaultlanguage = $skin->getConfigOption('defaultlanguage');
-            if (is_null($defaultlanguage)) {
-                $languages->rewind();
-                $defaultlanguage = $languages->current();
-            }
-            $langcookie = (string)$defaultlanguage;
-            static::setCookie('lang', $langcookie);
-        }
-
-        // Set the language domain - Need to install locales in Docker image
-        if (setlocale(LC_ALL, $langcookie) !== false) {
-            putenv('LC_ALL=' . $langcookie);
-            bindtextdomain('cilogon', static::getServerVar('DOCUMENT_ROOT') . '/locale');
-            bind_textdomain_codeset('cilogon', 'UTF-8');
-            textdomain('cilogon');
-        }
-
-        // Maybe need to put all available languages in a cookie so that
-        // JavaScript can populate a pop-up menu.
     }
 }

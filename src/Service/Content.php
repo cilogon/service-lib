@@ -86,6 +86,7 @@ class Content
 
         echo '
     <link rel="stylesheet" href="/include/fontawesome-7.1.0.min.css" />
+    <link rel="stylesheet" href="/include/solid.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-4.6.2.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-select-1.13.18.min.css" />
     <link rel="stylesheet" href="/include/cilogon-1.2.0.css" />

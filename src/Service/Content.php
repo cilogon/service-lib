@@ -85,7 +85,7 @@ class Content
         }
 
         echo '
-    <link rel="stylesheet" href="/include/font-awesome-4.7.0.min.css" />
+    <link rel="stylesheet" href="/include/fontawesome-7.1.0.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-4.6.2.min.css" />
     <link rel="stylesheet" href="/include/bootstrap-select-1.13.18.min.css" />
     <link rel="stylesheet" href="/include/cilogon-1.2.0.css" />
@@ -128,7 +128,7 @@ class Content
         <div class="dropup" id="langMenuDropdown">
             <button class="btn btn-secondary" type="button" id="langMenuDropdownButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expand="false">
-                <i class="fa fa-language fa-3x"></i>
+                <i class="fa-solid fa-language fa-3x"></i>
             </button>
             <div class="dropdown-menu" id="langMenuDropdownContent">
     ';
@@ -1158,7 +1158,7 @@ class Content
             ($collapsed ? 'false' : "true"),
             '" aria-controls="collapse-', $name, '"
             id="heading-', $name, '">
-            <i class="fa fa-chevron-down pull-right"></i>
+            <i class="fa-solid fa-chevron-down pull-right"></i>
             ', $title, '
           </a>
         </h5>

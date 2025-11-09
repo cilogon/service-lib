@@ -1130,7 +1130,7 @@ class Content
             ((strlen($help) > 0) ? '<span data-trigger="hover" ' .
             'data-toggle="popover" data-html="true" ' .
             'data-content="' . $help . '">' : '') .
-            '<i class="fa nocollapse ' . $icon . '"></i>' .
+            '<i class="fa-solid nocollapse ' . $icon . '"></i>' .
             ((strlen($help) > 0) ? '</span>' : '') .
             '</span>';
     }
@@ -1159,7 +1159,7 @@ class Content
             ($collapsed ? 'false' : "true"),
             '" aria-controls="collapse-', $name, '"
             id="heading-', $name, '">
-            <i class="fa-solid fa-chevron-down pull-right"></i>
+            <i class="fa-solid fa-chevron-down fa-pull-end"></i>
             ', $title, '
           </a>
         </h5>

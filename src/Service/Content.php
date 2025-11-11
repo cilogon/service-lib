@@ -60,6 +60,9 @@ class Content
             $poweredbytitle = (string)$pbtitle;
         }
 
+        // Set the language before any text output
+        Util::setLanguage();
+
         echo '<!doctype html>
 <html lang="en">
   <head>
@@ -123,7 +126,7 @@ class Content
         Util::unsetSessionVar('langsavailable');
         if (strlen($langsavailable) > 0) {
             $setlang = Util::getSessionVar('lang');
-            Util::unsetSessionVar('lang');
+            static::printFormHead();
             echo '
     <div class="langMenu" id="langMenu">
         <div class="dropup" id="langMenuDropdown">
@@ -134,21 +137,23 @@ class Content
             <div class="dropdown-menu" id="langMenuDropdownContent">
     ';
             foreach (explode(' ', $langsavailable) as $lang) {
-                echo '<button  class="dropdown-item';
+                echo '<button class="dropdown-item';
 
                 if ($lang == $setlang) {
                     echo ' active';
                 }
 
-                echo '" type="button" onclick="setLang(\'' . $lang . '\')">' .
+                echo '" type="submit" name="submit"
+                    title="', $lang, '" value="', $lang, '" >' .
                      strtoupper(substr($lang, 0, 2)) . '</button>
                      ';
             }
 
             echo '
-            </div>
-        </div>
-    </div>
+            </div> <!-- End langMenuDropdownContent -->
+        </div> <!-- End langMenuDropdown -->
+    </div> <!-- End langMenu -->
+    </form>
     ';
         }
 

@@ -556,7 +556,6 @@ class Util
     public static function cilogonInit()
     {
         static::startPHPSession();
-        static::setLanguage();
     }
 
     /**
@@ -623,8 +622,8 @@ class Util
      * This function sets the language to be used for text output by
      * gettext() (shorthand _() ). It checks if the skin has a
      * 'languages' configuration with at least one 'lang'. Next, it
-     * checks for a 'lang' cookie. If the cookie matches one of the
-     * skin's langs, then it attempts to set the locale.
+     * checks for a 'lang' session var or 'lang' cookie. If the lang matches
+     * one of the skin's langs, then it attempts to set the locale.
      */
     public static function setLanguage()
     {
@@ -638,7 +637,7 @@ class Util
         if ((!is_null($languages)) && (!empty($languages->lang))) {
             // One or more languages configured.
             // Save them to the session for use by printHeader().
-            // 2 letter languages are separated by spaces.
+            // Configured languages will be separated by spaces.
             $langsavailable = '';
             foreach ($languages->lang as $lang) {
                 $langsavailable .= (string)$lang . ' ';
@@ -646,18 +645,28 @@ class Util
             $langsavailable = trim($langsavailable);
             static::setSessionVar('langsavailable', $langsavailable);
 
-            $setlang = ''; // The language to set
-
-            // Check if there is a 'lang' cookie. If so, verify the
-            // cookie is one of the available languages.
-            $cookielang = static::getCookieVar('lang');
-            if (strlen($cookielang) > 0) {
-                foreach (explode(' ', $langsavailable) as $lang) {
-                    if ($lang == $cookielang) {
-                        $setlang = $lang;
+            // Check if there is a 'lang' session var or 'lang' cookie.
+            // If so, verify it is one of the available languages.
+            $setlang = ''; // The language to be set
+            $langvars = array(
+                static::getSessionVar('lang'),
+                static::getCookieVar('lang')
+            );
+            foreach ($langvars as $langvar) {
+                if (strlen($langvar) > 0) {
+                    foreach (explode(' ', $langsavailable) as $lang) {
+                        if ($lang == $langvar) {
+                            $setlang = $lang;
+                            break 2;
+                        }
                     }
                 }
-            } else { // No cookie? Check if skin has a default language
+            }
+
+            // If there was no session lang or cookie lang, or the lang
+            // was not in the list of configured languages, check if the
+            // skin has a default language.
+            if (strlen($setlang) == 0) {
                 $defaultlanguage = $skin->getConfigOption('defaultlanguage');
                 if (!is_null($defaultlanguage)) {
                     $setlang = (string)$defaultlanguage;
@@ -665,21 +674,27 @@ class Util
             }
 
             // If we found a language to set, then try to set the locale
-            // and save the language to the 'lang' session variable for
-            // use by printHeader().
+            // and save the language to the 'lang' session variable
+            // (and 'lang' cookie) for use by printHeader().
             if (strlen($setlang) > 0) {
                 if (setlocale(LC_ALL, $setlang) !== false) {
                     static::setSessionVar('lang', $setlang);
+                    static::setCookieVar('lang', $setlang);
                     putenv('LANG=' . $setlang);
                     define('TEXT_DOMAIN', 'cilogon');
                     bindtextdomain(TEXT_DOMAIN, $_SERVER['DOCUMENT_ROOT'] . '/locale');
                     bind_textdomain_codeset(TEXT_DOMAIN, 'UTF-8');
                     textdomain(TEXT_DOMAIN);
                 }
+            } else {
+                // If no acceptable lang was found, then unset the session
+                // 'lang' so it can't be used, but keep the 'lang' cookie
+                // in case the skin changes or the user quits their browser.
+                static::unsetSessionVar('lang');
             }
         } else {
             // No languages configured in skin.
-            // Delete available languges session var which would be read by
+            // Delete 'langsavailable' session var which would be read by
             // printHeader() to create the languages pulldown menu.
             static::unsetSessionVar('langsavailable');
         }

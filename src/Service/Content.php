@@ -723,7 +723,7 @@ class Content
 
         echo '
               <tr>
-                <th>', _('Identity Provider (entityID)'), ':</th>
+                <th>', _('Identity Provider'), ' (entityID)', ':</th>
                 <td>', $attr_arr['idp'], '</td>
                 <td>';
 
@@ -751,7 +751,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    _('Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.')
+                    _('Must have one of the following:'), ' ePPN, ePTID, Subject ID, Pairwise ID'
                 );
             }
 
@@ -768,7 +768,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    _('Must have one of ePPN, ePTID, Subject ID, or Pairwise ID.')
+                    _('Must have one of the following:'), ' ePPN, ePTID, Subject ID, Pairwise ID'
                 );
             } elseif (@$warnings['no_eppn']) {
                 echo static::getIcon(
@@ -786,7 +786,7 @@ class Content
             if (!empty($attr_arr['subject_id'])) {
                 echo '
                   <tr>
-                    <th>', _('Subject ID (subject-id)'), ':</th>
+                    <th>', _('Subject ID'), ' (subject-id)', ':</th>
                     <td>', $attr_arr['subject_id'], '</td>
                     <td> </td>
                   </tr>';
@@ -795,7 +795,7 @@ class Content
             if (!empty($attr_arr['pairwise_id'])) {
                 echo '
                   <tr>
-                    <th>', _('Pairwise ID (pairwise-id)'), ':</th>
+                    <th>', _('Pairwise ID'), ' (pairwise-id)', ':</th>
                     <td>', $attr_arr['pairwise_id'], '</td>
                     <td> </td>
                   </tr>';
@@ -826,7 +826,7 @@ class Content
         if ((!empty($attr_arr['first_name'])) || (@$errors['no_first_name'])) {
             echo '
               <tr>
-                <th>', _('First Name (givenName)'), ':</th>
+                <th>', _('First Name'), ' (givenName)', ':</th>
                 <td>', $attr_arr['first_name'], '</td>
                 <td>';
 
@@ -839,7 +839,7 @@ class Content
         if ((!empty($attr_arr['last_name'])) || (@$errors['no_last_name'])) {
             echo '
               <tr>
-                <th>', _('Last Name (sn)'), ':</th>
+                <th>', _('Last Name'), ' (sn)', ':</th>
                 <td>', $attr_arr['last_name'], '</td>
                 <td>';
 
@@ -852,7 +852,7 @@ class Content
         if ((!empty($attr_arr['display_name'])) || (@$errors['no_display_name'])) {
             echo '
               <tr>
-                <th>', _('Display Name (displayName)'), ':</th>
+                <th>', _('Display Name'), ' (displayName)', ':</th>
                 <td>', $attr_arr['display_name'], '</td>
                 <td>';
 
@@ -864,7 +864,7 @@ class Content
 
         echo '
               <tr>
-                <th>', _('Email Address (email)'), ':</th>
+                <th>', _('Email Address'), ' (email)', ':</th>
                 <td>', $attr_arr['email'], '</td>
                 <td>';
 
@@ -875,7 +875,7 @@ class Content
         if (!empty($attr_arr['loa'])) {
             echo '
               <tr>
-                <th>', _('Level of Assurance (assurance)'), ':</th>
+                <th>', _('Level of Assurance'), ' (assurance)', ':</th>
                 <td>', $attr_arr['loa'], '</td>
                 <td> </td>
               </tr>';
@@ -902,7 +902,7 @@ class Content
         if (!empty($attr_arr['affiliation'])) {
             echo '
               <tr>
-                <th>', _('Affiliation (affiliation)'), ':</th>
+                <th>', _('Affiliation'), ' (affiliation)', ':</th>
                 <td>', $attr_arr['affiliation'], '</td>
                 <td> </td>
               </tr>';
@@ -911,7 +911,7 @@ class Content
         if (!empty($attr_arr['entitlement'])) {
             echo '
               <tr>
-                <th>', _('Entitlement (entitlement)'), ':</th>
+                <th>', _('Entitlement'), ' (entitlement)', ':</th>
                 <td>', $attr_arr['entitlement'], '</td>
                 <td> </td>
               </tr>';
@@ -920,7 +920,7 @@ class Content
         if (!empty($attr_arr['ou'])) {
             echo '
               <tr>
-                <th>', _('Organizational Unit (ou)'), ':</th>
+                <th>', _('Organizational Unit'), ' (ou)', ':</th>
                 <td>', $attr_arr['ou'], '</td>
                 <td> </td>
               </tr>';
@@ -929,7 +929,7 @@ class Content
         if (!empty($attr_arr['member_of'])) {
             echo '
               <tr>
-                <th>', _('Member (member)'), ':</th>
+                <th>', _('Member'), ' (member)', ':</th>
                 <td>', $attr_arr['member_of'], '</td>
                 <td> </td>
               </tr>';
@@ -1096,7 +1096,7 @@ class Content
               </tr>
 
               <tr>
-                <th>', _('Entity ID'), ':</th>
+                <th>', _('Entity ID'), ' (entityID)', ':</th>
                 <td><a style="text-decoration:underline" target="_blank"
                 href="https://met.refeds.org/met/entity/',
                 rawurlencode($idp),

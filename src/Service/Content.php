@@ -1314,7 +1314,7 @@ class Content
                       <button type="submit" name="submit"
                       class="btn btn-primary submit form-control"
                       value="Proceed"
-                      title="', _('Proceed'),'">', 
+                      title="', _('Proceed'),'">',
                       _('Proceed'), '</button>
                     </div>
                   </div> <!-- end form-row align-items-center -->

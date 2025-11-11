@@ -620,41 +620,73 @@ class Util
      * setLanguage
      *
      * This function sets the language to be used for text output by
-     * gettext() (shorthand _() ). It checks if the skin has a
-     * 'languages' configuration with at least one 'lang'. Next, it
-     * checks for a 'lang' session var or 'lang' cookie. If the lang matches
-     * one of the skin's langs, then it attempts to set the locale.
+     * gettext() (shorthand _() ). It checks if either the current skin
+     * or the GLOBAL configuration has a 'languages' configuration with at
+     * least one language. Next, it checks for a 'lang' session var or 'lang'
+     * cookie. If the lang matches one of the configured languages, then it
+     * attempts to set the locale.
      */
     public static function setLanguage()
     {
-        // Check if skin option <languages> has been configured. If not, then
-        // there's no need to set a language since gettext calls such as
-        // _() will simply output the text in the function call when text
-        // domain is not set.
+        $langsavail = '';  // String of available langs separated by spaces
+        $defaultlang = ''; // The default lang to use if not previously set
+        $setlang = '';     // The actual lang that should be shown to user
+
+        // Language configuration can come from either the current skin or
+        // from the site-wide 'config.php' file. If both are configured, the
+        // skin takes precedence. If languages are not configured in the skin
+        // nor globally, then there's no need to set a language since gettext
+        // calls such as _() will simply output the (English) text in the
+        // function call when text domain is not set.
+
+        // If the skin has configured <languages>, convert the
+        // skin languages into a string of space-separated languages.
         $skin = static::getSkin();
         $languages = $skin->getConfigOption('languages');
-
         if ((!is_null($languages)) && (!empty($languages->lang))) {
-            // One or more languages configured.
-            // Save them to the session for use by printHeader().
-            // Configured languages will be separated by spaces.
-            $langsavailable = '';
             foreach ($languages->lang as $lang) {
-                $langsavailable .= (string)$lang . ' ';
+                $langsavail .= (string)$lang . ' ';
             }
-            $langsavailable = trim($langsavailable);
-            static::setSessionVar('langsavailable', $langsavailable);
+            $langsavail = trim($langsavail);
 
+            // Check if the skin has a default language
+            $skindefaultlanguage = $skin->getConfigOption('defaultlanguage');
+            if (!is_null($skindefaultlanguage)) {
+                $defaultlang = (string)$skindefaultlanguage;
+            }
+        }
+
+        // If the skin didn't have a configured list of languages, check the
+        // global configuration file 'config.php' for SITE_LANGUAGES.
+        if (
+            (strlen($langsavail) == 0) &&
+            (defined('SITE_LANGUAGES')) &&
+            (!empty(SITE_LANGUAGES))
+        ) {
+            foreach (SITE_LANGUAGES as $lang) {
+                $langsavail .= (string)$lang . ' ';
+            }
+            $langsavail = trim($langsavail);
+
+            // Check of there is a global default language
+            if (
+                (defined('SITE_DEFAULT_LANGUAGE')) &&
+                (!empty(SITE_DEFAULT_LANGUAGE))
+            ) {
+                $defaultlang = SITE_DEFAULT_LANGUAGE;
+            }
+        }
+
+        if (strlen($langsavail) > 0) {
             // Check if there is a 'lang' session var or 'lang' cookie.
             // If so, verify it is one of the available languages.
-            $setlang = ''; // The language to be set
             $langvars = array(
                 static::getSessionVar('lang'),
                 static::getCookieVar('lang')
             );
             foreach ($langvars as $langvar) {
                 if (strlen($langvar) > 0) {
-                    foreach (explode(' ', $langsavailable) as $lang) {
+                    foreach (explode(' ', $langsavail) as $lang) {
                         if ($lang == $langvar) {
                             $setlang = $lang;
                             break 2;
@@ -664,13 +696,10 @@ class Util
             }
 
             // If there was no session lang or cookie lang, or the lang
-            // was not in the list of configured languages, check if the
-            // skin has a default language.
+            // was not in the list of configured languages, use the
+            // default language.
             if (strlen($setlang) == 0) {
-                $defaultlanguage = $skin->getConfigOption('defaultlanguage');
-                if (!is_null($defaultlanguage)) {
-                    $setlang = (string)$defaultlanguage;
-                }
+                $setlang = $defaultlang;
             }
 
             // If we found a language to set, then try to set the locale
@@ -678,6 +707,7 @@ class Util
             // (and 'lang' cookie) for use by printHeader().
             if (strlen($setlang) > 0) {
                 if (setlocale(LC_ALL, $setlang) !== false) {
+                    static::setSessionVar('langsavailable', $langsavail);
                     static::setSessionVar('lang', $setlang);
                     static::setCookieVar('lang', $setlang);
                     putenv('LANG=' . $setlang);

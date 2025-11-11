@@ -751,7 +751,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    _('Must have one of the following:'), ' ePPN, ePTID, Subject ID, Pairwise ID'
+                    _('Must have one of the following:') . ' ePPN, ePTID, Subject ID, Pairwise ID'
                 );
             }
 
@@ -768,7 +768,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    _('Must have one of the following:'), ' ePPN, ePTID, Subject ID, Pairwise ID'
+                    _('Must have one of the following:') . ' ePPN, ePTID, Subject ID, Pairwise ID'
                 );
             } elseif (@$warnings['no_eppn']) {
                 echo static::getIcon(

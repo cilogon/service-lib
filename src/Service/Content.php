@@ -205,7 +205,7 @@ class Content
         ' <a target="_blank" href="https://www.cilogon.org/faq">FAQs</a> ' .
         _('or send email to') .
         ' <a href="mailto:' . EMAIL_HELP . '">' . EMAIL_HELP . '</a>.</p>
-        <p>' . _('When using the CILogon Service, be aware of') . '
+        <p>' . _('When using the CILogon Service, be mindful of') . '
         <a target="_blank" ' .
         'href="https://www.cilogon.org/aup">' .
         _('your responsibilities') .
@@ -751,7 +751,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    _('Must have one of the following:') . ' ePPN, ePTID, Subject ID, Pairwise ID'
+                    _('Must have one of the following') . ': ePPN, ePTID, Subject ID, Pairwise ID'
                 );
             }
 
@@ -768,7 +768,7 @@ class Content
                 echo static::getIcon(
                     'fa-exclamation-circle',
                     'red',
-                    _('Must have one of the following:') . ' ePPN, ePTID, Subject ID, Pairwise ID'
+                    _('Must have one of the following') . ': ePPN, ePTID, Subject ID, Pairwise ID'
                 );
             } elseif (@$warnings['no_eppn']) {
                 echo static::getIcon(

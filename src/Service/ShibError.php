@@ -209,7 +209,7 @@ class ShibError
               <div class="card-text my-2" id="id-shiberror-2">
                 ',
                 _('This may be a temporary error. Please try again later, ' .
-                ' or contact us at the email address at the bottom ' .
+                'or contact us at the email address at the bottom ' .
                 'of the page.'), '
               </div> <!-- end card-text -->
         ';

@@ -1639,7 +1639,7 @@ class Content
                 ' <a target="_blank" href="https://myaccount.google.com/personal-info">',
                 _('Google\'s Personal Info page'), '</a> ',
                 _('and enter your first name, last name, and email address. ' .
-                ' (All other Google account information is not required by ' .
+                '(All other Google account information is not required by ' .
                 'the CILogon Service.)'), '
               </div>
               <div class="card-text my-2" id="id-problem-google-2">

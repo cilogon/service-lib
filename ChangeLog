@@ -1,3 +1,29 @@
+c74aa3b 2025-11-13 Update README with info on i18n support
+3e9d97f 2025-11-13 Minor text fixes
+defc790 2025-11-12 Remove extra spaces
+c31c9d5 2025-11-12 Don't show language chooser when just 1 langugae is configured
+8392979 2025-11-11 Minor text tweaks
+3d33101 2025-11-11 Fix typos
+2254b0e 2025-11-11 Don't translate identifiers
+3527347 2025-11-11 CIL-2123 Allow for site-wide language configuration
+eb3a1fc 2025-11-11 CIL-2123 Use form submit instead of JavaScript for setting languages
+47a72dc 2025-11-09 More tweaks for Font Awesome 7
+82d64a5 2025-11-09 Add 'solid' Font Awesome CSS
+d06c4fb 2025-11-09 Update to Font Awesome 7
+47fd3ea 2025-11-07 CIL-2123 Bug fixes
+d4775aa 2025-10-30 CIL-2349 Change 'SELECT *' to 'SELECT col1,col2,col3'
+05d91f5 2025-10-17 Need to set langsavailable cookie
+807f1f7 2025-10-17 Add 'langmenu' <div> to <header>
+a0760f2 2025-10-17 Use skin's defaultlanguage if set
+108df57 2025-10-17 Changes for multi-language support.
+5ecd06e 2025-10-16 CIL-2348 Put admin_id and admin_name in session for logging
+bf2ff3b 2025-10-16 CIL-2347 Log messages as JSON objects
+fb4fd5e 2025-07-31 CIL-2291 Add a few more id attributes
+d0670ec 2025-07-31 Fix typos
+91156a8 2025-07-31 Simplify a few gettext strings
+a6a7937 2025-06-24 Add back myproxyinfo stuff
+437af97 2025-06-23 CIL-2272 Add skin config 'initialrecentidps'
+e0b5b00 2025-06-23 Update ChangeLog
 edf48c1 2025-06-23 Use cilogon-1.1.0.{css,js}
 89e9136 2025-06-23 Update ChangeLog
 148ac11 2025-06-18 CIL-2268 Default to 'social' IdPs at top of list
@@ -18,7 +44,13 @@ b97c0e9 2025-04-18 CIL-2222 OneID now asserts 'real' ePPN
 410d8aa 2025-04-16 CIL-2222 Federate DoE OneID IdP
 5127657 2025-04-03 Update Changelog
 7ce0dfd 2025-04-02 Update README and LICENSE files
+431fb6a 2025-03-28 Rephrase text so no HTML tags in gettext strings
+72db04d 2025-03-27 CIL-2123 Add initial setLang() functionality
+2e04afc 2025-03-25 Add gettext to aria-labels
+0af152e 2025-03-20 gettext automatically de-dupes strings
+3f60c90 2025-03-20 CIL-2123 Update Content.php with gettext stuff
 0a188d3 2025-03-19 CIL-2213 Host CSS/JavaScript files on cilogon.org
+dc6e129 2025-03-14 Initial check-in of gettext strings
 fb8b80c 2025-02-27 Update ChangeLog
 7476fab 2025-02-27 CIL-2188 Don't show cert warnings with DISABLE_X509
 3eb39ec 2025-02-27 Revert REFEDS warning message

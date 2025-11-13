@@ -29,6 +29,18 @@ To install, use composer:
 composer require cilogon/service-lib
 ```
 
+## Mulit-language (i18n) Support
+
+All text output to the user is wrapped by a `gettext()` ( shorthand `_()` )
+function call. [gettext](https://www.gnu.org/software/gettext/) enables the
+text to be displayed in multiple languages by setting the
+[locale](https://en.wikipedia.org/wiki/Locale_(computer_software)) for the
+program at runtime. While this is great for the user, it means that the
+programmer must update translation files anytime a text string in the code is
+changed or added. This is handled by the
+[gettext\_php\_to\_po.php](https://github.com/cilogon/service/blob/main/gettext_php_to_po.php)
+script. See [Internationalization Support](https://github.com/cilogon/service#internationalization-support) for more information.
+
 ## License
 
 The University of Illinois/NCSA Open Source License (NCSA). Please see [License File](https://github.com/cilogon/service-lib/blob/master/LICENSE) for more information.

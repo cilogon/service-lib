@@ -131,7 +131,7 @@ class Content
         // If there 2 or more languages configured, show the
         // language selector popup menu.
         if (count($langsavailarray) > 1) {
-            $setlang = Util::getSessionVar('lang');
+            $lang = Util::getSessionVar('lang');
             static::printFormHead();
             echo '
     <div class="langMenu" id="langMenu">
@@ -142,16 +142,16 @@ class Content
             </button>
             <div class="dropdown-menu" id="langMenuDropdownContent">
     ';
-            foreach ($langsavailarray as $lang) {
+            foreach ($langsavailarray as $langitem) {
                 echo '<button class="dropdown-item';
 
-                if ($lang == $setlang) {
+                if ($lang == $langitem) {
                     echo ' active';
                 }
 
                 echo '" type="submit" name="submit"
-                    title="', $lang, '" value="', $lang, '" >' .
-                     strtoupper(substr($lang, 0, 2)) . '</button>
+                    title="', $langitem, '" value="', $langitem, '" >' .
+                     strtoupper(substr($langitem, 0, 2)) . '</button>
                      ';
             }
 
@@ -1306,7 +1306,7 @@ class Content
 
         static::printErrorBox(_('An error has occurred. This may be a ' .
             'temporary error. Please try again later, or contact us at ' .
-            'the the email address at the bottom of the page.'));
+            'the email address at the bottom of the page.'));
 
         static::printFormHead(_('General Error'), $redirect, 'get');
 
@@ -1703,8 +1703,8 @@ class Content
                 'attempted to use Microsoft as your identity provider, but your ' .
                 'name or email address was missing. To rectify this problem, ' .
                 'go to'),
-                ' <a target="_blank" href="https://account.microsoft.com">',
-                _('Microsoft\'s Account page'), '</a>, ',
+                ' <a target="_blank" href="https://account.microsoft.com/profile">',
+                _('Microsoft\'s Profile page'), '</a>, ',
                 _('and enter your name and email address. ' .
                 '(All other Microsfot account information is not required by ' .
                 'the CILogon Service.)'), '
@@ -2812,7 +2812,7 @@ in "handleGotUser()" for valid IdPs for the skin.'
                 _('You can optionally click the link below to log out of ORCID. ' .
                 'Note that ORCID will redirect you to the ORCID Sign In page. ' .
                 'You can ignore this as your authentication session with ORCID ' .
-                'will have been cleared first.'), '
+                'will be cleared first.'), '
               </div>
               <div class="row align-items-center justify-content-center mt-3">
                 <div class="col-auto">

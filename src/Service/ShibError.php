@@ -199,7 +199,6 @@ class ShibError
               <div class="card-text my-2" id="id-shiberror-1">
                 ',
                 _('The CILogon Service has encountered a Shibboleth error.'), '
-
               </div> <!-- end card-text -->
         ';
 

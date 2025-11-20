@@ -1,0 +1,872 @@
+01b26e3 2025-11-20 CIL-2361 Add optional 'skin.css' for default 'skin'
+db71189 2025-11-13 Update Changelog
+c74aa3b 2025-11-13 Update README with info on i18n support
+3e9d97f 2025-11-13 Minor text fixes
+defc790 2025-11-12 Remove extra spaces
+c31c9d5 2025-11-12 Don't show language chooser when just 1 langugae is configured
+8392979 2025-11-11 Minor text tweaks
+3d33101 2025-11-11 Fix typos
+2254b0e 2025-11-11 Don't translate identifiers
+3527347 2025-11-11 CIL-2123 Allow for site-wide language configuration
+eb3a1fc 2025-11-11 CIL-2123 Use form submit instead of JavaScript for setting languages
+47a72dc 2025-11-09 More tweaks for Font Awesome 7
+82d64a5 2025-11-09 Add 'solid' Font Awesome CSS
+d06c4fb 2025-11-09 Update to Font Awesome 7
+47fd3ea 2025-11-07 CIL-2123 Bug fixes
+d4775aa 2025-10-30 CIL-2349 Change 'SELECT *' to 'SELECT col1,col2,col3'
+05d91f5 2025-10-17 Need to set langsavailable cookie
+807f1f7 2025-10-17 Add 'langmenu' <div> to <header>
+a0760f2 2025-10-17 Use skin's defaultlanguage if set
+108df57 2025-10-17 Changes for multi-language support.
+5ecd06e 2025-10-16 CIL-2348 Put admin_id and admin_name in session for logging
+bf2ff3b 2025-10-16 CIL-2347 Log messages as JSON objects
+fb4fd5e 2025-07-31 CIL-2291 Add a few more id attributes
+d0670ec 2025-07-31 Fix typos
+91156a8 2025-07-31 Simplify a few gettext strings
+a6a7937 2025-06-24 Add back myproxyinfo stuff
+437af97 2025-06-23 CIL-2272 Add skin config 'initialrecentidps'
+e0b5b00 2025-06-23 Update ChangeLog
+edf48c1 2025-06-23 Use cilogon-1.1.0.{css,js}
+89e9136 2025-06-23 Update ChangeLog
+148ac11 2025-06-18 CIL-2268 Default to 'social' IdPs at top of list
+05cda08 2025-06-16 CIL-2248 No need for Net_LDAP2 PHP library for DN anymore
+77610e0 2025-06-16 CIL-2248 A few more tweaks after removing X509 certs
+379f070 2025-05-30 Add back some deleted lines
+fe91f54 2025-05-30 Shorten tests for empty attributes
+0b92f1c 2025-05-30 Fix typo
+1d2a5ed 2025-05-29 CIL-2248 Remove MyProxy from PHP code
+3ffbc82 2025-05-22 CIL-2254 idp_display_name is sometimes 'Unspecified'
+3c2c291 2025-05-16 CIL-2243 Handle STATUS_PAIRWISE_ID_MISMATCH error
+910f76a 2025-04-29 Update ChangeLog
+edcfaa0 2025-04-29 CIL-2234 Disable X.509 certs on May 13, 2025
+f2210e2 2025-04-25 CIL-2233 Check modification time of testidplist.xml
+c6a231c 2025-04-18 Update ChangeLog
+5cba5e9 2025-04-18 CIL-2201 Log when user's entityID changes
+b97c0e9 2025-04-18 CIL-2222 OneID now asserts 'real' ePPN
+410d8aa 2025-04-16 CIL-2222 Federate DoE OneID IdP
+5127657 2025-04-03 Update Changelog
+7ce0dfd 2025-04-02 Update README and LICENSE files
+431fb6a 2025-03-28 Rephrase text so no HTML tags in gettext strings
+72db04d 2025-03-27 CIL-2123 Add initial setLang() functionality
+2e04afc 2025-03-25 Add gettext to aria-labels
+0af152e 2025-03-20 gettext automatically de-dupes strings
+3f60c90 2025-03-20 CIL-2123 Update Content.php with gettext stuff
+0a188d3 2025-03-19 CIL-2213 Host CSS/JavaScript files on cilogon.org
+dc6e129 2025-03-14 Initial check-in of gettext strings
+fb8b80c 2025-02-27 Update ChangeLog
+7476fab 2025-02-27 CIL-2188 Don't show cert warnings with DISABLE_X509
+3eb39ec 2025-02-27 Revert REFEDS warning message
+b691f7e 2025-02-26 CIL-2190 Disable web certs and ECP certs separately
+4d4a086 2025-02-26 CIL-2188 Don't show warnings for missing name/email
+0f69120 2025-02-14 CIL-2178 If OMIT_IDP, don't send 'idp' to dbService
+d23b44e 2024-11-14 CIL-2133 Add warning about X.509 certificate retirement
+feed342 2024-10-28 Update ChangeLog
+78184b1 2024-10-23 CIL-2114 Consume SAML eduPersonOrcid
+8a7dffc 2024-04-13 Update ChangeLog
+4c579b3 2024-04-13 CIL-1968 Don't sent remote_user to dbService
+546d804 2024-04-12 Update ChangeLog
+fd85e9a 2024-04-12 CIL-1967 Fix issues found during WCAG accessibility assessment
+7534db8 2024-04-08 Rename config to DYNAMODB_PHPSESSIONS_*
+a6104a6 2024-04-05 CIL-1963 Use DynamoDB for PHP sessions
+bec10c5 2024-03-21 Update ChangeLog
+5f46f73 2024-03-21 Require pear/log package v1.14.x
+8f0a9a5 2024-01-05 Update oauth2-azure library to 2.2.2
+314a564 2024-01-05 Update LICENSE for 2024
+cbe2c0b 2023-11-13 Update ChangeLog
+0633810 2023-11-13 CIL-1812 Allow session vars NOT to be output
+a6d0e31 2023-11-09 CIL-1879 Set options for PHPSESSID cookie
+85cf33d 2023-10-30 Use firebase/php-jwt v6.7.0.
+3ebff05 2023-10-30 Update ChangeLog
+73cc9d2 2023-10-30 Update libraries for bugfixes.
+ba8c617 2023-08-30 Move cilogon.js BEFORE custom script
+260ce1a 2023-08-03 Log XSEDE USAGE message only if enabled
+14f2126 2023-08-03 Update ChangeLog for v2.1.0 release
+aa7bf01 2023-07-27 CIL-1806 Consume uidNumber from UIUC IdP
+68de83f 2023-07-21 CIL-1800 Fix broken Microsoft OAuth2 login
+6122266 2023-07-17 Update ChangeLog
+36df135 2023-07-17 PHP support up to v8.1
+6b1a536 2023-07-11 CIL-1778 Add checks for undefined array key
+1bd1398 2023-06-12 CIL-1769 Enagle use of read-only database endpoint.
+f5a37ab 2023-06-12 Bugfix - add missing '&&'
+0aa1e22 2023-06-12 CIL-1751 Allow multiple Metadata XML source files.
+d08682d 2023-06-12 CIL-1765 Fix displayed scopes on Consent Screen
+c1ba941 2023-06-08 CIL-912 Update AUP links in footer
+319ed2e 2023-05-31 CIL-1738 Assert eduPersonAssurance as a JSON array
+d38eabc 2023-05-31 Code optimization
+828e575 2023-05-31 CIL-1738 Add eduPersonAssurance to database
+1be9e93 2023-05-11 CIL-1713 Don't use a static class variable for DB.
+e6661e4 2023-05-11 Require at least PHP 7
+148a7da 2023-05-10 CIL-1737 Show error about missing subject-id
+940509f 2023-05-10 CIL-1739 Combine <regauthgreenlit> and <idpgreenlit> lists
+2983b9f 2023-05-09 CIL-1742 Chnage "Select an IdP" text
+58e8382 2023-04-18 CIL-1713 Separate PHP DB code from PHP sessions code
+5a18021 2023-04-18 Remove extra semicolon.
+f91aef1 2023-04-13 Fixes #2 as reported in CIL-1709.
+8127943 2023-04-09 CIL-1632 For hidden IdPs, allow "showhidden" parameter.
+359606f 2023-04-04 Bug fix - need to normalize OAuth2 entityId.
+66e73d7 2023-04-03 CIL-1693 Scan InCommon metadata for "personalized"
+5bd0e6e 2023-04-01 Related to CIL-1685: Reduce number of IdP loops.
+94c653c 2023-03-31 CIL-1685 Restrict IdPs based on Registration Authorities
+9a78dab 2023-03-31 Remove extra line
+7a66126 2023-03-27 Update ChangeLog
+2ccbb92 2023-03-24 CIL-1674 STATUS_EPTID_MISMATCH can be WARNING or ERROR.
+d261cfc 2023-03-23 CIL-1674 If STATUS_EPTID_MISMATCH, try again without eptid.
+5d0d517 2023-03-01 Fix typo in comment
+5827e3a 2023-02-28 CIL-1643 Allow extra HTML/JavaScript to be added
+a03f3fc 2023-02-09 CIL-1632 - Skin option for "Hidden" IdPs.
+2682c5f 2023-01-12 CIL-1602 Change http:// to https:// where possible
+09a86bc 2023-01-10 CIL-1576 Better formatting of error email
+51e4043 2023-01-09 Fix Typo in function name
+d4e4e54 2023-01-09 Bug fix: statusToStatusText() must be "static"
+38ca972 2023-01-06 CIL-1591 Add error logging for getOIDCClientParams
+0a05475 2023-01-06 Bug fix
+8c9dc78 2023-01-06 CIL-1595 Show 'preferred' IdP at top of list
+a380dd9 2023-01-06 CIL1576 Add 'Get Help' button to Shib IdP error page
+e017161 2022-11-02 Bug fix: move PHP error suppression '@'
+10866ff 2022-10-20 CIL-1515 Remove extraneous line
+372454a 2022-10-18 CIL-1518 Don't send error email on QDL_ERRORs
+016b169 2022-10-17 Update comment
+bf54bab 2022-10-15 CIL-1531 setcookie() needs 'SameSite=None'
+cd5c7b5 2022-10-14 CIL-1515 Add skin option <maxrecentidps>
+015e3ad 2022-10-14 CIL-1515 Display 5 recent IdPs at the top.
+4d0e8c2 2022-10-14 CIL-1515 Move the function call to save recent IdPs
+38a5f05 2022-10-14 CIL-1515 Save recently used IdP to a cookie
+47c3d91 2022-10-08 CIL-1369 Bug fix: Save the SSO IdP only after choosing an IdP.
+1e71ae8 2022-10-07 Don't unset SSO session variable on logout
+5e72810 2022-10-07 CIL-1369 Move SSO code to a Util function.
+7b0a5ae 2022-10-07 Rewrite code for ACCESS SSO. Add skin options for front page.
+d91a3a4 2022-10-06 Rename cookie used for ACCESS SSO
+f7b84e0 2022-10-06 CIL-1510 Allow admin_id in bypass table
+2fa832b 2022-10-05 Bug fix for CIL-1510.
+4e9f1ea 2022-10-05 CIL-1510 Allow admin_ids for bypass table
+c2d49e9 2022-09-30 Change 'logout' (noun) to 'log out' (verb)
+497365d 2022-09-21 Bugfix: function call missing 'static::'
+dde162e 2022-09-02 Looks like require_once('DB.php') isn't needed anymore
+7c7b3de 2022-09-02 Clean up DB connections by using DBProps
+1f7c9c6 2022-08-31 CIL-1369 Don't query the COmanage database for ACCESS
+0905105 2022-08-31 CIL-1369 Rework logic for ACCESS SSO
+5ab55c8 2022-08-30 CIL-1369 SSO for ACCESS clients
+a35e33e 2022-08-29 CIL-1413 Better error logging for "Failed to getuser"
+151a9b9 2022-08-08 Update oauth2-orcid to v2.0.0
+bbdc030 2022-08-08 Explicitly require pear/db dev-trunk
+6a55071 2022-08-08 Try prefer-stable:true instead of inline alias
+9ed8c10 2022-08-08 Try inline alias for php/db
+0e21e23 2022-08-08 Require pear/db dev-trunk
+7183d52 2022-08-08 Change minimum-stability from dev to stable
+8cbc217 2022-07-22 Remove unused function dump()
+1c38764 2022-07-20 CIL-1342 Redirect to custom error uri on QDL error.
+fa83d3e 2022-07-18 Bug: need to normalize OAuth2 IdPs in more places.
+057dbbe 2022-07-07 CIL-1332 New STATUS_ error codes for QDL errors.
+a14d387 2022-07-07 CIL-1331 Also log the paramters to the dbService call() function.
+9e3e77d 2022-07-07 CIL-1331 Log response from setTransactionState
+7bf0850 2022-06-10 CIL-1311 Change Google IdP URL.
+85608f5 2022-05-19 CIL-1294 Use PHP openssl functions to convert X509 to PKCS12
+9517fa1 2022-05-18 Use /usr/bin/env (Debian) instead of /bin/env
+0d8c438 2022-05-18 Use /usr/bin/env (Debian) instead of /bin/env
+1b9b0cc 2022-05-12 CIL-1287 Don't display empty user attributes
+a6789dc 2022-05-12 Remove extra 'eduPersonOrcid' in output
+6f34c60 2022-05-12 CIL-1285 Assert eduPersonOrcid for ORCID logins
+ee9c979 2022-05-11 Suppress warnings for chmod
+0a17260 2022-05-11 CIL-1283 Set XSEDE upload stats CSV files as world-writable
+3167e1d 2022-04-25 CIL-1271 Check for entityID differences in /updateidplist/
+6c551fb 2022-04-18 Update ChangeLog
+bfef176 2022-04-16 Catch potential Exception from DateTime()
+420bc6d 2022-04-16 Bug: need to 'use DateTime'
+9114351 2022-04-15 CIL-1247 De-duplicate Set-Cookie headers
+0b9d252 2022-04-14 CIL-1247 Verify CSRF cookie only when it's not empty
+f34a7a2 2022-04-12 Fix minor typos
+27efe11 2022-04-04 CIL-1215 Calculate diffs BEFORE copying tempfile
+a08fb6a 2022-03-21 CIL-1215 Send emails for /updateidplist/ AFTER copying files
+666b29c 2022-02-24 CIL-1190 Check Last-Modified timestamp of InCommon Metadata in /updateidplist/
+a244c99 2022-02-23 Move several endpoints' code to library functions.
+4d24b1a 2022-02-18 CIL-1187 Handle Authn error response fields from setTransactionState
+caa69db 2022-02-14 'match' is a reserved keyword in PHP 8
+fa59b4b 2022-02-10 CIL-1171 Optionally set domain name
+e5163b0 2021-11-18 Compact the popup help text for the OAuth2 providers down to a single sentence.
+24016b4 2021-11-01 Don't use a constant before checking if it's available.
+a034de7 2021-10-29 For Microsoft OAuth2, pass defaultEndPointVersion in the extraparams array.
+5a3ad36 2021-10-29 Call defined() on the OAuth2 CLIENT_ID DEFINE, not on the value.
+1decaf4 2021-10-29 Add missing parens.
+3cc498f 2021-10-29 Check OAuth2 CLIENT_ID is defined before using.
+c2642be 2021-10-28 CIL-1116 Attempt to get Microsoft Azure Active Directory IdP working.
+2465570 2021-10-20 Do not show 'system admins have been notified' when no email alert was sent.
+24008f6 2021-10-20 Add statusText() method to return human-readable version of current status. Also add array of client-initiated errors to ignore during sending of alert emails.
+de9c239 2021-10-20 CIL-1098 Update log messages for client-initiated errors.
+5f6b7eb 2021-10-19 CIL-1098 Don't send email for client-initiated errors.
+88fd4e0 2021-10-14 Update PHP libraries to latest versions.
+ea7c00e 2021-10-14 Update PHP libraries to latest versions.
+bca4696 2021-10-14 CIL-1103 Change default IdP from Google to ORCID.
+41bad29 2021-09-20 Define HOSTNAME_FOOTER to print out local hostname below page footer.
+89124e7 2021-09-10 CIL-1080 Hide problematic IdPs from 'Select an Identity Provider' list.
+44f8544 2021-08-27 CIL-1068 Add config option for custom favicon.
+50175e3 2021-08-10 Remove line-ending spaces.
+dd65e1e 2021-08-09 Update Bypass class documentation.
+111eb0e 2021-08-08 Change 'value' column from TEXT to VARCHAR(255).
+6710c4e 2021-08-07 Remove trailing spaces.
+426672c 2021-08-07 CIL-1052 Allow the 3 config.php *_ARRAYs to be stored in the database.  This needs a new class 'Bypass' which reads entries from a new database table 'bypass' and formats the results in arrays which match the existing arrays. If an ARRAY is defined in the top-level config.php file, the corresponding database array is ignored.
+34e7d28 2021-08-04 Update Bootstrap CSS to v4.6.0.
+cabb8e3 2021-07-14 Fix typo.
+85a7a6e 2021-07-14 When forcing a skin, also check clientparams for matching client_id.
+e0997e9 2021-07-14 Check clientparams and GET params for initialidp option.
+5e8783c 2021-07-14 Enable PortalCookie to save 'authorize' AND 'device' flows by making 'redirect_uri' an optional parameter (i.e., present for 'authorize' flow, absent for 'device' flow).
+5bcec00 2021-07-13 CIL-935 Fix typo.
+34750e8 2021-07-13 CIL-935 Device flow. Call new dbService methods checkUserCode and userCodeApproved.
+d36f74b 2021-07-13 Update Bootstrap to v4.6.0 and Bootstrap-Select to v.1.13.18
+ca10f24 2021-06-30 CIL-1023 OIDC prompt parameter can contain multiple space-delimited values, so check for 'consent' as an array element.
+757cc9d 2021-06-30 CIL-1023 If OIDC prompt=consent parameter is given, then ignore all methods for bypassing the "Select an IdP" page so that the "consent to release attributes" section is always displayed.
+8ed97f3 2021-06-15 CIL-1003 Capture GitHub 'login' as 'preferred_username' claim.
+c788e96 2021-05-13 CIL-979 Speed up display of "Select an Identity Provider" page by loading the list of IdPs with an Ajax 'GET' after the page has rendered.
+6dec59c 2021-05-04 CIL-975 Generalize handling of AssertionConsumerServiceURL rewriting for ADFS IdPs (like Syngenta and NSF).
+db2175f 2021-04-27 Fix order of parameters in explode().
+9eba193 2021-04-27 CIL-951 Add MYPROXY_SERVER_DN_MAP and looping over MyProxy hostnames to set MYPROXY_SERVER_DN for hosts which do not match the configured MyProxy CA server name.
+1de626b 2021-04-27 Add sanity checks to verify 'defines' exist in config.php.
+39d2ab0 2021-04-26 CIL-959 Support for NSF.gov's new AD-based IdP. Check AMR attribute for MFA. If found, overwrite ACR with this value.
+f0efb38 2021-04-26 CIL-959 Add support for SAML attribute 'AMR' (authnmethodsreferences) asserted by NSF.gov's new AD-based IdP.
+e063296 2021-03-18 Add DEFAULT_LOGNAME for writing logs to file.
+c385b90 2021-03-11 CIL-938 Write XSEDE USAGE messages to CVS files in a configurable directory.
+40b373a 2021-03-11 Formatting to make phpcs happier.
+a8d1053 2021-03-10 Remove '&' from Log::singleton() (even though the docs say it's necessary) since it causes PHP warnings.
+4a345f4 2021-03-10 Enable Loggit to write to console (stdout).
+591d39c 2021-03-09 Require 'DB.php' to avoid warning message for DB_PORTABILITY_ALL.
+b145bba 2021-03-09 Suppress warning message durind DOM load().
+a5b13fc 2021-03-09 in_array() should be array_key_exists().
+ee9d9ec 2021-03-09 Update database connection to use configured database and host.
+2136e0b 2021-03-08 Device client could also request scopes which differ from the registered scopes, so ask for those as well.
+23d3c8b 2021-03-08 Move printOIDCConsent from authorize/index-functions.php to Util.php.  Allow 'Cancel' button in WAYF page to be forced to be displayed.
+5194386 2021-03-08 CIL-934 Initial implementation of dbService actions checkUserCode and userCodeApproved. Currently returning dummy values for testing purposes.
+1ed091d 2021-03-08 Fixes for CodeSniffer and comment tag.
+ddecf75 2021-03-04 In getHN(), verify the hostname has a '.' in it for AWS.
+2f4f65f 2021-02-25 Put MyProxy client credential in config.php.
+6f9c347 2021-02-25 Update to newer version of coveralls.
+3bdcd5c 2021-01-02 Fix email for Attribute Release Problem. Need to remove quote characters.
+c64a316 2020-12-10 Check if incoming $storetype is null before crushing it.
+562ec10 2020-12-10 CIL-895 Config option for PHP session file store directory.
+c5dd1cd 2020-11-10 Remove pear/DB repo from composer.json
+9be0c98 2020-11-05 CIL-865 Return number of certificate directories cleaned up.
+ab08c73 2020-11-05 CIL-866 Make IdpList->idparray public to be accessible by new '/updateidplist/' web endpoint.
+689cad8 2020-11-05 CIL-865 Add new function cleanupPKCS12 which can be called by a new '/cleancerts/' web endpoint to remove PKCS12 certs that are older than 10 minutes.
+981d0d8 2020-11-02 CIL-865 Clean up PKCS12 directory after generating new PKCS12 cert
+57b4ba7 2020-11-02 CIL-865 Clean up PKCS12 directory after generating new PKCS12 cert
+604994c 2020-09-30 CIL-837 BYPASS_IDP_ARRAY should reset 'skin' to unset green/red-lit IdPs.
+0b2ea38 2020-09-29 CIL-697 New 'status' codes for missing/malformed 'scope' parameter.'
+bfc6593 2020-09-08 Attempt to add the OAuth1/OIDC client name to the "Attribute Release Problem" email.
+4b8637d 2020-09-02 Remove whitespace at end of line.
+c9313b4 2020-09-02 Move composer require lcobucci/jwt to top-level CILogon service since it is not used by CILogon service-lib.
+099118f 2020-09-02 CIL-799 Get AMR (AuthnMethodRef) from ORCID id_token.
+82b9572 2020-08-24 CIL-793 When splitting display_name for missing first and last names, check for comma (,) and split into last_name, first_name.
+870b1ee 2020-08-24 CIL-793 For the OAuth 1.0a flow, check for missing first_name or last_name. If so, use display_name to split on space like we used to.
+ab7cdd6 2020-08-10 CIL-781 Show 'CILogon User Identifier' (user_uid) in 'User Attributes' block.
+36b9e7e 2020-08-07 CIL-779, CIL-618 Also read OIDC client scopes from the database.
+975193c 2020-08-07 Remove unused getClient/clearClient and associated variables. The database is now queried directly (CIL-618) rather than using the dbService.
+f06884d 2020-08-05 CIL-728 Update Privacy Policy link.
+fd55c45 2020-08-04 CIL-742 Remove extra check for idpwhitelist/idpblacklist in favor of idpgreenlit/idpredlit.
+3979db7 2020-07-22 Minor bug fixes.
+0c75c19 2020-07-22 CIL-742 Change whitelisted/blacklisted to greenlit/redlit.
+be80c65 2020-07-22 CIL-767 Add skin option for customized footer HTML.
+b456e1d 2020-07-22 CIL-741 For IdPs in the global blacklist array, simply omit them from the resulting idplist.xml file rather than remove their <whitelisted> tags.
+7793309 2020-07-21 CIL-763 New query parameter "initialidp" to allow a client to set the initially selected IdP to something other than Google.
+380a006 2020-06-05 CIL-723 Remove "InCommon R & S", "InCommon Bronze", and "InCommon Silver" lines from the "Identity Provider Attributes" block.
+e110ac2 2020-06-04 CIL-719 If no OIDC cookie is set for the current 'portal', attempt to use ONLY the 'providerId' from the most recent portal cookie.
+456718e 2020-06-03 CIL-719 If there is no OIDC cookie set for the current 'portal' (which is a combination of client_id, redirect_uri, and scopes), then read values from the most recently saved OIDC portal cookie.
+0980b2e 2020-06-02 Update to Bootstrap CSS v4.5 and jQuery v3.5.1.
+1562a64 2020-05-27 CIL-712 Add skin config option to display text in an informational banner at the top of the page.
+d3f5daf 2020-05-15 Improperly placed bracket prevented default skin config.xml from being read in.
+11fca45 2020-05-04 Remove dependency on PEAR Config which was used to read GridShibCA configuration.
+b1697a0 2020-05-04 Remove dependency on PEAR Config which was used to read GridShibCA configuration.
+5b22265 2020-05-01 Remove dependency on PEAR Config which was used to read GridShibCA configuration.
+d8c27c6 2020-04-28 Bug: Unset previous user attributes to avoid session pollution.
+4e54e43 2020-04-28 Fix preg_match() regex.
+e9954f4 2020-04-26 CIL-618 BUG: When getting OIDC client parameters, don't fetch everything, just name, home_url, and callback_uri.
+eb79f1f 2020-04-25 Update to latest versions of Bootstrap and Bootstrap-Select.
+36b1963 2020-04-25 CIL-624 Add config option DISABLE_X509 to prevent downloading of certificates.
+fca0dd6 2020-04-24 Fix typo in simplexml_load_string().
+4c77344 2020-04-24 CIL-690 Allow skins to be read in from either the filesystem (i.e., from the /skin/SKINNAME directory) or from the database. Next step is to migrate filesystem skins to database.
+97ce2e3 2020-04-24 CIL-690 As part of the move of skins from filesystem to database, put skin CSS "internal" (i.e., in the HTML) rather than "external" (i.e., referenced via <link> and read from disk).
+0e8d40e 2020-04-24 Add cssmin as requirement.
+a832985 2020-04-07 Update ChangeLog.
+e49003e 2020-04-07 Add log message for new users without a distinguished_name value.
+8e14a82 2020-04-07 Relax checking of eduGAIN and getcert check for basic download of X509 certs to allow users to log in.
+b9f3f70 2020-04-06 Add comments to explain the 'for' loop with '$$value'.
+d5face5 2020-04-03 Bug: After renaming the PHP session variables to better match those used by the dbService, MyProxy certs no longer contained the correct extensions for ePPN and ePTID because of a case change.
+e2eac2e 2020-04-02 Fix typo.
+11342d7 2020-04-01 Don't overwrite session 'loa' from non-existent database entry.
+ca767a5 2020-04-01 Add missing closing brace.
+e839ef7 2020-04-01 CIL-540 Save results of dbService?action=getUser back to PHP session in case database contains more user attributes than current authentication.
+0ca022b 2020-03-31 Rename a couple of functions to make get/set pair.
+68ed93e 2020-03-31 CIL-540 Don't set session from database since 'idp' is transformed to 'http' for writing to database. Also, in case of idp not in skin, don't unset client session vars.
+7014117 2020-03-30 CIL-540 Don't escape backslashes in JSON to save some characters.
+3b7317d 2020-03-27 CIL-540 Rename PHP session variables for user attributes to match those used by the dbService?action=getUser webapp. Also (re)set these session attributes after calling the dbService so the PHP session matches what is in the database.
+e2f802f 2020-03-20 CIL-672 Define help@/alerts@cilogon.org in top-level config.php file.
+5b4d639 2020-03-19 CIL-649 Make subject_id and pairwise_id distinct parameters to the dbService rather than part of attr_json.
+0d68785 2020-02-29 CIL-540 Show missing name/email attribues in Certificate Information box.
+24c0599 2020-02-29 For STATUS_ hex values, comments show decimal equivalent values.
+b76fff9 2020-02-25 CIL-540 For OAuth 1.0a, make the PHP code verify that distinguished_name is available for creation of delegated certificate.
+2f06197 2020-02-24 CIL-540 Let the dbService check for missing attributes.
+74a3838 2020-02-07 CIL-540 No longer check for 'dn' when validating user session.
+58b43e6 2020-02-06 CIL-655 - Remove unnecessary LOA port variable assignment.
+360e342 2020-02-06 CIL-655 Display actual LOA (assurance) instead of InCommon "silver".
+e9d2939 2020-02-05 Fix bug in IdPList JSON generation.
+24db12e 2020-02-04 Check if array key is set before accessing.
+8bd0f31 2020-01-29 CIL-649 Add support for subject-id and pairwise-id SAML attributes.
+70d62c3 2020-01-13 getElementsByTagName should be called on the DOMDocument object.
+ced8a63 2020-01-07 Add skin option to always expand the "Create Password-Protected Certificate" collapsible card.
+bcf872b 2019-12-09 Scrutinizer CI - Remove dead code and fix bugs.
+8e53e6e 2019-12-09 CIL-175, CIL-615, CIL-616, CIL-620 - Bootstrap CSS redesign (MAJOR UPDATE). Use bootstrap-select for "Select an Identity Provider" dropdown. Show cert DN, user attributes, IdP attributes on X509 page.  Remove "Show Help" button.
+3bea6df 2019-12-02 CIL-610 When allowing bypass via idphint, must set providerId in the portalcookie so OAuth2 providers work as expected (bug fix).
+4d95f70 2019-12-02 CIL-629 Remove "Request Silver" checkbox on "Select an IdP" page.
+b2c8b64 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+4f0147e 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+fba0029 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+71e9720 2019-11-25 Fix bugs as suggested by scrutinizer-ci.com .
+4762a98 2019-11-25 CIL-410 For /testidp/ use 'standard' flow when getting user attributes.
+8c20a7a 2019-11-22 Move set/unset of a few session vars from saveUserToDataStore() to setUserAttributeSessionVars().
+29fe4ac 2019-11-22 Move unset 'storeattributes' to a different function. (Note that this is still not the right place.)
+bee94cf 2019-11-22 Revert "Fix PHP Warning:  The use statement with non-compound name '...' has no effect."
+7c1fa83 2019-11-22 Fix PHP Warning:  The use statement with non-compound name '...' has no effect.
+a423d2f 2019-11-21 CIL-410 Refactor /testidp/ to use standard 'getuser' flow for both SAML and OAuth2 IdPs.
+4efdfb0 2019-11-20 Revert "Change strlen() to empty() where appropriate."
+fc45d12 2019-11-20 Move $disableligoalerts config to DISABLE_LIGO_ALERTS in top-level config.php.
+be9044b 2019-11-20 Change strlen() to empty() where appropriate.
+9456f23 2019-11-20 CIL-617 Show OAuth2 IdPs (Google, GitHub, Orcid) only if client_id is configured.
+d57941d 2019-11-20 CIL-613 Replace 'allowbypass' skin with ALLOW_BYPASS_ARRAY in config.php.
+a728d09 2019-11-20 CIL-623 If OPENSSL_KEY is not configured, then don't encrypt the Portal Array Cookie.
+f4e9957 2019-11-20 CIL-625 Move hostname mapping to config.php .
+39084b0 2019-11-19 Add another missing closing paren.
+84d5806 2019-11-19 Add missing closing paren.
+ec0aca5 2019-11-19 CIL-611 and CIL-622 - Move various config options/files to 'define()' statements in top-level config.php and config.secrets.php.
+d820065 2019-11-19 CIL-577 GridShib-CA is gone, so no need for deployJava.js.
+3c2b3e5 2019-11-19 Change deprecated 'each' statement to 'foreach'.
+64a5209 2019-11-19 Accidentally deleted a critical 'else' block.
+fe518b2 2019-11-19 CIL-614 Remove CILogon 2FA capability (i.e., local Google Authenticator / Duo).
+f952145 2019-11-19 Update comments regarding New Users.
+4dffb96 2019-11-18 Remove more unused code.
+91df4b6 2019-11-18 Remove unnecessary code which attempted to bypass the New User page (since the New User page is no longer shown).
+b0f9dd3 2019-11-18 CIL-542 and CIL-619 Retire the "Your DN has changed" and "New User" pages. Simply log the action instead.
+b7905f1 2019-11-18 Remove phpcs from Travis CI since it's old and doesn't support PSR-12.
+7be3d2d 2019-11-18 Make PHP code PSR12 compliant (https://www.php-fig.org/psr/psr-12/).
+27303a7 2019-11-18 CIL-577 Retire CILogon GridShibCA. Remove no-longer-needed PHP code pertaining to GridShib CA.
+2cf605c 2019-11-13 CIL-606 Fix problem with saving ePTID due to typo.
+7e3e9e4 2019-09-30 Fix typo in comment block.
+a0a2c22 2019-09-17 CIL-598 Add skin config option for IdPs registered by InCommon.
+f87cc18 2019-09-17 Make code compliant with PSR-12 (https://www.php-fig.org/psr/psr-12/).
+b6ea7ca 2019-08-20 Move isEduGAINAndGetCert() from Content.php to Util.php.
+8355af8 2019-07-02 CIL-575 Better handling of OAuth2 createTransaction errors.
+dea66a8 2019-07-02 CIL-548 Add support for AARC-G049 "IdP Hinting".
+9868680 2019-05-22 CIL-568 Add iTrustUIN claim for Rokwire client.
+ef66da2 2019-04-26 Update to new PHP analysis engine for Scrutinizer.
+a1987d0 2019-04-26 Calculate $numargs instead of using count($args) in for loop.
+f71f094 2019-04-23 Create new method setUserAttributeSessionVars which takes user attributes passed to saveUserToDataStore and puts them in the PHP session.
+b146998 2019-04-10 CIL-558 Scan metadata for <SingleLogoutService> tags and add <Logout> tag to idplist.xml file.
+ed4cb51 2019-03-22 CIL-555 Add utility function getGetOrPostVar() to look for a variable in a query parameter or form submit.
+656de54 2019-03-19 PHP supported versions are 7.1, 7.2, and 7.3.
+07d20bd 2019-03-19 For travis, test with PHP 7.1, 7.2, and 7.3.
+1eee37a 2019-03-19 Update LICENSE to 2019.
+9f11abd 2019-02-27 Add date/time to error email.
+5c11465 2019-02-27 Stop sending email when DNs change.
+28f7944 2019-02-27 CIL-497 - PHP sends UTF-8 characters to dbService (i.e., remove PHP iconv() UTF-7 encoding).
+08b6fdd 2019-02-25 CACC-241 We decided to have local database instances (instead of a separate central database like dodo-dev). So no need to connect to database with SSL anymore.
+6e01ccb 2019-02-19 CIL-539 Print missing R&S and SIRTFI for eduGAIN IdPs getting a cert.
+ec0305e 2019-02-19 CIL-539 For edugainandgetcert, default value should be false rather than empty string (although ultimately the behavior is the same).
+6ccb07d 2019-02-19 CIL-539 Print error message for missing R&S and/or SIRTFI attributes only when IdP is eduGAIN and user could get a certificate.
+dbc57ac 2019-02-18 Remove end-of-line spaces.
+327d2a7 2019-02-18 For upcoming oauth2.war v4.1.2 deployment, temporarily send email alerts for DN changes. Email alert can be removed after PHP code has been updated to send UTF-8 strings to dbService.
+36fb850 2019-02-13 CIL-537 Allow client_id to force skin or bypass IdP selection screen.
+a18fe3a 2019-02-13 Forgot to decode 'entitlement' from attr_json.
+83d022e 2019-02-08 Special log message when a user's Subject DN changes.
+c0caad1 2019-02-06 Bug fix: Pattern match display_name and idp_display_name separately.
+ac72a50 2019-02-06 Forgot to clear out a few class member variables.
+f2674e6 2019-01-10 CIL-532 Add eduPersonEntitlement.
+09925fe 2019-01-07 CACC-238 Issue CILogon Silver certificates when AuthnContextClassRef is REFEDS 'sfa' or 'mfa', and eduPersonAssurance is cappuccino.
+262b91d 2018-12-03 Add ChangeLog.
+45a9dde 2018-12-03 Update License date to 2018 and replace template name with CILogon.
+54f202e 2018-10-15 CIL-331 Starting with OA4MP 4.1.0, use /oauth2/dbService endpoint as default.
+47e35be 2018-09-17 CIL-507 Output special log messages for XSEDE log analysis.
+0249162 2018-09-06 Bug - Don't put IdP Display Name in shibarray since it overrides the user's displayName.
+638ab18 2018-09-06 Syngenta IdP transition to production was successful. Remove the banner.
+c7b465d 2018-09-05 CIL-439 For Syngenta IdP, use 'cilogon.org' for Shibboleth redirects.  Also, temporarily display banner until Syngenta IdP has successfully transitioned from test to production.
+f3214b1 2018-08-28 Use "machinehostname" for all parts of Shibboleth redirect.
+4c176fe 2018-08-27 CIL-439 For Syngenta, set the shib redirect to be just a single CILogon domain name (since Active Directory can be configured with just one AssertionConsumerService URL). Currently this is set to test.cilogon.org, but should be changed to cilogon.org when Syngenta is moved to the production server.
+c14e118 2018-08-24 Fix PSR2-related errors.
+1c1079e 2018-08-24 CIL-377 Use mdui:DisplayName for "Select Identity Provider" listing.  Otherwise use OrganizationDisplayName so that X509 cert Subject DNs don't get updated.
+d95b29e 2018-08-24 Add 'ssl' to DBProps connection configuration.
+c152b21 2018-08-22 Merge branches 'master', 'master', 'master', 'master', 'master', 'master' and 'master' of github.com:cilogon/service-lib
+65501b7 2018-08-22 CIL-384 Allow IdPs in testidplist.xml to override those in the InCommon-metadata.xml file.
+1baffe0 2018-08-22 CIL-377 Add DisplayName to idplist.xml output. Still need to modify how this new data is used in the PHP code.
+41fdadf 2018-07-19 Revert dbService to /oauth/dbService since /oauth2/dbService is broken for Fermi Lab. Note that /oauth/dbService is broken for robots from fnal (which uses ecp), so DNS has been updated to use polob (OA4MP3.6) for now.
+960fab9 2018-07-19 Use /oauth2/dbService instead of oauth/dbService.
+89bf4f0 2018-06-22 Add missing '*' to comment.
+dad2a4a 2018-06-20 Merge branches 'master', 'master', 'master' and 'master' of github.com:cilogon/service-lib
+2307df5 2018-06-20 CIL-481 When a user cancels login at an IdP (e.g., Duo), the resulting is a Shibboleth error authnFailed. In the Shib error handler, check for either OAuth 2.0 or OAuth 1.0a transaction (i.e., redirect url or failure url) and redirect appropriately.
+dcc33b8 2018-05-23 CIL-471 If no name given for support contact, simply use the email address as display string.
+6281cee 2018-03-27 CIL-462 Send 'acr' (Authentication Context Class Ref) from Shibboleth session to Java dbService API in the attr_json parameter.
+abe9eb6 2018-03-19 Merge branches 'master' and 'master' of github.com:cilogon/service-lib
+7412e9e 2018-03-19 CIL-452 Pass 'attr_json=...' query parameter to the dbService Java API.  This new parameter contains a JSON object populated by new user attributes such as 'member_of'.
+fa06645 2018-01-25 Allow endroid/qr-code 2.0 for PHP 5.6.
+c293cd5 2018-01-25 Use REMOTE_USER instead of HTTP_REMOTE_USER, which is discouraged.
+6fae5e5 2018-01-25 endroid/qrcode is abandoned. Use endroid/qr-code instead.
+b88e539 2018-01-25 endroid/qrcode is abandoned. use endroid/qr-code instead.
+382f336 2018-01-25 CIL-450 Get Shib member / group attributes.
+41a74a0 2018-01-24 Update database session handling for PHP 7.
+db96e6d 2018-01-10 CIL-431 Create 'bypass.txt' file for campus gateways. This new text file has <callback_uri, idp_entityid> keypairs which indicate gateways that should always use a specific IdP for logging on.
+d16e7da 2017-12-13 CIL-438 Always (re)set all user-related session variables when logging in.
+edaaa23 2017-10-30 Use PHP Coveralls v.1.0.2.
+c7ab3e2 2017-10-30 Try to make Travis-CI work with encrypted GITHUB_TOKEN.
+ccbc782 2017-09-08 CIL-410 Temporary fix for the Shibboleth error generated when going to /secure/testidp . Check for specific error condition and redirect to /testidp .
+951c60e 2017-08-30 Undo last update to ShibError.php.
+75f8867 2017-08-30 CIL-410 - Allow redirect URL parameter for ShibError.
+5afbfad 2017-08-22 Add remap for polod to dev.cilogon.org for Shibboleth.
+acc637f 2017-07-21 Get the OAuth2 redirect_uri from the query string rather than the session to prevent sticky SSO issues.
+89dfc52 2017-07-21 When checking for a forced skin, need to also check OAuth2 client redirect_uri (in addition to OAuth1 callbackuri).
+befe154 2017-07-10 CIL-402 Shorten the max length of the portal cookie to try to prevent a missing 'selected IdP' in the portal cookie (which in turn throws the "Missing OAuth2 client configuration values" error).
+8fe63de 2017-06-16 Remove spaces from end of lines.
+3c4888a 2017-06-16 CIL-401 Consult the blacklist.txt file when creating idplist.xml rather than when loading the "Select an Identity Provider" page.
+3558512 2017-06-12 CIL-398 For InCommon metadata IdP organization name, look for 'xml:lang=en*' to allow for both 'en' and 'en-US'.
+f6857a1 2017-06-09 CIL-393 When forcing skin, callbackURL takes precedence over selected IdP.
+c615f2c 2017-06-05 Fix bug where $skin is not instantiated.
+a44b540 2017-05-26 Fix classpath for CILogon oauth2-orcid Provider.
+a083c0e 2017-05-26 Create an unused DB() object so associated defined constants are initialized.
+b8aeb3e 2017-05-26 Fix typo.
+cde5561 2017-05-26 Use $value of array, not $key.
+14f7e2f 2017-05-26 Remove space at end of line to fix phpcs error.
+ddfe139 2017-05-26 Put the OAuth2 IdPs in an array so more can be added later.
+0bed7f7 2017-05-25 Add ORCID support.
+c49dc08 2017-05-25 Use correct link for LICENSE file.
+2534397 2017-05-25 Remove 'test' path from lint.
+7208831 2017-05-25 Require php-parallel-lint for Travis CI.
+9400f0c 2017-05-25 Fix issues as suggested by Scrutinizer. Use badges from shields.io. Try to get coveralls working.
+5ee6169 2017-04-05 Cannot get atoum working with Travis CI, so remove it.
+3fd54f7 2017-04-05 Need to require atoum for Travis CI.
+9d07515 2017-04-05 Try to get coveralls.io working with atoum.
+ac569e9 2017-04-05 Remove hhvm testing.
+34d862e 2017-04-05 Try to add the ldap extension using the instructions at https://docs.travis-ci.com/user/languages/php/#PHP-extensions .
+b5faf24 2017-04-05 For TravisCI, need to manually add ldap extension to php.ini as shown at https://github.com/travis-ci/travis-ci/issues/1096 .
+3c03949 2017-04-04 GitHub should set "us_idp=1" just like Google.
+1c6660c 2017-04-04 CIL-369 - Encode IdP display name as UTF-7 since some non-US universities can have special characters which ultimately go into the DN in the 'O=...' field.
+ac325d4 2017-04-04 Update README for push.
+a6ef542 2017-03-31 Change 'dev-master' to 'dev-trunk' for pear/config and pear/db.
+251fad8 2017-03-31 Set minimum-stability "dev".
+b81473c 2017-03-31 Split out the CILogon library code from the rest of the CILogon web service in preparation for moving to github.com.
+9bb8652 2017-03-20 Add composer.* files to install third party libraries.
+faba306 2017-03-15 Add XSEDE (and remove UIUC Test) to ECP IdP list.
+3770063 2017-03-13 * PHP code refactor for PSR-2 (Coding Style) and PSR-4 (Autoloader) compliance. * All external libraries are installed with PHP Composer. * Comments reformatted to be compatible with PHPDoc. * CIL-366 Use PHP League's OAuth2 library for Google. * Added GitHub logon support. * CIL-289 Better single sign on hanlding for OAuth flows. * CIL-254 Secondary LIGO IdP users now appear as login.ligo.org users. * CIL-360 Handle OAuth2 'response_mode'.
+4932ba2 2017-03-13 Force Help button to have a line break, via CSS.
+b53e821 2017-02-20 CIL-367 - Prefer <mdui:DisplayName> over <OrganizationDisplayName> for the list of Identity Providers.
+31401a5 2017-02-16 Update PHP QR Code library to latest version.
+9e595bb 2017-01-25 CIL-339 - Add STATUS_EPTID_MISMATCH error code.
+c0db324 2017-01-06 Check if OIDC state paramter is set before using it.
+ce5ac77 2017-01-04 openssl + PHP 5.6 gives warning message "unable to write 'random state'" in log files unless .rnd file is writeable by apache.
+3e55fa4 2017-01-03 Remove leading/trailing spaces/tabs/etc. from metadata keys/values.
+8f5a573 2016-12-05 CIL-357 - Add Marshal University to list of ECP IdPs.
+b087f2e 2016-10-26 The correct thing to do for OAuth 1.0a/2.0 error response is to make the <form> use the 'get' method as described in the OIDC spec.
+04acc29 2016-10-26 For mod_auth_openidc, the error response parameters need to be POSTed (i.e., in a <form>).
+86eeaad 2016-10-25 'exit()' after 302 redirects.
+7046d93 2016-10-25 Use English version of OrganizationDisplayName rather than the first one found in metadata.
+ca2a92f 2016-10-19 Ignore idplist.json from CVS.
+638e520 2016-09-30 CIL-345 - Since all IdPs are now whitelisted by default, we no longer need the https://cilogon.org/requestidp/ endpoint. Change /requestidp/ references to "send email to help@cilogon.org".
+25ea004 2016-09-19 Remove temporary hack for United ID.
+3086184 2016-09-19 CIL-338 - Major change of idplist format from DOM to array. This results in a 10x speed increase of display of WAYF.
+8dd545e 2016-09-19 CIL-289 - Separate out the user session vars into their own "unset" method so that OIDC/OAuth transactions do not "log off" the user for a better Web SSO user experience.
+a326a0f 2016-09-19 Add check for if IdP is eduGAIN and current session could be used to get a certificate. If so, unset user session vars to prevent getcert.
+8dc57cd 2016-09-15 CIL-337 - Blacklist mdanderson.org .
+3a007ca 2016-09-14 Make /var/www/html/pkcs12 subdirectories non-world-readable.
+051ac9e 2016-09-14 When testing for eduGAIN, make sure IdP isn't Google. Duh.
+bade924 2016-09-14 Move unsetAllUserSessionVars() inside the brackets rather than the if block.
+85f6e4c 2016-09-14 Only unset user session variables when printing out error page.
+ff2ed7e 2016-09-14 CIL-327 additional - If the IdP is an eduGAIN IdP without REFEDS R&S and SIRTFI, and the user could get an X509 cert (i.e., OIDC scope contains edu.uiuc.ncsa.myproxy.getcert, or a non-OIDC transaction such as PKCS12, JWS, or OAuth 1.0a), print out the error page regardless if the IdP actually released all required attributes.
+f38aa6d 2016-09-14 Add method $idplist->getOrganizationName().
+3c244b0 2016-09-12 When whitelisting IdPs, send 50 at a time to prevent problems with the URL query paramter being too long for the httpd server.
+840f019 2016-09-12 CIL-327 - Add all IdPs to whitelist. Also includes the following changes: * Update attribute release error page to be more helpful. * Scan for more InCommon metadata attributes for local idplist.xml file. * Show new InCommon attributes in testidp page. * Send 'us_idp' to dbservice endpoint for '/C=US'. * Initialize $idplist in util.php and use with 'global'.
+261b689 2016-08-23 Add $disableligoalerts boolean to allow temporary suspension of LIGO email alerts to 'alerts@cilogon.org'.
+628c425 2016-08-19 Blacklist the old (legacy) University of Pittsburgh IdP.
+2539594 2016-08-11 Undo premature commit of untested code.
+bd325f4 2016-08-11 Add configuration file for OIDC Discovery.
+0f71fcb 2016-07-25 Don't log messages from monit/nagios hosts.
+23757d3 2016-07-22 Revert to previous version: Send error alerts for LIGO missing attribute errors to alerts@cilogon.org, per Jim Basney.
+f276504 2016-07-22 Prevent error messages from being logged for missing shibarray elements.
+747a275 2016-07-20 Fix typo.
+cf5f445 2016-07-19 For LIGO logon problems, send "missing parameters" email ONLY to LIGO, but all other logon problems to alerts@cilogon.org AND LIGO.
+8680ca0 2016-07-19 Minor code reformat.
+99e8a34 2016-07-19 When writing missing attributes error to syslog, ALSO output any important missing user session variables.
+ac9886e 2016-07-19 Add extra message if missing emailaddr and affiliation contains 'student@'.
+cd28ff3 2016-07-19 Fixes CIL-298 and CIL-313. Revamp "missing attributes" error page to give more information to the end user to allow him to contact the identity provider.  Also return to OIDC/OAuth1.0a error url if available. Print error message to log rather than sending email alert. Add check in logwatch script to show IdPs with attribute release problems.
+8926668 2016-07-19 Add NCSA to list of ECP-enabled IdPs.
+2537db3 2016-06-28 CIL-308 Allow the CILogon OIDC consent page to be skipped when <forceinitialidp> is configured in the skin and "selected_idp" is passed as a URL query parameter for OIDC clients, i.e., "selected_idp" acts as the skin's <initialidp>.
+54ffbf1 2016-05-25 Performance tweak: get the full list of R&S IdPs first rather than searching through the DOM each time.
+188705c 2016-05-24 Move fix for CIL-174 from printWAYF() to getComopositeIdPList().
+7a51986 2016-03-08 Fix CIL-275 - Change error message for missing Shibboleth attributes to include links to (1) /secure/testidp/ to see which attributes are missing and (2) the InCommon Federated Error Handling Services to allow user to contact IdP admins (if info is available).
+173f61a 2015-12-14 Make the domain the same for cookies set by JavaScript.
+0381815 2015-12-12 Add space after comma for better flow when printing debug info.
+19370b3 2015-12-12 Forgot opening curly brace for 'else' clause.
+842c8ce 2015-12-12 Add safety bailout case which should never be reached, but just in case so we don't have an infinite while loop.
+23e7c77 2015-12-12 With the new longer keys for the portalcookie array, it might be possible for a user to get enough entries to encroach on the 4K cookie size limit. To alleviate this, add a timestamp to when the entry was last updated, and delete older entries when the size of the array grows too large.
+a8aa46e 2015-12-12 CIL-253 - Easy encryption of portalcookie using built-in PHP openssl_encrypt and openssl_decrypt with AES-128-CBC algorithm.
+1a8b653 2015-12-12 Create new function getConfigVar() to read values from the cilogon.ini file.
+8a3ca05 2015-12-11 Stop passing selected_idp as a parameter. Instead, get it from the PHP session $clientparams (if available). Also, since scope is now part of the 'key' into the portalcookie, no need to check if it has changed to force user re-consent.
+6a458fc 2015-12-11 For the OIDC case, the index into the portalcookie is now a tuple: (client_id,redirect_uri,scope,selected_idp), where selected_idp is optional.
+b34d094 2015-12-11 Added convenience function getPortalOrNormalCookieVar for those occasions when we want to get a single cookie value from either the portal cookie or from the 'normal' cookie.
+5f2ff3e 2015-12-10 CIL-245 - Save cookies on a per-portal basis so that OAuth 1.0a (delegate) and OIDC (authorize) can have their own selected idp and "Remember this selection" cookie values. Rework the portalcookie.php class to be simpler and auto-detect the callback/redirect uri for the portal. CIL-244 - Also save "scope" to the portal cookie for OIDC case to force user to re-consent if portal changes scope.
+324601e 2015-12-10 When setting cookie, also set $_COOKIE array so PHP code picks up the new value immediately. Also, simplify deleting cookie by setting time to 1 (= Jan 1, 1970).
+f1b91a7 2015-12-10 CIL-250 - Add two ECP-enabled IdPs for Fermi National Accelerator Laboratory (one is Kerberos-enabled).
+faef28b 2015-12-02 Dump 'pretty print' text of status result.
+0813526 2015-11-14 When selected_idp is not the remembered IdP, uncheck the "Remember this selection" checkbox.
+0427ada 2015-11-13 Two fixes: (1) Pass cilogon_info to the setTransactionState() method. (2) If selected_idp is passed to the authorize endpoint, allow it to override the "Remember this selection" checkbox when the saved IdP is different.
+13153f1 2015-11-11 Fix typo in comment.
+a50d1df 2015-11-11 CIL-211 - Add support for "affiliation", "display_name", and "ou" in PHP code.
+5fe55d8 2015-10-08 Fix CIL-205 again - Change email to 'cilogon-alerts@ligo.org'.
+0800dc6 2015-10-08 Fixes CIL-233 - Don't clear session variables when Show/Hide Help button is clicked.
+8a55980 2015-09-28 For upcoming transition to database being stored on separate server, make hostspec a configurable connection option.
+10e7f0f 2015-09-22 Allow an OIDC client to select an IdP via a "selected_idp" URL query parameter. If that IdP is whitelisted, show only that IdP in the selection list.
+cce3a90 2015-09-22 Change the "CILogon Service" banner to "CILogon".
+d6a625f 2015-09-21 Add LOA parameter to setTransactionState so OA4MP OIDC can fetch the certifcate from the correct MyProxy server.
+134c531 2015-09-11 Once again, move statement out of the loop.
+0c8d485 2015-09-11 Clean up code by using regex variable.
+219fdde 2015-09-11 Move sort out of the loop.
+e629091 2015-09-11 Fixes CIL-174 - Inconsistent Univ of Calif IdP names. Implemented fix suggested by Keith Hazelton. Replace commas and hyphens with comma.
+734149c 2015-09-09 CIL-205 update - Change 'rt-auth@ligo.org' to 'auth@ligo.org'.
+bfe368c 2015-08-12 Fixes CIL-205 - Send LIGO-related IdP login issues to rt-auth@ligo.org.
+65566fd 2015-06-24 Added Penn State U and U of Tennessee to ecpidps.txt.
+cb8fbf3 2015-06-04 Move funtionality of checkForceSkin() into the $skin->init(). Do extra checks for forceskin before and after user has authenticated with an IdP or come from an oauth (portal) client. Clear the cilogon_skin session variable after "Log Off" so that we no longer have to manually set the skin to "default" or "none".
+ce79bb8 2015-06-04 When initializing the skin object, check the forceskin.txt file for a matching IdP entityID or portal callbackurl. Put functionality of checkForceSkin into init().
+43e7921 2015-06-04 Allow for comments (lines starting with '#') in readArrayFromFile().
+224b1db 2015-06-04 Add comment block to forceskin.txt. Change from strict string equality to regex matching for URIs.
+dfbfa87 2015-06-04 Add comment block to blacklist.txt file.
+6dafb01 2015-06-02 Add extra security check after successful user authn to make sure selected IdP was actually whitelisted. Also modify checkForceSkin() to skip checking GET or POST parameters.
+b2b6f1e 2015-06-02 Make SeedMe dev portal use the SeedMe skin.
+ef10250 2015-06-02 When checking for skin name, add parameter to skip checking GET or POST parameters for checkForceSkin().
+31e07c7 2015-06-01 Create new function getCompositeIdPList() which returns just the whitelisted IdPs, correctly sorted (i.e., not using natcasesort()). When user clicks "Log On" button, verify that selected IdP is whitelisted.
+a8b1836 2015-06-01 Don't use natcasesort since it ignores spaces.
+3299072 2015-05-27 Added backup LIGO IdPs to forceskin.txt.
+55eb8b6 2015-04-30 Blacklist the legacy Cal Poly Pomona IdP so new users select the newer IdP.
+4671961 2015-04-30 Replace EmailAddressValidator with PHP built-in function filter_var().
+1f54577 2015-04-17 For upcoming InCommon-metadata.xml change of adding entities which were not registered by InCommon (e.g., eduGAIN), only allow IdPs with the RegistrationInfo extension of 'https://incommon.org'.
+077e5a6 2015-04-15 Add new refeds 'research-and-scholarship' attribute for RandS entities.
+5910666 2015-03-03 Added Clemson University to list of ECP-enabled IdPs.
+0e79820 2015-03-02 Added University of Utah to list of ECP-enabled IdPs.
+c684e60 2015-02-18 Added .cvsignore for idplist.xml.
+ea4e765 2015-02-17 Add poloc to getMachineHostname().
+cfb922c 2015-02-04 * authntime is now a required user session variable. * Change forceauthn from a function parameter to a session variable. * For the OIDC authorization code flow, always skip the New User page. * Check dbservice return values to ensure successful call(). Send error   email alert upon failure.
+84d104a 2015-02-04 Send error alert email when getUser dbservice command fails to execute.
+7a16c20 2015-02-04 Fixed typo in comment.
+acbb987 2015-01-29 Added error code returned by setTransactionState(). Changed error code name for getClient().
+c8ee95b 2015-01-29 When logging off, should also unset the ePPN, ePTID, openidID, and oidcID session variables.
+f5e8f73 2015-01-29 Fixed typo in debug output.
+f8696bf 2015-01-29 Added two new dbservice commands "getClient" and "setTransactionState" to support OIDC authorization endpoint. NOTE: Still need to add error STATUS_ values returned by setTransactionState.
+f9ed613 2015-01-29 * Added support for authntime, the Unix timestamp for the user's most recent   IdP authentication. * Added function parameter to force re-authentication when OIDC client   passes in max_age parameter. * Added second myproxy2.cilogon.org server for myproxy-logon command.
+0de26a4 2015-01-29 Added undocumented MYPROXY_SOCKET_TIMEOUT=1 for shorter timeout when primary myproxy.cilogon.org server is offline.
+c569b52 2015-01-29 Added support for authntime, the Unix timestamp for the user's most recent IdP authentication.
+e39229e 2015-01-23 Fixed typo.
+26c666f 2014-12-11 Remove "transitional" code for deleting non-domain-specific cookies which caused problems with Safari on polo3.
+dae03c0 2014-12-10 Add missing closing php tag.
+27183ac 2014-09-19 For multi-valued SAML attributes, use only the first one by chopping off everything after the semicolon.
+13c5fc0 2014-09-12 Add "prompt=select_account" as per Google API docs at https://developers.google.com/accounts/docs/OAuth2Login#prompt to allow the user to select a Google account at login time.
+4594eee 2014-09-11 Updated Google logon error message to include email address as possible cause.
+1f1411d 2014-09-04 Add 'issuer' label for Google Authenticator as described in https://code.google.com/p/google-authenticator/wiki/KeyUriFormat .
+c242d25 2014-08-15 MAJOR UPDATE - removed OpenID 2.0 support, added Google OIDC support. Also now send eppn/eptid/openid/oidc to datastore to allow for when Google stops sending OpenID 2.0 identifiers.
+8b088e8 2014-08-08 Remove help text references to ProtectNetwork, Verisign, and PayPal. Also remove Verisign from list of available IdPs.
+638df49 2014-07-09 Add banner text when user is logged in with ProtectNetwork to notify end of support for PN IdP Dec 2014.
+ed2eb5d 2014-06-18 For atomic action, save to a temporary file and then rename to final filename.
+0a86ffe 2014-06-18 Send Google OIDC Identifier to datastore if available. Currently ignored by datastore webapp.
+c38c581 2014-06-18 Disable PayPal since OpenID no longer works.
+fd23ca5 2014-06-18 Updated "outage" message.
+5d08ef5 2014-05-20 Add fozzie.nics.utk.edu to list of polo?.cilogon.org hostnames.
+55406d4 2014-04-30 Move getMachineHostname() from util.php to content.php since only content.php calls it. getMachineHostname() now uses an array to map local hostnames (e.g. polo1.ncsa.illinois.edu) to cilogon-specific URL hostnames (e.g. polo1.cilogon.org).
+e131355 2014-04-28 Check for empty idpdom variable before writing it to file.
+9e8044b 2014-04-25 The database.configuration file is no longer used.
+d212e02 2014-04-21 Swap PostgreSQL & MySQL if...then blocks. Oops!
+1e8ee92 2014-04-21 Updated outage message date/time.
+7bd2f12 2014-04-07 Don't rely on the OA4MP cilogon.xml file for database username/password. Instead read values from cilogon.ini.
+43e8fbc 2014-03-26 Add a global blacklist.txt file. Any entityIDs listed in this file will be globally blacklisted, i.e., removed from all skins' IdP selection lists.
+b70d837 2014-03-26 Send openid, eppn, and eptid to database web service.  Extra parameters are simply ignored by the web service.
+eb858c6 2014-03-11 Remove "SHA1" support in certificates since OSG no longer needs it.
+c6e8a01 2014-02-13 Make "deployjava" a skin config option so as not to check for installed version of Java unless explicitly told to do so. Update skins which use the JWS downloader to use the new "deployjava" config option. This fixes the issue where PKCS12 cert users see a notice about Java even though Java is not necessary for their use case.
+b77b57f 2014-02-13 Checking in latest version available from http://www.java.com/js/deployJava.js . See http://docs.oracle.com/javase/6/docs/technotes/guides/jweb/deployment_advice.html for more information.
+b5b7a14 2014-01-21 In csrf.php, change static (class) methods to instance methods. Add extra space for Show/Hide Help button since latest MSIE does not honor force line breaks in Submit buttons.
+173bb23 2014-01-21 Added entry for "Google+" (currently commented out) to use new Google OAuth 2.0 login method.
+7b1bacf 2014-01-21 Added code to deal with new Google OAuth 2.0 login method. Currently only activated by uncommenting "Google+" in array in openid.php. Use old Google OpenID method until Google OAuth 2.0 is not quite so buggy.
+bf1e25f 2014-01-21 Move getMachineHostname from content.php to util.php.
+ded7d8a 2014-01-21 Rename redirectToGetUser() to redirectToGetShibUser().
+6131df7 2014-01-21 Look for InCommon-metadata.xml file in /var/cache/shibboleth/ instead of /etc/shibboleth/ .
+d16a7af 2014-01-21 Change 'openiderror' to 'logonerror'.
+e7e9ffb 2013-11-07 Added University of Michigan to list of ECP IdPs.
+fb80e14 2013-10-22 Add reverse DNS lookup to email alert.
+89f5d88 2013-10-22 Remote extra space.
+d1df613 2013-10-11 For the delegate case, show the "User Changed" page even if the skin has been configured to skip all of the "extra" pages.
+ac4983b 2013-09-16 Remove Indiana University due to problems with their campus SSO / Shibboleth integration.
+e993235 2013-09-03 Use HOSTNAME rather than 'cilogon.org'.
+40809cc 2013-09-03 Fix the main class comment block.
+cbe4ad1 2013-08-28 Updated service outage message.
+4838f05 2013-08-28 Added Indiana University to list of ECP IdPs.
+e66e22c 2013-08-20 Updated outage message for upcoming polo swap.
+88b4035 2013-08-20 Certain $_SERVER variables were Arrays which caused error messages in ssl_error_log. Catch them and simply output "Array" instead.
+38d1d3c 2013-08-15 Updated "system outage" message.
+66512b1 2013-04-18 Add new skin config option "usesha1" and new skin "sha1". This supplants the hack that was specific to the OSG skin. Now any skin can specify SHA-1 (instead of SHA-256) when getting a cert from the myproxy server.
+bc0b7fe 2013-03-26 Add new config.xml for LIGO skin to set default AND max cert lifetimes to 72 hours. Also force use of LIGO skin when LIGO IdP selected.
+aa52724 2013-03-08 If <allowforceinitialidp> is set, make sure the portal is in the <portallist> before force redirecting the user to the <initialidp>.
+ea5e981 2013-03-08 Rename portalListed() to inPortalList(), and fix bug where no <portal>s in the <portallist> would incorrectly return true for inPortalList().
+ab7c800 2013-03-06 Fix issue with slashes in first/last name by using a lower-level function of the LDAP library and processing the subject DN element-by-element.
+e6f6f3b 2013-03-06 Fix reformatting of subject DNs for RFC2253.
+a26a574 2013-03-05 Added new <forceinitialidp> option to completely bypass the Select IdP page. Also moved code from the main "switch" statements (for both the main CILogon site and the "delegate" CILogon site) into functions for code reuse.
+b3c949b 2013-02-20 Put htmlentities in a util function so as to force "UTF-8" encoding. Also use iconv() to convert UTF-8 to UTF-7 for first and last name.
+c4da9e4 2013-02-05 Log CSRF check failure.
+7e51c1e 2013-01-03 Added UIUC to list of ECP-enabled IdPs.
+0d243e9 2012-12-11 Added two-factor support for ECP.
+f7ab5c9 2012-12-07 Hide "Duo Security" method in "twofactor" skin (and default skin), but make available in "all" skin.
+8abd740 2012-12-06 Add comments in header block.
+af1690e 2012-12-06 Major update. (1) Add two-factor authentication support. (2) Refactor util.php as a class with static methods.
+0385046 2012-12-06 Add new classes for twofactor authentication support.
+e1b3d09 2012-10-18 Change page footer to link to acknowledgements on a separate page (http://ca.cilogon.org/acknowledgements).
+06cf96e 2012-10-08 Check IdP list for <silver>. If found, request silver from IdP.
+f0716cd 2012-09-18 Added University of Wisconsin-Madison to ECP list.
+a6269d8 2012-09-14 Change handling of requesting silver assurance certification. User can still check "Request Silver" checkbox, but the checkbox is hidden by default. (It can be shown via CSS.) Also, now check local idplist.xml file for <Silver> tag (set by scanning InCommon Metadata). This extra functionality is currently implemented on test.cilogon.org only (i.e., the code is commented out on polo1/polo2.)
+ae8ac9a 2012-09-14 Scan the InCommon MetaData for silver assurance certification and add tag to local idplist.xml file.
+d96a4cd 2012-09-14 Changed the display of the "Request Silver" checkbox to a CSS option, hidden by default.
+c6646d7 2012-09-14 New files added for upcoming CILogon Globus CA.
+fc6aee0 2012-08-27 Make shib request to {polo1,polo2}.cilogon.org, but only for a subset of REMOTE_ADDRs.
+b5ef63d 2012-08-22 Simplify code handling cilogon.org -> {polo1|polo2}.cilogon.org URL redirection for Shibboleth.
+7f87bae 2012-08-18 Start requesting the ICAM LoA 1 PAPE policy since Google fixed the problem on July 19.
+21bb2ce 2012-08-10 Update text for /testidp/.
+80fab61 2012-08-10 Unset host-specific cookie when setting domain-specific cookie.
+b99c817 2012-08-10 Added getInCommonIdPs() function to return list of all InCommon IdPs.
+bd4ca13 2012-08-10 Modified printWAYF so that it can alternatively list all InCommon IdPs (rather than just whitelisted IdPs).
+e6a7ff0 2012-08-09 Move setcookie() calls to setCookieVar() function in util.php. Set a domain for cookies.
+21ec2ef 2012-08-09 Added 'toString' method to allow for text output of portalparams cookie.
+12989c9 2012-07-25 Fix opening bracket; move to same line as "function" for consistency.
+f145d25 2012-07-25 Read storage type for PHP sessions and OpenID state sessions from /var/www/config/cilogon.ini configuration file.
+6e5c7d7 2012-07-25 Add extra output on shib error to show that forceauthn was requested.
+92368f7 2012-07-24 Use is_null() function instead of comparing value to 'null'.
+946b010 2012-07-24 Initial check-in of sessionmgr.php to save PHP session data to MySQL. This can be enabled by calling startPHPSession(true), or by changing the default value of $usemysql in that function.
+80c02ff 2012-07-12 Moved reading of the database config file to a new class dbprops.php. Recoded openid.php's getDBStorage() to use new dbprops class.
+20537c8 2012-07-11 Print more PHP session variables in email alerts.
+76b9807 2012-07-11 Send Shibboleth errors to alerts@cilogon.org (rather than tfleury).
+cb8e2ed 2012-07-11 Read database config info from new /var/www/config/cilogon.xml file. Use MySQL for PHP state info (instead of PostgreSQL).
+70c4ec2 2012-07-11 Commented out PAPE openid-trust-level1 extension due to Google no longer accepting it.
+212f5fc 2012-06-29 Update outage text to be the same on all polos.
+b0a2e27 2012-06-29 Change dbservice to use the new (cilogon2) oauth webapp interface.
+70a3b8b 2012-06-21 Ran JavaScript code through JSHint.
+549e668 2012-06-15 Fixed missing closing quote.
+eaa697f 2012-06-14 Add code to handle <forceauthn> for OpenID IdPs by setting max_auth_age=0 in a PAPE extension.
+9bd39d0 2012-06-13 Add new skin config parameter <forceauthn> which makes a user reauthenticate at a Shibboleth IdP every time by sending "forceAuthn=true" when initiating the session. See https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSessionCreationParameters for documentation.
+721c050 2012-05-22 Wrap shibboleth errors in htmlentities to prevent script attacks.
+d72d174 2012-05-22 When an IdP sends multiple email addresses, they are concatenated together with a semicolon. This breaks the email address validator. So check for a semicolon and use only the first of multiple email addresses.
+a490cb4 2012-05-11 Add a few more htmlentities() calls. Also, check new user DNs for htmlentities. If found, send an email alert.
+fb60dd9 2012-05-11 Call htmlentities() on the DN so that weird characters are rendered correctly in browser.
+c02016d 2012-04-19 Stop accessing null data which causes "PHP Notice" messages in /var/log/httpd/ssl_error_log.
+dd0b10a 2012-04-19 Updated outage banner text.
+5269743 2012-03-29 Updated comments.
+5a4fbf4 2012-03-26 Updated BANNER outage message content.
+fecbae8 2012-03-26 Add ePPN, ePTID, and openidID to the "info" parameter passed to MyProxy.
+f1f2e36 2012-03-26 Added code to handle Shibboleth SP errors when configured with a "redirectErrors" URL.
+ce481a4 2012-03-16 Allow specifying a different "Powered By CILogon" icon via skin's config.xml file. Updated globusonline skin to use squater "Powered By" icon in upper-right corner.
+60d58a8 2012-03-06 Can now change the dbservice URL via a function call.
+87a4b03 2012-01-26 Allow setting destination for email alerts.
+a32e220 2012-01-26 Major rewrite of handling InCommon Metadata.
+11da402 2012-01-17 Made the index-maint.php page a bit nicer looking.
+233ef67 2011-12-05 Special hack for OSG to get SHA-1 signed certificates.
+0c4d9eb 2011-12-05 Add note to self to fix printing of session vars to log when we move to storing PHP session to database.
+27ad2d6 2011-11-15 Add missing 'php' to the opening '<?' tag.  Required for PHP 5.3.x.
+ff93432 2011-10-26 Read minlifetime and maxlifetime from skin. Added function to check if a particular IdP should be "forced" to use a specific skin.
+a8ef95e 2011-10-26 Added support for MySQL. Untested.
+697234e 2011-10-26 Can now read default/site-wide config.xml from the root 'skin' directory.
+43a4226 2011-10-26 Added placeholder for IdPs which should be "forced" to use a specific skin.
+726e577 2011-10-26 Also check for minlifetime now.
+0ee16ba 2011-10-26 Removed unneeded CSS for the no-longer displayed "Help Me Choose" button.
+e1c7827 2011-09-29 Fixed typo.
+0cd5f8b 2011-09-29 Added a new skin config option <dnformat> for DataONE. This allows the certificate subject DN to be displayed in RFC2253 format.
+cdfef8b 2011-09-23 Print a more precise error message to user when an IdP does not provide full name and/or email address.
+b8b6763 2011-09-19 Modified OpenID Error message to include "help@cilogon.org".
+865b85a 2011-09-16 Changed OpenId provider endpoints.  Made them all "https" (instead of "http") and also changed "google.com" to "www.google.com" as per Google's latest documentation. Patched getopeniduser to map new OpenId provider endpoints to old (non-https) URLs, so no changes to database needed.
+455848b 2011-09-15 Made a few code changes as suggested by jslint.com.
+e8baef8 2011-09-15 Set text focus to lifetime text input field on "allow or deny delegation" page.
+4f12d5c 2011-09-06 Remove CILogon Test IdP (Boingo) from ECP IdP list.  Also make ProtectNetwork the default choice in the ecp.pl script.
+22835e6 2011-08-26 Make "Show/Hide Help" button flash every 10 seconds via an animated gif background.
+36e33c8 2011-08-26 Rewrite the error email alerting code so that it is centralized. Also myproxy getcert errors now send an alert email.
+a77ef83 2011-08-26 Rename LTERN to LTER Network.
+b82fae8 2011-08-25 Added ProtectNetwork to the list of ECP-enabled IdPs.
+5cbe281 2011-08-17 Changed the options for the <delegate> block in the skin's config.xml file. Now have <initial...> and <force...> parameters for lifetime and remember. The <initial..> options set the cookies for the portal, while the <force...> options override the portal cookies.
+e44b381 2011-08-12 Add a little top/bottom padding to help button.
+2d6bf77 2011-08-12 Make the help button background black, and make the font bigger.
+db6b4e3 2011-08-12 Forgot to add dbservice.php before!  Specifying skin with the cilogon_skin is now case-insensitive.  Send alert on curl error.
+78eeb06 2011-08-11 Added University of Chicago to list of ECP IdPs.
+6db360e 2011-08-11 Removed "allowdiv" specific stuff since that class is no longer used.
+8bffad7 2011-08-11 When there is just one IdP in the list, don't show the "Search" box.
+ba3867c 2011-08-02 Add University of Washington to the list of ECP-enabled IdPs.
+454091e 2011-08-02 Added 'LTERN IdP' to the list of ECP-enabled IdPs.
+1a915ed 2011-07-28 Removed the LIGO test IdP from the list.
+976cf5a 2011-07-26 Initial check-in of the Perl ECP client. Need to add more ECP-enabled IdPs to the ecpidps.txt file, and change the SP from test.cilogon.org to cilogon.org.
+33af966 2011-07-13 When the skin is configured to skip the Certificate Lifetime page (for the 'delegate' case), the New User and User Changed pages should also be skipped.
+9609129 2011-07-11 Added OOI-requested enhancements and updated OOI skin.
+b05076e 2011-07-08 Added code to handle new <portallist> config.xml option.  Also renamed <whitelist> and <blacklist> to <idpwhitelist> and <idpblacklist>.
+9412927 2011-07-08 Added hidden "Cancel" button on WAYF.
+5869c39 2011-07-08 Rename <whitelist> and <blacklist> to <idpwhitelist> and <idpblacklist>. Also output hidden "Cancel" button for the WAYF.
+28186e0 2011-07-06 When user has no first/last name at Google, print nicer error message with link to Google Account profile page, and allow user to try to "Log On" again.
+9489051 2011-06-20 Distinguish between the two lifetime paragraphs, one for PKCS12 certs and one for GridShib-CA certs, so either can be hidden.
+dea81b7 2011-05-23 Revert to calling startPHPSession(), but fix that utility call so as NOT to first check session_id().  Rather, simply tall session_start(), but with error reporting turned off.  This will keep the same session ID if already set.
+43d6894 2011-05-22 Change separator character from tab to space for 'activation' and 'p12' PHP session variables.  Also, must call "start_session()" instead of "startPHPSession()" in order to keep the Activation Code in the PHP session. Need to investigate the reason for this.
+7a33e02 2011-05-19 Move generateP12 from main index-site.php to content.php, so it can be called by the secure/getuser/ script.
+9e083ea 2011-05-19 Add support for certreq option for myproxy-logon, to be used by ECP clients.
+010a04f 2011-05-19 Per Jim Basney, add "?vo=..." URL option as alias for "?skin=...".
+1c2e13a 2011-05-13 Added a "Show Help" / "Hide Help" button to toggle the display of help text.
+986d0b8 2011-04-21 Remove Yahoo from OpenID providers so as to be compliant with ICAM LOA 1 with remaining OpenID providers.
+1c4403f 2011-04-04 Added PayPal OpenID authentication.
+a0857c7 2011-03-31 Updated OpenID policy to fetch first/last name and email address and store these in the database.  Also updated MyProxy config for OpenID to issue certs with DN and subjectAltName similar to Basic and Silver.
+848ee0f 2011-03-30 Stopped using the OpenID box a long time ago.  Remove unneeded CSS.
+3b1474b 2011-03-23 Created new "skin.php" class to read in CSS and config.xml for a skin. Added new skin configuration options for both 'normal' site and 'delegate' site. (Config for OOI now auto-skips the approval page.) A config-example.xml file is available in /var/www/html/skin/.  Added Portal Info table to WAYF page for delegate site, which can be hidden via CSS.
+690cba9 2011-03-17 Use "try...catch" to overcome MSIE problem.
+2ea4d40 2011-03-17 JavaScipt bug fixes for MSIE.
+e645995 2011-03-15 Created new 'skin' class to handle reading not only CSS for a skin, but also configuration options.  New options include whitelist, blacklist, and defaultidp.
+2f1bb5c 2011-03-15 ePTID now set from HTTP_PERSISTENT_ID rather than HTTP_TARGETED_ID.
+4fa5e83 2011-03-15 Display of the "Powered by CILogon" is now controlled via CSS.
+4dd22b1 2011-03-07 Make 'viewport' slightly smaller for Jim's iPhone.
+c6cf6f5 2011-03-02 Added check for Safari on Mac for the "ondblclick" JavaScript action in the WAYF <select> list.  Safari on Mac does a double-click even on the scroll arrows, which is bad.  So ignore double-clicks for Safari on Mac.
+af3ba81 2011-02-17 Added <meta> tag for viewport zoom to 80% for phone browsers.
+0b0f102 2011-02-17 Fixed bug - Search box is now case insensitive.
+5e24d41 2011-02-14 New version of cilogon.org.  WAYF now has a search function and uses JavaScript to provide better user experience.  Main site now has a "Get New Certificate" button which generates a PKCS12 file directly rather than relying on the GridShib-CA code.  Old site is retained and can be displayed by using skins.
+26c6082 2011-02-14 Moved all JavaScript code from secutil.js to cilogon.js. Added new JavaScript for handling various interface elements in new cilogon site.
+31f45b8 2011-02-14 Moved all JavaScript code from secutil.js to cilogon.js.
+80c8f59 2011-01-21 Added tempDir and deleteDir for use by the new "Get New Certificate" button.
+30a051c 2011-01-21 Remove session variables for the Download Link and Activation Code.
+3011933 2011-01-21 Undelete the myproxy.php code since we might replace the JWS stuff with the new "Click Here To Download Certificate" link.
+15eb689 2011-01-21 Updated the index.html files to redirect to the parent directory rather than cilogon.org.
+c1946a2 2011-01-20 Changed the skinned CILogon logo to be "Powered By CILogon".
+4ab9422 2011-01-20 Put hover text correctly in the <span> rather than the <img>.
+c50ead6 2011-01-20 Move non-breaking space inside the <span> so it also gets the hover text.
+031847f 2011-01-20 Added a new text-only "Quit your browser to log off" box for DataONE.
+1e901e2 2011-01-20 Added small "?" icon next to "Select Identity Provider" with a link to an entry on www.cilogon.org.  Also changed "privacy policy" font size for DataONE.
+5a84faf 2011-01-07 Change the question icon in the footer to a bigger icon.
+0ee02f8 2010-12-15 Changed all $_SESSION[] instances to using functions in util.php, to set or unset the value.
+d26e86e 2010-12-15 Fixed the padding in the actionboxes to be more uniform around the edges.
+bdbf40b 2010-12-10 Modified cilogon.org site to be more streamlined and faster.
+63b10e4 2010-12-10 Removing unnecessary files due to the update of the cilogon.org site.
+2943844 2010-11-12 Tried to make the timeit.php code a little more robust and also added lots of comments.
+b56a741 2010-10-14 Added functions to read/write array to/from file, and to read the GridShib-CA config file using straight PHP (rather than PHP->Perl).
+dc9ec3f 2010-10-14 Remove references to GridShib-CA perl code by (re)writing the previously called functions in straight PHP.  Also, attempt to read mapping of IdPs to PrettyPrintNames from a basic text file rather than from the InCommon metadata XML file.  Both of these are for speed increases.
+85bdfa1 2010-10-14 Change the way the whitelist file is written.  Previously wrote out XML formatted file. Now simply print out basic file with one IdP per line. Also, default to reading whitelist from file rather than database.
+cb6d7d4 2010-10-14 Since there is now a checkbox for "Download Root CAs", a cookie needs to be set so the checkbox state is remembered.
+b22e1ba 2010-10-14 Fixed some comment strings.
+f7dd646 2010-10-14 Fixed error due to copying of code without changing variable name.
+1a12a8a 2010-10-14 MyProxy rpm is now at 5.2, so we no longer need special 2048 bit version of myproxy-logon.
+ec01dda 2010-10-14 Added new timeit class to help debugging timing of php execution.
+09d4bcb 2010-10-11 Fixed incorrect if..then block.
+9644e12 2010-09-24 Added Fupei.com as a new OpenID provider.
+3a96aed 2010-09-24 Removed Yiid from list of OpenID providers since they are closing next week.
+04742f1 2010-09-03 Removed whitelist.xml since we are using the database to store the list of available IdPs.
+41ee6b7 2010-09-03 Removed Vox as an OpenID provider since they are ending service as of Sept. 30, 2010. Added Clickpass as a new OpenID provider.
+6b926c5 2010-08-20 Removed unneeded CSS since no longer using actual text for the page header.
+c15dc47 2010-08-20 Changed the page header icon/text to be a single image so as to have nicely rendered text.
+078e8c5 2010-08-19 Fixed "arial" in font-family, and tweaked color of form submit buttons.
+81554df 2010-08-12 Fix spelling error.
+a6aeef6 2010-08-12 Added function handleLifetime() which gets called when the user clicks the "Download Credential" button.  This function populates the hidden RequestedLifetime field and sets a cookie for the field value.
+761d4ee 2010-08-12 Added CSS for the "Lifetime" field under the "Download Certificate" button.
+adf92d7 2010-08-09 Add a link to the privacy policy in the "Start Here" box under the "Log On" button.
+85b34fa 2010-08-03 Compacted the code to output the dropdown table of OpenID Providers.  Table now generated dynamically using $providerarray in openid.php.  Also, added Steam as a new OpenID provider and temporarily removed certifi.ca (since it hasn't worked for me in over a month).
+2eccc32 2010-07-23 Revert to using PostgreSQL for OpenID stuff.
+b27020c 2010-07-23 Commented out the "next service outage" message.
+7a90069 2010-07-16 Added a getFileStorage() function to use OpenID FileStore in addition to OpenID PostgreSQLStore.  Which one gets used is determined by what gets called in the getStorage() function.
+10a2ac7 2010-07-14 Latest dump of whitelist database.
+69bf75a 2010-07-14 Added "clear()" metehod. Also clear out the current whitearray before reading from file or database.
+1bea281 2010-07-09 Change background color back to white.
+80dc9bf 2010-07-09 Replace instances of 'cilogon.org' in URLs with HOSTNAME, set in include/util.php via the HTTP_HOST server variable (or to 'cilogon.org' if HTTP_HOST is not set).
+8f5f9c0 2010-07-08 Change the output for "OpenID Login".  Simply print out the "pretty print" name of the OpenID provider.
+eba1671 2010-07-07 Added banner to top of pages indicating future outage.
+0b51b7e 2010-07-02 For 'echo' statements, replace '.' concat operator with ',' as suggested by http://www.tuxradar.com/practicalphp/18/1/6 .
+13baef0 2010-07-01 Break out long strings into shorter strings.  Probably not useful.
+a109e7e 2010-07-01 Broke up one long 'echo' statement into several smaller staements for debugging purposes.
+04ecd7a 2010-07-01 Moved the "startPHPSession()" call to /include/util.php so that simply require_once('include/util.php') at the top of any other PHP file will start a secure PHP session.
+10c2ff9 2010-07-01 Make $db protected instead of public.
+41f7f6f 2010-07-01 Added OpenID as login option.  Moved several common functions from /index.php and /delegate/index.php to here.
+4052c2d 2010-06-30 Remove showUrlDiv() function since we don't use it.
+6d3a671 2010-06-30 Added code to connect to the PostgreSQL database for use by the Auth_OpenID_Consumer.
+5ca20fa 2010-06-30 When setting useOpenID to '1', also focus/select the OpenID 'username' field, if any.
+35ee911 2010-06-30 Add lengthy notice about "not the opinion of NSF".
+0718dac 2010-06-30 Add CSS for when there is an OpenID error.
+9128641 2010-06-10 Use the 2048 bit private key version of myproxy-logon.
+63eceac 2010-06-04 Fixed JavaScript syntax errors.
+6abdc19 2010-06-04 Changed "exists()" method to always require 1 parameter.
+1666d85 2010-06-04 Fixed capitalization mistake in function name.
+ff1b70f 2010-06-04 Added link in footer to "Subscriber Responsibilities" link.
+fa890d7 2010-06-03 Added method to output OpenID URL with a <input type="text"> box replacing the 'username' in the URL.
+651e0d1 2010-06-03 Fixed warning message from Yahoo OpenID using local cilogon.xrds file.
+832db56 2010-06-02 Shorten exists() method block.
+5c94d1e 2010-06-02 Change isProviderValid() to exists() to better align with whitelist.php functionality.
+47fe607 2010-06-02 Changed '.' to '#' since using id="providerId".
+9725bff 2010-06-02 Changed id="selectIdP" to id="providerId" to be the same as the root index.php script.
+0286daf 2010-06-02 Changed read()/write() to read/write to/from the data store rather than the whitelist.xml file.
+25c8d49 2010-06-02 Added new openid.php file to manage the OpenID providers and their associated URLs.  Modified CSS file to handle OpenID provider list.  Fixed openid.js to change alt text of img.
+3a66642 2010-05-28 Added block to preload all OpenID images for immediate display of dropdown menu icons.
+aa96548 2010-05-28 Changed path to the openid icon .png.
+4a9d9f0 2010-05-28 Added CSS specific to the OpenID selector.
+4532818 2010-05-28 Added new JavaScript file to support OpenID selector.
+1cdad7b 2010-05-28 Added support for ":hover" over anything in Internet Explorer.  Taken from http://www.xs4all.nl/~peterned/csshover.html , version 3.11.
+8286f73 2010-05-07 Add / remove some spaces in the log output string.
+408baee 2010-05-06 Fix selected="selected" option for HTML validation.
+58ea052 2010-05-05 Set cookie duration to 1 year rather than expire at session end.
+dd5036a 2010-05-05 Added CSS for the "Return to Your Portal" link.
+b7e4624 2010-05-05 Added sanity checks when reading the cookie.
+2aeaa22 2010-05-05 Initial check in of portalcookie.php to keep track of info related to delegated certificate ('lifetime' and 'remember these settings').
+7ee7abc 2010-04-30 Added CSS for the "Allow Delegation" page.
+3c50527 2010-04-27 Move p.note out of div to be more general.
+1ac872c 2010-04-26 Added getGetVar() and setOrUnsetSessionVar() functions.
+78e1b93 2010-04-26 Added methods to call CILogon::Store->getPortalParameters() and associated PortalParameters subroutines.
+395ac29 2010-04-23 Fixed a comment.
+11bb508 2010-04-23 Added css for the printUserChangedPage() output.
+8b8deaa 2010-04-23 Added getLastUserObj() method to call getLastArchivedUser().  This gets the latest archived user to find out which attributes changed.
+0e308c6 2010-04-22 Fixed the url for MyProxy.
+843fced 2010-04-22 Changed the STATUS_* codes from individual variables to an array.
+6b89933 2010-04-21 Remove multiple input.submit blocks.  Add css for printing error messages and the GSI-SSHTerm applet.
+14986a4 2010-04-20 Deleted the "redirect()" function since I probably don't need it.
+3cd042f 2010-04-20 Delete the PHP session csrf value after successfully accessing it.
+7c78ac8 2010-04-19 Needed to include CILogon::IdentifierFactory" for when a new user gets added to the database.
+0b57c41 2010-04-19 Needed to initialize the GridShibCA perl code in order to set the csrf cookie for "Download Certificate" button (i.e. launch gridshib-ca).
+b1e6aa7 2010-04-15 Remove unnecessary perl "use" statements since they seem to cause problems.
+c7dbeff 2010-04-15 Add new function to unset a given $_SESSION variable.
+ab1782c 2010-04-15 Check to see if the $_SESSION token exists before removing it.
+2fa1d42 2010-04-15 Added methods to read/write whitelist from/to the persistent store.  Also, renamed "delete" methods to "remove" since "delete" is a built-in PHP function.
+2dccd48 2010-04-15 Renamed "delete" methods to "remove" since "delete" is a built-in PHP function.
+94a6606 2010-04-15 Initial check in of the wrapper class for the CILogon::Store Perl module.
+5b0bbc0 2010-04-14 Remove a space.
+7c6470f 2010-04-14 Append $_SESSION variables to log output.
+6f5c1e2 2010-04-14 Initial check in of getMyProxyCredential() function.
+c6212d6 2010-04-13 Check the keepidp cookie and check the checkbox appropriately.
+aa6d066 2010-04-12 Added css for the main "Get Certificate" page.
+cd56f5d 2010-04-09 Typecast returned xml values as strings.
+251cab3 2010-04-08 Modified getScriptDir() to allow for the prepending of the https://servername to result in a full URL.
+ba46b78 2010-04-08 Added a comment line.
+7d6786d 2010-04-08 Make tokenname a const value.  Change all "csrf::" to "self:".  Modify verifyCookieAndGetSubmit to check both the hidden <form> csrf element AND the PHP session "submit" variable.
+b029612 2010-04-08 Add a little space just above the header on the Welcome page.
+9521149 2010-03-31 Added convenience methods to check if an entityID / OrganizationDisplayName exists in the InCommon metadata.
+fc56cc4 2010-03-31 Adding to the whitelist.xml file via testidp now works.
+6ba4b1a 2010-03-31 Added new function printIcon for printing okay/error icons.  Also minor text changes.
+a9d9a7c 2010-03-31 Added markup for the testidp page.
+a42f4f1 2010-03-30 Added convenience method to get the directory of a script (rather than using SCRIPT_NAME).
+ec1e2bb 2010-03-30 Added convenience method to get the value of a form "submit" button while also verifying that the hidden csrf field matches the csrf cookie.
+6d38387 2010-03-30 Use getScriptDir() for target of form submit button.
+93ad150 2010-03-29 Changed "id" to "class" for all divs.  CSS is now correct for the main Welcome page and the RequestIdP page.
+85e78a8 2010-03-29 Updated the WAYF whitelist of IdPs. Other minor html fixes.
+0c9fba8 2010-03-27 Use a simpler tooltip popup.
+f861400 2010-03-26 Added a bunch of testing css.  Needs cleanup.
+a1c0c1f 2010-03-26 Fixed form submit action. Added "Logon" button.  Added function to print a decorated page header.
+1eb12ff 2010-03-26 Forgot to add parens to the funtion definition.
+8a76e50 2010-03-26 Change including of .css file to older (and faster) <link> style.
+108e0fe 2010-03-26 Added a bunch of methods to write the CSRF token to a PHP session (rather than a hidden <form> element) and compare that to the CSRF cookie.
+3ff57ef 2010-03-26 Moved the session_start stuff from the (now deleted) session.php file to the util.php file in a new startPHPSession() function.
+e53a375 2010-03-25 Needed to add another subdirectory to the search list since I moved some <name>.php scripts to <name>/index.php.
+41da833 2010-03-24 We are no longer using a local Discovery Service (in Tomcat), so remove all functionality specific to the Tomcat stuff.
+b3c3cd5 2010-03-24 Moved the secure session creation out of util.php and into session.php.
+b3baa32 2010-03-24 Moved the functionality of getInCommonIdPs out of the shib.php file and into a new incommon.php class.
+3194129 2010-03-24 Added some new text to the footer section and added a new method to print out the list of available IdPs for the user to choose.
+e2c5ad2 2010-03-24 Added markup for the footer at the bottom of each page.  Still needs tweaking since vertical alignment and text color is off.
+84a5cc7 2010-03-24 Removed getInCommonIdPs from shib.php and created a new class for reading IdP information (entityID/OrganizationDisplayName) from the InCommon metadata file.
+774aa57 2010-03-24 Moved PHP session creation out of util.php and into its own file.
+31475fe 2010-03-24 Added a sample whitelist.xml file for testing purposes.
+49d193f 2010-03-03 The "exists()" method checks for empty strings, so no need to do it twice.
+7986e76 2010-03-03 Add some functions to get $_SERVER, $_POST, and $_COOKIE variables.
+bc2d627 2010-03-03 Rather than return a boolean from getShibInfo and set the $shibarray as a side effect, return the shib attribute array itself.
+93fc4e3 2010-03-03 Utilize a function from the util.php file.
+7a2afbe 2010-03-03 Changed from Strict to Transitional and fixed the text encoding.
+a33eb9b 2010-03-03 Added more CSS for various new entities on the php pages.  Probably need to go back and consolidate some of them.
+b991f36 2010-03-02 Create a new page 'requestidp.php' which allows a user to request any IdP to be added to our Discovery Service.
+e89b6c3 2010-03-02 Added a function to get the value of a $_POST variable.
+1544894 2010-03-02 When setting the cookie, ALWAYS set it.  Also, added method to get the cookie previously set.
+9188bb7 2010-03-02 We decided to go ahead with the simple CILogon logo that Terry designed, so start using it in the CSS file. Also add some other images needed for the web pages.
+ab0fae1 2010-02-25 Added new function to get a list of all InCommon IdPs.  This can be utilized to populate a dropdown list of (non-whitelisted) IdPs from which a user can select when requesting the school be added to our WAYF's whitelist.
+2625606 2010-02-17 Initial creation of 'service' module and initial check in of PHP code

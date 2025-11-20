@@ -305,10 +305,11 @@ class Skin
      * readDefaultSkin
      *
      * If we don't read a skin from the filesystem or the database, then
-     * read in the default "/skin/config.xml" file.
+     * read in the default "/skin/config.xml" file. Also check for
+     * optional "/skin/skin.css" file.
      *
-     * @return bool True if the default config.xml file was read in.
-     *         False otherwise.
+     * @return bool True if either the default config.xml file or the
+     *         default skin.css file was read in. False otherwise.
      */
     protected function readDefaultSkin()
     {
@@ -318,10 +319,19 @@ class Skin
         $this->css = '';
         Util::unsetSessionVar('cilogon_skin');
 
+        // Read in the default config XML
         $skinconf = Util::getServerVar('DOCUMENT_ROOT') . '/skin/config.xml';
         if (is_readable($skinconf)) {
             if (($xml = @simplexml_load_file($skinconf)) !== false) {
                 $this->configxml = $xml;
+                $readin = true;
+            }
+        }
+        // CIL-2361 Optional 'skin.css' for default skin
+        $skincss = Util::getServerVar('DOCUMENT_ROOT') . '/skin/skin.css';
+        if (is_readable($skincss)) {
+            if (($css = file_get_contents($skincss)) !== false) {
+                $this->css = $css;
                 $readin = true;
             }
         }

@@ -700,8 +700,15 @@ class DBService
                 '&user_uid=' . urlencode($uid) .
                 '&auth_time=' . urlencode($authntime) .
                 '&loa=' . urlencode($loa) .
-                ((strlen($myproxyinfo) > 0) ?
-                    ('&cilogon_info=' . urlencode($myproxyinfo)) : '')
+                (
+                    (
+                        (strlen($myproxyinfo) > 0) &&
+                        (!defined('OMIT_CILOGON_INFO') ||
+                        OMIT_CILOGON_INFO !== true)
+                    )
+                    ?  '&cilogon_info=' . urlencode($myproxyinfo)
+                    : ''
+                )
             );
         }
 

@@ -731,6 +731,30 @@ class Util
     }
 
     /**
+     * changeLanguage
+     *
+     * This function is called by the main index.html page when a new
+     * language is chosen by the user. It simply sets a session variable and
+     * logs the language update.
+     *
+     * @param string $lang The new language to be used for the GUI.
+     */
+    public static function changeLanguage($lang)
+    {
+        $oldlang = Util::getSessionVar('lang');
+        if ($oldlang != $lang) {
+            Util::setSessionVar('lang', $lang);
+            $log = new Loggit();
+            $log->info(
+                "Language set to $lang." . ((strlen($oldlang) > 0) ?
+                    " Previous language was $oldlang." : ''),
+                false,
+                false
+            );
+        }
+    }
+
+    /**
      * getScriptDir
      *
      * This function returns the directory (or full url) of the script

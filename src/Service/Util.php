@@ -936,7 +936,6 @@ CILogon Service - ' . $summary . '
 
 Session Variables
 -----------------
-Timestamp     = ' . date(DATE_ATOM) . '
 Server Host   = ' . static::getHN() . '
 Remote Address= ' . $remoteaddr . '
 ' . (($remotehost !== false) ? "Remote Host   = $remotehost" : '') . '
@@ -948,7 +947,127 @@ Remote Address= ' . $remoteaddr . '
             }
         }
 
-        mail($mailto, $mailsubj, $mailmsg, $mailfrom);
+        if (!static::checkThrottleEmail($mailmsg)) {
+            // Add the timestamp at the end so as not to affect the hash
+            $mailmsg .= '
+Timestamp     = ' . date(DATE_ATOM) . '
+';
+            mail($mailto, $mailsubj, $mailmsg, $mailfrom);
+        }
+    }
+
+    /**
+     * checkThrottleEmail
+     *
+     * CIL-2040 - This function checks if an error email should be
+     * "throttled". It first calculates a hash value for the contents of the
+     * message. Then it checks DynamoDB for the presence of that hash value in
+     * the table. If found, it checks the expiration (duration) to see if the
+     * message should be sent or not. If the message should be throttled
+     * (i.e., not sent), the return value is true. If the message should NOT
+     * be throttled (i.e., the message is okay to be sent), the return value
+     * is false.
+     *
+     * @param string $message The email message to be sent (or not)
+     * @return bool True if the message should be throttled (i.e., not sent),
+     *              false otherwise.
+     */
+    public static function checkThrottleEmail($message)
+    {
+        $throttleemail = false; // Assume message should NOT be throttled
+
+        // First, check if the appropriate constants have been defined.
+        // Use the same DynamoDB table as phpsessions.
+        if (
+            (defined('ERROR_EMAIL_THROTTLE_DURATION')) &&
+            (ERROR_EMAIL_THROTTLE_DURATION > 0) &&
+            (defined('DYNAMODB_PHPSESSIONS_ACCESSKEY')) &&
+            (strlen(DYNAMODB_PHPSESSIONS_ACCESSKEY) > 0)
+        ) {
+            // Generate a hash of the email message, plus a prefix
+            $mailhashprefix = 'THROTTLE_';
+            if (defined('ERROR_EMAIL_THROTTLE_HASH_PREFIX')) {
+                $mailhashprefix = ERROR_EMAIL_THROTTLE_HASH_PREFIX;
+            }
+            $mailhash = $mailhashprefix . hash('xxh128', $message);
+            $now = date('U');
+            $oldexpires = 0;
+            $newexpires = $now + ERROR_EMAIL_THROTTLE_DURATION;
+
+            try {
+                // Create a DynamoDBClient for all operations
+                $dynamoDb = new \Aws\DynamoDb\DynamoDbClient([
+                    'region' => DYNAMODB_REGION,
+                    'credentials' => [
+                        'key' => DYNAMODB_PHPSESSIONS_ACCESSKEY,
+                        'secret' => DYNAMODB_PHPSESSIONS_SECRETACCESSKEY,
+                    ],
+                ]);
+
+                // Query the DynamoDB table for an existing entry for the
+                // hash. If found, get the previous expires time.
+                $result = $dynamoDb->getItem([
+                    'Key' => [
+                        'id' => [
+                            'S' => $mailhash,
+                         ],
+                    ],
+                    'ConsistentRead' => true,
+                    'TableName' => DYNAMODB_PHPSESSIONS_TABLE
+                ]);
+                if ($result->get('Item')) { // Found it!
+                    $oldexpires = $result['Item']['expires']['N'];
+                }
+
+                // If the current time is less than the old expires time, then
+                // we should throttle the email (i.e., don't send the email
+                // since we already sent one and we are waiting for the
+                // throttle to expire.)
+                if ($now < $oldexpires) {
+                    $throttleemail = true;
+                }
+
+                // Add a new entry or update an existing entry for the mail
+                // hash for the next time we need to check. This code is a bit
+                // tricky due to ERROR_EMAIL_THROTTLE_ABSOLUTE. If this
+                // constant is not set or is 'false', then we always upsert
+                // the new exipration time for the mail hash. However, if the
+                // constant is set to 'true', then we upsert the new
+                // expiration only if there is no existing entry (i.e.,
+                // $oldexpires is 0) or if the existing entry has expired.
+                if (
+                    (!defined('ERROR_EMAIL_THROTTLE_ABSOLUTE')) ||
+                    (ERROR_EMAIL_THROTTLE_ABSOLUTE == false) ||
+                    ($oldexpires == 0) ||
+                    ($now >= $oldexpires)
+                ) {
+                    $result = $dynamoDb->updateItem([
+                        'Key' => [
+                            'id' => [
+                                'S' => $mailhash,
+                             ],
+                        ],
+                        'ExpressionAttributeNames' => [
+                            '#D' => 'data',
+                            '#E' => 'expires',
+                        ],
+                        'ExpressionAttributeValues' => [
+                            ':d' => [
+                                'S' => '1',
+                            ],
+                            ':e' => [
+                                'N' => (string)$newexpires,
+                            ],
+                        ],
+                        'UpdateExpression' => 'SET #D = :d, #E = :e',
+                        'TableName' => DYNAMODB_PHPSESSIONS_TABLE,
+                    ]);
+                }
+            } catch (Exception $e) {
+            }
+        }
+
+        return $throttleemail;
     }
 
     /**

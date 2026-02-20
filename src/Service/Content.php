@@ -415,13 +415,23 @@ class Content
             fn ($m) => array_key_exists($m, $idps)
         ));
 
+        // CIL-2378 Allow for no default IdP, i.e., a "blank"
+        // entry at the top of the list of IdPs.
+        $disableinitialidp = (string)$skin->getConfigOption('disableinitialidp');
+        $disableinitialidptext = (string)$skin->getConfigOption('disableinitialidptext');
+        if (strlen($disableinitialidptext) == 0) {
+            $disableinitialidptext = 'Select an IdP';
+        }
+
         // Push the "default" IdP onto the front, making sure it
         // doesn't already exist in the list.
-        $recentidps = array_values(array_filter(
-            $recentidps,
-            fn ($m) => $m != $providerId
-        ));
-        array_unshift($recentidps, $providerId);
+        if ($disableinitialidp != '1') {
+            $recentidps = array_values(array_filter(
+                $recentidps,
+                fn ($m) => $m != $providerId
+            ));
+            array_unshift($recentidps, $providerId);
+        }
 
         // CIL-1632 Remove "hidden" IdPs from the recently used IdPs
         $hiddenidps = $skin->getHiddenIdPs();
@@ -513,10 +523,24 @@ class Content
                 autofocus="autofocus"
                 class="selectpicker mw-100"
                 data-size="20" data-width="fit"
+                data-none-selected-text="', $disableinitialidptext, '"
                 data-live-search="true"
                 data-live-search-placeholder="Type to search"
                 data-live-search-normalize="true">
                 ';
+
+        // CIL-2378 If <disableinitialidp> is specified in the skin
+        // and there are no recent IdPs (e.g., first time visitor),
+        // then show a "blank" entry at the top of the list. This
+        // entry is not actually part of the list (hidden) and
+        // can't be selected (disabled), but since it's
+        // "selected" it shows up.
+        if (($disableinitialidp) && (count($recentidps) == 0)) {
+            echo '
+                <option hidden disabled selected value>',
+                $disableinitialidptext, '</option>
+                ';
+        }
 
         // CIL-15151 Show recent IdPs at the top of the list
         $idpcount = 0;

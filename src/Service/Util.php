@@ -2260,8 +2260,19 @@ Timestamp     = ' . date(DATE_ATOM) . '
             // Check skin for initial recent IdP list
             $skin = static::getSkin();
             $skinrecentidps = $skin->getConfigOption('initialrecentidps');
-            if (!is_null($skinrecentidps)) {
+            $disableinitialidp = (string)$skin->getConfigOption('disableinitialidp');
+            if ($disableinitialidp == '1') {
+                // CIL-2378 If <disableinitialidp> is specified, then also
+                // disable initial recent IdPs.
+                $idps = '';
+            } elseif (!is_null($skinrecentidps)) {
                 $idps = (string)$skinrecentidps;
+                // CIL-2378 If the <initialrecentidps> config value contains
+                // the magic word "NONE", then there should be no initial
+                // recent IdPs for new visitors.
+                if (preg_match('/NONE/', $idps)) {
+                    $idps = '';
+                }
             } else { // Default to ORCID, Google, Microsoft, and GitHub
                 $idps = 'http://orcid.org/oauth/authorize,' .
                     'http://google.com/accounts/o8/id,' .

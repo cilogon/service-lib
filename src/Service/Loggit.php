@@ -115,8 +115,14 @@ class Loggit
         if ($sess) {
             if (session_id() != '') {
                 foreach ($_SESSION as $key => $value) {
-                    $logarray[$key] =
-                        (is_array($value) ? 'Array' : $value);
+                    $outvalue = $value;
+                    if (is_array($value)) {
+                        $outvalue = 'Array';
+                    // CIL-2402 Decode any JSON objects/strings
+                    } elseif (json_validate($value)) {
+                        $outvalue = json_decode($value, true);
+                    }
+                    $logarray[$key] = $outvalue;
                 }
             }
         }

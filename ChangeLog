@@ -1,3 +1,11 @@
+532f478 2026-03-09 CIL-2402 Decode JSON strings before logging
+38511d6 2026-02-20 CIL-2378 Skin options for no default IdP for new visitors
+685724c 2026-02-18 CIL-2040 Add options to throttle error emails
+1dc436c 2026-02-12 CIL-2387 Log when the language is changed
+c057ab8 2025-12-12 CIL-2274 Add OMIT_CILOGON_INFO to omit sending cilogon_info to dbService?action=setTransactionState
+700a69f 2025-11-20 Update Changelog
+01b26e3 2025-11-20 CIL-2361 Add optional 'skin.css' for default 'skin'
+db71189 2025-11-13 Update Changelog
 c74aa3b 2025-11-13 Update README with info on i18n support
 3e9d97f 2025-11-13 Minor text fixes
 defc790 2025-11-12 Remove extra spaces

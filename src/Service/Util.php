@@ -942,16 +942,21 @@ Remote Address= ' . $remoteaddr . '
 ';
 
         foreach ($sessionvars as $svar => $sname) {
-            if (strlen($val = static::getSessionVar($svar)) > 0) {
+            // Skip authntime since it changes for each logon attempt
+            if ($svar == 'authntime') {
+                continue;
+            } elseif (strlen($val = static::getSessionVar($svar)) > 0) {
                 $mailmsg .= sprintf("%-14s= %s\n", $sname, $val);
             }
         }
 
         if (!static::checkThrottleEmail($mailmsg)) {
+            // Add the authntime if it exists
+            if (strlen($val = static::getSessionVar('authntime')) > 0) {
+                $mailmsg .= sprintf("%-14s= %s\n", 'Authn Time', $val);
+            }
             // Add the timestamp at the end so as not to affect the hash
-            $mailmsg .= '
-Timestamp     = ' . date(DATE_ATOM) . '
-';
+            $mailmsg .= 'Timestamp     = ' . date(DATE_ATOM) . "\n";
             mail($mailto, $mailsubj, $mailmsg, $mailfrom);
         }
     }

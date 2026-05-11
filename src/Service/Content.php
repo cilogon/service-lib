@@ -1978,12 +1978,12 @@ class Content
             }
         }
 
-        // CIL-1023 If OIDC prompt=consent parameter is given, then ignore
+        // CIL-1023 / CIL-2423 If OIDC prompt parameter is given as one of
+        // "login", "consent", or "select_account", then ignore
         // all methods for bypassing the "Select an IdP" page so that the
         // "consent to release attributes" section is always displayed.
         if (isset($clientparams['prompt'])) {
-            $promptarr = explode(' ', $clientparams['prompt']);
-            if (in_array('consent', $promptarr)) {
+            if (in_array($clientparams['prompt'], ['login', 'consent', 'select_account'])) {
                 $providerId = '';
             }
         }

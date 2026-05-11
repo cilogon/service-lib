@@ -71,6 +71,12 @@ class OAuth2Provider
                 $extraparams = array('defaultEndPointVersion' => '2.0');
             }
 
+            // CIL-2423 - Pass OIDC 'prompt' parameter if present
+            $clientparams = json_decode(Util::getSessionVar('clientparams'), true);
+            if (isset($clientparams['prompt'])) {
+                $this->authzUrlOpts['prompt'] = $clientparams['prompt'];
+            }
+
             $this->provider = new $classname(array_merge(array(
                 'clientId'     => $client_id,
                 'clientSecret' => $client_secret,

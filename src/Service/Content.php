@@ -1990,6 +1990,12 @@ class Content
                 (in_array('select_account', $promptarr))
             ) {
                 $providerId = '';
+                // If prompt=login, unset the PHP session var user_uid to
+                // invalildate the current session and force a redirect to
+                // the user's IdP in order to log in again.
+                if (in_array('login', $promptarr)) {
+                    Util::unsetSessionVar('user_uid');
+                }
             }
         }
 

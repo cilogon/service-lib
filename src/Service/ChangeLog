@@ -1,3 +1,8 @@
+59d4114 2026-06-04 CIL-2423 Bugfix for 'prompt=login'
+6c5bb13 2026-05-20 Update ChangeLog
+e41f9b8 2026-05-11 CIL-2423 'prompt' parameter is space separated list
+b7b4fee 2026-05-11 CIL-2423 Pass OIDC 'prompt' parameter to social IdPs
+575862b 2026-03-10 Update ChangeLog
 50c1447 2026-03-10 CIL-2040 Bugfix - Don't add authntime to message when calculating hash
 8fc6cc3 2026-03-10 Update ChangeLog
 532f478 2026-03-09 CIL-2402 Decode JSON strings before logging
